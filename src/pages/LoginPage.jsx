@@ -131,7 +131,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const redirectTo = location.state?.from?.pathname ?? '/dashboard';
-  const [isLogin, setIsLogin] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
 
   const [form, setForm] = useState({
     name: state.userName || '',
@@ -253,22 +253,22 @@ export function LoginPage() {
             <button
               type="button"
               onClick={() => {
-                setIsLogin(false);
-                setError('');
-              }}
-              className={`rounded-[1.2rem] px-4 py-3 text-sm font-black transition-all ${!isLogin ? 'bg-white text-slate-950' : 'text-slate-400 hover:text-white'}`}
-            >
-              Create Account
-            </button>
-            <button
-              type="button"
-              onClick={() => {
                 setIsLogin(true);
                 setError('');
               }}
               className={`rounded-[1.2rem] px-4 py-3 text-sm font-black transition-all ${isLogin ? 'bg-white text-slate-950' : 'text-slate-400 hover:text-white'}`}
             >
               Sign In
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsLogin(false);
+                setError('');
+              }}
+              className={`rounded-[1.2rem] px-4 py-3 text-sm font-black transition-all ${!isLogin ? 'bg-white text-slate-950' : 'text-slate-400 hover:text-white'}`}
+            >
+              Create Account
             </button>
           </div>
 
@@ -331,6 +331,20 @@ export function LoginPage() {
             >
               {isSubmitting ? 'Connecting...' : isSuccess ? "Finishing the Climb..." : progress === 100 ? (isLogin ? 'Continue Learning' : 'Ready to Launch!') : (isLogin ? 'Enter Email & Password' : 'Complete the Steps Above')}
             </button>
+
+            <p className="text-center text-sm font-semibold text-slate-400">
+              {isLogin ? "Don't have an account yet? " : 'Already have an account? '}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLogin(prev => !prev);
+                  setError('');
+                }}
+                className="text-blue-300 hover:text-emerald-300"
+              >
+                {isLogin ? 'Create your ascent profile' : 'Sign in instead'}
+              </button>
+            </p>
           </form>
         </motion.div>
       </div>
