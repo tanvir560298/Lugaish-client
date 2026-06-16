@@ -47,30 +47,30 @@ export function CoursePage() {
   if (!course) return <div className="text-center py-20 text-white">Course not found</div>;
 
   return (
-    <section className="space-y-12 pb-20">
-      <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 py-16 -mx-6 px-6">
-        <h1 className="text-5xl font-black text-white mb-4">{course.name}</h1>
-        <p className="text-xl text-slate-300 mb-8">{course.description}</p>
-        <div className="flex flex-wrap gap-6">
-          <div className="section-card p-6 bg-blue-500/10">
+    <section className="space-y-8 pb-12 sm:space-y-12 sm:pb-20">
+      <div className="-mx-4 bg-gradient-to-r from-blue-900/30 to-purple-900/30 px-4 py-10 sm:-mx-6 sm:px-6 sm:py-16">
+        <h1 className="mb-4 text-4xl font-black text-white sm:text-5xl">{course.name}</h1>
+        <p className="mb-6 text-base text-slate-300 sm:mb-8 sm:text-xl">{course.description}</p>
+        <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
+          <div className="section-card bg-blue-500/10 p-5 sm:p-6">
             <p className="text-sm text-slate-400">Total duration</p>
-            <p className="text-3xl font-bold text-white">{course.totalDays} days</p>
+            <p className="text-2xl font-bold text-white sm:text-3xl">{course.totalDays} days</p>
           </div>
-          <div className="section-card p-6 bg-emerald-500/10">
+          <div className="section-card bg-emerald-500/10 p-5 sm:p-6">
             <p className="text-sm text-slate-400">Difficulty</p>
-            <p className="text-3xl font-bold text-white">{course.difficulty}</p>
+            <p className="text-2xl font-bold text-white sm:text-3xl">{course.difficulty}</p>
           </div>
         </div>
       </div>
 
       <div className="app-shell">
-        <h2 className="text-3xl font-bold text-white mb-8">📚 Course Modules</h2>
+        <h2 className="mb-6 text-2xl font-bold text-white sm:mb-8 sm:text-3xl">📚 Course Modules</h2>
         <div className="space-y-4">
           {course.modules.map((module, idx) => (
-            <div key={idx} className="section-card p-8 hover:bg-white/5 transition">
-              <div className="flex items-start justify-between">
+            <div key={idx} className="section-card p-5 transition hover:bg-white/5 sm:p-8">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold text-white">{module.title}</h3>
+                  <h3 className="text-xl font-bold text-white sm:text-2xl">{module.title}</h3>
                   <p className="text-slate-400 mt-2">{module.lessons} lessons • {module.days}</p>
                 </div>
                 <span className="badge-pill border-blue-400/30 bg-blue-500/10 text-blue-200">

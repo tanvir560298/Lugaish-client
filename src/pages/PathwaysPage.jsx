@@ -84,9 +84,9 @@ export function PathwaysPage() {
       </div>
 
       {/* 2. THE FLOATING PROGRESS HUD */}
-      <header className="sticky top-0 z-[100] p-6 backdrop-blur-2xl border-b border-white/5 bg-black/40">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-6">
+      <header className="sticky top-0 z-[100] border-b border-white/5 bg-black/40 p-3 backdrop-blur-2xl sm:p-6">
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center justify-between gap-4 sm:gap-6">
             <div className="hidden md:block">
                <div className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1">Your Journey</div>
                <div className="flex gap-1">
@@ -99,15 +99,15 @@ export function PathwaysPage() {
                  ))}
                </div>
             </div>
-            <h2 className="text-2xl font-black italic tracking-tighter">Lugaish Odyssey</h2>
+            <h2 className="text-xl font-black italic tracking-tighter sm:text-2xl">Lugaish Odyssey</h2>
           </div>
 
-          <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
+          <div className="grid grid-cols-2 rounded-2xl border border-white/10 bg-white/5 p-1 sm:flex">
             {['english', 'arabic'].map(l => (
               <button 
                 key={l} 
                 onClick={() => setActiveTab(l)}
-                className={`px-6 py-2 rounded-xl text-xs font-black transition-all ${activeTab === l ? 'bg-white text-black shadow-xl' : 'text-white/40'}`}
+                className={`rounded-xl px-4 py-2 text-xs font-black transition-all sm:px-6 ${activeTab === l ? 'bg-white text-black shadow-xl' : 'text-white/40'}`}
               >
                 {l.toUpperCase()}
               </button>
@@ -116,21 +116,21 @@ export function PathwaysPage() {
         </div>
       </header>
 
-      <main className="relative max-w-5xl mx-auto px-6 py-40">
+      <main className="relative mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-28 lg:py-40">
         
         {/* THE FLOATING CHARACTER */}
-        <div className="fixed left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 pointer-events-none z-50">
+        <div className="pointer-events-none fixed left-1/2 top-1/2 z-50 hidden -translate-x-1/2 -translate-y-1/2 md:block">
           <EvolutionCharacter progress={smoothProgress} />
         </div>
 
         {/* THE CENTRAL GLOWING FILAMENT */}
-        <div className="absolute left-1/2 -translate-x-1/2 top-40 bottom-40 w-[1px] bg-white/10" />
+        <div className="absolute bottom-20 left-4 top-16 w-[1px] bg-white/10 sm:left-1/2 sm:top-28 sm:bottom-28 sm:-translate-x-1/2 lg:top-40 lg:bottom-40" />
         <motion.div 
           style={{ scaleY: smoothProgress, originY: 0 }}
-          className="absolute left-1/2 -translate-x-1/2 top-40 bottom-40 w-[2px] bg-gradient-to-b from-cyan-400 via-blue-500 to-amber-500 shadow-[0_0_20px_#fff] z-10"
+          className="absolute bottom-20 left-4 top-16 z-10 w-[2px] bg-gradient-to-b from-cyan-400 via-blue-500 to-amber-500 shadow-[0_0_20px_#fff] sm:left-1/2 sm:top-28 sm:bottom-28 sm:-translate-x-1/2 lg:top-40 lg:bottom-40"
         />
 
-        <div className="space-y-32 relative z-20">
+        <div className="relative z-20 space-y-14 sm:space-y-24 lg:space-y-32">
           {pathData.map((day, idx) => {
              const completed = state.completedLessons?.includes(day.id);
              const isNext = !completed && (idx === 0 || state.completedLessons?.includes(pathData[idx-1]?.id));
@@ -164,17 +164,17 @@ export function PathwaysPage() {
         </div>
 
         {/* THE FINAL ALTAR */}
-        <div className="min-h-screen flex flex-col items-center justify-center text-center mt-60 relative">
+        <div className="relative mt-24 flex min-h-[70svh] flex-col items-center justify-center text-center sm:mt-40 lg:mt-60 lg:min-h-screen">
           <motion.div 
              initial={{ opacity: 0, scale: 0.5 }}
              whileInView={{ opacity: 1, scale: 1 }}
              onViewportEnter={() => confetti({ particleCount: 200, spread: 80, origin: { y: 0.8 } })}
           >
-            <div className="h-56 w-56 bg-gradient-to-t from-amber-500 to-orange-400 rounded-[4rem] flex items-center justify-center border-8 border-white shadow-[0_0_100px_rgba(245,158,11,0.5)]">
-              <Crown size={100} className="text-white" />
+            <div className="flex h-32 w-32 items-center justify-center rounded-[2rem] border-4 border-white bg-gradient-to-t from-amber-500 to-orange-400 shadow-[0_0_70px_rgba(245,158,11,0.45)] sm:h-44 sm:w-44 sm:rounded-[3rem] sm:border-8 lg:h-56 lg:w-56 lg:rounded-[4rem]">
+              <Crown size={72} className="text-white sm:h-24 sm:w-24 lg:h-[100px] lg:w-[100px]" />
             </div>
           </motion.div>
-          <h2 className="text-8xl font-black italic tracking-tighter mt-12 leading-none uppercase">Apex <br/> Master.</h2>
+          <h2 className="mt-8 text-5xl font-black uppercase italic leading-none tracking-tighter sm:mt-12 sm:text-7xl lg:text-8xl">Apex <br/> Master.</h2>
         </div>
       </main>
     </motion.div>
@@ -188,19 +188,19 @@ function WeeklyBreakthrough({ day, text, isPassed }) {
     <motion.div 
       initial={{ opacity: 0, scale: 0.9 }}
       whileInView={{ opacity: 1, scale: 1 }}
-      className="w-full py-20 flex justify-center"
+      className="flex w-full justify-center py-8 sm:py-14 lg:py-20"
     >
-      <div className={`relative max-w-2xl w-full p-1 border-2 rounded-[3rem] transition-all duration-700 ${isPassed ? 'border-white/20 bg-white/5' : 'border-white/5 bg-transparent opacity-20'}`}>
-         <div className="p-10 text-center space-y-4">
-           <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="h-px w-10 bg-white/20" />
-              <span className="text-xs font-black uppercase tracking-[0.4em] text-amber-400">Week {day/7} Breakthrough</span>
-              <div className="h-px w-10 bg-white/20" />
+      <div className={`relative w-full max-w-2xl rounded-[2rem] border-2 p-1 transition-all duration-700 sm:rounded-[3rem] ${isPassed ? 'border-white/20 bg-white/5' : 'border-white/5 bg-transparent opacity-20'}`}>
+         <div className="space-y-4 p-5 text-center sm:p-10">
+           <div className="mb-4 flex items-center justify-center gap-2 sm:gap-3">
+              <div className="h-px w-6 bg-white/20 sm:w-10" />
+              <span className="text-[10px] font-black uppercase tracking-[0.18em] text-amber-400 sm:text-xs sm:tracking-[0.4em]">Week {day/7} Breakthrough</span>
+              <div className="h-px w-6 bg-white/20 sm:w-10" />
            </div>
-           <h3 className="text-2xl font-black italic tracking-tight leading-tight">
+           <h3 className="text-lg font-black italic leading-tight tracking-tight sm:text-2xl">
              "{text}"
            </h3>
-           <div className="pt-4 flex justify-center gap-6">
+           <div className="flex flex-wrap justify-center gap-3 pt-4 sm:gap-6">
               <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-white/40"><Shield size={14}/> Protection</div>
               <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-white/40"><Rocket size={14}/> Velocity</div>
               <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-white/40"><Lightbulb size={14}/> Clarity</div>
@@ -215,20 +215,21 @@ function WeeklyBreakthrough({ day, text, isPassed }) {
 
 function StoryNode({ day, index, completed, isNext, onAction }) {
   const isLeft = index % 2 === 0;
+  const alignment = isLeft ? 'justify-start' : 'justify-start sm:justify-end';
 
   return (
-    <div className={`flex w-full ${isLeft ? 'justify-start' : 'justify-end'}`}>
+    <div className={`flex w-full ${alignment}`}>
       <motion.div 
         initial={{ opacity: 0, x: isLeft ? -40 : 40 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ margin: "-50px" }}
-        className="w-full max-w-[300px]"
+        className="w-full max-w-[300px] pl-8 sm:pl-0"
       >
         <div 
           onClick={onAction}
-          className={`relative p-8 rounded-[2.5rem] border-2 transition-all duration-500 cursor-pointer ${
+          className={`relative cursor-pointer rounded-[2rem] border-2 p-5 transition-all duration-500 sm:rounded-[2.5rem] sm:p-8 ${
             isNext 
-              ? 'bg-white text-slate-900 border-white scale-110 shadow-[0_0_50px_rgba(255,255,255,0.3)] z-20' 
+              ? 'bg-white text-slate-900 border-white sm:scale-110 shadow-[0_0_50px_rgba(255,255,255,0.3)] z-20' 
               : completed 
                 ? 'bg-white/5 border-emerald-500/20 text-white/60' 
                 : 'bg-white/5 border-white/5 text-white/5 blur-[3px] hover:blur-0'

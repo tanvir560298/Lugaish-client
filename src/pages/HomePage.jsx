@@ -40,48 +40,48 @@ export function HomePage() {
     <div className="bg-slate-950 text-slate-50 selection:bg-blue-500/30 overflow-x-hidden">
       
       {/* --- HERO: THE GRAND ENTRANCE --- */}
-      <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
+      <section className="relative flex min-h-[calc(100svh-72px)] items-center overflow-hidden py-14 sm:py-20 lg:min-h-screen lg:py-0 lg:pt-20">
         <Suspense fallback={<div className="absolute inset-0 bg-slate-950" />}>
           <HeroScene />
         </Suspense>
 
-        <div className="app-shell relative z-10 grid lg:grid-cols-2 gap-16 items-center">
+        <div className="app-shell relative z-10 grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <motion.div 
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="space-y-8"
+            className="space-y-6 sm:space-y-8"
           >
             {/* Mascot Welcome */}
             <motion.div 
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.5, type: 'spring' }}
-              className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md"
+              className="inline-flex max-w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 backdrop-blur-md sm:px-4"
             >
               <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-emerald-400 rounded-lg flex items-center justify-center text-white shadow-lg">
                 <Sparkles size={16} />
               </div>
-              <span className="text-sm font-bold text-blue-100">Welcome to the future of learning.</span>
+              <span className="text-xs font-bold text-blue-100 sm:text-sm">Welcome to the future of learning.</span>
             </motion.div>
 
-            <h1 className="text-7xl md:text-9xl font-black tracking-tighter leading-[0.85]">
+            <h1 className="text-5xl font-black leading-[0.9] tracking-tighter sm:text-6xl md:text-8xl lg:text-9xl">
               Climb to <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-emerald-400 to-blue-500 italic">
                 Fluency.
               </span>
             </h1>
 
-            <p className="max-w-lg text-xl text-slate-400 leading-relaxed font-medium">
+            <p className="max-w-lg text-base font-medium leading-relaxed text-slate-400 sm:text-lg lg:text-xl">
               Join <span className="text-white">1,200+ early adopters</span> mastering English and Arabic through daily 10-minute "ascents." No fluff, just progress.
             </p>
 
-            <div className="flex flex-wrap gap-5 pt-4">
+            <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:flex-wrap sm:gap-5 sm:pt-4">
               <motion.button
                 whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(59,130,246,0.4)" }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleStart('english')}
-                className="group px-10 py-5 bg-blue-600 rounded-2xl font-black text-xl text-white flex items-center gap-3 transition-all"
+                className="group flex w-full items-center justify-center gap-3 rounded-2xl bg-blue-600 px-6 py-4 text-base font-black text-white transition-all sm:w-auto sm:px-10 sm:py-5 sm:text-xl"
               >
                 Start English <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform" />
               </motion.button>
@@ -90,13 +90,13 @@ export function HomePage() {
                 whileHover={{ scale: 1.05, background: "rgba(255,255,255,0.1)" }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleStart('arabic')}
-                className="px-10 py-5 bg-slate-900 border border-slate-800 rounded-2xl font-black text-xl text-white flex items-center gap-3 transition-all"
+                className="flex w-full items-center justify-center gap-3 rounded-2xl border border-slate-800 bg-slate-900 px-6 py-4 text-base font-black text-white transition-all sm:w-auto sm:px-10 sm:py-5 sm:text-xl"
               >
                 Start Arabic
               </motion.button>
             </div>
             
-            <div className="flex items-center gap-6 text-slate-500 pt-4">
+            <div className="flex flex-col gap-3 pt-2 text-slate-500 sm:flex-row sm:items-center sm:gap-6 sm:pt-4">
                <div className="flex items-center gap-2">
                   <CheckCircle2 size={18} className="text-emerald-500" />
                   <span className="text-xs font-bold uppercase tracking-widest">Free Premium Launch</span>
@@ -157,7 +157,7 @@ export function HomePage() {
         <motion.div 
           animate={{ y: [0, 10, 0] }}
           transition={{ repeat: Infinity, duration: 2 }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-slate-500 opacity-50 flex flex-col items-center gap-2"
+          className="absolute bottom-5 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-slate-500 opacity-50 sm:bottom-10"
         >
           <span className="text-[10px] font-black uppercase tracking-widest">Scroll to Explore</span>
           <ChevronDown size={20} />
@@ -165,9 +165,9 @@ export function HomePage() {
       </section>
 
       {/* --- THE ASCENT PHILOSOPHY --- */}
-      <section className="py-32 relative bg-slate-900/30 border-y border-white/5">
+      <section className="relative border-y border-white/5 bg-slate-900/30 py-16 sm:py-24 lg:py-32">
         <div className="app-shell">
-          <div className="grid lg:grid-cols-3 gap-12">
+          <div className="grid gap-5 sm:gap-8 lg:grid-cols-3 lg:gap-12">
             {[
               { icon: <Zap />, color: "blue", title: "Instant Impact", desc: "Start speaking from Day 1. Our lessons focus on high-frequency communication." },
               { icon: <Flame />, color: "orange", title: "Daily Momentum", desc: "Build a habit that lasts. 10 minutes is all you need to reach new heights." },
@@ -176,7 +176,7 @@ export function HomePage() {
               <motion.div 
                 key={i}
                 {...fadeInUp}
-                className="p-10 rounded-[2.5rem] bg-slate-950 border border-white/5 hover:border-blue-500/20 transition-all group"
+                className="rounded-[2rem] border border-white/5 bg-slate-950 p-6 transition-all hover:border-blue-500/20 sm:p-8 lg:p-10 group"
               >
                 <div className={`w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform text-${item.color}-500`}>
                   {item.icon}
@@ -190,14 +190,14 @@ export function HomePage() {
       </section>
 
       {/* --- PATHWAY SELECTION --- */}
-      <section className="py-32 overflow-hidden">
+      <section className="overflow-hidden py-16 sm:py-24 lg:py-32">
         <div className="app-shell">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-7xl font-black mb-6">Choose your <br/>Learning Destination.</h2>
-            <p className="text-slate-400 text-xl max-w-2xl mx-auto italic">"A different language is a different vision of life."</p>
+          <div className="mb-12 text-center sm:mb-16 lg:mb-20">
+            <h2 className="mb-4 text-4xl font-black leading-tight sm:text-5xl md:text-7xl">Choose your <br/>Learning Destination.</h2>
+            <p className="mx-auto max-w-2xl text-base italic text-slate-400 sm:text-xl">"A different language is a different vision of life."</p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-10">
+          <div className="grid gap-6 lg:grid-cols-2 lg:gap-10">
             <PathCard 
               keyName="english"
               flag="🇬🇧" 
@@ -221,25 +221,25 @@ export function HomePage() {
       </section>
 
       {/* --- THE "ESCAPE" PRICING TEASER --- */}
-      <section className="py-32 relative overflow-hidden bg-gradient-to-b from-transparent to-blue-900/10">
+      <section className="relative overflow-hidden bg-gradient-to-b from-transparent to-blue-900/10 py-16 sm:py-24 lg:py-32">
         <div className="app-shell relative z-10">
-           <div className="glass-card p-12 md:p-20 rounded-[4rem] border border-blue-500/20 text-center relative overflow-hidden">
+           <div className="glass-card relative overflow-hidden rounded-[2rem] border border-blue-500/20 p-6 text-center sm:rounded-[3rem] sm:p-12 md:p-20 lg:rounded-[4rem]">
               <div className="absolute top-0 left-0 w-full h-full bg-blue-500/5 pointer-events-none" />
               
               {/* Mascot Cameo */}
               <motion.div 
                 animate={{ y: [0, -10, 0] }}
                 transition={{ repeat: Infinity, duration: 3 }}
-                className="inline-block px-6 py-3 bg-white text-slate-950 rounded-2xl font-black text-sm mb-10 shadow-2xl"
+                className="mb-8 inline-block rounded-2xl bg-white px-4 py-3 text-xs font-black text-slate-950 shadow-2xl sm:mb-10 sm:px-6 sm:text-sm"
               >
                 🎉 PREMIUM IS FREE RIGHT NOW!
               </motion.div>
 
-              <h2 className="text-5xl md:text-8xl font-black tracking-tighter mb-8 leading-none">
+              <h2 className="mb-6 text-4xl font-black leading-none tracking-tighter sm:text-5xl md:text-8xl">
                 Become a <br/> Founding Member.
               </h2>
               
-              <p className="max-w-2xl mx-auto text-xl text-slate-300 mb-12">
+              <p className="mx-auto mb-8 max-w-2xl text-base text-slate-300 sm:mb-12 sm:text-xl">
                 Join the launch phase and get <span className="text-white font-bold underline underline-offset-8 decoration-emerald-500">full premium access for free</span>. 
                 Normally 299 BDT/mo — today, it's our gift to you.
               </p>
@@ -248,13 +248,13 @@ export function HomePage() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-12 py-6 bg-white text-slate-950 rounded-[2rem] font-black text-2xl shadow-[0_0_50px_rgba(255,255,255,0.3)] hover:bg-emerald-400 transition-colors"
+                  className="w-full rounded-[1.5rem] bg-white px-6 py-4 text-base font-black text-slate-950 shadow-[0_0_50px_rgba(255,255,255,0.3)] transition-colors hover:bg-emerald-400 sm:w-auto sm:rounded-[2rem] sm:px-12 sm:py-6 sm:text-2xl"
                 >
                   View Launch Offer
                 </motion.button>
               </Link>
 
-              <div className="mt-12 flex justify-center gap-8 text-slate-500 font-bold uppercase tracking-widest text-xs">
+              <div className="mt-8 flex flex-col justify-center gap-3 text-xs font-bold uppercase tracking-widest text-slate-500 sm:mt-12 sm:flex-row sm:gap-8">
                 <span>No Credit Card</span>
                 <span>•</span>
                 <span>Lifetime Founding Status</span>
@@ -266,13 +266,13 @@ export function HomePage() {
       </section>
 
       {/* --- FINAL CTA --- */}
-      <footer className="py-32 text-center">
+      <footer className="py-16 text-center sm:py-24 lg:py-32">
          <div className="app-shell">
-            <h2 className="text-4xl font-black text-slate-700 mb-8 uppercase tracking-widest">Ready to climb?</h2>
+            <h2 className="mb-6 text-2xl font-black uppercase tracking-widest text-slate-700 sm:mb-8 sm:text-4xl">Ready to climb?</h2>
             <div className="flex justify-center">
                <button 
                  onClick={() => navigate('/login')}
-                 className="flex items-center gap-3 text-2xl font-black text-white hover:text-blue-400 transition-colors"
+                 className="flex items-center gap-3 text-lg font-black text-white transition-colors hover:text-blue-400 sm:text-2xl"
                >
                  Create Your Profile <ArrowRight />
                </button>
@@ -290,18 +290,18 @@ function PathCard({ flag, title, desc, color, features, onStart }) {
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       whileHover={{ y: -10 }}
-      className={`relative p-12 rounded-[3.5rem] bg-slate-900/50 border border-white/5 overflow-hidden group`}
+      className={`group relative overflow-hidden rounded-[2rem] border border-white/5 bg-slate-900/50 p-6 sm:rounded-[3rem] sm:p-10 lg:rounded-[3.5rem] lg:p-12`}
     >
-      <div className={`absolute top-0 right-0 p-12 text-[12rem] font-black text-${color}-500/5 pointer-events-none group-hover:opacity-10 transition-opacity`}>
+      <div className={`pointer-events-none absolute right-0 top-0 p-8 text-[7rem] font-black text-${color}-500/5 transition-opacity group-hover:opacity-10 sm:p-12 sm:text-[12rem]`}>
         {flag}
       </div>
       
       <div className="relative z-10">
-        <div className="text-6xl mb-8">{flag}</div>
-        <h3 className="text-4xl font-black mb-4">{title}</h3>
-        <p className="text-slate-400 text-lg mb-8 max-w-xs">{desc}</p>
+        <div className="mb-6 text-5xl sm:mb-8 sm:text-6xl">{flag}</div>
+        <h3 className="mb-4 text-3xl font-black sm:text-4xl">{title}</h3>
+        <p className="mb-8 max-w-xs text-base text-slate-400 sm:text-lg">{desc}</p>
         
-        <ul className="space-y-4 mb-12">
+        <ul className="mb-8 space-y-4 sm:mb-12">
           {features.map((f, i) => (
             <li key={i} className="flex items-center gap-3 font-bold text-sm text-slate-300">
               <div className={`h-2 w-2 rounded-full bg-${color}-500`} />
@@ -312,7 +312,7 @@ function PathCard({ flag, title, desc, color, features, onStart }) {
 
         <button 
           onClick={onStart}
-          className={`w-full py-5 rounded-2xl bg-white text-slate-950 font-black text-lg group-hover:bg-${color}-500 group-hover:text-white transition-all`}
+          className={`w-full rounded-2xl bg-white py-4 text-base font-black text-slate-950 transition-all group-hover:bg-${color}-500 group-hover:text-white sm:py-5 sm:text-lg`}
         >
           Launch Pathway
         </button>

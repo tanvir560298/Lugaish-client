@@ -59,35 +59,35 @@ const EscapingMascot = () => {
 
 export function PricingPage() {
   return (
-    <div className="relative min-h-screen bg-slate-950 text-slate-50 overflow-hidden pb-32">
+    <div className="relative min-h-screen overflow-hidden bg-slate-950 pb-16 text-slate-50 sm:pb-24 lg:pb-32">
       
       {/* GLOW BACKGROUNDS */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/20 blur-[120px] rounded-full" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/10 blur-[120px] rounded-full" />
+      <div className="absolute left-1/4 top-0 h-64 w-64 rounded-full bg-blue-600/20 blur-[90px] sm:h-96 sm:w-96 sm:blur-[120px]" />
+      <div className="absolute bottom-0 right-1/4 h-64 w-64 rounded-full bg-purple-600/10 blur-[90px] sm:h-96 sm:w-96 sm:blur-[120px]" />
 
-      <div className="app-shell relative z-10 pt-20">
+      <div className="app-shell relative z-10 pt-10 sm:pt-16 lg:pt-20">
         
         {/* HEADER */}
-        <div className="text-center max-w-3xl mx-auto mb-24">
+        <div className="mx-auto mb-12 max-w-3xl text-center sm:mb-16 lg:mb-24">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold text-xs uppercase tracking-widest mb-6"
+            className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-emerald-400 sm:mb-6 sm:px-4 sm:text-xs"
           >
             <Sparkles size={14} />
             Limited Founding Member Launch
           </motion.div>
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 leading-none">
+          <h1 className="mb-5 text-4xl font-black leading-none tracking-tighter sm:text-5xl md:text-7xl">
             Unlock the <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400 uppercase italic">Entire Path</span>
           </h1>
-          <p className="text-slate-400 text-lg md:text-xl">
+          <p className="text-base text-slate-400 sm:text-lg md:text-xl">
             Lugaish is currently in early-access. To celebrate our launch, 
             we are giving away <span className="text-white font-bold underline decoration-blue-500">Lifetime Premium Access</span> to our first users.
           </p>
         </div>
 
         {/* PRICING GRID */}
-        <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto relative">
+        <div className="relative mx-auto grid max-w-6xl gap-6 lg:grid-cols-2 lg:gap-8">
           
           {/* --- CARD 1: THE FOUNDING ACCESS (FREE) --- */}
           <motion.div
@@ -99,29 +99,29 @@ export function PricingPage() {
             {/* Pulsing Border Effect */}
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-emerald-500 rounded-[3rem] blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200" />
             
-            <div className="relative h-full bg-slate-900 rounded-[2.8rem] border border-white/10 p-10 md:p-14 overflow-hidden">
-              <div className="flex justify-between items-start mb-12">
+            <div className="relative h-full overflow-hidden rounded-[2rem] border border-white/10 bg-slate-900 p-6 sm:rounded-[2.8rem] sm:p-10 md:p-14">
+              <div className="mb-8 flex items-start justify-between gap-4 sm:mb-12">
                 <div>
-                  <h2 className="text-4xl font-black tracking-tight text-white mb-2">Founding <br/>Member</h2>
+                  <h2 className="mb-2 text-3xl font-black tracking-tight text-white sm:text-4xl">Founding <br/>Member</h2>
                   <p className="text-emerald-400 font-bold flex items-center gap-2">
                     <TrendingDown size={18} />
                     100% OFF — Limited Time
                   </p>
                 </div>
-                <div className="h-16 w-16 bg-blue-500/20 rounded-3xl flex items-center justify-center text-blue-400">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-500/20 text-blue-400 sm:h-16 sm:w-16 sm:rounded-3xl">
                   <Star size={32} fill="currentColor" />
                 </div>
               </div>
 
               <div className="mb-10">
                 <div className="flex items-baseline gap-3">
-                  <span className="text-7xl font-black tracking-tighter italic">FREE</span>
-                  <span className="text-slate-500 line-through text-2xl font-bold">299 BDT</span>
+                  <span className="text-5xl font-black italic tracking-tighter sm:text-7xl">FREE</span>
+                  <span className="text-lg font-bold text-slate-500 line-through sm:text-2xl">299 BDT</span>
                 </div>
                 <p className="text-slate-400 mt-2 font-medium">Full access to English & Arabic pathways.</p>
               </div>
 
-              <div className="space-y-4 mb-12">
+              <div className="mb-8 space-y-4 sm:mb-12">
                 {[
                   "Complete English Language Path",
                   "Complete Arabic Language Path",
@@ -143,7 +143,7 @@ export function PricingPage() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="w-full py-6 bg-gradient-to-r from-blue-600 to-emerald-500 rounded-2xl text-white font-black text-xl shadow-2xl shadow-blue-500/20 hover:shadow-emerald-500/40 transition-all flex items-center justify-center gap-3"
+                  className="flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-blue-600 to-emerald-500 py-4 text-base font-black text-white shadow-2xl shadow-blue-500/20 transition-all hover:shadow-emerald-500/40 sm:py-6 sm:text-xl"
                 >
                   Get Started Free <ArrowRight size={22} />
                 </motion.button>
@@ -161,29 +161,29 @@ export function PricingPage() {
             {/* THE CHARACTER ESCAPING FROM THIS CARD */}
             <EscapingMascot />
 
-            <div className="h-full bg-slate-900/50 backdrop-blur-xl rounded-[2.8rem] border-2 border-purple-500/30 p-10 md:p-14 relative overflow-hidden group">
+            <div className="group relative h-full overflow-hidden rounded-[2rem] border-2 border-purple-500/30 bg-slate-900/50 p-6 backdrop-blur-xl sm:rounded-[2.8rem] sm:p-10 md:p-14">
               {/* Subtle Overlay to show it's "coming soon" but still pretty */}
               <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-transparent pointer-events-none" />
               
-              <div className="flex justify-between items-start mb-12">
+              <div className="mb-8 flex items-start justify-between gap-4 sm:mb-12">
                 <div>
-                  <h2 className="text-4xl font-black tracking-tight text-slate-300 mb-2 italic">Pro <br/>Plan</h2>
+                  <h2 className="mb-2 text-3xl font-black italic tracking-tight text-slate-300 sm:text-4xl">Pro <br/>Plan</h2>
                   <p className="text-purple-400 font-bold uppercase tracking-widest text-[10px]">Upcoming Price</p>
                 </div>
-                <div className="h-16 w-16 bg-purple-500/10 rounded-3xl flex items-center justify-center text-purple-400">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-purple-500/10 text-purple-400 sm:h-16 sm:w-16 sm:rounded-3xl">
                   <Zap size={32} />
                 </div>
               </div>
 
               <div className="mb-10">
                 <div className="flex items-baseline gap-3">
-                  <span className="text-7xl font-black tracking-tighter text-slate-500">299</span>
-                  <span className="text-slate-500 text-2xl font-bold italic">BDT/mo</span>
+                  <span className="text-5xl font-black tracking-tighter text-slate-500 sm:text-7xl">299</span>
+                  <span className="text-lg font-bold italic text-slate-500 sm:text-2xl">BDT/mo</span>
                 </div>
                 <p className="text-slate-500 mt-2 font-medium">Standard price for new students post-launch.</p>
               </div>
 
-              <div className="space-y-4 mb-12 opacity-50">
+              <div className="mb-8 space-y-4 opacity-50 sm:mb-12">
                 {[
                   "Standard Course Access",
                   "Daily Progress Tracking",
@@ -197,7 +197,7 @@ export function PricingPage() {
                 ))}
               </div>
 
-              <div className="w-full py-6 rounded-2xl bg-white/5 border border-white/10 text-slate-600 font-black text-xl flex items-center justify-center gap-3 cursor-not-allowed">
+              <div className="flex w-full cursor-not-allowed items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/5 py-4 text-base font-black text-slate-600 sm:py-6 sm:text-xl">
                 Become a Pro
               </div>
               
@@ -213,9 +213,9 @@ export function PricingPage() {
         <motion.div 
            initial={{ opacity: 0, y: 30 }}
            whileInView={{ opacity: 1, y: 0 }}
-           className="mt-20 p-8 rounded-[2rem] bg-white/5 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-8 max-w-4xl mx-auto"
+           className="mx-auto mt-12 flex max-w-4xl flex-col items-stretch justify-between gap-6 rounded-[2rem] border border-white/10 bg-white/5 p-5 sm:mt-20 sm:p-8 md:flex-row md:items-center md:gap-8"
         >
-          <div className="flex items-center gap-6">
+          <div className="flex items-start gap-4 sm:items-center sm:gap-6">
             <div className="h-14 w-14 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-500">
               <Clock size={28} className="animate-spin-slow" />
             </div>
@@ -225,7 +225,7 @@ export function PricingPage() {
             </div>
           </div>
           <Link to="/login">
-            <button className="px-8 py-4 bg-white text-slate-900 font-black rounded-xl hover:bg-emerald-400 transition-colors">
+            <button className="w-full rounded-xl bg-white px-8 py-4 font-black text-slate-900 transition-colors hover:bg-emerald-400 md:w-auto">
               Claim My Spot
             </button>
           </Link>

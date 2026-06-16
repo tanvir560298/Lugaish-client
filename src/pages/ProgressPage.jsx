@@ -8,36 +8,36 @@ export function ProgressPage() {
   const completionPercent = (state.completedLessons.length / 30) * 100;
 
   return (
-    <section className="space-y-12 pb-20">
-      <div className="bg-gradient-to-r from-emerald-900/30 to-blue-900/30 py-16 -mx-6 px-6">
-        <h1 className="text-5xl font-black text-white">Your Progress</h1>
+    <section className="space-y-8 pb-12 sm:space-y-12 sm:pb-20">
+      <div className="-mx-4 bg-gradient-to-r from-emerald-900/30 to-blue-900/30 px-4 py-10 sm:-mx-6 sm:px-6 sm:py-16">
+        <h1 className="text-4xl font-black text-white sm:text-5xl">Your Progress</h1>
       </div>
 
       <div className="app-shell space-y-8">
         {/* Overall Stats */}
-        <div className="grid md:grid-cols-4 gap-6">
-          <div className="section-card p-8 text-center">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+          <div className="section-card p-5 text-center sm:p-8">
             <p className="text-sm text-slate-400 mb-2">TOTAL XP</p>
-            <p className="text-4xl font-black text-white">{state.xp.toLocaleString()}</p>
+            <p className="text-3xl font-black text-white sm:text-4xl">{state.xp.toLocaleString()}</p>
           </div>
-          <div className="section-card p-8 text-center">
+          <div className="section-card p-5 text-center sm:p-8">
             <p className="text-sm text-slate-400 mb-2">CURRENT LEVEL</p>
-            <p className="text-4xl font-black text-blue-400">{level}</p>
+            <p className="text-3xl font-black text-blue-400 sm:text-4xl">{level}</p>
           </div>
-          <div className="section-card p-8 text-center">
+          <div className="section-card p-5 text-center sm:p-8">
             <p className="text-sm text-slate-400 mb-2">STREAK</p>
-            <p className="text-4xl font-black text-yellow-400">🔥 {state.streak}</p>
+            <p className="text-3xl font-black text-yellow-400 sm:text-4xl">🔥 {state.streak}</p>
           </div>
-          <div className="section-card p-8 text-center">
+          <div className="section-card p-5 text-center sm:p-8">
             <p className="text-sm text-slate-400 mb-2">LESSONS COMPLETED</p>
-            <p className="text-4xl font-black text-emerald-400">{state.completedLessons.length}</p>
+            <p className="text-3xl font-black text-emerald-400 sm:text-4xl">{state.completedLessons.length}</p>
           </div>
         </div>
 
         {/* Completion Bar */}
-        <div className="section-card p-8">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-white">Course Progress</h2>
+        <div className="section-card p-5 sm:p-8">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-bold text-white sm:text-2xl">Course Progress</h2>
             <p className="text-lg font-bold text-slate-300">{Math.round(completionPercent)}%</p>
           </div>
           <div className="w-full bg-slate-900 rounded-full h-3 overflow-hidden">
@@ -52,8 +52,8 @@ export function ProgressPage() {
         </div>
 
         {/* Badges */}
-        <div className="section-card p-8">
-          <h2 className="text-2xl font-bold text-white mb-6">🏆 Achievements</h2>
+        <div className="section-card p-5 sm:p-8">
+          <h2 className="mb-6 text-xl font-bold text-white sm:text-2xl">🏆 Achievements</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
               { name: '7-Day Streak', unlocked: state.streak >= 7 },
@@ -79,14 +79,14 @@ export function ProgressPage() {
         </div>
 
         {/* Daily Heatmap */}
-        <div className="section-card p-8">
-          <h2 className="text-2xl font-bold text-white mb-6">📅 Activity Heatmap</h2>
+        <div className="section-card p-5 sm:p-8">
+          <h2 className="mb-6 text-xl font-bold text-white sm:text-2xl">📅 Activity Heatmap</h2>
           <p className="text-slate-400 mb-6">Your learning consistency over the past 12 weeks</p>
-          <div className="grid grid-cols-7 gap-2">
+          <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
             {Array.from({ length: 84 }).map((_, idx) => (
               <div
                 key={idx}
-                className={`w-8 h-8 rounded-sm border border-white/10 ${
+                className={`aspect-square w-full rounded-sm border border-white/10 ${
                   idx % 3 === 0
                     ? 'bg-emerald-500/60'
                     : idx % 3 === 1

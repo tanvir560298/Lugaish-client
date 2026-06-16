@@ -23,7 +23,7 @@ export function LessonPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm uppercase tracking-[0.3em] text-slate-400">{pathway.title}</p>
-          <h1 className="text-4xl font-black text-white">{lesson.title}</h1>
+          <h1 className="text-3xl font-black text-white sm:text-4xl">{lesson.title}</h1>
           <p className="mt-3 text-slate-400">{lesson.description}</p>
         </div>
         <button
@@ -35,7 +35,7 @@ export function LessonPage() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
-        <div className="section-card p-8">
+        <div className="section-card p-5 sm:p-8">
           <div className="flex flex-wrap items-center gap-4 border-b border-white/10 pb-4">
             <div className="flex gap-3">
               <button className={`rounded-full px-4 py-2 text-sm font-semibold ${activeTab === 'vocab' ? 'bg-blue-500/20 text-white' : 'bg-white/5 text-slate-300'}`} onClick={() => setActiveTab('vocab')}>Vocabulary</button>
@@ -47,16 +47,16 @@ export function LessonPage() {
           {activeTab === 'vocab' ? (
             <div className="mt-8 space-y-6">
               <div className="relative mx-auto w-full max-w-2xl perspective-1200">
-                <div className={`relative min-h-[420px] transform-style preserve-3d transition-transform duration-700 ${flipped ? 'rotate-y-180' : ''}`} style={{ perspective: '1200px' }}>
-                  <div className="absolute inset-0 rounded-[2rem] border border-white/10 bg-slate-950/90 p-10 shadow-soft backface-hidden">
+                <div className={`relative min-h-[360px] transform-style preserve-3d transition-transform duration-700 sm:min-h-[420px] ${flipped ? 'rotate-y-180' : ''}`} style={{ perspective: '1200px' }}>
+                  <div className="absolute inset-0 rounded-[1.5rem] border border-white/10 bg-slate-950/90 p-6 shadow-soft backface-hidden sm:rounded-[2rem] sm:p-10">
                     <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.24em] text-slate-300">{currentCard?.type ?? ''}</span>
-                    <h2 className="mt-8 text-5xl font-black text-white">{currentCard?.word}</h2>
+                    <h2 className="mt-8 text-4xl font-black text-white sm:text-5xl">{currentCard?.word}</h2>
                     <p className="mt-8 text-slate-400">Tap the card to reveal the translation, context, and example.</p>
                   </div>
-                  <div className="absolute inset-0 rounded-[2rem] border border-white/10 bg-slate-950/95 p-10 shadow-soft rotate-y-180 backface-hidden">
+                  <div className="absolute inset-0 rounded-[1.5rem] border border-white/10 bg-slate-950/95 p-6 shadow-soft rotate-y-180 backface-hidden sm:rounded-[2rem] sm:p-10">
                     <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.24em] text-slate-300">{currentCard?.type ?? ''}</span>
-                    <h2 className="mt-8 text-5xl font-black text-green-400">{currentCard?.translation}</h2>
-                    <p className="mt-8 text-slate-300">{currentCard?.explanation}</p>
+                    <h2 className="mt-8 text-3xl font-black text-green-400 sm:text-5xl">{currentCard?.translation}</h2>
+                    <p className="mt-6 text-slate-300 sm:mt-8">{currentCard?.explanation}</p>
                     <p className="mt-6 rounded-3xl border border-green-500/20 bg-green-500/10 p-4 text-slate-100">"{currentCard?.example}"</p>
                   </div>
                 </div>
@@ -92,13 +92,13 @@ export function LessonPage() {
         </div>
 
         <aside className="space-y-6">
-          <div className="section-card p-8">
+          <div className="section-card p-5 sm:p-8">
             <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Current path</p>
             <h2 className="mt-4 text-2xl font-bold text-white">{pathway.title}</h2>
             <p className="mt-3 text-slate-400">{pathway.description}</p>
           </div>
 
-          <div className="section-card p-8">
+          <div className="section-card p-5 sm:p-8">
             <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Leaderboard teaser</p>
             <h3 className="mt-4 text-xl font-bold text-white">Stay competitive</h3>
             <p className="mt-3 text-slate-400">Review your position among other student leaders and earn XP to climb higher.</p>

@@ -30,7 +30,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-[100] border-b border-white/5 bg-[#020617]/80 backdrop-blur-2xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
         
         {/* --- 1. THE EVOLVING LOGO --- */}
         <Link to="/" className="relative group flex items-center gap-4">
@@ -88,7 +88,7 @@ export function Header() {
         </nav>
 
         {/* --- 3. ACTIONS & USER STATUS --- */}
-        <div className="flex items-center gap-4">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-4">
           
           {/* User Progress Badge */}
           <div className="hidden md:flex items-center gap-3 px-4 py-2 rounded-2xl bg-white/5 border border-white/5">
@@ -118,7 +118,7 @@ export function Header() {
             <Link to="/login">
               <motion.button
                 whileHover={{ scale: 1.05 }}
-                className="px-6 py-2.5 rounded-xl bg-white text-slate-950 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-400 transition-colors"
+                className="px-3 py-2.5 rounded-xl bg-white text-slate-950 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-400 transition-colors sm:px-6"
               >
                 Launch <Sparkles size={12} className="inline ml-1" />
               </motion.button>
@@ -144,13 +144,13 @@ export function Header() {
             exit={{ opacity: 0, height: 0 }}
             className="lg:hidden border-t border-white/5 bg-[#020617] overflow-hidden"
           >
-            <div className="p-6 space-y-4">
+            <div className="p-4 space-y-2 sm:p-6 sm:space-y-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   to={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-4 text-xl font-black text-white italic py-2"
+                  className="flex items-center gap-4 rounded-2xl px-3 py-3 text-lg font-black text-white italic sm:text-xl"
                 >
                   <span className="text-emerald-500">{link.icon}</span>
                   {link.label}

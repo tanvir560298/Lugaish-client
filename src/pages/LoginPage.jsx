@@ -195,8 +195,8 @@ export function LoginPage() {
 
   // --- REGISTRATION UI ---
   return (
-    <section className="relative min-h-screen">
-      <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] items-start">
+    <section className="relative min-h-[calc(100svh-96px)]">
+      <div className="grid items-start gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-12">
         
         {/* LEFT COLUMN: THE LADDER (STICKY) */}
         <div className="sticky top-12 hidden lg:block h-[650px] rounded-[3rem] border border-white/5 bg-slate-900/40 backdrop-blur-sm overflow-visible">
@@ -207,11 +207,11 @@ export function LoginPage() {
         <motion.div 
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="space-y-10 py-4"
+          className="space-y-7 py-2 sm:space-y-10 sm:py-4"
         >
           <div className="space-y-4">
-             <h1 className="text-5xl font-black text-white tracking-tighter">Start your Ascent.</h1>
-             <p className="text-slate-400 text-lg">Complete your profile to unlock your personalized pathway.</p>
+             <h1 className="text-4xl font-black tracking-tighter text-white sm:text-5xl">Start your Ascent.</h1>
+             <p className="text-base text-slate-400 sm:text-lg">Complete your profile to unlock your personalized pathway.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -254,7 +254,7 @@ export function LoginPage() {
 
             <button 
               type="submit" 
-              className={`w-full py-6 rounded-[2rem] font-black text-xl transition-all ${
+              className={`w-full rounded-[1.5rem] py-4 text-base font-black transition-all sm:rounded-[2rem] sm:py-6 sm:text-xl ${
                 progress === 100 
                 ? 'bg-gradient-to-r from-blue-600 to-emerald-500 text-white shadow-2xl shadow-emerald-500/20' 
                 : 'bg-slate-800 text-slate-500 cursor-not-allowed'
@@ -273,11 +273,11 @@ export function LoginPage() {
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-[999] bg-slate-950/90 backdrop-blur-2xl flex flex-col items-center justify-center p-6 text-center"
           >
-            <motion.div initial={{ scale: 0 }} animate={{ scale: 1, rotate: [0, 10, -10, 0] }} className="mb-8 p-8 bg-emerald-500 rounded-[3rem] shadow-[0_0_50px_rgba(16,185,129,0.5)]">
-              <Trophy size={80} className="text-white" />
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1, rotate: [0, 10, -10, 0] }} className="mb-6 rounded-[2rem] bg-emerald-500 p-6 shadow-[0_0_50px_rgba(16,185,129,0.5)] sm:mb-8 sm:rounded-[3rem] sm:p-8">
+              <Trophy size={64} className="text-white sm:h-20 sm:w-20" />
             </motion.div>
-            <h2 className="text-6xl font-black text-white mb-2">YOU MADE IT!</h2>
-            <p className="text-emerald-400 text-2xl font-bold italic tracking-tight">Your premium journey starts now.</p>
+            <h2 className="mb-2 text-4xl font-black text-white sm:text-6xl">YOU MADE IT!</h2>
+            <p className="text-lg font-bold italic tracking-tight text-emerald-400 sm:text-2xl">Your premium journey starts now.</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -292,7 +292,7 @@ function InputField({ label, value, onChange, type="text" }) {
       <label className="text-sm font-bold text-slate-400 ml-1">{label}</label>
       <input 
         type={type} value={value} onChange={e => onChange(e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-slate-900/50 px-6 py-4 text-white focus:border-blue-500 outline-none transition-all"
+        className="w-full rounded-2xl border border-white/10 bg-slate-900/50 px-4 py-3 text-white outline-none transition-all focus:border-blue-500 sm:px-6 sm:py-4"
       />
     </div>
   );
@@ -304,7 +304,7 @@ function SelectField({ label, value, onChange, options }) {
       <label className="text-sm font-bold text-slate-400 ml-1">{label}</label>
       <select 
         value={value} onChange={e => onChange(e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-slate-900/50 px-6 py-4 text-white focus:border-blue-500 outline-none appearance-none"
+        className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/50 px-4 py-3 text-white outline-none focus:border-blue-500 sm:px-6 sm:py-4"
       >
         <option value="">Select Option</option>
         {options.map(o => <option key={o} value={o} className="bg-slate-900">{o}</option>)}

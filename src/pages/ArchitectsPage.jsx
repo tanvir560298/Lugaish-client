@@ -44,34 +44,34 @@ export function ArchitectsPage() {
   const filteredTeam = TEAM_DATA.filter(member => filter === "All" ? true : member.category === filter);
 
   return (
-    <div className="min-h-screen bg-[#020617] text-white pb-40 overflow-hidden">
-      <section className="relative py-32 px-6">
+    <div className="min-h-screen overflow-hidden bg-[#020617] pb-20 text-white sm:pb-32 lg:pb-40">
+      <section className="relative px-4 py-16 sm:px-6 sm:py-24 lg:py-32">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-blue-600/10 via-transparent to-transparent pointer-events-none" />
-        <div className="max-w-5xl mx-auto text-center space-y-8 relative z-10">
-          <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-black uppercase tracking-[0.3em] text-blue-400">
+        <div className="relative z-10 mx-auto max-w-5xl space-y-6 text-center sm:space-y-8">
+          <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-blue-400 sm:px-4 sm:text-xs sm:tracking-[0.3em]">
             <Sparkles size={14} /> The Minds Behind Lugaish
           </motion.div>
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none italic text-white">
+          <h1 className="text-5xl font-black italic leading-none tracking-tighter text-white sm:text-6xl md:text-8xl">
             The Architects.
           </h1>
-          <p className="max-w-2xl mx-auto text-xl text-slate-400 font-medium leading-relaxed">
+          <p className="mx-auto max-w-2xl text-base font-medium leading-relaxed text-slate-400 sm:text-xl">
             A collective of instructors, engineers, and creators dedicated to transforming how the world communicates.
           </p>
         </div>
       </section>
 
-      <nav className="flex justify-center mb-20 px-6">
-        <div className="flex bg-white/5 p-1.5 rounded-[2rem] border border-white/10 backdrop-blur-xl">
+      <nav className="mb-12 flex justify-center px-4 sm:mb-20 sm:px-6">
+        <div className="grid w-full grid-cols-2 gap-1 rounded-[1.5rem] border border-white/10 bg-white/5 p-1.5 backdrop-blur-xl sm:w-auto sm:flex sm:rounded-[2rem]">
           {CATEGORIES.map(cat => (
-            <button key={cat} onClick={() => setFilter(cat)} className={`px-8 py-3 rounded-[1.5rem] text-xs font-black uppercase tracking-widest transition-all ${filter === cat ? 'bg-white text-slate-900 shadow-xl' : 'text-slate-500 hover:text-white'}`}>
+            <button key={cat} onClick={() => setFilter(cat)} className={`rounded-[1rem] px-3 py-3 text-[10px] font-black uppercase tracking-widest transition-all sm:rounded-[1.5rem] sm:px-8 sm:text-xs ${filter === cat ? 'bg-white text-slate-900 shadow-xl' : 'text-slate-500 hover:text-white'}`}>
               {cat}
             </button>
           ))}
         </div>
       </nav>
 
-      <section className="max-w-7xl mx-auto px-6">
-        <motion.div layout className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6">
+        <motion.div layout className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
           <AnimatePresence mode="popLayout">
             {filteredTeam.map((member) => (
               <TeamCard key={member.id} member={member} />
@@ -85,14 +85,14 @@ export function ArchitectsPage() {
 
 function TeamCard({ member }) {
   return (
-    <motion.div layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} whileHover={{ y: -10 }} className="group relative h-[450px] rounded-[3rem] bg-slate-900/40 border border-white/5 overflow-hidden transition-all duration-500 hover:border-white/20">
+    <motion.div layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} whileHover={{ y: -10 }} className="group relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/5 bg-slate-900/40 transition-all duration-500 hover:border-white/20 sm:min-h-[450px] sm:rounded-[3rem]">
       <div className={`absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br ${member.color} blur-[80px] opacity-20 group-hover:opacity-40 transition-opacity`} />
-      <div className="p-10 h-full flex flex-col">
+      <div className="flex h-full flex-col p-6 sm:p-10">
         <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${member.color} flex items-center justify-center text-white mb-8 shadow-2xl`}>
           {member.icon}
         </div>
         <div className="flex-1 space-y-4">
-          <h3 className="text-3xl font-black tracking-tighter text-white leading-none">{member.name}</h3>
+          <h3 className="text-2xl font-black leading-none tracking-tighter text-white sm:text-3xl">{member.name}</h3>
           <p className="text-blue-400 text-xs font-black uppercase tracking-widest">{member.role}</p>
           <p className="text-slate-400 text-sm leading-relaxed">{member.bio}</p>
         </div>
