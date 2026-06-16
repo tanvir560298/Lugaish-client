@@ -1,4 +1,5 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Layout } from './components/Layout.jsx';
 import { HomePage } from './pages/HomePage.jsx';
 import { DashboardPage } from './pages/DashboardPage.jsx';
@@ -16,9 +17,20 @@ import { ProfilePage } from './pages/ProfilePage.jsx';
 import { AppProvider } from './state/AppContext.jsx';
 import { ArchitectsPage } from './pages/ArchitectsPage.jsx';
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [pathname]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <AppProvider>
+      <ScrollToTop />
       <Layout>
         <Routes>
           <Route path='/' element={<HomePage />} />
