@@ -38,6 +38,8 @@ export function PathwaysPage() {
   const { courseData, actions, state } = useAppContext();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('english');
+  const [unlockTaps, setUnlockTaps] = useState({});
+  const [unlockedDays, setUnlockedDays] = useState(() => new Set());
   const containerRef = useRef(null);
 
   const { scrollYProgress } = useScroll({
@@ -71,6 +73,27 @@ export function PathwaysPage() {
     }
     return days;
   }, [activeTab, courseData]);
+
+  const nextLessonIndex = useMemo(() => {
+    const firstOpenIndex = pathData.findIndex(day => !state.completedLessons?.includes(day.id));
+    return firstOpenIndex === -1 ? pathData.length - 1 : firstOpenIndex;
+  }, [pathData, state.completedLessons]);
+
+  function handleLockedTap(day) {
+    const currentTaps = unlockTaps[day.id] ?? 0;
+    const nextTaps = Math.min(currentTaps + 1, 3);
+
+    setUnlockTaps(prev => ({ ...prev, [day.id]: nextTaps }));
+
+    if (nextTaps === 3) {
+      setUnlockedDays(prev => {
+        const next = new Set(prev);
+        next.add(day.id);
+        return next;
+      });
+      confetti({ particleCount: 60, spread: 55, origin: { y: 0.7 } });
+    }
+  }
 
   return (
     <motion.div 
@@ -133,7 +156,10 @@ export function PathwaysPage() {
         <div className="relative z-20 space-y-14 sm:space-y-24 lg:space-y-32">
           {pathData.map((day, idx) => {
              const completed = state.completedLessons?.includes(day.id);
-             const isNext = !completed && (idx === 0 || state.completedLessons?.includes(pathData[idx-1]?.id));
+             const isToday = !completed && idx === nextLessonIndex;
+             const isTomorrow = !completed && idx === nextLessonIndex + 1;
+             const isUnlocked = unlockedDays.has(day.id);
+             const isLocked = !completed && !isToday && !isTomorrow && !isUnlocked;
              
              if (day.isWeekly) {
                return (
@@ -152,11 +178,16 @@ export function PathwaysPage() {
                  day={day}
                  index={idx}
                  completed={completed}
-                 isNext={isNext}
+                 isToday={isToday}
+                 isTomorrow={isTomorrow}
+                 isLocked={isLocked}
+                 isUnlocked={isUnlocked}
+                 tapCount={unlockTaps[day.id] ?? 0}
+                 onLockedTap={() => handleLockedTap(day)}
                  onAction={() => {
                    if (day.isPlaceholder) return;
                    actions.setActiveLesson(day.id, activeTab);
-                   navigate('/lesson');
+                   navigate(`/lesson/${day.dayNumber}`);
                  }}
                />
              );
@@ -213,9 +244,22 @@ function WeeklyBreakthrough({ day, text, isPassed }) {
 
 /* ---------------- STORY NODE ---------------- */
 
-function StoryNode({ day, index, completed, isNext, onAction }) {
+function StoryNode({ day, index, completed, isToday, isTomorrow, isLocked, isUnlocked, tapCount, onLockedTap, onAction }) {
   const isLeft = index % 2 === 0;
   const alignment = isLeft ? 'justify-start' : 'justify-start sm:justify-end';
+  const tapsLeft = Math.max(3 - tapCount, 0);
+  const nodeTitle = completed || isToday || isTomorrow || isUnlocked ? day.title : 'Sleepy Step';
+
+  function handleClick() {
+    if (isLocked) {
+      onLockedTap();
+      return;
+    }
+
+    if (isToday || completed || isUnlocked) {
+      onAction();
+    }
+  }
 
   return (
     <div className={`flex w-full ${alignment}`}>
@@ -226,26 +270,93 @@ function StoryNode({ day, index, completed, isNext, onAction }) {
         className="w-full max-w-[300px] pl-8 sm:pl-0"
       >
         <div 
-          onClick={onAction}
-          className={`relative cursor-pointer rounded-[2rem] border-2 p-5 transition-all duration-500 sm:rounded-[2.5rem] sm:p-8 ${
-            isNext 
-              ? 'bg-white text-slate-900 border-white sm:scale-110 shadow-[0_0_50px_rgba(255,255,255,0.3)] z-20' 
-              : completed 
-                ? 'bg-white/5 border-emerald-500/20 text-white/60' 
-                : 'bg-white/5 border-white/5 text-white/5 blur-[3px] hover:blur-0'
+          onClick={handleClick}
+          className={`relative min-h-[220px] cursor-pointer overflow-hidden rounded-[2rem] border-2 p-5 transition-all duration-500 sm:rounded-[2.5rem] sm:p-8 ${
+            isToday 
+              ? 'z-20 border-orange-200 bg-gradient-to-br from-orange-100 via-amber-100 to-white text-slate-950 shadow-[0_0_70px_rgba(251,146,60,0.5)] sm:scale-110' 
+              : isTomorrow
+                ? 'border-amber-300/30 bg-amber-500/10 text-amber-50 shadow-[0_0_32px_rgba(245,158,11,0.16)]'
+                : completed 
+                  ? 'bg-white/5 border-emerald-500/20 text-white/60' 
+                  : isUnlocked
+                    ? 'border-cyan-300/30 bg-cyan-500/10 text-white'
+                    : 'bg-slate-950/50 border-white/5 text-white/80'
           }`}
         >
+          {isToday && (
+            <div className="pointer-events-none absolute inset-0">
+              <motion.div
+                animate={{ scale: [0.9, 1.18, 0.9], opacity: [0.45, 0.85, 0.45] }}
+                transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+                className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-orange-400/40 blur-2xl"
+              />
+              <motion.div
+                animate={{ y: [10, -8, 10], rotate: [-4, 4, -4] }}
+                transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
+                className="absolute bottom-4 right-5 text-6xl"
+              >
+                🔥
+              </motion.div>
+            </div>
+          )}
+
+          {isTomorrow && (
+            <motion.div
+              animate={{ opacity: [0.35, 0.7, 0.35], y: [3, -3, 3] }}
+              transition={{ repeat: Infinity, duration: 2.8, ease: 'easeInOut' }}
+              className="pointer-events-none absolute bottom-5 right-6 text-4xl opacity-60"
+            >
+              🔥
+            </motion.div>
+          )}
+
+          {isLocked && (
+            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-slate-950/88 p-5 text-center backdrop-blur-sm">
+              <div className="grid grid-cols-3 gap-2 text-cyan-200/80">
+                {[...Array(9)].map((_, eyeIndex) => (
+                  <motion.div
+                    key={eyeIndex}
+                    animate={{ scale: [1, 1.15, 1], opacity: [0.45, 1, 0.45] }}
+                    transition={{ repeat: Infinity, duration: 1.8 + eyeIndex * 0.08, delay: eyeIndex * 0.05 }}
+                  >
+                    <Eye size={18} />
+                  </motion.div>
+                ))}
+              </div>
+              <div>
+                <p className="text-sm font-black uppercase tracking-widest text-white">I am almost dead</p>
+                <p className="mt-2 text-xs font-bold text-slate-300">
+                  Tap {tapsLeft} more {tapsLeft === 1 ? 'time' : 'times'} to unlock me
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="flex justify-between items-start mb-4">
              <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Day {day.dayNumber}</span>
              {completed && <CheckCircle2 size={16} className="text-emerald-500" />}
+             {isLocked && <Lock size={16} className="text-cyan-200/70" />}
           </div>
           <h3 className="font-black text-xl leading-none uppercase tracking-tighter mb-4">
-            {isNext || completed ? day.title : 'Mystery Step'}
+            {nodeTitle}
           </h3>
-          {isNext && (
+          {isToday && (
             <div className="flex items-center gap-2 text-[10px] font-black uppercase bg-slate-900 text-white px-3 py-1.5 rounded-full w-fit">
-              Conquer <ArrowRight size={12} />
+              Burning today <ArrowRight size={12} />
             </div>
+          )}
+          {isTomorrow && (
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase bg-amber-300/10 text-amber-100 px-3 py-1.5 rounded-full w-fit">
+              Warming up
+            </div>
+          )}
+          {isUnlocked && !completed && !isToday && !day.isPlaceholder && (
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase bg-cyan-300/10 text-cyan-100 px-3 py-1.5 rounded-full w-fit">
+              Unlocked <ArrowRight size={12} />
+            </div>
+          )}
+          {day.isPlaceholder && !isLocked && (
+            <p className="mt-4 text-xs font-bold uppercase tracking-widest opacity-50">Coming soon</p>
           )}
         </div>
       </motion.div>
