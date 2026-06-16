@@ -7,10 +7,10 @@ import { PathwaysPage } from './pages/PathwaysPage.jsx';
 import { LessonPage } from './pages/LessonPage.jsx';
 import { QuizPage } from './pages/QuizPage.jsx';
 import { LeaderboardPage } from './pages/LeaderboardPage.jsx';
+import { LoginPage } from './pages/LoginPage.jsx';
 import { CoursePage } from './pages/CoursePage.jsx';
 import { TodayPage } from './pages/TodayPage.jsx';
 import { PricingPage } from './pages/PricingPage.jsx';
-import { AuthPage } from './pages/AuthPage.jsx';
 import { ProgressPage } from './pages/ProgressPage.jsx';
 import { ProfilePage } from './pages/ProfilePage.jsx';
 import { AppProvider, useAppContext } from './state/AppContext.jsx';
@@ -44,7 +44,7 @@ export default function App() {
       <Layout>
         <Routes>
           <Route path='/' element={<HomePage />} />
-          <Route path='/login' element={<AuthPage />} />
+          <Route path='/login' element={<LoginPage />} />
           <Route path='/auth' element={<Navigate to="/login" replace />} />
           <Route path='/pricing' element={<PricingPage />} />
           <Route path='/course/:language' element={<ProtectedRoute><CoursePage /></ProtectedRoute>} />

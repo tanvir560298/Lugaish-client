@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '../state/AppContext.jsx';
 import { 
@@ -129,10 +129,14 @@ const LadderVisual = ({ progress }) => {
 export function LoginPage() {
   const { state, actions } = useAppContext();
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = location.state?.from?.pathname ?? '/dashboard';
+  const [isLogin, setIsLogin] = useState(false);
 
   const [form, setForm] = useState({
     name: state.userName || '',
     email: state.userEmail || '',
+    password: '',
     profession: state.learnerProfile?.profession || '',
     expectation: state.learnerProfile?.expectation || '',
     courseDuration: state.learnerProfile?.courseDuration || '',
@@ -140,21 +144,53 @@ export function LoginPage() {
   });
 
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   // Dynamic progress calculation based on non-empty strings
   const progress = useMemo(() => {
-    const fields = Object.values(form);
+    const fields = isLogin
+      ? [form.email, form.password]
+      : Object.values(form);
     const filledFields = fields.filter(value => value && value.trim() !== '').length;
     return (filledFields / fields.length) * 100;
-  }, [form]);
+  }, [form, isLogin]);
 
   const updateField = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (event) => {
+  if (state.isLoggedIn) {
+    return <Navigate to={redirectTo} replace />;
+  }
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!form.name.trim() || !form.email.trim()) return;
+    if (!form.email.trim() || !form.password.trim()) return;
+    if (!isLogin && !form.name.trim()) return;
+
+    setError('');
+    setIsSubmitting(true);
+
+    try {
+      await actions.authenticate({
+        mode: isLogin ? 'login' : 'signup',
+        name: form.name.trim() || form.email.split('@')[0],
+        email: form.email.trim(),
+        password: form.password,
+        languageSelected: state.activePathway,
+        learnerProfile: {
+          profession: form.profession,
+          expectation: form.expectation,
+          courseDuration: form.courseDuration,
+          referralSource: form.referralSource,
+        },
+      });
+    } catch (err) {
+      setError(err.message || 'Authentication failed');
+      setIsSubmitting(false);
+      return;
+    }
 
     setIsSuccess(true);
     
@@ -184,13 +220,8 @@ export function LoginPage() {
     }());
 
     setTimeout(() => {
-      actions.login({
-        userName: form.name.trim(),
-        userEmail: form.email.trim(),
-        learnerProfile: { ...form },
-      });
-      navigate('/dashboard');
-    }, 2500);
+      navigate(redirectTo, { replace: true });
+    }, 1600);
   };
 
   // --- REGISTRATION UI ---
@@ -210,47 +241,85 @@ export function LoginPage() {
           className="space-y-7 py-2 sm:space-y-10 sm:py-4"
         >
           <div className="space-y-4">
-             <h1 className="text-4xl font-black tracking-tighter text-white sm:text-5xl">Start your Ascent.</h1>
-             <p className="text-base text-slate-400 sm:text-lg">Complete your profile to unlock your personalized pathway.</p>
+             <h1 className="text-4xl font-black tracking-tighter text-white sm:text-5xl">
+               {isLogin ? 'Welcome Back.' : 'Start your Ascent.'}
+             </h1>
+             <p className="text-base text-slate-400 sm:text-lg">
+               {isLogin ? 'Sign in to continue your English and Arabic learning journey.' : 'Complete your profile to unlock your personalized pathway.'}
+             </p>
+          </div>
+
+          <div className="grid grid-cols-2 rounded-[1.5rem] border border-white/10 bg-white/5 p-1">
+            <button
+              type="button"
+              onClick={() => {
+                setIsLogin(false);
+                setError('');
+              }}
+              className={`rounded-[1.2rem] px-4 py-3 text-sm font-black transition-all ${!isLogin ? 'bg-white text-slate-950' : 'text-slate-400 hover:text-white'}`}
+            >
+              Create Account
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsLogin(true);
+                setError('');
+              }}
+              className={`rounded-[1.2rem] px-4 py-3 text-sm font-black transition-all ${isLogin ? 'bg-white text-slate-950' : 'text-slate-400 hover:text-white'}`}
+            >
+              Sign In
+            </button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid gap-6 sm:grid-cols-2">
-              <InputField label="Name" value={form.name} onChange={v => updateField('name', v)} />
+              {!isLogin && <InputField label="Name" value={form.name} onChange={v => updateField('name', v)} />}
               <InputField label="Email" type="email" value={form.email} onChange={v => updateField('email', v)} />
+              <InputField label="Password" type="password" value={form.password} onChange={v => updateField('password', v)} />
             </div>
 
-            <SelectField 
-              label="Profession" 
-              value={form.profession}
-              onChange={v => updateField('profession', v)}
-              options={["Student", "Teacher", "Professional", "Business Owner", "Freelancer", "Other"]}
-            />
+            {!isLogin && (
+              <>
+                <SelectField 
+                  label="Profession" 
+                  value={form.profession}
+                  onChange={v => updateField('profession', v)}
+                  options={["Student", "Teacher", "Professional", "Business Owner", "Freelancer", "Other"]}
+                />
 
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-400 ml-1">Your Expectations</label>
-              <textarea
-                value={form.expectation}
-                onChange={e => updateField('expectation', e.target.value)}
-                placeholder="I want to speak confidently..."
-                className="w-full h-32 rounded-[2rem] border border-white/10 bg-slate-900/50 px-6 py-4 text-white focus:border-blue-500 outline-none transition-all resize-none"
-              />
-            </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-400 ml-1">Your Expectations</label>
+                  <textarea
+                    value={form.expectation}
+                    onChange={e => updateField('expectation', e.target.value)}
+                    placeholder="I want to speak confidently..."
+                    className="w-full h-32 rounded-[2rem] border border-white/10 bg-slate-900/50 px-6 py-4 text-white focus:border-blue-500 outline-none transition-all resize-none"
+                  />
+                </div>
 
-            <div className="grid gap-6 sm:grid-cols-2">
-              <SelectField 
-                label="Course Duration" 
-                value={form.courseDuration}
-                onChange={v => updateField('courseDuration', v)}
-                options={["1 Month", "3 Months", "6 Months", "Flexible"]}
-              />
-              <SelectField 
-                label="How you found us" 
-                value={form.referralSource}
-                onChange={v => updateField('referralSource', v)}
-                options={["Social Media", "Friend", "Search", "Other"]}
-              />
-            </div>
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <SelectField 
+                    label="Course Duration" 
+                    value={form.courseDuration}
+                    onChange={v => updateField('courseDuration', v)}
+                    options={["1 Month", "3 Months", "6 Months", "Flexible"]}
+                  />
+                  <SelectField 
+                    label="How you found us" 
+                    value={form.referralSource}
+                    onChange={v => updateField('referralSource', v)}
+                    options={["Social Media", "Friend", "Search", "Other"]}
+                  />
+                </div>
+              </>
+            )}
+
+            {error && (
+              <p className="rounded-2xl border border-red-400/30 bg-red-500/10 px-5 py-4 text-sm font-semibold text-red-100">
+                {error}
+              </p>
+            )}
 
             <button 
               type="submit" 
@@ -260,7 +329,7 @@ export function LoginPage() {
                 : 'bg-slate-800 text-slate-500 cursor-not-allowed'
               }`}
             >
-              {isSuccess ? "Finishing the Climb..." : progress === 100 ? "Ready to Launch!" : "Complete the Steps Above"}
+              {isSubmitting ? 'Connecting...' : isSuccess ? "Finishing the Climb..." : progress === 100 ? (isLogin ? 'Continue Learning' : 'Ready to Launch!') : (isLogin ? 'Enter Email & Password' : 'Complete the Steps Above')}
             </button>
           </form>
         </motion.div>

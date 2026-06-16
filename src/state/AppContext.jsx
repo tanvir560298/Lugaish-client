@@ -140,7 +140,7 @@ export function AppProvider({ children }) {
         isLoggedIn: true,
       }));
     },
-    async authenticate({ mode, name, email, password, languageSelected }) {
+    async authenticate({ mode, name, email, password, languageSelected, learnerProfile }) {
       const response = mode === 'login'
         ? await api.login({ email, password })
         : await api.signup({ name, email, password, languageSelected });
@@ -151,6 +151,10 @@ export function AppProvider({ children }) {
         userName: response.user?.name ?? name ?? prev.userName,
         userEmail: response.user?.email ?? email ?? prev.userEmail,
         activePathway: response.user?.languageSelected ?? languageSelected ?? prev.activePathway,
+        learnerProfile: {
+          ...prev.learnerProfile,
+          ...(learnerProfile ?? {}),
+        },
         isLoggedIn: true,
       }));
 
