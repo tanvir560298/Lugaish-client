@@ -5,14 +5,15 @@ import { useAppContext } from '../state/AppContext.jsx';
 import { 
   Menu, 
   X, 
-  Flame, 
-  User, 
   Hammer, 
   LayoutDashboard, 
   Map, 
   Sparkles,
   Trophy,
-  CreditCard
+  CreditCard,
+  Sun,
+  Moon,
+  Activity
 } from 'lucide-react';
 
 const navLinks = [
@@ -27,9 +28,11 @@ export function Header() {
   const { state, actions } = useAppContext();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const level = Math.floor(state.xp / 500) + 1;
+  const themeLabel = state.theme === 'dark' ? 'Light mode' : 'Dark mode';
 
   return (
-    <header className="sticky top-0 z-[100] border-b border-white/5 bg-[#020617]/80 backdrop-blur-2xl">
+    <header className="site-header sticky top-0 z-[100] border-b border-white/5 bg-[#020617]/80 backdrop-blur-2xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
         
         {/* --- 1. THE EVOLVING LOGO --- */}
@@ -66,8 +69,9 @@ export function Header() {
                   key={link.href}
                   to={link.href}
                   className={`
+                    nav-link
                     relative flex items-center gap-2 px-5 py-2 text-xs font-black uppercase tracking-widest transition-all
-                    ${isActive ? 'text-white' : 'text-slate-400 hover:text-slate-200'}
+                    ${isActive ? 'nav-link-active text-white' : 'text-slate-400 hover:text-slate-200'}
                   `}
                 >
                   {/* The Background Pill */}
@@ -90,17 +94,30 @@ export function Header() {
         {/* --- 3. ACTIONS & USER STATUS --- */}
         <div className="flex min-w-0 items-center gap-2 sm:gap-4">
           
+          <button
+            type="button"
+            onClick={actions.toggleTheme}
+            className="header-control hidden h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10 sm:inline-flex"
+            aria-label={themeLabel}
+            title={themeLabel}
+          >
+            {state.theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+
           {/* User Progress Badge */}
-          <div className="hidden md:flex items-center gap-3 px-4 py-2 rounded-2xl bg-white/5 border border-white/5">
+          <div className="header-control hidden md:flex items-center gap-3 px-4 py-2 rounded-2xl bg-white/5 border border-white/5">
             {state.isLoggedIn ? (
-              <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] font-black text-white uppercase tracking-wider">{state.userName}</span>
+              <div className="flex items-center gap-3">
+                <Activity size={15} className="text-emerald-400" />
+                <div className="leading-none">
+                  <span className="block text-[10px] font-black text-white uppercase tracking-wider">{state.userName || 'Learner'}</span>
+                  <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider">{state.xp} XP earned</span>
+                </div>
               </div>
             ) : (
               <div className="flex items-center gap-2">
-                <Flame size={14} className="text-orange-500" />
-                <span className="text-[10px] font-black text-orange-200 uppercase tracking-wider">{state.streak}D STREAK</span>
+                <Sparkles size={14} className="text-emerald-400" />
+                <span className="text-[10px] font-black text-white uppercase tracking-wider">Start Learning</span>
               </div>
             )}
           </div>
@@ -110,7 +127,7 @@ export function Header() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               onClick={actions.logout}
-              className="px-5 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all"
+              className="px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all sm:px-5"
             >
               Sign Out
             </motion.button>
@@ -118,17 +135,18 @@ export function Header() {
             <Link to="/login">
               <motion.button
                 whileHover={{ scale: 1.05 }}
-                className="px-3 py-2.5 rounded-xl bg-white text-slate-950 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-400 transition-colors sm:px-6"
+                className="header-auth px-3 py-2.5 rounded-xl bg-white text-slate-950 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-400 transition-colors sm:px-6"
               >
-                Launch <Sparkles size={12} className="inline ml-1" />
+                Sign In <Sparkles size={12} className="inline ml-1" />
               </motion.button>
             </Link>
           )}
 
           {/* Mobile Menu Toggle */}
           <button
-            className="lg:hidden p-2 text-white bg-white/5 rounded-xl border border-white/10"
+            className="header-menu lg:hidden p-2 text-white bg-white/5 rounded-xl border border-white/10"
             onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Open navigation menu"
           >
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -142,9 +160,25 @@ export function Header() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden border-t border-white/5 bg-[#020617] overflow-hidden"
+            className="mobile-nav lg:hidden border-t border-white/5 bg-[#020617] overflow-hidden"
           >
             <div className="p-4 space-y-2 sm:p-6 sm:space-y-4">
+              <button
+                type="button"
+                onClick={actions.toggleTheme}
+                className="header-control mb-2 flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-left text-sm font-black uppercase tracking-widest text-white"
+              >
+                <span>{themeLabel}</span>
+                {state.theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
+
+              {state.isLoggedIn && (
+                <div className="header-control rounded-2xl border border-white/10 bg-white/5 px-3 py-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Your progress</p>
+                  <p className="mt-1 text-base font-black text-white">{state.userName || 'Learner'} · Level {level} · {state.xp} XP</p>
+                </div>
+              )}
+
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
