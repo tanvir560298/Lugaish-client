@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAppContext } from '../state/AppContext.jsx';
 
 export function AuthPage() {
@@ -10,7 +10,13 @@ export function AuthPage() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { actions, state } = useAppContext();
+  const redirectTo = location.state?.from?.pathname ?? '/dashboard';
+
+  if (state.isLoggedIn) {
+    return <Navigate to={redirectTo} replace />;
+  }
 
   const handleSubmit = async e => {
     e.preventDefault();
@@ -25,7 +31,7 @@ export function AuthPage() {
         password,
         languageSelected: state.activePathway,
       });
-      navigate('/dashboard');
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err.message || 'Authentication failed');
     } finally {
