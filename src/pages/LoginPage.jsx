@@ -170,13 +170,15 @@ export function LoginPage({ mode = 'login' }) {
     async function handleRedirectResult() {
       setIsSubmitting(true);
       try {
-        const result = await getGoogleRedirectLoginResult() ?? await waitForFirebaseUser();
+        const storedContext = sessionStorage.getItem(GOOGLE_REDIRECT_CONTEXT_KEY);
+        const redirectResult = await getGoogleRedirectLoginResult();
+        const result = redirectResult ?? (storedContext ? await waitForFirebaseUser() : null);
         if (!result) {
           setIsSubmitting(false);
           return;
         }
 
-        const context = JSON.parse(sessionStorage.getItem(GOOGLE_REDIRECT_CONTEXT_KEY) || '{}');
+        const context = JSON.parse(storedContext || '{}');
         sessionStorage.removeItem(GOOGLE_REDIRECT_CONTEXT_KEY);
         if (!ignore) await finishGoogleLogin(result, context);
       } catch (err) {
