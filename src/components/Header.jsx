@@ -7,6 +7,7 @@ import {
   X, 
   Hammer, 
   LayoutDashboard, 
+  Gauge,
   Map, 
   Sparkles,
   CalendarDays,
@@ -30,6 +31,13 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const level = Math.floor(state.xp / 500) + 1;
   const themeLabel = state.theme === 'dark' ? 'Light mode' : 'Dark mode';
+  const visibleNavLinks = state.isLoggedIn
+    ? [
+        ...navLinks.slice(0, 1),
+        { href: '/dashboard', label: 'Dashboard', icon: <Gauge size={16} /> },
+        ...navLinks.slice(1),
+      ]
+    : navLinks;
 
   return (
     <header className="site-header sticky top-0 z-[100] border-b border-white/5 bg-[#020617]/80 backdrop-blur-2xl">
@@ -59,7 +67,7 @@ export function Header() {
         {/* --- 2. DESKTOP NAV (Magnetic Style) --- */}
         <nav className="header-nav hidden lg:flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/5">
           <LayoutGroup>
-            {navLinks.map((link) => {
+            {visibleNavLinks.map((link) => {
               const isActive = link.exact
                 ? location.pathname === link.href
                 : location.pathname === link.href || location.pathname.startsWith(`${link.href}/`);
@@ -174,7 +182,7 @@ export function Header() {
                 </div>
               )}
 
-              {navLinks.map((link) => (
+              {visibleNavLinks.map((link) => (
                 <Link
                   key={link.href}
                   to={link.href}
