@@ -1,20 +1,29 @@
-import { useEffect } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Layout } from './components/Layout.jsx';
-import { HomePage } from './pages/HomePage.jsx';
-import { DashboardPage } from './pages/DashboardPage.jsx';
-import { PathwaysPage } from './pages/PathwaysPage.jsx';
-import { LessonPage } from './pages/LessonPage.jsx';
-import { QuizPage } from './pages/QuizPage.jsx';
-import { LeaderboardPage } from './pages/LeaderboardPage.jsx';
-import { LoginPage } from './pages/LoginPage.jsx';
-import { CoursePage } from './pages/CoursePage.jsx';
-import { TodayPage } from './pages/TodayPage.jsx';
-import { PricingPage } from './pages/PricingPage.jsx';
-import { ProgressPage } from './pages/ProgressPage.jsx';
-import { ProfilePage } from './pages/ProfilePage.jsx';
 import { AppProvider, useAppContext } from './state/AppContext.jsx';
-import { ArchitectsPage } from './pages/ArchitectsPage.jsx';
+
+const HomePage = lazy(() => import('./pages/HomePage.jsx').then(module => ({ default: module.HomePage })));
+const DashboardPage = lazy(() => import('./pages/DashboardPage.jsx').then(module => ({ default: module.DashboardPage })));
+const PathwaysPage = lazy(() => import('./pages/PathwaysPage.jsx').then(module => ({ default: module.PathwaysPage })));
+const LessonPage = lazy(() => import('./pages/LessonPage.jsx').then(module => ({ default: module.LessonPage })));
+const QuizPage = lazy(() => import('./pages/QuizPage.jsx').then(module => ({ default: module.QuizPage })));
+const DailyLessonsPage = lazy(() => import('./pages/DailyLessonsPage.jsx').then(module => ({ default: module.DailyLessonsPage })));
+const LoginPage = lazy(() => import('./pages/LoginPage.jsx').then(module => ({ default: module.LoginPage })));
+const CoursePage = lazy(() => import('./pages/CoursePage.jsx').then(module => ({ default: module.CoursePage })));
+const TodayPage = lazy(() => import('./pages/TodayPage.jsx').then(module => ({ default: module.TodayPage })));
+const PricingPage = lazy(() => import('./pages/PricingPage.jsx').then(module => ({ default: module.PricingPage })));
+const ProgressPage = lazy(() => import('./pages/ProgressPage.jsx').then(module => ({ default: module.ProgressPage })));
+const ProfilePage = lazy(() => import('./pages/ProfilePage.jsx').then(module => ({ default: module.ProfilePage })));
+const ArchitectsPage = lazy(() => import('./pages/ArchitectsPage.jsx').then(module => ({ default: module.ArchitectsPage })));
+
+function PageFallback() {
+  return (
+    <div className="grid min-h-[60svh] place-items-center">
+      <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-500/20 border-t-blue-500" />
+    </div>
+  );
+}
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -42,23 +51,28 @@ export default function App() {
     <AppProvider>
       <ScrollToTop />
       <Layout>
-        <Routes>
-          <Route path='/' element={<HomePage />} />
-          <Route path='/login' element={<LoginPage />} />
-          <Route path='/auth' element={<Navigate to="/login" replace />} />
-          <Route path='/pricing' element={<PricingPage />} />
-          <Route path='/course/:language' element={<ProtectedRoute><CoursePage /></ProtectedRoute>} />
-          <Route path='/today' element={<ProtectedRoute><TodayPage /></ProtectedRoute>} />
-          <Route path='/lesson/:day' element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
-          <Route path='/quiz' element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
-          <Route path='/dashboard' element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-          <Route path='/profile' element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-          <Route path='/progress' element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
-          <Route path='/pathways' element={<ProtectedRoute><PathwaysPage /></ProtectedRoute>} />
-          <Route path='/leaderboard' element={<ProtectedRoute><LeaderboardPage /></ProtectedRoute>} />
-          <Route path="/architects" element={<ArchitectsPage />} />
-          <Route path='*' element={<Navigate to='/' replace />} />
-        </Routes>
+        <Suspense fallback={<PageFallback />}>
+          <Routes>
+            <Route path='/' element={<HomePage />} />
+            <Route path='/login' element={<LoginPage />} />
+            <Route path='/signup' element={<LoginPage mode="signup" />} />
+            <Route path='/auth' element={<Navigate to="/login" replace />} />
+            <Route path='/pricing' element={<PricingPage />} />
+            <Route path='/course/:language' element={<ProtectedRoute><CoursePage /></ProtectedRoute>} />
+            <Route path='/today' element={<ProtectedRoute><TodayPage /></ProtectedRoute>} />
+            <Route path='/lesson' element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
+            <Route path='/lesson/:day' element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
+            <Route path='/quiz' element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
+            <Route path='/dashboard' element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path='/profile' element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path='/progress' element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
+            <Route path='/pathways' element={<ProtectedRoute><PathwaysPage /></ProtectedRoute>} />
+            <Route path='/daily-lessons' element={<ProtectedRoute><DailyLessonsPage /></ProtectedRoute>} />
+            <Route path='/leaderboard' element={<Navigate to="/daily-lessons" replace />} />
+            <Route path="/architects" element={<ArchitectsPage />} />
+            <Route path='*' element={<Navigate to='/' replace />} />
+          </Routes>
+        </Suspense>
       </Layout>
     </AppProvider>
   );

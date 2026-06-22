@@ -45,8 +45,20 @@ export const api = {
       body: JSON.stringify(payload),
     });
   },
+  firebaseLogin(payload) {
+    return request('/auth/firebase', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
   currentUser() {
     return request('/auth/me');
+  },
+  enrollPathway(payload) {
+    return request('/auth/enroll', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
   },
   completeLesson(payload) {
     return request('/lessons/complete', {

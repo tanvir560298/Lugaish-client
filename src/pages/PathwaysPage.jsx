@@ -19,6 +19,15 @@ const BIOMES = [
   { day: 80, color: "#451a03", label: "The Solar Peak", icon: <Sun size={14}/> }      // Gold
 ];
 
+const LIGHT_BIOMES = [
+  { day: 1,  color: "#e0f7ff", label: "The Clear Grotto", icon: <Anchor size={14}/> },
+  { day: 14, color: "#dcfce7", label: "The Verdant Wilds", icon: <Wind size={14}/> },
+  { day: 28, color: "#e0e7ff", label: "The Indigo Ridge", icon: <Mountain size={14}/> },
+  { day: 42, color: "#f3e8ff", label: "The Twilight Veil", icon: <Sparkles size={14}/> },
+  { day: 60, color: "#ffedd5", label: "The Crimson Ascent", icon: <Flame size={14}/> },
+  { day: 80, color: "#fef3c7", label: "The Solar Peak", icon: <Sun size={14}/> }
+];
+
 const WEEKLY_BREAKTHROUGHS = {
   7:  "Your brain has started recognizing new phonetic patterns. The fog is lifting.",
   14: "Basic sentence structures are becoming muscle memory. You're thinking faster.",
@@ -48,12 +57,13 @@ export function PathwaysPage() {
   });
 
   const smoothProgress = useSpring(scrollYProgress, { stiffness: 40, damping: 20 });
+  const activeBiomes = state.theme === 'light' ? LIGHT_BIOMES : BIOMES;
 
   // --- DYNAMIC BACKGROUND ENGINE ---
   const backgroundColor = useTransform(
     smoothProgress,
-    BIOMES.map(b => (b.day - 1) / 90),
-    BIOMES.map(b => b.color)
+    activeBiomes.map(b => (b.day - 1) / 90),
+    activeBiomes.map(b => b.color)
   );
 
   const pathData = useMemo(() => {
@@ -99,7 +109,7 @@ export function PathwaysPage() {
     <motion.div 
       ref={containerRef}
       style={{ background: backgroundColor }}
-      className="relative min-h-screen text-white transition-colors duration-1000"
+      className={`pathways-page relative min-h-screen transition-colors duration-1000 ${state.theme === 'light' ? 'text-slate-950' : 'text-white'}`}
     >
       {/* 1. ATMOSPHERIC LAYERS */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden opacity-30">
@@ -113,7 +123,7 @@ export function PathwaysPage() {
             <div className="hidden md:block">
                <div className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1">Your Journey</div>
                <div className="flex gap-1">
-                 {BIOMES.map(b => (
+                 {activeBiomes.map(b => (
                    <motion.div 
                      key={b.day}
                      animate={{ opacity: (smoothProgress.get() * 90) >= b.day ? 1 : 0.2 }}

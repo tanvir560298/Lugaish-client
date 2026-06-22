@@ -1,10 +1,11 @@
-import React, { Suspense } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '../state/AppContext.jsx';
 import { 
   CheckCircle2, 
-  Globe2, 
+  BookOpen,
+  Languages,
   Zap, 
   Trophy, 
   ArrowRight, 
@@ -13,7 +14,8 @@ import {
   Target,
   ChevronDown
 } from 'lucide-react';
-import HeroScene from '../components/HeroScene.jsx';
+
+const HeroScene = lazy(() => import('../components/HeroScene.jsx'));
 
 // Animation Constants
 const fadeInUp = {
@@ -27,23 +29,38 @@ export function HomePage() {
   const { state, actions } = useAppContext();
   const navigate = useNavigate();
   const isLoggedIn = state.isLoggedIn;
+  const [showHeroScene, setShowHeroScene] = useState(false);
   const { scrollYProgress } = useScroll();
   
   const yOffset = useTransform(scrollYProgress, [0, 1], [0, -100]);
 
+  useEffect(() => {
+    const scheduleHeroScene = window.requestIdleCallback ?? ((callback) => window.setTimeout(callback, 250));
+    const cancelHeroScene = window.cancelIdleCallback ?? window.clearTimeout;
+    const id = scheduleHeroScene(() => setShowHeroScene(true));
+
+    return () => cancelHeroScene(id);
+  }, []);
+
   const handleStart = (path) => {
-    actions.switchPathway(path);
+    if (isLoggedIn) {
+      actions.enrollPathway(path);
+    } else {
+      actions.switchPathway(path);
+    }
     navigate(isLoggedIn ? '/pathways' : '/login');
   };
 
   return (
-    <div className="bg-slate-950 text-slate-50 selection:bg-blue-500/30 overflow-x-hidden">
+    <div className="home-page bg-slate-950 text-slate-50 selection:bg-blue-500/30 overflow-x-hidden">
       
       {/* --- HERO: THE GRAND ENTRANCE --- */}
-      <section className="relative flex min-h-[calc(100svh-72px)] items-center overflow-hidden py-14 sm:py-20 lg:min-h-screen lg:py-0 lg:pt-20">
-        <Suspense fallback={<div className="absolute inset-0 bg-slate-950" />}>
-          <HeroScene />
-        </Suspense>
+      <section className="home-hero relative flex min-h-[calc(100svh-72px)] items-center overflow-hidden py-14 sm:py-20 lg:min-h-screen lg:py-0 lg:pt-20">
+        {showHeroScene && (
+          <Suspense fallback={<div className="absolute inset-0 bg-slate-950" />}>
+            <HeroScene />
+          </Suspense>
+        )}
 
         <div className="app-shell relative z-10 grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
           <motion.div 
@@ -57,7 +74,7 @@ export function HomePage() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.5, type: 'spring' }}
-              className="inline-flex max-w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 backdrop-blur-md sm:px-4"
+              className="hero-kicker inline-flex max-w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 backdrop-blur-md sm:px-4"
             >
               <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-emerald-400 rounded-lg flex items-center justify-center text-white shadow-lg">
                 <Sparkles size={16} />
@@ -81,7 +98,7 @@ export function HomePage() {
                 whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(59,130,246,0.4)" }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleStart('english')}
-                className="group flex w-full items-center justify-center gap-3 rounded-2xl bg-blue-600 px-6 py-4 text-base font-black text-white transition-all sm:w-auto sm:px-10 sm:py-5 sm:text-xl"
+                className="hero-primary-button group flex w-full items-center justify-center gap-3 rounded-2xl bg-blue-600 px-6 py-4 text-base font-black text-white transition-all sm:w-auto sm:px-10 sm:py-5 sm:text-xl"
               >
                 Start English <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform" />
               </motion.button>
@@ -90,7 +107,7 @@ export function HomePage() {
                 whileHover={{ scale: 1.05, background: "rgba(255,255,255,0.1)" }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleStart('arabic')}
-                className="flex w-full items-center justify-center gap-3 rounded-2xl border border-slate-800 bg-slate-900 px-6 py-4 text-base font-black text-white transition-all sm:w-auto sm:px-10 sm:py-5 sm:text-xl"
+                className="hero-secondary-button flex w-full items-center justify-center gap-3 rounded-2xl border border-slate-800 bg-slate-900 px-6 py-4 text-base font-black text-white transition-all sm:w-auto sm:px-10 sm:py-5 sm:text-xl"
               >
                 Start Arabic
               </motion.button>
@@ -114,7 +131,7 @@ export function HomePage() {
             className="hidden lg:block relative"
           >
              <div className="absolute -inset-10 bg-blue-500/10 blur-[100px] rounded-full" />
-             <div className="relative glass-card p-2 rounded-[3rem] border border-white/10 shadow-2xl">
+             <div className="hero-preview relative glass-card p-2 rounded-[3rem] border border-white/10 shadow-2xl">
                 <div className="bg-slate-950 rounded-[2.8rem] overflow-hidden border border-white/5 p-8 space-y-8">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -169,16 +186,16 @@ export function HomePage() {
         <div className="app-shell">
           <div className="grid gap-5 sm:gap-8 lg:grid-cols-3 lg:gap-12">
             {[
-              { icon: <Zap />, color: "blue", title: "Instant Impact", desc: "Start speaking from Day 1. Our lessons focus on high-frequency communication." },
-              { icon: <Flame />, color: "orange", title: "Daily Momentum", desc: "Build a habit that lasts. 10 minutes is all you need to reach new heights." },
-              { icon: <Trophy />, color: "emerald", title: "Mastery Path", desc: "Unlock certificates and badges as you conquer increasingly complex pathways." }
+              { icon: <Zap />, iconClass: "text-blue-500", title: "Instant Impact", desc: "Start speaking from Day 1. Our lessons focus on high-frequency communication." },
+              { icon: <Flame />, iconClass: "text-orange-500", title: "Daily Momentum", desc: "Build a habit that lasts. 10 minutes is all you need to reach new heights." },
+              { icon: <Trophy />, iconClass: "text-emerald-500", title: "Mastery Path", desc: "Unlock certificates and badges as you conquer increasingly complex pathways." }
             ].map((item, i) => (
               <motion.div 
                 key={i}
                 {...fadeInUp}
                 className="rounded-[2rem] border border-white/5 bg-slate-950 p-6 transition-all hover:border-blue-500/20 sm:p-8 lg:p-10 group"
               >
-                <div className={`w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform text-${item.color}-500`}>
+                <div className={`w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform ${item.iconClass}`}>
                   {item.icon}
                 </div>
                 <h3 className="text-2xl font-black mb-4">{item.title}</h3>
@@ -200,7 +217,8 @@ export function HomePage() {
           <div className="grid gap-6 lg:grid-cols-2 lg:gap-10">
             <PathCard 
               keyName="english"
-              flag="🇬🇧" 
+              icon={<BookOpen size={34} />}
+              badge="English Speaking"
               title="Speak Global English" 
               desc="The standard for business, travel, and international technology."
               color="blue"
@@ -209,7 +227,8 @@ export function HomePage() {
             />
             <PathCard 
               keyName="arabic"
-              flag="🇸🇦" 
+              icon={<Languages size={34} />}
+              badge="Arabic Fluency"
               title="Understand Arabic" 
               desc="Unlock cultural depth and colloquial fluency across the Arab world."
               color="emerald"
@@ -284,7 +303,22 @@ export function HomePage() {
 }
 
 // --- SUB-COMPONENT: PATH CARD ---
-function PathCard({ flag, title, desc, color, features, onStart }) {
+const pathCardColors = {
+  blue: {
+    ghost: 'text-blue-500/5',
+    dot: 'bg-blue-500',
+    hover: 'group-hover:bg-blue-500',
+  },
+  emerald: {
+    ghost: 'text-emerald-500/5',
+    dot: 'bg-emerald-500',
+    hover: 'group-hover:bg-emerald-500',
+  },
+};
+
+function PathCard({ icon, badge, title, desc, color, features, onStart }) {
+  const colorClasses = pathCardColors[color] ?? pathCardColors.blue;
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 30 }}
@@ -292,19 +326,22 @@ function PathCard({ flag, title, desc, color, features, onStart }) {
       whileHover={{ y: -10 }}
       className={`group relative overflow-hidden rounded-[2rem] border border-white/5 bg-slate-900/50 p-6 sm:rounded-[3rem] sm:p-10 lg:rounded-[3.5rem] lg:p-12`}
     >
-      <div className={`pointer-events-none absolute right-0 top-0 p-8 text-[7rem] font-black text-${color}-500/5 transition-opacity group-hover:opacity-10 sm:p-12 sm:text-[12rem]`}>
-        {flag}
+      <div className={`pointer-events-none absolute right-0 top-0 p-8 text-[7rem] font-black ${colorClasses.ghost} transition-opacity group-hover:opacity-10 sm:p-12 sm:text-[12rem]`}>
+        {color === 'blue' ? 'EN' : 'AR'}
       </div>
       
       <div className="relative z-10">
-        <div className="mb-6 text-5xl sm:mb-8 sm:text-6xl">{flag}</div>
+        <div className={`mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 ${colorClasses.dot} text-white shadow-2xl sm:mb-8`}>
+          {icon}
+        </div>
+        <p className="mb-3 text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">{badge}</p>
         <h3 className="mb-4 text-3xl font-black sm:text-4xl">{title}</h3>
         <p className="mb-8 max-w-xs text-base text-slate-400 sm:text-lg">{desc}</p>
         
         <ul className="mb-8 space-y-4 sm:mb-12">
           {features.map((f, i) => (
             <li key={i} className="flex items-center gap-3 font-bold text-sm text-slate-300">
-              <div className={`h-2 w-2 rounded-full bg-${color}-500`} />
+              <div className={`h-2 w-2 rounded-full ${colorClasses.dot}`} />
               {f}
             </li>
           ))}
@@ -312,7 +349,7 @@ function PathCard({ flag, title, desc, color, features, onStart }) {
 
         <button 
           onClick={onStart}
-          className={`w-full rounded-2xl bg-white py-4 text-base font-black text-slate-950 transition-all group-hover:bg-${color}-500 group-hover:text-white sm:py-5 sm:text-lg`}
+          className={`w-full rounded-2xl bg-white py-4 text-base font-black text-slate-950 transition-all ${colorClasses.hover} group-hover:text-white sm:py-5 sm:text-lg`}
         >
           Launch Pathway
         </button>

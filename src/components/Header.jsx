@@ -9,7 +9,7 @@ import {
   LayoutDashboard, 
   Map, 
   Sparkles,
-  Trophy,
+  CalendarDays,
   CreditCard,
   Sun,
   Moon,
@@ -18,10 +18,10 @@ import {
 
 const navLinks = [
   { href: '/', label: 'Overview', icon: <LayoutDashboard size={16} />, exact: true },
+  { href: '/daily-lessons', label: 'Today', icon: <CalendarDays size={16} /> },
   { href: '/pathways', label: 'Odyssey', icon: <Map size={16} /> },
   { href: '/pricing', label: 'Plans', icon: <CreditCard size={16} /> },
   { href: '/architects', label: 'Architects', icon: <Hammer size={16} /> }, // NEW PAGE
-  { href: '/leaderboard', label: 'Hall of Fame', icon: <Trophy size={16} /> },
 ];
 
 export function Header() {
@@ -57,7 +57,7 @@ export function Header() {
         </Link>
 
         {/* --- 2. DESKTOP NAV (Magnetic Style) --- */}
-        <nav className="hidden lg:flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/5">
+        <nav className="header-nav hidden lg:flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/5">
           <LayoutGroup>
             {navLinks.map((link) => {
               const isActive = link.exact
@@ -69,7 +69,7 @@ export function Header() {
                   key={link.href}
                   to={link.href}
                   className={`
-                    nav-link
+                    nav-link header-nav-link
                     relative flex items-center gap-2 px-5 py-2 text-xs font-black uppercase tracking-widest transition-all
                     ${isActive ? 'nav-link-active text-white' : 'text-slate-400 hover:text-slate-200'}
                   `}
@@ -78,7 +78,7 @@ export function Header() {
                   {isActive && (
                     <motion.div
                       layoutId="activePill"
-                      className="absolute inset-0 bg-white/10 rounded-xl border border-white/10"
+                      className="header-nav-active-pill absolute inset-0 bg-white/10 rounded-xl border border-white/10"
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
@@ -97,7 +97,7 @@ export function Header() {
           <button
             type="button"
             onClick={actions.toggleTheme}
-            className="header-control hidden h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10 sm:inline-flex"
+            className="header-control header-icon-button hidden h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10 sm:inline-flex"
             aria-label={themeLabel}
             title={themeLabel}
           >
@@ -105,8 +105,8 @@ export function Header() {
           </button>
 
           {/* User Progress Badge */}
-          <div className="header-control hidden md:flex items-center gap-3 px-4 py-2 rounded-2xl bg-white/5 border border-white/5">
-            {state.isLoggedIn ? (
+          {state.isLoggedIn && (
+            <div className="header-control header-progress hidden items-center gap-2 rounded-xl border border-white/5 bg-white/5 px-3 py-2 md:flex">
               <div className="flex items-center gap-3">
                 <Activity size={15} className="text-emerald-400" />
                 <div className="leading-none">
@@ -114,20 +114,15 @@ export function Header() {
                   <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider">{state.xp} XP earned</span>
                 </div>
               </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Sparkles size={14} className="text-emerald-400" />
-                <span className="text-[10px] font-black text-white uppercase tracking-wider">Start Learning</span>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Auth Button */}
           {state.isLoggedIn ? (
             <motion.button
               whileHover={{ scale: 1.05 }}
               onClick={actions.logout}
-              className="px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all sm:px-5"
+              className="header-signout px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all sm:px-5"
             >
               Sign Out
             </motion.button>
@@ -144,7 +139,7 @@ export function Header() {
 
           {/* Mobile Menu Toggle */}
           <button
-            className="header-menu lg:hidden p-2 text-white bg-white/5 rounded-xl border border-white/10"
+            className="header-menu header-icon-button lg:hidden p-2 text-white bg-white/5 rounded-xl border border-white/10"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Open navigation menu"
           >
@@ -166,7 +161,7 @@ export function Header() {
               <button
                 type="button"
                 onClick={actions.toggleTheme}
-                className="header-control mb-2 flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-left text-sm font-black uppercase tracking-widest text-white"
+                className="header-control header-mobile-theme mb-2 flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-left text-sm font-black uppercase tracking-widest text-white"
               >
                 <span>{themeLabel}</span>
                 {state.theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}

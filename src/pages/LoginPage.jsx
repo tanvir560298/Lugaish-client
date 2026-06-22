@@ -1,360 +1,370 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useAppContext } from '../state/AppContext.jsx';
-import { 
-  User, 
-  Mail, 
-  Briefcase, 
-  Target, 
-  Clock, 
-  Share2, 
-  ChevronRight, 
-  Trophy,
-  Sparkles
-} from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { AnimatePresence, motion } from 'framer-motion';
+import { CheckCircle2, Loader2, LockKeyhole, ShieldCheck, Sparkles, Trophy } from 'lucide-react';
+import { useState } from 'react';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { isFirebaseConfigured, signInWithGoogle } from '../lib/firebase.js';
+import { useAppContext } from '../state/AppContext.jsx';
 
- // --- SUB-COMPONENT: THE CLIMBING CHARACTER (FIXED VERSION) ---
-const LadderVisual = ({ progress }) => {
-  const messages = [
-    "Ready to start the climb?",
-    "Great start! Keep going!",
-    "You're halfway to the top!",
-    "Almost there, don't stop!",
-    "One more step to greatness!",
-    "CONGRATS! YOU MADE IT! 🏆"
-  ];
+function getFriendlyAuthError(error) {
+  const code = error?.code || error?.message || '';
 
-  // Logic to ensure message index stays within bounds
-  const currentMessage = messages[Math.min(
-    Math.floor((progress / 100) * messages.length), 
-    messages.length - 1
-  )];
+  if (code.includes('auth/configuration-not-found')) {
+    return 'Firebase Authentication is not enabled yet. Enable Google sign-in in Firebase Console.';
+  }
+
+  if (code.includes('auth/operation-not-allowed')) {
+    return 'Google sign-in is not enabled yet. Turn on Google provider in Firebase Authentication.';
+  }
+
+  if (code.includes('auth/unauthorized-domain')) {
+    return 'This local domain is not authorized in Firebase. Add 127.0.0.1 and localhost in Authorized domains.';
+  }
+
+  if (code.includes('auth/popup-closed-by-user')) {
+    return 'Google sign-in popup was closed before finishing.';
+  }
+
+  return error?.message || 'Google sign in failed';
+}
+
+function LadderVisual({ progress = 0, isSignup = false }) {
+  const progressPercent = Math.max(0, Math.min(1, progress)) * 100;
+  const currentStep = Math.round(progress * 5);
 
   return (
-    <div className="relative h-full w-full flex flex-col items-center justify-center pt-32 pb-12 px-12">
-      {/* 
-         CONTAINER BOX 
-         Added overflow-visible to ensure bubble isn't clipped 
-      */}
-      <div className="relative h-[400px] w-24 overflow-visible">
-        
-        {/* The Ladder Rails */}
-        <div className="absolute inset-y-0 left-0 w-2 bg-slate-800/50 rounded-full" />
-        <div className="absolute inset-y-0 right-0 w-2 bg-slate-800/50 rounded-full" />
-        
-        {/* The Rungs (Steps) */}
+    <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden px-12 pb-12 pt-28">
+      <div className="absolute left-16 top-16 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-emerald-300">
+        {isSignup ? `${currentStep}/5 profile steps` : 'Secure sign in'}
+      </div>
+
+      <div className="relative h-[430px] w-28 overflow-visible">
+        <div className="absolute inset-y-0 left-0 w-2 rounded-full bg-slate-800/50" />
+        <div className="absolute inset-y-0 right-0 w-2 rounded-full bg-slate-800/50" />
         {[...Array(7)].map((_, i) => (
-          <div 
-            key={i} 
-            className="absolute left-0 right-0 h-2 bg-slate-800/50 rounded-full"
-            style={{ top: `${(i) * 16.6}%` }}
+          <div
+            key={i}
+            className={`absolute left-0 right-0 h-2 rounded-full transition-colors duration-500 ${i <= currentStep ? 'bg-emerald-400/80' : 'bg-slate-800/70'}`}
+            style={{ top: `${i * 16.6}%` }}
           />
         ))}
 
-        {/* The Glowing Progress Line */}
-        <motion.div 
-          className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-blue-600 via-emerald-400 to-emerald-300 rounded-full z-10"
-          initial={{ height: 0 }}
-          animate={{ height: `${progress}%` }}
-          transition={{ type: 'spring', stiffness: 50, damping: 20 }}
+        <motion.div
+          className="absolute bottom-0 left-0 right-0 z-10 rounded-full bg-gradient-to-t from-blue-600 via-emerald-400 to-emerald-300"
+          animate={{ height: `${Math.max(12, progressPercent)}%` }}
+          transition={{ type: 'spring', stiffness: 90, damping: 18 }}
         />
 
-        {/* The Character (Lugie) */}
         <motion.div
-          className="absolute left-1/2 -translate-x-1/2 z-30"
-          initial={{ bottom: '0%' }}
-          animate={{ 
-            // We stop at 95% visually so the head doesn't clip the very top rail
-            bottom: `${progress}%`,
-            y: progress === 100 ? [0, -10, 0] : 0
-          }}
-          transition={{ 
-            bottom: { type: 'spring', stiffness: 60, damping: 15 },
-            y: { duration: 2, repeat: Infinity }
-          }}
+          className="absolute left-1/2 z-30 -translate-x-1/2"
+          animate={{ bottom: `${progressPercent}%` }}
+          transition={{ type: 'spring', stiffness: 90, damping: 18 }}
         >
-          {/* Speech Bubble - Adjusted positioning to never get cut off */}
-          <AnimatePresence mode="wait">
-            <motion.div 
-              key={currentMessage}
-              initial={{ opacity: 0, y: 10, scale: 0.8 }}
-              animate={{ opacity: 1, y: -65, scale: 1 }}
-              exit={{ opacity: 0, y: -20 }}
-              className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap px-4 py-2 rounded-2xl font-black text-xs shadow-2xl border-2 transition-colors duration-500 ${
-                progress === 100 
-                ? 'bg-emerald-500 text-white border-emerald-400' 
-                : 'bg-white text-slate-900 border-blue-100'
-              }`}
-            >
-              {currentMessage}
-              <div className={`absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 border-b-2 border-r-2 ${
-                progress === 100 ? 'bg-emerald-500 border-emerald-400' : 'bg-white border-blue-100'
-              }`} />
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Character Body */}
-          <motion.div 
-             className={`w-16 h-16 rounded-2xl shadow-2xl border-4 flex items-center justify-center transition-all duration-500 ${
-               progress === 100 
-               ? 'bg-emerald-500 border-white shadow-emerald-500/50 scale-110' 
-               : 'bg-gradient-to-br from-blue-500 to-emerald-500 border-white/20'
-             }`}
+          <motion.div
+            animate={{ opacity: 1, y: -65, scale: progress > 0 ? 1 : 0.95 }}
+            transition={{ type: 'spring', stiffness: 120, damping: 16 }}
+            className="absolute left-1/2 whitespace-nowrap rounded-2xl border-2 border-emerald-400 bg-emerald-500 px-4 py-2 text-xs font-black text-white shadow-2xl -translate-x-1/2"
           >
-            {progress === 100 ? (
-              <motion.div
-                animate={{ rotate: [0, 20, -20, 0] }}
-                transition={{ repeat: Infinity, duration: 1 }}
-              >
-                <Trophy size={32} className="text-white" />
-              </motion.div>
-            ) : (
-              <Sparkles size={32} className="text-white" />
-            )}
+            {isSignup ? (progress >= 1 ? 'Ready to start.' : 'Fill to climb.') : 'One click return.'}
+            <div className="absolute -bottom-2 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-b-2 border-r-2 border-emerald-400 bg-emerald-500" />
           </motion.div>
+
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl border-4 border-white bg-emerald-500 shadow-2xl shadow-emerald-500/50">
+            <ShieldCheck size={32} className="text-white" />
+          </div>
         </motion.div>
       </div>
 
-      {/* Decorative Floor */}
-      <div className="mt-8 text-center">
-        <div className="w-48 h-2 bg-slate-800/50 rounded-full mx-auto" />
-        <p className="mt-4 text-slate-500 font-black uppercase tracking-[0.4em] text-[9px]">Level: {Math.floor(progress / 20) + 1}</p>
-      </div>
+      {[0, 1, 2].map(index => (
+        <div
+          key={index}
+          className={`absolute right-16 rounded-2xl border px-4 py-3 text-sm font-black shadow-2xl backdrop-blur transition-colors duration-500 ${
+            currentStep > index + 1
+              ? 'border-emerald-400/40 bg-emerald-400/15 text-emerald-100'
+              : 'border-white/10 bg-white/5 text-white'
+          }`}
+          style={{ top: `${34 + index * 15}%` }}
+        >
+          Step {index + 1}
+        </div>
+      ))}
     </div>
   );
-};
+}
 
-export function LoginPage() {
+export function LoginPage({ mode = 'login' }) {
   const { state, actions } = useAppContext();
   const navigate = useNavigate();
   const location = useLocation();
   const redirectTo = location.state?.from?.pathname ?? '/dashboard';
-  const [isLogin, setIsLogin] = useState(true);
-
-  const [form, setForm] = useState({
-    name: state.userName || '',
-    email: state.userEmail || '',
-    password: '',
-    profession: state.learnerProfile?.profession || '',
-    expectation: state.learnerProfile?.expectation || '',
-    courseDuration: state.learnerProfile?.courseDuration || '',
-    referralSource: state.learnerProfile?.referralSource || '',
-  });
-
-  const [isSuccess, setIsSuccess] = useState(false);
+  const isSignup = mode === 'signup' || location.pathname === '/signup';
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
-
-  // Dynamic progress calculation based on non-empty strings
-  const progress = useMemo(() => {
-    const fields = isLogin
-      ? [form.email, form.password]
-      : Object.values(form);
-    const filledFields = fields.filter(value => value && value.trim() !== '').length;
-    return (filledFields / fields.length) * 100;
-  }, [form, isLogin]);
-
-  const updateField = (field, value) => {
-    setForm(prev => ({ ...prev, [field]: value }));
-  };
+  const [form, setForm] = useState({
+    displayName: '',
+    profession: '',
+    expectation: '',
+    courseDuration: '',
+    referralSource: '',
+  });
 
   if (state.isLoggedIn) {
     return <Navigate to={redirectTo} replace />;
   }
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (!form.email.trim() || !form.password.trim()) return;
-    if (!isLogin && !form.name.trim()) return;
+  const celebrate = () => {
+    const end = Date.now() + 1400;
 
+    (function frame() {
+      confetti({
+        particleCount: 4,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: ['#3b82f6', '#10b981'],
+      });
+      confetti({
+        particleCount: 4,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: ['#3b82f6', '#10b981'],
+      });
+
+      if (Date.now() < end) requestAnimationFrame(frame);
+    }());
+  };
+
+  const handleGoogleSignIn = async () => {
     setError('');
     setIsSubmitting(true);
 
     try {
-      await actions.authenticate({
-        mode: isLogin ? 'login' : 'signup',
-        name: form.name.trim() || form.email.split('@')[0],
-        email: form.email.trim(),
-        password: form.password,
+      const { idToken, user } = await signInWithGoogle();
+      await actions.authenticateWithFirebase({
+        idToken,
         languageSelected: state.activePathway,
-        learnerProfile: {
-          profession: form.profession,
-          expectation: form.expectation,
-          courseDuration: form.courseDuration,
-          referralSource: form.referralSource,
+        displayName: form.displayName,
+        firebaseUser: {
+          name: user.displayName,
+          email: user.email,
+          avatarUrl: user.photoURL,
         },
+        learnerProfile: isSignup
+          ? {
+              profession: form.profession,
+              expectation: form.expectation,
+              courseDuration: form.courseDuration,
+              referralSource: form.referralSource,
+            }
+          : undefined,
       });
+      setIsSuccess(true);
+      celebrate();
+      setTimeout(() => navigate(redirectTo, { replace: true }), 900);
     } catch (err) {
-      setError(err.message || 'Authentication failed');
+      setError(getFriendlyAuthError(err));
       setIsSubmitting(false);
-      return;
     }
-
-    setIsSuccess(true);
-    
-    // Epic Celebration
-    const duration = 3 * 1000;
-    const end = Date.now() + duration;
-
-    (function frame() {
-      confetti({
-        particleCount: 3,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0 },
-        colors: ['#3b82f6', '#10b981']
-      });
-      confetti({
-        particleCount: 3,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1 },
-        colors: ['#3b82f6', '#10b981']
-      });
-
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    }());
-
-    setTimeout(() => {
-      navigate(redirectTo, { replace: true });
-    }, 1600);
   };
 
-  // --- REGISTRATION UI ---
+  const updateForm = (field, value) => {
+    setForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const completedFields = [
+    form.displayName,
+    form.profession,
+    form.courseDuration,
+    form.expectation,
+    form.referralSource,
+  ].filter(value => value.trim()).length;
+  const visualProgress = isSignup ? completedFields / 5 : 0.45;
+
   return (
     <section className="relative min-h-[calc(100svh-96px)]">
       <div className="grid items-start gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-12">
-        
-        {/* LEFT COLUMN: THE LADDER (STICKY) */}
-        <div className="sticky top-12 hidden lg:block h-[650px] rounded-[3rem] border border-white/5 bg-slate-900/40 backdrop-blur-sm overflow-visible">
-           <LadderVisual progress={progress} />
+        <div className="sticky top-12 hidden h-[650px] overflow-visible rounded-[3rem] border border-white/5 bg-slate-900/40 backdrop-blur-sm lg:block">
+          <LadderVisual progress={visualProgress} isSignup={isSignup} />
         </div>
 
-        {/* RIGHT COLUMN: THE FORM */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="space-y-7 py-2 sm:space-y-10 sm:py-4"
+          className="space-y-8 py-2 sm:py-4"
         >
           <div className="space-y-4">
-             <h1 className="text-4xl font-black tracking-tighter text-white sm:text-5xl">
-               {isLogin ? 'Welcome Back.' : 'Start your Ascent.'}
-             </h1>
-             <p className="text-base text-slate-400 sm:text-lg">
-               {isLogin ? 'Sign in to continue your English and Arabic learning journey.' : 'Complete your profile to unlock your personalized pathway.'}
-             </p>
+            <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-black uppercase tracking-[0.24em] text-emerald-400">
+              <Sparkles size={14} />
+              {isSignup ? 'Google only signup' : 'Google only sign in'}
+            </p>
+            <h1 className="text-4xl font-black tracking-tighter text-white sm:text-5xl">
+              {isSignup ? 'Start your ascent.' : 'Continue your ascent.'}
+            </h1>
+            <p className="max-w-xl text-base leading-relaxed text-slate-400 sm:text-lg">
+              {isSignup
+                ? 'Tell us a little about your goal, then create your account with Google.'
+                : 'Use your Google account to return to your lessons, progress, and enrolled courses.'}
+            </p>
           </div>
 
-          <div className="grid grid-cols-2 rounded-[1.5rem] border border-white/10 bg-white/5 p-1">
-            <button
-              type="button"
-              onClick={() => {
-                setIsLogin(true);
-                setError('');
-              }}
-              className={`rounded-[1.2rem] px-4 py-3 text-sm font-black transition-all ${isLogin ? 'bg-white text-slate-950' : 'text-slate-400 hover:text-white'}`}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setIsLogin(false);
-                setError('');
-              }}
-              className={`rounded-[1.2rem] px-4 py-3 text-sm font-black transition-all ${!isLogin ? 'bg-white text-slate-950' : 'text-slate-400 hover:text-white'}`}
-            >
-              Create Account
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid gap-6 sm:grid-cols-2">
-              {!isLogin && <InputField label="Name" value={form.name} onChange={v => updateField('name', v)} />}
-              <InputField label="Email" type="email" value={form.email} onChange={v => updateField('email', v)} />
-              <InputField label="Password" type="password" value={form.password} onChange={v => updateField('password', v)} />
+          <div className="section-card max-w-xl p-6 sm:p-8">
+            <div className="mb-6 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-slate-950/70 p-1">
+              <Link
+                to="/login"
+                className={`rounded-xl px-4 py-3 text-center text-sm font-black uppercase tracking-[0.14em] transition ${!isSignup ? 'bg-white text-slate-950' : 'text-slate-400 hover:text-white'}`}
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/signup"
+                className={`rounded-xl px-4 py-3 text-center text-sm font-black uppercase tracking-[0.14em] transition ${isSignup ? 'bg-white text-slate-950' : 'text-slate-400 hover:text-white'}`}
+              >
+                Sign Up
+              </Link>
             </div>
 
-            {!isLogin && (
-              <>
-                <SelectField 
-                  label="Profession" 
-                  value={form.profession}
-                  onChange={v => updateField('profession', v)}
-                  options={["Student", "Teacher", "Professional", "Business Owner", "Freelancer", "Other"]}
+            {isSignup ? (
+            <div className="mb-6 grid gap-4">
+              <div className="grid gap-2">
+                <label htmlFor="displayName" className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">
+                  Name
+                </label>
+                <input
+                  id="displayName"
+                  value={form.displayName}
+                  onChange={event => updateForm('displayName', event.target.value)}
+                  placeholder="Your preferred name"
+                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/70 focus:bg-white/10"
                 />
+              </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-400 ml-1">Your Expectations</label>
-                  <textarea
-                    value={form.expectation}
-                    onChange={e => updateField('expectation', e.target.value)}
-                    placeholder="I want to speak confidently..."
-                    className="w-full h-32 rounded-[2rem] border border-white/10 bg-slate-900/50 px-6 py-4 text-white focus:border-blue-500 outline-none transition-all resize-none"
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-2">
+                  <label htmlFor="profession" className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">
+                    Profession
+                  </label>
+                  <input
+                    id="profession"
+                    value={form.profession}
+                    onChange={event => updateForm('profession', event.target.value)}
+                    placeholder="Student, job holder..."
+                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/70 focus:bg-white/10"
                   />
                 </div>
 
-                <div className="grid gap-6 sm:grid-cols-2">
-                  <SelectField 
-                    label="Course Duration" 
-                    value={form.courseDuration}
-                    onChange={v => updateField('courseDuration', v)}
-                    options={["1 Month", "3 Months", "6 Months", "Flexible"]}
-                  />
-                  <SelectField 
-                    label="How you found us" 
+                <div className="grid gap-2">
+                  <label htmlFor="courseDuration" className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">
+                    Course Duration
+                  </label>
+                  <div className="select-field">
+                    <select
+                      id="courseDuration"
+                      value={form.courseDuration}
+                      onChange={event => updateForm('courseDuration', event.target.value)}
+                    >
+                      <option value="">Choose one</option>
+                      <option value="3-months">3 months</option>
+                      <option value="6-months">6 months</option>
+                      <option value="1-year">1 year</option>
+                      <option value="2-years">2 years</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-2">
+                <label htmlFor="expectation" className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">
+                  Learning Goal
+                </label>
+                <textarea
+                  id="expectation"
+                  value={form.expectation}
+                  onChange={event => updateForm('expectation', event.target.value)}
+                  placeholder="Speaking, job interview, travel, Quranic Arabic..."
+                  rows={3}
+                  className="min-h-24 w-full resize-none rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/70 focus:bg-white/10"
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <label htmlFor="referralSource" className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">
+                  How did you hear about us?
+                </label>
+                <div className="select-field">
+                  <select
+                    id="referralSource"
                     value={form.referralSource}
-                    onChange={v => updateField('referralSource', v)}
-                    options={["Social Media", "Friend", "Search", "Other"]}
-                  />
+                    onChange={event => updateForm('referralSource', event.target.value)}
+                  >
+                    <option value="">Choose one</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="youtube">YouTube</option>
+                    <option value="friend">Friend or family</option>
+                    <option value="search">Google search</option>
+                    <option value="other">Other</option>
+                  </select>
                 </div>
-              </>
+              </div>
+            </div>
+            ) : (
+              <div className="mb-6 rounded-2xl border border-white/10 bg-white/5 p-5">
+                <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-400/15 text-emerald-300">
+                  <LockKeyhole size={22} />
+                </div>
+                <h2 className="text-xl font-black text-white">Welcome back</h2>
+                <p className="mt-2 text-sm font-semibold leading-relaxed text-slate-400">
+                  Sign in with the same Google account you used before. Your profile and courses stay attached.
+                </p>
+              </div>
+            )}
+
+            <div className="mb-6 grid gap-3">
+              {[
+                'No password to remember',
+                'One account for English and Arabic courses',
+                'Course enrollment stays attached to your Google account',
+              ].map(item => (
+                <div key={item} className="flex items-center gap-3 text-sm font-semibold text-slate-300">
+                  <CheckCircle2 size={17} className="text-emerald-400" />
+                  {item}
+                </div>
+              ))}
+            </div>
+
+            {isFirebaseConfigured ? (
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={isSubmitting}
+                className="google-login-shell flex min-h-14 w-full items-center justify-center gap-3 rounded-full bg-white px-5 text-sm font-black uppercase tracking-[0.14em] text-slate-950 shadow-xl shadow-black/20 transition hover:-translate-y-0.5 hover:bg-slate-100 disabled:pointer-events-none disabled:opacity-60"
+              >
+                {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} className="text-emerald-500" />}
+                Continue with Google
+              </button>
+            ) : (
+              <div className="rounded-2xl border border-amber-400/30 bg-amber-500/10 px-5 py-4 text-sm font-semibold text-amber-100">
+                Firebase login needs the frontend Firebase environment values.
+              </div>
             )}
 
             {error && (
-              <p className="rounded-2xl border border-red-400/30 bg-red-500/10 px-5 py-4 text-sm font-semibold text-red-100">
+              <p className="mt-5 rounded-2xl border border-red-400/30 bg-red-500/10 px-5 py-4 text-sm font-semibold text-red-100">
                 {error}
               </p>
             )}
-
-            <button 
-              type="submit" 
-              className={`w-full rounded-[1.5rem] py-4 text-base font-black transition-all sm:rounded-[2rem] sm:py-6 sm:text-xl ${
-                progress === 100 
-                ? 'bg-gradient-to-r from-blue-600 to-emerald-500 text-white shadow-2xl shadow-emerald-500/20' 
-                : 'bg-slate-800 text-slate-500 cursor-not-allowed'
-              }`}
-            >
-              {isSubmitting ? 'Connecting...' : isSuccess ? "Finishing the Climb..." : progress === 100 ? (isLogin ? 'Continue Learning' : 'Ready to Launch!') : (isLogin ? 'Enter Email & Password' : 'Complete the Steps Above')}
-            </button>
-
-            <p className="text-center text-sm font-semibold text-slate-400">
-              {isLogin ? "Don't have an account yet? " : 'Already have an account? '}
-              <button
-                type="button"
-                onClick={() => {
-                  setIsLogin(prev => !prev);
-                  setError('');
-                }}
-                className="text-blue-300 hover:text-emerald-300"
-              >
-                {isLogin ? 'Create your ascent profile' : 'Sign in instead'}
-              </button>
-            </p>
-          </form>
+          </div>
         </motion.div>
       </div>
 
-      {/* FULL SCREEN CELEBRATION OVERLAY */}
       <AnimatePresence>
         {isSuccess && (
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[999] bg-slate-950/90 backdrop-blur-2xl flex flex-col items-center justify-center p-6 text-center"
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-slate-950/90 p-6 text-center backdrop-blur-2xl"
           >
             <motion.div initial={{ scale: 0 }} animate={{ scale: 1, rotate: [0, 10, -10, 0] }} className="mb-6 rounded-[2rem] bg-emerald-500 p-6 shadow-[0_0_50px_rgba(16,185,129,0.5)] sm:mb-8 sm:rounded-[3rem] sm:p-8">
               <Trophy size={64} className="text-white sm:h-20 sm:w-20" />
@@ -365,33 +375,5 @@ export function LoginPage() {
         )}
       </AnimatePresence>
     </section>
-  );
-}
-
-// Minimalist Internal Components for the form
-function InputField({ label, value, onChange, type="text" }) {
-  return (
-    <div className="space-y-2">
-      <label className="text-sm font-bold text-slate-400 ml-1">{label}</label>
-      <input 
-        type={type} value={value} onChange={e => onChange(e.target.value)}
-        className="w-full rounded-2xl border border-white/10 bg-slate-900/50 px-4 py-3 text-white outline-none transition-all focus:border-blue-500 sm:px-6 sm:py-4"
-      />
-    </div>
-  );
-}
-
-function SelectField({ label, value, onChange, options }) {
-  return (
-    <div className="space-y-2">
-      <label className="text-sm font-bold text-slate-400 ml-1">{label}</label>
-      <select 
-        value={value} onChange={e => onChange(e.target.value)}
-        className="w-full appearance-none rounded-2xl border border-white/10 bg-slate-900/50 px-4 py-3 text-white outline-none focus:border-blue-500 sm:px-6 sm:py-4"
-      >
-        <option value="">Select Option</option>
-        {options.map(o => <option key={o} value={o} className="bg-slate-900">{o}</option>)}
-      </select>
-    </div>
   );
 }

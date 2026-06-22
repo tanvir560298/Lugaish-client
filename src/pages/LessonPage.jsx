@@ -1,15 +1,29 @@
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAppContext, getLessonFromState, getPathFromState } from '../state/AppContext.jsx';
 
 export function LessonPage() {
   const { state, actions, courseData } = useAppContext();
+  const { day } = useParams();
   const lesson = getLessonFromState(state, courseData);
   const pathway = getPathFromState(state, courseData);
   const [activeTab, setActiveTab] = useState('vocab');
   const [cardIndex, setCardIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const dayNumber = Number(day);
+    if (!dayNumber || Number.isNaN(dayNumber)) return;
+
+    const lessons = pathway.modules.flatMap(module => module.lessons);
+    const lessonForDay = lessons[dayNumber - 1];
+    if (lessonForDay && lessonForDay.id !== state.activeLessonId) {
+      actions.setActiveLesson(lessonForDay.id, state.activePathway);
+      setCardIndex(0);
+      setFlipped(false);
+    }
+  }, [actions, day, pathway, state.activeLessonId, state.activePathway]);
 
   const progressLabel = useMemo(() => {
     const total = lesson?.cards.length ?? 0;
@@ -99,11 +113,11 @@ export function LessonPage() {
           </div>
 
           <div className="section-card p-5 sm:p-8">
-            <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Leaderboard teaser</p>
-            <h3 className="mt-4 text-xl font-bold text-white">Stay competitive</h3>
-            <p className="mt-3 text-slate-400">Review your position among other student leaders and earn XP to climb higher.</p>
-            <button className="mt-6 glow-button glow-button-muted" onClick={() => navigate('/leaderboard')}>
-              View leaderboard
+            <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Daily box</p>
+            <h3 className="mt-4 text-xl font-bold text-white">Video, cards, tasks</h3>
+            <p className="mt-3 text-slate-400">Return to the daily lesson boxes to pick another day or review completed work.</p>
+            <button className="mt-6 glow-button glow-button-muted" onClick={() => navigate('/daily-lessons')}>
+              View daily lessons
             </button>
           </div>
         </aside>

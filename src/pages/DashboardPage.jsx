@@ -10,6 +10,14 @@ export function DashboardPage() {
   }
   const pathway = getPathFromState(state, courseData);
   const activeLesson = getLessonFromState(state, courseData);
+  const enrolledCount = state.enrolledPathways?.length ?? 1;
+  const displayName = state.userName || 'Lugaish Learner';
+  const initials = displayName
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part[0]?.toUpperCase())
+    .join('') || 'LL';
   const level = Math.floor(state.xp / 500) + 1;
   const xpInLevel = state.xp % 500;
   const remaining = 500 - xpInLevel;
@@ -28,8 +36,8 @@ export function DashboardPage() {
       <div className="grid gap-6 xl:grid-cols-[340px_1fr]">
         <aside className="space-y-6">
           <div className="section-card p-8 text-center">
-            <div className="mx-auto mb-6 grid h-28 w-28 place-items-center rounded-full bg-gradient-to-br from-blue-500 to-green-500 text-4xl font-black text-white">JH</div>
-            <h2 className="text-2xl font-bold text-white">Jameel Hassan</h2>
+            <div className="mx-auto mb-6 grid h-28 w-28 place-items-center rounded-full bg-gradient-to-br from-blue-500 to-green-500 text-4xl font-black text-white">{initials}</div>
+            <h2 className="text-2xl font-bold text-white">{displayName}</h2>
             <p className="mt-1 text-sm uppercase tracking-[0.24em] text-slate-400">Student Leader</p>
             <div className="mt-8 space-y-4 text-left">
               <div className="flex items-center justify-between text-sm text-slate-300">
@@ -76,12 +84,13 @@ export function DashboardPage() {
           <div className="section-card p-8">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Current pathway</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Current course</p>
                 <h2 className="mt-3 text-2xl font-bold text-white">{pathway.title}</h2>
-                <p className="mt-3 text-slate-400">{activeLesson.description}</p>
+                <p className="mt-3 text-slate-400">{activeLesson?.description ?? 'Pick a pathway to begin your next lesson.'}</p>
+                <p className="mt-3 text-xs font-bold uppercase tracking-widest text-emerald-400">{enrolledCount} enrolled course{enrolledCount > 1 ? 's' : ''}</p>
               </div>
-              <Link to="/lesson" className="glow-button glow-button-blue">
-                Resume lesson
+              <Link to="/daily-lessons" className="glow-button glow-button-blue">
+                Open Today
               </Link>
             </div>
           </div>

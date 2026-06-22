@@ -8,6 +8,7 @@ const defaultState = {
   xp: 1250,
   streak: 12,
   completedLessons: [],
+  enrolledPathways: ['english'],
   activePathway: 'english',
   activeLessonId: 'en-les-1',
   badges: ['visionary-voice'],
@@ -74,6 +75,23 @@ function computeLevel(xp) {
   return Math.floor(xp / 500) + 1;
 }
 
+function getFirstLessonId(pathway) {
+  return COURSE_DATA[pathway]?.modules[0]?.lessons[0]?.id ?? defaultState.activeLessonId;
+}
+
+function normalizeState(state) {
+  const activePathway = COURSE_DATA[state.activePathway] ? state.activePathway : defaultState.activePathway;
+  const enrolledPathways = Array.isArray(state.enrolledPathways) && state.enrolledPathways.length
+    ? state.enrolledPathways.filter(pathway => COURSE_DATA[pathway])
+    : [activePathway];
+
+  return {
+    ...state,
+    activePathway,
+    enrolledPathways: [...new Set([...(enrolledPathways.length ? enrolledPathways : []), activePathway])],
+  };
+}
+
 function getLessonApiPayload(lessonId, pathway) {
   const path = COURSE_DATA[pathway];
   const lessons = path?.modules.flatMap(module => module.lessons) ?? [];
@@ -84,7 +102,7 @@ function getLessonApiPayload(lessonId, pathway) {
 }
 
 export function AppProvider({ children }) {
-  const [state, setState] = useState(() => loadState());
+  const [state, setState] = useState(() => normalizeState(loadState()));
 
   useEffect(() => {
     saveState(state);
@@ -96,10 +114,36 @@ export function AppProvider({ children }) {
 
   const actions = useMemo(() => ({
     switchPathway(pathway) {
-      setState(prev => ({ ...prev, activePathway: pathway }));
+      setState(prev => {
+        const currentPath = COURSE_DATA[pathway];
+        const activeLessonExists = currentPath?.modules
+          .flatMap(module => module.lessons)
+          .some(lesson => lesson.id === prev.activeLessonId);
+
+        return {
+          ...prev,
+          activePathway: pathway,
+          activeLessonId: activeLessonExists ? prev.activeLessonId : getFirstLessonId(pathway),
+        };
+      });
+    },
+    enrollPathway(pathway) {
+      setState(prev => ({
+        ...prev,
+        activePathway: pathway,
+        activeLessonId: getFirstLessonId(pathway),
+        enrolledPathways: [...new Set([...(prev.enrolledPathways ?? []), pathway])],
+      }));
+
+      api.enrollPathway({ language: pathway }).catch(() => {});
     },
     setActiveLesson(lessonId, pathway) {
-      setState(prev => ({ ...prev, activeLessonId: lessonId, activePathway: pathway }));
+      setState(prev => ({
+        ...prev,
+        activeLessonId: lessonId,
+        activePathway: pathway,
+        enrolledPathways: pathway ? [...new Set([...(prev.enrolledPathways ?? []), pathway])] : prev.enrolledPathways,
+      }));
     },
     completeLesson(lessonId) {
       setState(prev => {
@@ -138,12 +182,31 @@ export function AppProvider({ children }) {
           ...(nextProfile.learnerProfile ?? {}),
         },
         isLoggedIn: true,
+        enrolledPathways: prev.enrolledPathways?.length ? prev.enrolledPathways : [prev.activePathway],
       }));
     },
     async authenticate({ mode, name, email, password, languageSelected, learnerProfile }) {
-      const response = mode === 'login'
-        ? await api.login({ email, password })
-        : await api.signup({ name, email, password, languageSelected });
+      let response;
+
+      try {
+        response = mode === 'login'
+          ? await api.login({ email, password })
+          : await api.signup({ name, email, password, languageSelected });
+      } catch (error) {
+        if (!import.meta.env.DEV) {
+          throw error;
+        }
+
+        response = {
+          token: 'local-dev-session',
+          user: {
+            name: name || email.split('@')[0],
+            email,
+            languageSelected,
+            enrolledPathways: [languageSelected],
+          },
+        };
+      }
 
       setAuthToken(response.token);
       setState(prev => ({
@@ -151,9 +214,68 @@ export function AppProvider({ children }) {
         userName: response.user?.name ?? name ?? prev.userName,
         userEmail: response.user?.email ?? email ?? prev.userEmail,
         activePathway: response.user?.languageSelected ?? languageSelected ?? prev.activePathway,
+        activeLessonId: getFirstLessonId(response.user?.languageSelected ?? languageSelected ?? prev.activePathway),
+        enrolledPathways: response.user?.enrolledPathways?.length
+          ? response.user.enrolledPathways
+          : [
+              ...new Set([
+                ...((mode === 'login' && prev.enrolledPathways?.length) ? prev.enrolledPathways : []),
+                response.user?.languageSelected ?? languageSelected ?? prev.activePathway,
+              ]),
+            ],
         learnerProfile: {
           ...prev.learnerProfile,
           ...(learnerProfile ?? {}),
+        },
+        isLoggedIn: true,
+      }));
+
+      return response;
+    },
+    async authenticateWithFirebase({ idToken, languageSelected, displayName, firebaseUser, learnerProfile }) {
+      let response;
+      const localDevUser = {
+        token: 'local-dev-firebase-session',
+        user: {
+          name: displayName || firebaseUser?.name || firebaseUser?.email?.split('@')[0] || 'Learner',
+          email: firebaseUser?.email || '',
+          avatarUrl: firebaseUser?.avatarUrl,
+          languageSelected,
+          enrolledPathways: [languageSelected],
+          learnerProfile,
+        },
+      };
+
+      try {
+        response = import.meta.env.DEV && import.meta.env.VITE_USE_BACKEND_AUTH !== 'true'
+          ? localDevUser
+          : await api.firebaseLogin({
+              idToken,
+              languageSelected,
+              displayName,
+              learnerProfile,
+            });
+      } catch (error) {
+        if (!import.meta.env.DEV) {
+          throw error;
+        }
+
+        response = localDevUser;
+      }
+
+      setAuthToken(response.token);
+      setState(prev => ({
+        ...prev,
+        userName: response.user?.name ?? prev.userName,
+        userEmail: response.user?.email ?? prev.userEmail,
+        activePathway: response.user?.languageSelected ?? languageSelected ?? prev.activePathway,
+        activeLessonId: getFirstLessonId(response.user?.languageSelected ?? languageSelected ?? prev.activePathway),
+        enrolledPathways: response.user?.enrolledPathways?.length
+          ? response.user.enrolledPathways
+          : [response.user?.languageSelected ?? languageSelected ?? prev.activePathway],
+        learnerProfile: {
+          ...prev.learnerProfile,
+          ...(response.user?.learnerProfile ?? learnerProfile ?? {}),
         },
         isLoggedIn: true,
       }));
