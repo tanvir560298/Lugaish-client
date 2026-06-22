@@ -115,10 +115,6 @@ export function LoginPage({ mode = 'login' }) {
     referralSource: '',
   });
 
-  if (state.isLoggedIn) {
-    return <Navigate to={redirectTo} replace />;
-  }
-
   const celebrate = () => {
     const end = Date.now() + 1400;
 
@@ -233,6 +229,10 @@ export function LoginPage({ mode = 'login' }) {
     form.referralSource,
   ].filter(value => value.trim()).length;
   const visualProgress = isSignup ? completedFields / 5 : 0.45;
+
+  if (state.isLoggedIn) {
+    return <Navigate to={redirectTo} replace />;
+  }
 
   return (
     <section className="relative min-h-[calc(100svh-96px)]">
