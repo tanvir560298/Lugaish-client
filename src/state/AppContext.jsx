@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { api, setAuthToken } from '../api/client.js';
 import { COURSE_DATA } from '../data/courseData.js';
+import { ROLES, getRolePermissions, normalizeRole } from '../utils/roles.js';
 
 const LOCAL_STORAGE_KEY = 'lugaish_state_v1';
 
@@ -15,6 +16,8 @@ const defaultState = {
   activityData: [],
   userName: '',
   userEmail: '',
+  userRole: ROLES.learner,
+  permissions: [],
   learnerProfile: {
     profession: '',
     expectation: '',
@@ -89,6 +92,10 @@ function normalizeState(state) {
     ...state,
     activePathway,
     enrolledPathways: [...new Set([...(enrolledPathways.length ? enrolledPathways : []), activePathway])],
+    userRole: normalizeRole(state.userRole),
+    permissions: Array.isArray(state.permissions) && state.permissions.length
+      ? state.permissions
+      : getRolePermissions(state.userRole),
   };
 }
 
@@ -177,6 +184,8 @@ export function AppProvider({ children }) {
         ...prev,
         userName: nextProfile.userName ?? prev.userName,
         userEmail: nextProfile.userEmail ?? prev.userEmail,
+        userRole: normalizeRole(nextProfile.userRole ?? prev.userRole),
+        permissions: nextProfile.permissions ?? getRolePermissions(nextProfile.userRole ?? prev.userRole),
         learnerProfile: {
           ...prev.learnerProfile,
           ...(nextProfile.learnerProfile ?? {}),
@@ -202,6 +211,8 @@ export function AppProvider({ children }) {
           user: {
             name: name || email.split('@')[0],
             email,
+            role: ROLES.learner,
+            permissions: [],
             languageSelected,
             enrolledPathways: [languageSelected],
           },
@@ -213,6 +224,8 @@ export function AppProvider({ children }) {
         ...prev,
         userName: response.user?.name ?? name ?? prev.userName,
         userEmail: response.user?.email ?? email ?? prev.userEmail,
+        userRole: normalizeRole(response.user?.role ?? prev.userRole),
+        permissions: response.user?.permissions ?? getRolePermissions(response.user?.role ?? prev.userRole),
         activePathway: response.user?.languageSelected ?? languageSelected ?? prev.activePathway,
         activeLessonId: getFirstLessonId(response.user?.languageSelected ?? languageSelected ?? prev.activePathway),
         enrolledPathways: response.user?.enrolledPathways?.length
@@ -240,6 +253,8 @@ export function AppProvider({ children }) {
           name: displayName || firebaseUser?.name || firebaseUser?.email?.split('@')[0] || 'Learner',
           email: firebaseUser?.email || '',
           avatarUrl: firebaseUser?.avatarUrl,
+          role: ROLES.learner,
+          permissions: [],
           languageSelected,
           enrolledPathways: [languageSelected],
           learnerProfile,
@@ -268,6 +283,8 @@ export function AppProvider({ children }) {
         ...prev,
         userName: response.user?.name ?? prev.userName,
         userEmail: response.user?.email ?? prev.userEmail,
+        userRole: normalizeRole(response.user?.role ?? prev.userRole),
+        permissions: response.user?.permissions ?? getRolePermissions(response.user?.role ?? prev.userRole),
         activePathway: response.user?.languageSelected ?? languageSelected ?? prev.activePathway,
         activeLessonId: getFirstLessonId(response.user?.languageSelected ?? languageSelected ?? prev.activePathway),
         enrolledPathways: response.user?.enrolledPathways?.length
@@ -284,7 +301,14 @@ export function AppProvider({ children }) {
     },
     logout() {
       setAuthToken(null);
-      setState(prev => ({ ...prev, userName: '', userEmail: '', isLoggedIn: false }));
+      setState(prev => ({
+        ...prev,
+        userName: '',
+        userEmail: '',
+        userRole: ROLES.learner,
+        permissions: [],
+        isLoggedIn: false,
+      }));
     },
     toggleTheme() {
       setState(prev => ({ ...prev, theme: prev.theme === 'dark' ? 'light' : 'dark' }));

@@ -60,6 +60,15 @@ export const api = {
       body: JSON.stringify(payload),
     });
   },
+  listUsers() {
+    return request('/auth/users');
+  },
+  updateUserRole(userId, payload) {
+    return request(`/auth/users/${userId}/role`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  },
   completeLesson(payload) {
     return request('/lessons/complete', {
       method: 'POST',
