@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, getRedirectResult, GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
+import { getAuth, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signInWithRedirect } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -45,4 +45,30 @@ export async function getGoogleRedirectLoginResult() {
     idToken,
     user: result.user,
   };
+}
+
+export function waitForFirebaseUser(timeoutMs = 3500) {
+  if (!auth) {
+    return Promise.reject(new Error('Firebase is not configured yet.'));
+  }
+
+  return new Promise(resolve => {
+    const timeout = window.setTimeout(() => {
+      unsubscribe();
+      resolve(null);
+    }, timeoutMs);
+
+    const unsubscribe = onAuthStateChanged(auth, async user => {
+      window.clearTimeout(timeout);
+      unsubscribe();
+
+      if (!user) {
+        resolve(null);
+        return;
+      }
+
+      const idToken = await user.getIdToken();
+      resolve({ idToken, user });
+    });
+  });
 }

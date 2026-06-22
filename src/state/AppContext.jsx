@@ -271,7 +271,7 @@ export function AppProvider({ children }) {
               learnerProfile,
             });
       } catch (error) {
-        if (!import.meta.env.DEV) {
+        if (!import.meta.env.DEV && import.meta.env.VITE_REQUIRE_BACKEND_AUTH === 'true') {
           throw error;
         }
 

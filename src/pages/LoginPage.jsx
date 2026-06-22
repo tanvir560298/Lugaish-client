@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle2, Loader2, LockKeyhole, ShieldCheck, Sparkles, Trophy } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { getGoogleRedirectLoginResult, isFirebaseConfigured, signInWithGoogle } from '../lib/firebase.js';
+import { getGoogleRedirectLoginResult, isFirebaseConfigured, signInWithGoogle, waitForFirebaseUser } from '../lib/firebase.js';
 import { useAppContext } from '../state/AppContext.jsx';
 
 const GOOGLE_REDIRECT_CONTEXT_KEY = 'lugaish_google_redirect_context';
@@ -143,27 +143,27 @@ export function LoginPage({ mode = 'login' }) {
   };
 
   const finishGoogleLogin = async ({ idToken, user }, context = {}) => {
-      await actions.authenticateWithFirebase({
-        idToken,
+    await actions.authenticateWithFirebase({
+      idToken,
       languageSelected: context.languageSelected ?? state.activePathway,
       displayName: context.displayName ?? form.displayName,
-        firebaseUser: {
-          name: user.displayName,
-          email: user.email,
-          avatarUrl: user.photoURL,
-        },
+      firebaseUser: {
+        name: user.displayName,
+        email: user.email,
+        avatarUrl: user.photoURL,
+      },
       learnerProfile: context.isSignup
-          ? {
+        ? {
             profession: context.learnerProfile?.profession ?? '',
             expectation: context.learnerProfile?.expectation ?? '',
             courseDuration: context.learnerProfile?.courseDuration ?? '',
             referralSource: context.learnerProfile?.referralSource ?? '',
-            }
-          : undefined,
-      });
-      setIsSuccess(true);
-      celebrate();
-      setTimeout(() => navigate(redirectTo, { replace: true }), 900);
+          }
+        : undefined,
+    });
+    setIsSuccess(true);
+    celebrate();
+    setTimeout(() => navigate(redirectTo, { replace: true }), 900);
   };
 
   useEffect(() => {
@@ -174,7 +174,7 @@ export function LoginPage({ mode = 'login' }) {
     async function handleRedirectResult() {
       setIsSubmitting(true);
       try {
-        const result = await getGoogleRedirectLoginResult();
+        const result = await getGoogleRedirectLoginResult() ?? await waitForFirebaseUser();
         if (!result) {
           setIsSubmitting(false);
           return;
