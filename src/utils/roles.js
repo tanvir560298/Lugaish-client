@@ -12,6 +12,8 @@ export const ROLE_LABELS = {
   [ROLES.editor]: 'Editor',
 };
 
+export const ROLE_VALUES = Object.values(ROLES);
+
 export const ROLE_PERMISSIONS = {
   [ROLES.learner]: [],
   [ROLES.webDeveloper]: [
