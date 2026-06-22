@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Layout } from './components/Layout.jsx';
+import { SEO } from './components/SEO.jsx';
 import { AppProvider, useAppContext } from './state/AppContext.jsx';
 
 const HomePage = lazy(() => import('./pages/HomePage.jsx').then(module => ({ default: module.HomePage })));
@@ -49,6 +50,7 @@ function ProtectedRoute({ children }) {
 export default function App() {
   return (
     <AppProvider>
+      <SEO />
       <ScrollToTop />
       <Layout>
         <Suspense fallback={<PageFallback />}>
