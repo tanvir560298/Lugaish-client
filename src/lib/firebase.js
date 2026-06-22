@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { getAuth, getRedirectResult, GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -28,7 +28,17 @@ export async function signInWithGoogle() {
     throw new Error('Firebase is not configured yet.');
   }
 
-  const result = await signInWithPopup(auth, googleProvider);
+  await signInWithRedirect(auth, googleProvider);
+}
+
+export async function getGoogleRedirectLoginResult() {
+  if (!auth) {
+    throw new Error('Firebase is not configured yet.');
+  }
+
+  const result = await getRedirectResult(auth);
+  if (!result?.user) return null;
+
   const idToken = await result.user.getIdToken();
 
   return {

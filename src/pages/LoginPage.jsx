@@ -1,10 +1,12 @@
 import confetti from 'canvas-confetti';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle2, Loader2, LockKeyhole, ShieldCheck, Sparkles, Trophy } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { isFirebaseConfigured, signInWithGoogle } from '../lib/firebase.js';
+import { getGoogleRedirectLoginResult, isFirebaseConfigured, signInWithGoogle } from '../lib/firebase.js';
 import { useAppContext } from '../state/AppContext.jsx';
+
+const GOOGLE_REDIRECT_CONTEXT_KEY = 'lugaish_google_redirect_context';
 
 function getFriendlyAuthError(error) {
   const code = error?.code || error?.message || '';
@@ -22,7 +24,11 @@ function getFriendlyAuthError(error) {
   }
 
   if (code.includes('auth/popup-closed-by-user')) {
-    return 'Google sign-in popup was closed before finishing.';
+    return 'Google sign-in was closed before finishing.';
+  }
+
+  if (code.includes('auth/missing-initial-state')) {
+    return 'Safari blocked the sign-in state. Use the same live domain as Firebase authDomain, then try again.';
   }
 
   return error?.message || 'Google sign in failed';
@@ -136,33 +142,79 @@ export function LoginPage({ mode = 'login' }) {
     }());
   };
 
-  const handleGoogleSignIn = async () => {
-    setError('');
-    setIsSubmitting(true);
-
-    try {
-      const { idToken, user } = await signInWithGoogle();
+  const finishGoogleLogin = async ({ idToken, user }, context = {}) => {
       await actions.authenticateWithFirebase({
         idToken,
-        languageSelected: state.activePathway,
-        displayName: form.displayName,
+      languageSelected: context.languageSelected ?? state.activePathway,
+      displayName: context.displayName ?? form.displayName,
         firebaseUser: {
           name: user.displayName,
           email: user.email,
           avatarUrl: user.photoURL,
         },
-        learnerProfile: isSignup
+      learnerProfile: context.isSignup
           ? {
-              profession: form.profession,
-              expectation: form.expectation,
-              courseDuration: form.courseDuration,
-              referralSource: form.referralSource,
+            profession: context.learnerProfile?.profession ?? '',
+            expectation: context.learnerProfile?.expectation ?? '',
+            courseDuration: context.learnerProfile?.courseDuration ?? '',
+            referralSource: context.learnerProfile?.referralSource ?? '',
             }
           : undefined,
       });
       setIsSuccess(true);
       celebrate();
       setTimeout(() => navigate(redirectTo, { replace: true }), 900);
+  };
+
+  useEffect(() => {
+    if (!isFirebaseConfigured) return;
+
+    let ignore = false;
+
+    async function handleRedirectResult() {
+      setIsSubmitting(true);
+      try {
+        const result = await getGoogleRedirectLoginResult();
+        if (!result) {
+          setIsSubmitting(false);
+          return;
+        }
+
+        const context = JSON.parse(sessionStorage.getItem(GOOGLE_REDIRECT_CONTEXT_KEY) || '{}');
+        sessionStorage.removeItem(GOOGLE_REDIRECT_CONTEXT_KEY);
+        if (!ignore) await finishGoogleLogin(result, context);
+      } catch (err) {
+        if (!ignore) {
+          setError(getFriendlyAuthError(err));
+          setIsSubmitting(false);
+        }
+      }
+    }
+
+    handleRedirectResult();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  const handleGoogleSignIn = async () => {
+    setError('');
+    setIsSubmitting(true);
+
+    try {
+      sessionStorage.setItem(GOOGLE_REDIRECT_CONTEXT_KEY, JSON.stringify({
+        isSignup,
+        languageSelected: state.activePathway,
+        displayName: form.displayName,
+        learnerProfile: {
+          profession: form.profession,
+          expectation: form.expectation,
+          courseDuration: form.courseDuration,
+          referralSource: form.referralSource,
+        },
+      }));
+      await signInWithGoogle();
     } catch (err) {
       setError(getFriendlyAuthError(err));
       setIsSubmitting(false);
