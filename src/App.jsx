@@ -57,7 +57,7 @@ export default function App() {
           <Routes>
             <Route path='/' element={<HomePage />} />
             <Route path='/login' element={<LoginPage />} />
-            <Route path='/signup' element={<LoginPage mode="signup" />} />
+            <Route path='/signup' element={<Navigate to="/login" replace />} />
             <Route path='/auth' element={<Navigate to="/login" replace />} />
             <Route path='/pricing' element={<PricingPage />} />
             <Route path='/course/:language' element={<ProtectedRoute><CoursePage /></ProtectedRoute>} />

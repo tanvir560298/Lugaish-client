@@ -2,11 +2,12 @@ import confetti from 'canvas-confetti';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle2, Loader2, LockKeyhole, ShieldCheck, Sparkles, Trophy } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { getGoogleRedirectLoginResult, isFirebaseConfigured, signInWithGoogle, waitForFirebaseUser } from '../lib/firebase.js';
 import { useAppContext } from '../state/AppContext.jsx';
 
 const GOOGLE_REDIRECT_CONTEXT_KEY = 'lugaish_google_redirect_context';
+const SIGNUP_ENABLED = false;
 
 function getFriendlyAuthError(error) {
   const code = error?.code || error?.message || '';
@@ -103,7 +104,7 @@ export function LoginPage({ mode = 'login' }) {
   const navigate = useNavigate();
   const location = useLocation();
   const redirectTo = location.state?.from?.pathname ?? '/dashboard';
-  const isSignup = mode === 'signup' || location.pathname === '/signup';
+  const isSignup = SIGNUP_ENABLED && (mode === 'signup' || location.pathname === '/signup');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -264,21 +265,6 @@ export function LoginPage({ mode = 'login' }) {
           </div>
 
           <div className="section-card max-w-xl p-6 sm:p-8">
-            <div className="mb-6 grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-slate-950/70 p-1">
-              <Link
-                to="/login"
-                className={`rounded-xl px-4 py-3 text-center text-sm font-black uppercase tracking-[0.14em] transition ${!isSignup ? 'bg-white text-slate-950' : 'text-slate-400 hover:text-white'}`}
-              >
-                Sign In
-              </Link>
-              <Link
-                to="/signup"
-                className={`rounded-xl px-4 py-3 text-center text-sm font-black uppercase tracking-[0.14em] transition ${isSignup ? 'bg-white text-slate-950' : 'text-slate-400 hover:text-white'}`}
-              >
-                Sign Up
-              </Link>
-            </div>
-
             {isSignup ? (
             <div className="mb-6 grid gap-4">
               <div className="grid gap-2">

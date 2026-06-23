@@ -293,7 +293,7 @@ export function HomePage() {
                  onClick={() => navigate('/login')}
                  className="flex items-center gap-3 text-lg font-black text-white transition-colors hover:text-blue-400 sm:text-2xl"
                >
-                 Create Your Profile <ArrowRight />
+                 Continue with Google <ArrowRight />
                </button>
             </div>
          </div>
