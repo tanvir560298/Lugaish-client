@@ -160,7 +160,7 @@ export function LoginPage({ mode = 'login' }) {
     });
     setIsSuccess(true);
     celebrate();
-    setTimeout(() => navigate(redirectTo, { replace: true }), 900);
+    setTimeout(() => navigate(redirectTo, { replace: true }), 200);
   };
 
   useEffect(() => {
@@ -169,9 +169,10 @@ export function LoginPage({ mode = 'login' }) {
     let ignore = false;
 
     async function handleRedirectResult() {
-      setIsSubmitting(true);
       try {
         const storedContext = sessionStorage.getItem(GOOGLE_REDIRECT_CONTEXT_KEY);
+        if (storedContext) setIsSubmitting(true);
+
         const redirectResult = await getGoogleRedirectLoginResult();
         const result = redirectResult ?? (storedContext ? await waitForFirebaseUser() : null);
         if (!result) {
