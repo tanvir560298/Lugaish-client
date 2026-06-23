@@ -1,5 +1,6 @@
-import { BookOpen, CheckCircle2, Clock3, Film, ListChecks, Lock, Play, Plus, Sparkles } from 'lucide-react';
-import { useMemo } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { BookOpen, CheckCircle2, Clock3, Film, ListChecks, Lock, Play, Plus, Sparkles, TimerReset } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../state/AppContext.jsx';
 
@@ -16,14 +17,26 @@ function getLessons(pathway) {
 export function DailyLessonsPage() {
   const { state, actions, courseData } = useAppContext();
   const navigate = useNavigate();
+  const [comingSoon, setComingSoon] = useState(null);
   const enrolledPathways = state.enrolledPathways?.length ? state.enrolledPathways : [state.activePathway];
   const availableToEnroll = Object.keys(courseData).filter(pathway => !enrolledPathways.includes(pathway));
   const pathway = courseData[state.activePathway] ?? courseData.english;
   const lessons = useMemo(() => getLessons(pathway), [pathway]);
 
+  useEffect(() => {
+    if (!comingSoon) return undefined;
+
+    const timeout = window.setTimeout(() => setComingSoon(null), 1800);
+    return () => window.clearTimeout(timeout);
+  }, [comingSoon]);
+
   const openLesson = (lesson) => {
     actions.setActiveLesson(lesson.id, state.activePathway);
     navigate(`/lesson/${lesson.dayNumber}`);
+  };
+
+  const showComingSoon = (title) => {
+    setComingSoon(title);
   };
 
   const enrollCourse = (pathwayKey) => {
@@ -129,11 +142,10 @@ export function DailyLessonsPage() {
 
               <button
                 type="button"
-                onClick={() => openLesson(lesson)}
-                disabled={isLocked}
+                onClick={() => (isLocked ? showComingSoon(`Day ${lesson.dayNumber}`) : openLesson(lesson))}
                 className={`mt-6 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm font-black uppercase tracking-widest transition ${
                   isLocked
-                    ? 'cursor-not-allowed bg-white/5 text-slate-500'
+                    ? 'bg-white/5 text-slate-500 hover:bg-red-500/10 hover:text-red-100'
                     : completed
                       ? 'border border-emerald-400/20 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500 hover:text-white'
                       : 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-emerald-500'
@@ -160,9 +172,58 @@ export function DailyLessonsPage() {
               </div>
             </div>
             <p className="text-sm leading-6 text-slate-400">A new daily box can be added here for video, tasks, and practice.</p>
+            <button
+              type="button"
+              onClick={() => showComingSoon(`Day ${lessons.length + index + 1}`)}
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-sm font-black uppercase tracking-widest text-slate-300 transition hover:border-emerald-400/30 hover:bg-emerald-500/10 hover:text-emerald-100"
+            >
+              Preview Waitlist <Sparkles size={15} />
+            </button>
           </article>
         ))}
       </div>
+
+      <AnimatePresence>
+        {comingSoon && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[999] grid place-items-center bg-slate-950/80 p-6 backdrop-blur-xl"
+            onClick={() => setComingSoon(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.82, y: 24 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 12 }}
+              transition={{ type: 'spring', stiffness: 180, damping: 16 }}
+              className="relative w-full max-w-md overflow-hidden rounded-[2rem] border border-emerald-400/20 bg-slate-950 p-8 text-center shadow-[0_30px_100px_rgba(16,185,129,0.18)]"
+              onClick={event => event.stopPropagation()}
+            >
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}
+                className="mx-auto grid h-24 w-24 place-items-center rounded-full border border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
+              >
+                <TimerReset size={42} />
+              </motion.div>
+              <p className="mt-6 text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Level loading</p>
+              <h2 className="mt-3 text-3xl font-black text-white">{comingSoon} is coming soon</h2>
+              <p className="mt-3 text-sm leading-6 text-slate-400">
+                This lesson box is being prepared. Finish the open lesson first and the next level will unlock.
+              </p>
+              <div className="mt-6 h-2 overflow-hidden rounded-full bg-white/10">
+                <motion.div
+                  initial={{ x: '-100%' }}
+                  animate={{ x: '100%' }}
+                  transition={{ repeat: Infinity, duration: 1.1, ease: 'easeInOut' }}
+                  className="h-full w-1/2 rounded-full bg-gradient-to-r from-blue-500 to-emerald-400"
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
