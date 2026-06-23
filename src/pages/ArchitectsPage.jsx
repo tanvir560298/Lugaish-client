@@ -29,7 +29,7 @@ const LinkedinIcon = () => (
 );
 
 const TEAM_DATA = [
-  { id: 1, name: "Dr. Sarah Ahmed", role: "Lead English Instructor", category: "Instruction", bio: "Linguistics expert with 12+ years of experience in ESL and cognitive learning.", icon: <GraduationCap size={24} />, color: "from-blue-500 to-cyan-400" },
+  { id: 1, name: "Hasibuddin Zidan", role: "English Instructor", category: "Instruction", bio: "Guiding learners through clear English practice, speaking confidence, and everyday communication.", icon: <GraduationCap size={24} />, color: "from-blue-500 to-cyan-400" },
   { id: 2, name: "Yasin Mansour", role: "Arabic Curriculum Designer", category: "Instruction", bio: "Specializes in Modern Standard Arabic and colloquial dialects for global learners.", icon: <Globe size={24} />, color: "from-emerald-500 to-teal-400" },
   { id: 3, name: "Alex Rivera", role: "Senior Web Developer", category: "Technology", bio: "Crafting the digital engine and the 'Odyssey' experience.", icon: <Code size={24} />, color: "from-purple-500 to-pink-400" },
   { id: 4, name: "Layla Chen", role: "Lead Video Editor", category: "Creative", bio: "The eye behind the cinematic lesson visuals and motion graphics.", icon: <Video size={24} />, color: "from-orange-500 to-red-400" },
