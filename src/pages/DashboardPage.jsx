@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { BookOpenCheck, FilePenLine, GraduationCap, ShieldCheck, TrendingUp, UsersRound } from 'lucide-react';
+import { BookOpenCheck, ChevronDown, FilePenLine, GraduationCap, ShieldCheck, TrendingUp, UsersRound } from 'lucide-react';
 import { api } from '../api/client.js';
 import { useAppContext } from '../state/AppContext.jsx';
 import { ROLE_LABELS, ROLE_VALUES, ROLES, hasPermission, normalizeRole } from '../utils/roles.js';
@@ -91,11 +91,11 @@ function getInitials(name = '', email = '') {
     .join('') || 'L';
 }
 
-function LearnerRoleRow({ user, onRoleChange }) {
+function LearnerRoleRow({ user, onRoleChange, canManageRoles }) {
   const role = normalizeRole(user.role);
 
   return (
-    <div className="grid gap-4 border-t border-white/10 px-4 py-4 transition hover:bg-white/[0.03] lg:grid-cols-[1.35fr_0.75fr_210px] lg:items-center">
+    <div className={`grid gap-4 border-t border-white/10 px-4 py-4 transition hover:bg-white/[0.03] ${canManageRoles ? 'lg:grid-cols-[1.35fr_0.75fr_190px]' : 'lg:grid-cols-[1.35fr_0.75fr]' } lg:items-center`}>
       <div className="flex min-w-0 items-center gap-4">
         <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-white/10 bg-gradient-to-br from-blue-500/30 via-indigo-500/20 to-emerald-500/30 text-sm font-black text-white">
           {getInitials(user.name, user.email)}
@@ -111,28 +111,31 @@ function LearnerRoleRow({ user, onRoleChange }) {
         <RoleBadge role={role} />
       </div>
 
-      <div className="flex items-center gap-3">
-        <select
-          value={role}
-          onChange={event => onRoleChange(user.id, event.target.value)}
-          className="h-11 w-full rounded-xl border border-white/10 bg-slate-950 px-3 text-xs font-black uppercase tracking-wider text-white outline-none transition focus:border-emerald-400"
-        >
-          {ROLE_VALUES.map(item => (
-            <option key={item} value={item}>{ROLE_LABELS[item]}</option>
-          ))}
-        </select>
-      </div>
+      {canManageRoles && (
+        <div className="relative flex items-center">
+          <select
+            value={role}
+            onChange={event => onRoleChange(user.id, event.target.value)}
+            className="h-11 w-full appearance-none rounded-xl border border-white/10 bg-slate-950 px-3 pr-10 text-xs font-black uppercase tracking-wider text-white outline-none transition focus:border-emerald-400"
+          >
+            {ROLE_VALUES.map(item => (
+              <option key={item} value={item}>{ROLE_LABELS[item]}</option>
+            ))}
+          </select>
+          <ChevronDown size={16} className="pointer-events-none absolute right-3 text-slate-400" />
+        </div>
+      )}
     </div>
   );
 }
 
-function RoleManagementPanel({ canManageRoles }) {
+function RoleManagementPanel({ canManageRoles, canViewRoles }) {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    if (!canManageRoles) return;
+    if (!canViewRoles) return;
 
     let ignore = false;
     setIsLoading(true);
@@ -150,7 +153,7 @@ function RoleManagementPanel({ canManageRoles }) {
     return () => {
       ignore = true;
     };
-  }, [canManageRoles]);
+  }, [canViewRoles]);
 
   const updateRole = async (userId, role) => {
     setMessage('');
@@ -163,17 +166,23 @@ function RoleManagementPanel({ canManageRoles }) {
     }
   };
 
-  if (!canManageRoles) return null;
+  if (!canViewRoles) return null;
 
   return (
     <div className="section-card p-6 sm:p-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-400">Web developer control</p>
-          <h3 className="mt-2 text-xl font-black text-white">Role management</h3>
-          <p className="mt-2 text-sm text-slate-400">Promote instructors, editors, or learners after they sign in once.</p>
+          <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-400">
+            {canManageRoles ? 'Web developer control' : 'Team role directory'}
+          </p>
+          <h3 className="mt-2 text-xl font-black text-white">{canManageRoles ? 'Role management' : 'Role overview'}</h3>
+          <p className="mt-2 text-sm text-slate-400">
+            {canManageRoles
+              ? 'Promote instructors, editors, or learners after they sign in once.'
+              : 'View learner and staff roles. Only the web developer can make changes.'}
+          </p>
         </div>
-        <RoleBadge role={ROLES.webDeveloper} />
+        <RoleBadge role={canManageRoles ? ROLES.webDeveloper : ROLES.instructor} />
       </div>
 
       {message && (
@@ -183,17 +192,17 @@ function RoleManagementPanel({ canManageRoles }) {
       )}
 
       <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/20">
-        <div className="hidden grid-cols-[1.35fr_0.75fr_210px] gap-3 bg-white/5 px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 lg:grid">
+        <div className={`hidden gap-3 bg-white/5 px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 ${canManageRoles ? 'lg:grid-cols-[1.35fr_0.75fr_190px]' : 'lg:grid-cols-[1.35fr_0.75fr]'} lg:grid`}>
           <span>User</span>
           <span>Current role</span>
-          <span>Set role</span>
+          {canManageRoles && <span>Set role</span>}
         </div>
 
         {isLoading ? (
           <div className="px-4 py-5 text-sm font-semibold text-slate-400">Loading users...</div>
         ) : users.length ? (
           users.map(user => (
-            <LearnerRoleRow key={user.id} user={user} onRoleChange={updateRole} />
+            <LearnerRoleRow key={user.id} user={user} onRoleChange={updateRole} canManageRoles={canManageRoles} />
           ))
         ) : (
           <div className="px-4 py-5 text-sm font-semibold text-slate-400">No users found yet.</div>
@@ -253,6 +262,7 @@ export function DashboardPage() {
   const role = normalizeRole(state.userRole);
   const isStaff = role !== ROLES.learner;
   const canManageRoles = hasPermission(role, 'manage_roles');
+  const canViewRoles = isStaff;
   const canManageLessons = hasPermission(role, 'manage_lessons');
   const canCreatePost = hasPermission(role, 'create_post');
   const canPublish = hasPermission(role, 'publish_post');
@@ -293,14 +303,14 @@ export function DashboardPage() {
                 <GraduationCap size={21} />
               </div>
             </div>
-            <div className="relative mt-8 h-28 w-28 mx-auto">
+            <div className="relative mx-auto mt-8 h-40 w-40">
               <svg viewBox="0 0 130 130" className="h-full w-full rotate-[-90deg]">
-                <circle cx="65" cy="65" r="54" className="fill-none stroke-white/10 stroke-[9]" />
+                <circle cx="65" cy="65" r="54" className="fill-none stroke-white/10 stroke-[10]" />
                 <circle
                   cx="65"
                   cy="65"
                   r="54"
-                  className="fill-none stroke-gradient stroke-[9]"
+                  className="fill-none stroke-gradient stroke-[10]"
                   style={{
                     strokeDasharray: 339.292,
                     strokeDashoffset: 339.292 - (xpInLevel / XP_PER_LEVEL) * 339.292,
@@ -309,7 +319,7 @@ export function DashboardPage() {
               </svg>
               <div className="absolute inset-0 grid place-items-center text-center">
                 <div>
-                  <p className="text-3xl font-black text-white">{levelProgress}%</p>
+                  <p className="text-4xl font-black text-white">{levelProgress}%</p>
                   <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Complete</p>
                 </div>
               </div>
@@ -336,7 +346,7 @@ export function DashboardPage() {
         </aside>
 
         <div className="space-y-6">
-          {isStaff && (
+          {canManageRoles && (
             <div className="section-card p-6 sm:p-8">
               <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                 <div>
@@ -388,7 +398,7 @@ export function DashboardPage() {
             </div>
           )}
 
-          <RoleManagementPanel canManageRoles={canManageRoles} />
+          <RoleManagementPanel canManageRoles={canManageRoles} canViewRoles={canViewRoles} />
 
           <div className="section-card p-6 sm:p-8">
             <div className="mb-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
