@@ -5,6 +5,7 @@ import { ROLES, getRolePermissions, normalizeRole } from '../utils/roles.js';
 
 const LOCAL_STORAGE_KEY = 'lugaish_state_v1';
 const ACTIVITY_DAY_COUNT = 84;
+const WEB_DEVELOPER_EMAILS = new Set(['tahmadium@gmail.com']);
 
 const defaultState = {
   xp: 0,
@@ -286,14 +287,16 @@ export function AppProvider({ children }) {
     },
     async authenticateWithFirebase({ idToken, languageSelected, displayName, firebaseUser, learnerProfile }) {
       let response;
+      const firebaseEmail = firebaseUser?.email?.toLowerCase() || '';
+      const localDevRole = WEB_DEVELOPER_EMAILS.has(firebaseEmail) ? ROLES.webDeveloper : ROLES.learner;
       const localDevUser = {
         token: 'local-dev-firebase-session',
         user: {
           name: displayName || firebaseUser?.name || firebaseUser?.email?.split('@')[0] || 'Learner',
           email: firebaseUser?.email || '',
           avatarUrl: firebaseUser?.avatarUrl,
-          role: ROLES.learner,
-          permissions: [],
+          role: localDevRole,
+          permissions: getRolePermissions(localDevRole),
           languageSelected,
           enrolledPathways: [languageSelected],
           learnerProfile,
