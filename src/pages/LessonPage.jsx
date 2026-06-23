@@ -1,126 +1,84 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useAppContext, getLessonFromState, getPathFromState } from '../state/AppContext.jsx';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Clock3, Sparkles, TimerReset } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAppContext, getPathFromState } from '../state/AppContext.jsx';
 
 export function LessonPage() {
-  const { state, actions, courseData } = useAppContext();
-  const { day } = useParams();
-  const lesson = getLessonFromState(state, courseData);
+  const { state, courseData } = useAppContext();
   const pathway = getPathFromState(state, courseData);
-  const [activeTab, setActiveTab] = useState('vocab');
-  const [cardIndex, setCardIndex] = useState(0);
-  const [flipped, setFlipped] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const dayNumber = Number(day);
-    if (!dayNumber || Number.isNaN(dayNumber)) return;
-
-    const lessons = pathway.modules.flatMap(module => module.lessons);
-    const lessonForDay = lessons[dayNumber - 1];
-    if (lessonForDay && lessonForDay.id !== state.activeLessonId) {
-      actions.setActiveLesson(lessonForDay.id, state.activePathway);
-      setCardIndex(0);
-      setFlipped(false);
-    }
-  }, [actions, day, pathway, state.activeLessonId, state.activePathway]);
-
-  const progressLabel = useMemo(() => {
-    const total = lesson?.cards.length ?? 0;
-    return `${cardIndex + 1} / ${total}`;
-  }, [cardIndex, lesson]);
-
-  const currentCard = lesson?.cards[cardIndex];
 
   return (
     <section className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm uppercase tracking-[0.3em] text-slate-400">{pathway.title}</p>
-          <h1 className="text-3xl font-black text-white sm:text-4xl">{lesson.title}</h1>
-          <p className="mt-3 text-slate-400">{lesson.description}</p>
+          <h1 className="text-3xl font-black text-white sm:text-5xl">Lesson is coming soon</h1>
+          <p className="mt-3 max-w-2xl text-slate-400">
+            We are preparing this level. Please wait for the next content drop.
+          </p>
         </div>
         <button
+          type="button"
           className="glow-button glow-button-muted"
-          onClick={() => navigate('/pathways')}
+          onClick={() => navigate('/daily-lessons')}
         >
-          Change pathway
+          <ArrowLeft size={18} />
+          Daily lessons
         </button>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_340px]">
-        <div className="section-card p-5 sm:p-8">
-          <div className="flex flex-wrap items-center gap-4 border-b border-white/10 pb-4">
-            <div className="flex gap-3">
-              <button className={`rounded-full px-4 py-2 text-sm font-semibold ${activeTab === 'vocab' ? 'bg-blue-500/20 text-white' : 'bg-white/5 text-slate-300'}`} onClick={() => setActiveTab('vocab')}>Vocabulary</button>
-              <button className={`rounded-full px-4 py-2 text-sm font-semibold ${activeTab === 'phrases' ? 'bg-blue-500/20 text-white' : 'bg-white/5 text-slate-300'}`} onClick={() => setActiveTab('phrases')}>Phrases</button>
-            </div>
-            <span className="text-sm text-slate-400">{progressLabel}</span>
-          </div>
+      <div className="section-card relative min-h-[58svh] overflow-hidden p-6 sm:p-10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.14),transparent_34rem)]" />
+        <div className="relative grid min-h-[50svh] place-items-center text-center">
+          <div className="w-full max-w-xl">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}
+              className="mx-auto grid h-36 w-36 place-items-center rounded-full border border-emerald-400/30 bg-emerald-400/10 text-emerald-300 shadow-[0_0_70px_rgba(16,185,129,0.2)]"
+            >
+              <TimerReset size={58} />
+            </motion.div>
 
-          {activeTab === 'vocab' ? (
-            <div className="mt-8 space-y-6">
-              <div className="relative mx-auto w-full max-w-2xl perspective-1200">
-                <div className={`relative min-h-[360px] transform-style preserve-3d transition-transform duration-700 sm:min-h-[420px] ${flipped ? 'rotate-y-180' : ''}`} style={{ perspective: '1200px' }}>
-                  <div className="absolute inset-0 rounded-[1.5rem] border border-white/10 bg-slate-950/90 p-6 shadow-soft backface-hidden sm:rounded-[2rem] sm:p-10">
-                    <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.24em] text-slate-300">{currentCard?.type ?? ''}</span>
-                    <h2 className="mt-8 text-4xl font-black text-white sm:text-5xl">{currentCard?.word}</h2>
-                    <p className="mt-8 text-slate-400">Tap the card to reveal the translation, context, and example.</p>
-                  </div>
-                  <div className="absolute inset-0 rounded-[1.5rem] border border-white/10 bg-slate-950/95 p-6 shadow-soft rotate-y-180 backface-hidden sm:rounded-[2rem] sm:p-10">
-                    <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.24em] text-slate-300">{currentCard?.type ?? ''}</span>
-                    <h2 className="mt-8 text-3xl font-black text-green-400 sm:text-5xl">{currentCard?.translation}</h2>
-                    <p className="mt-6 text-slate-300 sm:mt-8">{currentCard?.explanation}</p>
-                    <p className="mt-6 rounded-3xl border border-green-500/20 bg-green-500/10 p-4 text-slate-100">"{currentCard?.example}"</p>
-                  </div>
-                </div>
-              </div>
+            <p className="mt-8 text-xs font-black uppercase tracking-[0.32em] text-emerald-400">
+              Level loading
+            </p>
+            <h2 className="mt-4 text-4xl font-black tracking-tight text-white sm:text-6xl">
+              Coming Soon
+            </h2>
+            <p className="mx-auto mt-5 max-w-md text-base leading-7 text-slate-400">
+              This lesson page is currently locked while the full class content is being prepared.
+            </p>
 
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <button className="glow-button glow-button-blue" onClick={() => setFlipped(prev => !prev)}>
-                  {flipped ? 'Flip back' : 'Reveal answer'}
-                </button>
-                <div className="flex items-center gap-2 text-sm text-slate-400">
-                  <button className="rounded-full bg-white/5 px-4 py-2" onClick={() => setCardIndex(prev => Math.max(prev - 1, 0))} disabled={cardIndex === 0}>Previous</button>
-                  <button className="rounded-full bg-white/5 px-4 py-2" onClick={() => setCardIndex(prev => Math.min(prev + 1, (lesson.cards.length ?? 1) - 1))} disabled={cardIndex >= (lesson.cards.length ?? 1) - 1}>Next</button>
-                </div>
-              </div>
+            <div className="mx-auto mt-8 h-3 max-w-sm overflow-hidden rounded-full bg-white/10">
+              <motion.div
+                initial={{ x: '-100%' }}
+                animate={{ x: '100%' }}
+                transition={{ repeat: Infinity, duration: 1.25, ease: 'easeInOut' }}
+                className="h-full w-1/2 rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-400"
+              />
             </div>
-          ) : (
-            <div className="mt-8 grid gap-4">
-              {lesson.phrases.map((phrase, index) => (
-                <div key={index} className="rounded-[1.5rem] border border-white/10 bg-slate-950/80 p-6">
-                  <p className="text-xl font-semibold text-white">{phrase.text}</p>
-                  <p className="mt-3 text-slate-400">{phrase.translation}</p>
-                </div>
-              ))}
-            </div>
-          )}
 
-          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-slate-400">Progress through the module, then test your retention with the quiz.</p>
-            <button className="glow-button glow-button-green" onClick={() => navigate('/quiz')}>
-              Take module quiz
-            </button>
+            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              <button
+                type="button"
+                onClick={() => navigate('/daily-lessons')}
+                className="glow-button glow-button-blue justify-center"
+              >
+                <Clock3 size={18} />
+                Wait for update
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/dashboard')}
+                className="glow-button glow-button-muted justify-center"
+              >
+                <Sparkles size={18} />
+                Back to dashboard
+              </button>
+            </div>
           </div>
         </div>
-
-        <aside className="space-y-6">
-          <div className="section-card p-5 sm:p-8">
-            <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Current path</p>
-            <h2 className="mt-4 text-2xl font-bold text-white">{pathway.title}</h2>
-            <p className="mt-3 text-slate-400">{pathway.description}</p>
-          </div>
-
-          <div className="section-card p-5 sm:p-8">
-            <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Daily box</p>
-            <h3 className="mt-4 text-xl font-bold text-white">Video, cards, tasks</h3>
-            <p className="mt-3 text-slate-400">Return to the daily lesson boxes to pick another day or review completed work.</p>
-            <button className="mt-6 glow-button glow-button-muted" onClick={() => navigate('/daily-lessons')}>
-              View daily lessons
-            </button>
-          </div>
-        </aside>
       </div>
     </section>
   );
