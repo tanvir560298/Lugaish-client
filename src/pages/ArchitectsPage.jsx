@@ -31,7 +31,7 @@ const LinkedinIcon = () => (
 const TEAM_DATA = [
   { id: 1, name: "Hasibuddin Zidan", role: "English Instructor", category: "Instruction", bio: "Guiding learners through clear English practice, speaking confidence, and everyday communication.", icon: <GraduationCap size={24} />, color: "from-blue-500 to-cyan-400" },
   { id: 2, name: "Yasin Mansour", role: "Arabic Curriculum Designer", category: "Instruction", bio: "Specializes in Modern Standard Arabic and colloquial dialects for global learners.", icon: <Globe size={24} />, color: "from-emerald-500 to-teal-400" },
-  { id: 3, name: "Tanvir Ahmad", role: "Senior Web Developer", category: "Technology", bio: "Crafting the digital engine and the 'Odyssey' experience.", icon: <Code size={24} />, color: "from-purple-500 to-pink-400" },
+  { id: 3, name: "Tanvir Ahmad", role: "Web Developer", category: "Technology", bio: "Crafting the digital engine and the 'Odyssey' experience.", icon: <Code size={24} />, color: "from-purple-500 to-pink-400" },
   { id: 4, name: "Layla Chen", role: "Lead Video Editor", category: "Creative", bio: "The eye behind the cinematic lesson visuals and motion graphics.", icon: <Video size={24} />, color: "from-orange-500 to-red-400" },
   { id: 5, name: "Marcus Thorne", role: "UI/UX Architect", category: "Technology", bio: "Designing interfaces that feel like a quest, not an app.", icon: <Cpu size={24} />, color: "from-indigo-500 to-blue-400" },
   { id: 6, name: "Sofia Rossi", role: "Content Editor", category: "Creative", bio: "Ensuring every word is crisp, professional, and impactful.", icon: <PenTool size={24} />, color: "from-yellow-400 to-orange-500" }
