@@ -2,10 +2,52 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { BookOpenCheck, FilePenLine, GraduationCap, ShieldCheck, TrendingUp, UsersRound } from 'lucide-react';
 import { api } from '../api/client.js';
-import { useAppContext, getLessonFromState, getPathFromState } from '../state/AppContext.jsx';
+import { useAppContext } from '../state/AppContext.jsx';
 import { ROLE_LABELS, ROLE_VALUES, ROLES, hasPermission, normalizeRole } from '../utils/roles.js';
 
 const XP_PER_LEVEL = 500;
+const CONSISTENCY_DAY_COUNT = 14;
+
+function getCourseLessons(pathway) {
+  return pathway.modules.flatMap(module => module.lessons);
+}
+
+function getLocalDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function getDateFromKey(key) {
+  const [year, month, day] = key.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function getCourseConsistency({ courseActivity = {}, courseStartedAt, selectedCourse }) {
+  const today = new Date();
+  const todayKey = getLocalDateKey(today);
+  const startDate = getDateFromKey(courseStartedAt?.[selectedCourse] ?? todayKey);
+  const activity = courseActivity?.[selectedCourse] ?? {};
+
+  return Array.from({ length: CONSISTENCY_DAY_COUNT }, (_, index) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() - (CONSISTENCY_DAY_COUNT - 1 - index));
+    const dateKey = getLocalDateKey(date);
+    const hasCompleted = Boolean(activity[dateKey]);
+    const hasStarted = date >= startDate;
+    const isToday = dateKey === todayKey;
+    const isMissed = hasStarted && !hasCompleted && date < getDateFromKey(todayKey);
+    const status = hasCompleted ? 'completed' : isMissed ? 'missed' : isToday && hasStarted ? 'today' : 'neutral';
+
+    return {
+      date,
+      dateKey,
+      status,
+      lessonId: activity[dateKey]?.lessonId,
+    };
+  });
+}
 
 function RoleBadge({ role }) {
   const normalized = normalizeRole(role);
@@ -162,14 +204,41 @@ function RoleManagementPanel({ canManageRoles }) {
 }
 
 export function DashboardPage() {
-  const { state, courseData } = useAppContext();
+  const { state, actions, courseData } = useAppContext();
+  const enrolledPathways = state.enrolledPathways?.length ? state.enrolledPathways : [state.activePathway];
+  const [selectedCourse, setSelectedCourse] = useState(state.activePathway);
+
+  useEffect(() => {
+    if (!enrolledPathways.includes(selectedCourse)) {
+      setSelectedCourse(enrolledPathways[0] ?? state.activePathway);
+    }
+  }, [enrolledPathways, selectedCourse, state.activePathway]);
+
+  const badges = useMemo(
+    () => [
+      { id: 'visionary-voice', label: 'Visionary Voice', description: 'Gain 500 XP to unlock visionary status.', unlocked: state.badges.includes('visionary-voice') },
+      { id: 'streak-warrior', label: 'Streak Warrior', description: 'Maintain a 7-day learning streak.', unlocked: state.streak >= 7 },
+      { id: 'rhetorical-elite', label: 'Rhetorical Elite', description: 'Surpass 1,500 total XP points.', unlocked: state.xp >= 1500 },
+    ],
+    [state.badges, state.streak, state.xp],
+  );
 
   if (!state.isLoggedIn) {
     return <Navigate to="/login" replace />;
   }
-  const pathway = getPathFromState(state, courseData);
-  const activeLesson = getLessonFromState(state, courseData);
-  const enrolledCount = state.enrolledPathways?.length ?? 1;
+  const pathway = courseData[selectedCourse] ?? courseData.english;
+  const courseLessons = getCourseLessons(pathway);
+  const completedCourseLessons = courseLessons.filter(lesson => state.completedLessons.includes(lesson.id));
+  const nextLesson = courseLessons.find(lesson => !state.completedLessons.includes(lesson.id)) ?? courseLessons[courseLessons.length - 1];
+  const courseProgress = courseLessons.length ? Math.round((completedCourseLessons.length / courseLessons.length) * 100) : 0;
+  const consistency = getCourseConsistency({
+    courseActivity: state.courseActivity,
+    courseStartedAt: state.courseStartedAt,
+    selectedCourse,
+  });
+  const completedDays = consistency.filter(item => item.status === 'completed').length;
+  const missedDays = consistency.filter(item => item.status === 'missed').length;
+  const enrolledCount = enrolledPathways.length;
   const displayName = state.userName || 'Lugaish Learner';
   const initials = displayName
     .split(' ')
@@ -187,15 +256,6 @@ export function DashboardPage() {
   const canManageLessons = hasPermission(role, 'manage_lessons');
   const canCreatePost = hasPermission(role, 'create_post');
   const canPublish = hasPermission(role, 'publish_post');
-
-  const badges = useMemo(
-    () => [
-      { id: 'visionary-voice', label: 'Visionary Voice', description: 'Gain 500 XP to unlock visionary status.', unlocked: state.badges.includes('visionary-voice') },
-      { id: 'streak-warrior', label: 'Streak Warrior', description: 'Maintain a 7-day learning streak.', unlocked: state.streak >= 7 },
-      { id: 'rhetorical-elite', label: 'Rhetorical Elite', description: 'Surpass 1,500 total XP points.', unlocked: state.xp >= 1500 },
-    ],
-    [state.badges, state.streak, state.xp],
-  );
 
   return (
     <section className="space-y-10">
@@ -217,8 +277,8 @@ export function DashboardPage() {
                 <span className="font-semibold text-white">{level >= 4 ? 'Orator Elite' : level >= 3 ? 'Visionary' : level >= 2 ? 'Pathfinder' : 'Initiate'}</span>
               </div>
               <div className="flex items-center justify-between text-sm text-slate-300">
-                <span>Modules completed</span>
-                <span className="font-semibold text-white">{state.completedLessons.length}</span>
+                <span>{pathway.title.replace(' Pathway', '')} completed</span>
+                <span className="font-semibold text-white">{completedCourseLessons.length}/{courseLessons.length}</span>
               </div>
             </div>
           </div>
@@ -330,31 +390,93 @@ export function DashboardPage() {
 
           <RoleManagementPanel canManageRoles={canManageRoles} />
 
-          <div className="section-card p-8">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="section-card p-6 sm:p-8">
+            <div className="mb-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Current course</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Course view</p>
                 <h2 className="mt-3 text-2xl font-bold text-white">{pathway.title}</h2>
-                <p className="mt-3 text-slate-400">{activeLesson?.description ?? 'Pick a pathway to begin your next lesson.'}</p>
-                <p className="mt-3 text-xs font-bold uppercase tracking-widest text-emerald-400">{enrolledCount} enrolled course{enrolledCount > 1 ? 's' : ''}</p>
               </div>
-              <Link to="/daily-lessons" className="glow-button glow-button-blue">
+              <div className="grid gap-2 sm:flex">
+                {enrolledPathways.map(pathwayKey => {
+                  const course = courseData[pathwayKey];
+                  const isSelected = selectedCourse === pathwayKey;
+
+                  return (
+                    <button
+                      key={pathwayKey}
+                      type="button"
+                      onClick={() => setSelectedCourse(pathwayKey)}
+                      className={`rounded-2xl border px-4 py-3 text-xs font-black uppercase tracking-widest transition ${
+                        isSelected
+                          ? 'border-blue-400/30 bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                          : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
+                      }`}
+                    >
+                      {course.flag} {course.title.replace(' Pathway', '')}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="grid gap-5 lg:grid-cols-[1fr_220px] lg:items-center">
+              <div>
+                <p className="text-slate-400">{nextLesson?.description ?? 'Pick a pathway to begin your next lesson.'}</p>
+                <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Progress</p>
+                    <p className="mt-2 text-2xl font-black text-white">{courseProgress}%</p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Done</p>
+                    <p className="mt-2 text-2xl font-black text-emerald-300">{completedCourseLessons.length}/{courseLessons.length}</p>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Courses</p>
+                    <p className="mt-2 text-2xl font-black text-blue-200">{enrolledCount}</p>
+                  </div>
+                </div>
+              </div>
+
+              <Link
+                to="/daily-lessons"
+                onClick={() => actions.switchPathway(selectedCourse)}
+                className="glow-button glow-button-blue justify-center text-center"
+              >
                 Open Today
               </Link>
             </div>
           </div>
 
-          <div className="section-card p-8">
+          <div className="section-card p-6 sm:p-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h3 className="text-xl font-bold text-white">Consistency calendar</h3>
-                <p className="mt-2 text-sm text-slate-400">Visualize learner activity from the last 12 weeks.</p>
+                <h3 className="text-xl font-bold text-white">{pathway.title.replace(' Pathway', '')} consistency</h3>
+                <p className="mt-2 text-sm text-slate-400">Green means class completed that day. Red means that course was missed.</p>
               </div>
-              <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300">Updated daily</div>
+              <div className="flex flex-wrap gap-2 text-xs font-black uppercase tracking-widest">
+                <span className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-emerald-200">{completedDays} done</span>
+                <span className="rounded-full border border-red-400/20 bg-red-500/10 px-3 py-2 text-red-200">{missedDays} missed</span>
+              </div>
             </div>
-            <div className="mt-6 grid grid-cols-[repeat(12,minmax(0,1fr))] gap-2 overflow-x-auto py-4">
-              {state.activityData.map(item => (
-                <div key={item.date} className={`h-12 w-full rounded-xl ${item.intensity === 0 ? 'bg-white/5' : item.intensity === 1 ? 'bg-blue-500/20' : item.intensity === 2 ? 'bg-blue-500/40' : item.intensity === 3 ? 'bg-blue-500/60' : 'bg-blue-500'}`} title={`${new Date(item.date).toLocaleDateString()} — ${item.xp} XP`} />
+            <div className="mt-6 grid grid-cols-7 gap-2 sm:grid-cols-[repeat(14,minmax(0,1fr))]">
+              {consistency.map(item => (
+                <div
+                  key={item.dateKey}
+                  className={`flex h-16 flex-col items-center justify-center rounded-2xl border text-[10px] font-black uppercase tracking-wider ${
+                    item.status === 'completed'
+                      ? 'border-emerald-400/30 bg-emerald-500/20 text-emerald-100'
+                      : item.status === 'missed'
+                        ? 'border-red-400/30 bg-red-500/20 text-red-100'
+                        : item.status === 'today'
+                          ? 'border-blue-400/30 bg-blue-500/15 text-blue-100'
+                          : 'border-white/10 bg-white/5 text-slate-500'
+                  }`}
+                  title={`${item.date.toLocaleDateString()} - ${item.status}`}
+                >
+                  <span>{item.date.toLocaleDateString(undefined, { weekday: 'short' })}</span>
+                  <span className="mt-1 text-sm text-white/90">{item.date.getDate()}</span>
+                </div>
               ))}
             </div>
           </div>

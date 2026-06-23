@@ -15,6 +15,8 @@ const defaultState = {
   activeLessonId: 'en-les-1',
   badges: [],
   activityData: [],
+  courseActivity: {},
+  courseStartedAt: {},
   userName: '',
   userEmail: '',
   userRole: ROLES.learner,
@@ -42,6 +44,13 @@ function generateActivityData() {
       xp: 0,
     };
   });
+}
+
+function getDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function isDemoProgressState(state) {
@@ -101,6 +110,11 @@ function normalizeState(state) {
     ...state,
     activePathway,
     enrolledPathways: [...new Set([...(enrolledPathways.length ? enrolledPathways : []), activePathway])],
+    courseActivity: state.courseActivity && typeof state.courseActivity === 'object' ? state.courseActivity : {},
+    courseStartedAt: [...new Set([...(enrolledPathways.length ? enrolledPathways : []), activePathway])].reduce((acc, pathway) => ({
+      ...acc,
+      [pathway]: state.courseStartedAt?.[pathway] ?? getDateKey(),
+    }), {}),
     userRole: normalizeRole(state.userRole),
     permissions: Array.isArray(state.permissions) && state.permissions.length
       ? state.permissions
@@ -149,6 +163,10 @@ export function AppProvider({ children }) {
         activePathway: pathway,
         activeLessonId: getFirstLessonId(pathway),
         enrolledPathways: [...new Set([...(prev.enrolledPathways ?? []), pathway])],
+        courseStartedAt: {
+          ...(prev.courseStartedAt ?? {}),
+          [pathway]: prev.courseStartedAt?.[pathway] ?? getDateKey(),
+        },
       }));
 
       api.enrollPathway({ language: pathway }).catch(() => {});
@@ -166,8 +184,20 @@ export function AppProvider({ children }) {
         const completed = prev.completedLessons.includes(lessonId)
           ? prev.completedLessons
           : [...prev.completedLessons, lessonId];
+        const pathway = prev.activePathway;
+        const todayKey = getDateKey();
+        const courseActivity = {
+          ...(prev.courseActivity ?? {}),
+          [pathway]: {
+            ...(prev.courseActivity?.[pathway] ?? {}),
+            [todayKey]: {
+              lessonId,
+              completedAt: new Date().toISOString(),
+            },
+          },
+        };
 
-        return { ...prev, completedLessons: completed };
+        return { ...prev, completedLessons: completed, courseActivity };
       });
 
       const payload = getLessonApiPayload(lessonId, state.activePathway);
