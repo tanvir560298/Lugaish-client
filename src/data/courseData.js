@@ -16,15 +16,15 @@ export const COURSE_DATA = {
             description: 'Master the personal introduction and articulate a compelling vision.',
             langCode: 'en-US',
             cards: [
-              { word: 'Initiative', translation: 'المبادرة', type: 'noun', explanation: 'The power to start action confidently and independently.', example: 'Taking initiative makes every team move forward.' },
-              { word: 'Visionary', translation: 'ذو رؤية / استشرافي', type: 'adjective', explanation: 'Thinking beyond the present to shape a bold future.', example: 'A visionary leader inspires others with a clear purpose.' },
-              { word: 'Collaborate', translation: 'يتعاون', type: 'verb', explanation: 'Working together to create stronger ideas and solutions.', example: 'Great teams collaborate across differences to achieve results.' },
-              { word: 'Empower', translation: 'يمكّن / يقوّي', type: 'verb', explanation: 'Giving others the confidence and resources to take action.', example: 'A good leader empowers teammates to own success.' },
+              { word: 'Initiative', translation: 'Taking the first step', type: 'noun', explanation: 'The power to start action confidently and independently.', example: 'Taking initiative makes every team move forward.' },
+              { word: 'Visionary', translation: 'Future-focused thinker', type: 'adjective', explanation: 'Thinking beyond the present to shape a bold future.', example: 'A visionary leader inspires others with a clear purpose.' },
+              { word: 'Collaborate', translation: 'Work together', type: 'verb', explanation: 'Working together to create stronger ideas and solutions.', example: 'Great teams collaborate across differences to achieve results.' },
+              { word: 'Empower', translation: 'Give confidence and ability', type: 'verb', explanation: 'Giving others the confidence and resources to take action.', example: 'A good leader empowers teammates to own success.' },
             ],
             phrases: [
-              { text: 'I believe we can make a difference by working together.', translation: 'أعتقد أنه يمكننا إحداث فرق من خلال العمل معًا.' },
-              { text: 'My vision for this project is to foster community growth.', translation: 'رؤيتي لهذا المشروع هي تعزيز نمو المجتمع.' },
-              { text: 'Let\'s align our goals and share the responsibility.', translation: 'دعونا نوائم أهدافنا ونتقاسم المسؤولية.' },
+              { text: 'I believe we can make a difference by working together.', translation: 'Use this to express teamwork and shared impact.' },
+              { text: 'My vision for this project is to foster community growth.', translation: 'Use this to explain a future-focused goal.' },
+              { text: 'Let\'s align our goals and share the responsibility.', translation: 'Use this to invite teamwork and accountability.' },
             ],
             quiz: [
               {
@@ -40,10 +40,10 @@ export const COURSE_DATA = {
                 explanation: '"Visionary" is the adjective that describes planning for the future with imagination and foresight.',
               },
               {
-                question: "What is the translation of 'Collaborate' in Arabic?",
-                options: ['يمكّن', 'يتعاون', 'ذو رؤية', 'المبادرة'],
+                question: "Which phrase best matches 'Collaborate'?",
+                options: ['Give up quickly', 'Work together', 'Speak louder', 'Start alone'],
                 answer: 1,
-                explanation: 'Collaborate translates to يتعاون (to work jointly).',
+                explanation: 'Collaborate means to work together toward a shared result.',
               },
             ],
           },
@@ -53,14 +53,14 @@ export const COURSE_DATA = {
             description: 'Learn how to capture attention, use vocal variety, and deliver powerful speeches.',
             langCode: 'en-US',
             cards: [
-              { word: 'Eloquence', translation: 'الفصاحة / البلاغة', type: 'noun', explanation: 'Fluent or persuasive speaking or writing.', example: 'Her eloquence moved the audience to take action.' },
-              { word: 'Articulate', translation: 'يعبر بوضوح', type: 'verb', explanation: 'Express an idea or feeling clearly and fluently.', example: 'A leader must be able to articulate their thoughts under pressure.' },
-              { word: 'Resonance', translation: 'الرنين / الصدى', type: 'noun', explanation: 'A quality of sound that makes it deep and reverberating.', example: 'A voice with resonance commands attention in a large hall.' },
-              { word: 'Persuade', translation: 'يقنع', type: 'verb', explanation: 'Cause someone to do or believe something through reasoning.', example: 'He used stories to persuade the council to fund the center.' },
+              { word: 'Eloquence', translation: 'Powerful expression', type: 'noun', explanation: 'Fluent or persuasive speaking or writing.', example: 'Her eloquence moved the audience to take action.' },
+              { word: 'Articulate', translation: 'Express clearly', type: 'verb', explanation: 'Express an idea or feeling clearly and fluently.', example: 'A leader must be able to articulate their thoughts under pressure.' },
+              { word: 'Resonance', translation: 'Deep impact', type: 'noun', explanation: 'A quality of sound or message that feels strong and memorable.', example: 'A voice with resonance commands attention in a large hall.' },
+              { word: 'Persuade', translation: 'Convince with reasons', type: 'verb', explanation: 'Cause someone to do or believe something through reasoning.', example: 'He used stories to persuade the council to fund the center.' },
             ],
             phrases: [
-              { text: 'Speaking from the heart builds trust with your audience.', translation: 'التحدث من القلب يبني الثقة مع جمهورك.' },
-              { text: 'Clear communication is the bridge between confusion and clarity.', translation: 'التواصل الواضح هو الجسر بين الارتباك والوضوح.' },
+              { text: 'Speaking from the heart builds trust with your audience.', translation: 'Use this when discussing authentic communication.' },
+              { text: 'Clear communication is the bridge between confusion and clarity.', translation: 'Use this to explain why simple language matters.' },
             ],
             quiz: [
               {
