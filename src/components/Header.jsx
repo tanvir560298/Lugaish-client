@@ -22,7 +22,7 @@ const navLinks = [
   { href: '/daily-lessons', label: 'Today', icon: <CalendarDays size={16} /> },
   { href: '/pathways', label: 'Odyssey', icon: <Map size={16} /> },
   { href: '/pricing', label: 'Plans', icon: <CreditCard size={16} /> },
-  { href: '/architects', label: 'Architects', icon: <Hammer size={16} /> }, // NEW PAGE
+  { href: '/architects', label: 'Architects', icon: <Hammer size={16} /> },
 ];
 
 export function Header() {
@@ -33,9 +33,8 @@ export function Header() {
   const themeLabel = state.theme === 'dark' ? 'Light mode' : 'Dark mode';
   const visibleNavLinks = state.isLoggedIn
     ? [
-        ...navLinks.slice(0, 1),
+        ...navLinks,
         { href: '/dashboard', label: 'Dashboard', icon: <Gauge size={16} /> },
-        ...navLinks.slice(1),
       ]
     : navLinks;
 
