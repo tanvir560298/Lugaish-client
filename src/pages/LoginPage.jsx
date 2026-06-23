@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle2, Loader2, LockKeyhole, ShieldCheck, Sparkles, Trophy } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { getGoogleRedirectLoginResult, isFirebaseConfigured, signInWithGoogle, waitForFirebaseUser } from '../lib/firebase.js';
+import { getGoogleRedirectLoginResult, isFirebaseConfigured, signInWithGoogle, signInWithGoogleRedirect, waitForFirebaseUser } from '../lib/firebase.js';
 import { useAppContext } from '../state/AppContext.jsx';
 
 const GOOGLE_REDIRECT_CONTEXT_KEY = 'lugaish_google_redirect_context';
@@ -26,6 +26,10 @@ function getFriendlyAuthError(error) {
 
   if (code.includes('auth/popup-closed-by-user')) {
     return 'Google sign-in was closed before finishing.';
+  }
+
+  if (code.includes('auth/popup-blocked')) {
+    return 'Your browser blocked the Google sign-in popup. Please allow popups and try again.';
   }
 
   if (code.includes('auth/missing-initial-state')) {
@@ -201,22 +205,39 @@ export function LoginPage({ mode = 'login' }) {
   const handleGoogleSignIn = async () => {
     setError('');
     setIsSubmitting(true);
+    const redirectContext = {
+      isSignup,
+      languageSelected: state.activePathway,
+      displayName: form.displayName,
+      learnerProfile: {
+        profession: form.profession,
+        expectation: form.expectation,
+        courseDuration: form.courseDuration,
+        referralSource: form.referralSource,
+      },
+    };
 
     try {
-      sessionStorage.setItem(GOOGLE_REDIRECT_CONTEXT_KEY, JSON.stringify({
-        isSignup,
-        languageSelected: state.activePathway,
-        displayName: form.displayName,
-        learnerProfile: {
-          profession: form.profession,
-          expectation: form.expectation,
-          courseDuration: form.courseDuration,
-          referralSource: form.referralSource,
-        },
-      }));
-      await signInWithGoogle();
+      const result = await signInWithGoogle();
+      await finishGoogleLogin(result, redirectContext);
     } catch (err) {
-      setError(getFriendlyAuthError(err));
+      const code = err?.code || err?.message || '';
+      const canFallbackToRedirect = code.includes('auth/popup-blocked')
+        || code.includes('auth/cancelled-popup-request')
+        || code.includes('auth/operation-not-supported-in-this-environment');
+
+      if (canFallbackToRedirect) {
+        try {
+          sessionStorage.setItem(GOOGLE_REDIRECT_CONTEXT_KEY, JSON.stringify(redirectContext));
+          await signInWithGoogleRedirect();
+          return;
+        } catch (redirectError) {
+          setError(getFriendlyAuthError(redirectError));
+        }
+      } else {
+        setError(getFriendlyAuthError(err));
+      }
+
       setIsSubmitting(false);
     }
   };
