@@ -4,15 +4,16 @@ import { COURSE_DATA } from '../data/courseData.js';
 import { ROLES, getRolePermissions, normalizeRole } from '../utils/roles.js';
 
 const LOCAL_STORAGE_KEY = 'lugaish_state_v1';
+const ACTIVITY_DAY_COUNT = 84;
 
 const defaultState = {
-  xp: 1250,
-  streak: 12,
+  xp: 0,
+  streak: 0,
   completedLessons: [],
   enrolledPathways: ['english'],
   activePathway: 'english',
   activeLessonId: 'en-les-1',
-  badges: ['visionary-voice'],
+  badges: [],
   activityData: [],
   userName: '',
   userEmail: '',
@@ -32,29 +33,37 @@ const AppContext = createContext(null);
 
 function generateActivityData() {
   const now = new Date();
-  return Array.from({ length: 84 }, (_, index) => {
+  return Array.from({ length: ACTIVITY_DAY_COUNT }, (_, index) => {
     const date = new Date(now);
-    date.setDate(now.getDate() - (83 - index));
-    const dayOfWeek = date.getDay();
-    let intensity = 0;
-    let xp = 0;
-
-    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-      if (Math.random() > 0.4) {
-        intensity = Math.ceil(Math.random() * 3);
-        xp = intensity * 50;
-      }
-    } else if (Math.random() > 0.8) {
-      intensity = 4;
-      xp = 200;
-    }
-
+    date.setDate(now.getDate() - (ACTIVITY_DAY_COUNT - 1 - index));
     return {
       date: date.toISOString(),
-      intensity,
-      xp,
+      intensity: 0,
+      xp: 0,
     };
   });
+}
+
+function isDemoProgressState(state) {
+  return state.xp === 1250
+    && state.streak === 12
+    && Array.isArray(state.badges)
+    && state.badges.length === 1
+    && state.badges[0] === 'visionary-voice'
+    && (!Array.isArray(state.completedLessons) || state.completedLessons.length === 0);
+}
+
+function normalizeFreshProgress(state) {
+  if (!isDemoProgressState(state)) return state;
+
+  return {
+    ...state,
+    xp: defaultState.xp,
+    streak: defaultState.streak,
+    badges: defaultState.badges,
+    completedLessons: defaultState.completedLessons,
+    activityData: generateActivityData(),
+  };
 }
 
 function loadState() {
@@ -63,7 +72,7 @@ function loadState() {
 
   try {
     const parsed = JSON.parse(raw);
-    return { ...defaultState, ...parsed };
+    return normalizeFreshProgress({ ...defaultState, ...parsed });
   } catch (error) {
     localStorage.removeItem(LOCAL_STORAGE_KEY);
     return { ...defaultState, activityData: generateActivityData() };
@@ -317,6 +326,10 @@ export function AppProvider({ children }) {
       setState(prev => {
         const xp = prev.xp + amount;
         const badges = [...prev.badges];
+
+        if (xp >= 500 && !badges.includes('visionary-voice')) {
+          badges.push('visionary-voice');
+        }
 
         if (computeLevel(xp) >= 4 && !badges.includes('rhetorical-elite')) {
           badges.push('rhetorical-elite');
