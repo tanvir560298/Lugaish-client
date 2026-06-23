@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { BookOpenCheck, FilePenLine, ShieldCheck, UsersRound } from 'lucide-react';
+import { BookOpenCheck, FilePenLine, GraduationCap, ShieldCheck, TrendingUp, UsersRound } from 'lucide-react';
 import { api } from '../api/client.js';
 import { useAppContext, getLessonFromState, getPathFromState } from '../state/AppContext.jsx';
 import { ROLE_LABELS, ROLE_VALUES, ROLES, hasPermission, normalizeRole } from '../utils/roles.js';
+
+const XP_PER_LEVEL = 500;
 
 function RoleBadge({ role }) {
   const normalized = normalizeRole(role);
@@ -24,8 +26,8 @@ function RoleBadge({ role }) {
 
 function StaffActionCard({ icon, title, description, to, disabled = false }) {
   const content = (
-    <div className={`rounded-2xl border p-5 transition ${disabled ? 'border-white/10 bg-white/[0.03] opacity-60' : 'border-white/10 bg-white/5 hover:border-emerald-400/40 hover:bg-white/10'}`}>
-      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-400/10 text-emerald-300">
+    <div className={`h-full rounded-2xl border p-5 transition ${disabled ? 'border-white/10 bg-white/[0.03] opacity-60' : 'border-white/10 bg-gradient-to-br from-white/[0.08] to-white/[0.03] hover:-translate-y-1 hover:border-emerald-400/40 hover:bg-white/10'}`}>
+      <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-400/20 bg-emerald-400/10 text-emerald-300 shadow-lg shadow-emerald-950/20">
         {icon}
       </div>
       <h4 className="text-base font-black text-white">{title}</h4>
@@ -35,6 +37,51 @@ function StaffActionCard({ icon, title, description, to, disabled = false }) {
 
   if (disabled) return content;
   return <Link to={to}>{content}</Link>;
+}
+
+function getInitials(name = '', email = '') {
+  const source = name.trim() || email.split('@')[0] || 'Learner';
+  return source
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part[0]?.toUpperCase())
+    .join('') || 'L';
+}
+
+function LearnerRoleRow({ user, onRoleChange }) {
+  const role = normalizeRole(user.role);
+
+  return (
+    <div className="grid gap-4 border-t border-white/10 px-4 py-4 transition hover:bg-white/[0.03] lg:grid-cols-[1.35fr_0.75fr_210px] lg:items-center">
+      <div className="flex min-w-0 items-center gap-4">
+        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-white/10 bg-gradient-to-br from-blue-500/30 via-indigo-500/20 to-emerald-500/30 text-sm font-black text-white">
+          {getInitials(user.name, user.email)}
+        </div>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-black text-white">{user.name || 'Unnamed learner'}</p>
+          <p className="truncate text-xs font-semibold text-slate-500">{user.email}</p>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between gap-3 lg:justify-start">
+        <span className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500 lg:hidden">Current</span>
+        <RoleBadge role={role} />
+      </div>
+
+      <div className="flex items-center gap-3">
+        <select
+          value={role}
+          onChange={event => onRoleChange(user.id, event.target.value)}
+          className="h-11 w-full rounded-xl border border-white/10 bg-slate-950 px-3 text-xs font-black uppercase tracking-wider text-white outline-none transition focus:border-emerald-400"
+        >
+          {ROLE_VALUES.map(item => (
+            <option key={item} value={item}>{ROLE_LABELS[item]}</option>
+          ))}
+        </select>
+      </div>
+    </div>
+  );
 }
 
 function RoleManagementPanel({ canManageRoles }) {
@@ -93,8 +140,8 @@ function RoleManagementPanel({ canManageRoles }) {
         </p>
       )}
 
-      <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
-        <div className="grid grid-cols-[1.4fr_1fr_190px] gap-3 bg-white/5 px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/20">
+        <div className="hidden grid-cols-[1.35fr_0.75fr_210px] gap-3 bg-white/5 px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 lg:grid">
           <span>User</span>
           <span>Current role</span>
           <span>Set role</span>
@@ -104,22 +151,7 @@ function RoleManagementPanel({ canManageRoles }) {
           <div className="px-4 py-5 text-sm font-semibold text-slate-400">Loading users...</div>
         ) : users.length ? (
           users.map(user => (
-            <div key={user.id} className="grid grid-cols-[1.4fr_1fr_190px] items-center gap-3 border-t border-white/10 px-4 py-4">
-              <div className="min-w-0">
-                <p className="truncate text-sm font-black text-white">{user.name || 'Unnamed learner'}</p>
-                <p className="truncate text-xs font-semibold text-slate-500">{user.email}</p>
-              </div>
-              <RoleBadge role={user.role} />
-              <select
-                value={normalizeRole(user.role)}
-                onChange={event => updateRole(user.id, event.target.value)}
-                className="rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-xs font-black uppercase tracking-wider text-white outline-none focus:border-emerald-400"
-              >
-                {ROLE_VALUES.map(role => (
-                  <option key={role} value={role}>{ROLE_LABELS[role]}</option>
-                ))}
-              </select>
-            </div>
+            <LearnerRoleRow key={user.id} user={user} onRoleChange={updateRole} />
           ))
         ) : (
           <div className="px-4 py-5 text-sm font-semibold text-slate-400">No users found yet.</div>
@@ -145,9 +177,10 @@ export function DashboardPage() {
     .slice(0, 2)
     .map(part => part[0]?.toUpperCase())
     .join('') || 'LL';
-  const level = Math.floor(state.xp / 500) + 1;
-  const xpInLevel = state.xp % 500;
-  const remaining = 500 - xpInLevel;
+  const level = Math.floor(state.xp / XP_PER_LEVEL) + 1;
+  const xpInLevel = state.xp % XP_PER_LEVEL;
+  const remaining = XP_PER_LEVEL - xpInLevel;
+  const levelProgress = Math.round((xpInLevel / XP_PER_LEVEL) * 100);
   const role = normalizeRole(state.userRole);
   const isStaff = role !== ROLES.learner;
   const canManageRoles = hasPermission(role, 'manage_roles');
@@ -191,7 +224,15 @@ export function DashboardPage() {
           </div>
 
           <div className="section-card p-8">
-            <h3 className="text-lg font-semibold text-white">Level progression</h3>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-400">Learning level</p>
+                <h3 className="mt-2 text-lg font-black text-white">Level {level}</h3>
+              </div>
+              <div className="grid h-11 w-11 place-items-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-blue-200">
+                <GraduationCap size={21} />
+              </div>
+            </div>
             <div className="relative mt-8 h-28 w-28 mx-auto">
               <svg viewBox="0 0 130 130" className="h-full w-full rotate-[-90deg]">
                 <circle cx="65" cy="65" r="54" className="fill-none stroke-white/10 stroke-[9]" />
@@ -202,16 +243,35 @@ export function DashboardPage() {
                   className="fill-none stroke-gradient stroke-[9]"
                   style={{
                     strokeDasharray: 339.292,
-                    strokeDashoffset: 339.292 - (xpInLevel / 500) * 339.292,
+                    strokeDashoffset: 339.292 - (xpInLevel / XP_PER_LEVEL) * 339.292,
                   }}
                 />
               </svg>
               <div className="absolute inset-0 grid place-items-center text-center">
-                <p className="text-3xl font-black text-white">{state.xp.toLocaleString()}</p>
-                <p className="text-sm text-slate-400">Level {level}</p>
+                <div>
+                  <p className="text-3xl font-black text-white">{levelProgress}%</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Complete</p>
+                </div>
               </div>
             </div>
-            <p className="mt-6 text-center text-slate-400">{remaining} XP remaining for Level {level + 1}</p>
+            <div className="mt-7 space-y-3">
+              <div className="flex items-center justify-between text-xs font-black uppercase tracking-[0.16em] text-slate-400">
+                <span>{xpInLevel} XP</span>
+                <span>{XP_PER_LEVEL} XP</span>
+              </div>
+              <div className="h-3 overflow-hidden rounded-full bg-white/10">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-400"
+                  style={{ width: `${levelProgress}%` }}
+                />
+              </div>
+              <div className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
+                <TrendingUp size={18} className="mt-0.5 shrink-0 text-emerald-400" />
+                <p>
+                  <span className="font-black text-white">{remaining} XP</span> until Level {level + 1}. Complete lessons and quizzes to move up.
+                </p>
+              </div>
+            </div>
           </div>
         </aside>
 
