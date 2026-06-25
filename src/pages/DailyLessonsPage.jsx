@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { BookOpen, CheckCircle2, Clock3, Film, ListChecks, Lock, Play, Plus, Sparkles, TimerReset } from 'lucide-react';
+import { BookOpen, CheckCircle2, Clock3, Film, ListChecks, Lock, Play, Plus, Sparkles, TimerReset, Video } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../state/AppContext.jsx';
@@ -158,29 +158,60 @@ export function DailyLessonsPage() {
           );
         })}
 
-        {Array.from({ length: 6 }).map((_, index) => (
-          <article key={`placeholder-${index}`} className="section-card border-dashed p-5 opacity-70 sm:p-6">
-            <div className="mb-5 flex items-center justify-between">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">
-                  Day {lessons.length + index + 1}
+        {Array.from({ length: 6 }).map((_, index) => {
+          const dayNumber = lessons.length + index + 1;
+          const isInterviewDay = dayNumber === 7;
+
+          if (isInterviewDay) {
+            return (
+              <article key={`placeholder-${index}`} className="section-card border-blue-400/30 p-5 shadow-[0_24px_70px_rgba(37,99,235,0.14)] sm:p-6">
+                <div className="mb-5 flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.28em] text-blue-300">Day 7</p>
+                    <h2 className="mt-2 text-xl font-black leading-tight text-white">Weekly Interview Session</h2>
+                  </div>
+                  <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-blue-500 text-white">
+                    <Video size={18} />
+                  </div>
+                </div>
+                <p className="text-sm leading-6 text-slate-400">
+                  Join your weekly output check, get your room serial, and wait respectfully until your turn.
                 </p>
-                <h2 className="mt-2 text-xl font-black text-white">Coming Soon</h2>
+                <button
+                  type="button"
+                  onClick={() => navigate('/interview')}
+                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 py-4 text-sm font-black uppercase tracking-widest text-white shadow-lg shadow-blue-500/20 transition hover:bg-emerald-500"
+                >
+                  Open Interview Queue <Sparkles size={15} />
+                </button>
+              </article>
+            );
+          }
+
+          return (
+            <article key={`placeholder-${index}`} className="section-card border-dashed p-5 opacity-70 sm:p-6">
+              <div className="mb-5 flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">
+                    Day {dayNumber}
+                  </p>
+                  <h2 className="mt-2 text-xl font-black text-white">Coming Soon</h2>
+                </div>
+                <div className="grid h-11 w-11 place-items-center rounded-2xl bg-white/5 text-slate-500">
+                  <Clock3 size={18} />
+                </div>
               </div>
-              <div className="grid h-11 w-11 place-items-center rounded-2xl bg-white/5 text-slate-500">
-                <Clock3 size={18} />
-              </div>
-            </div>
-            <p className="text-sm leading-6 text-slate-400">A new daily box can be added here for video, tasks, and practice.</p>
-            <button
-              type="button"
-              onClick={() => showComingSoon(`Day ${lessons.length + index + 1}`)}
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-sm font-black uppercase tracking-widest text-slate-300 transition hover:border-emerald-400/30 hover:bg-emerald-500/10 hover:text-emerald-100"
-            >
-              Preview Waitlist <Sparkles size={15} />
-            </button>
-          </article>
-        ))}
+              <p className="text-sm leading-6 text-slate-400">A new daily box can be added here for video, tasks, and practice.</p>
+              <button
+                type="button"
+                onClick={() => showComingSoon(`Day ${dayNumber}`)}
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-sm font-black uppercase tracking-widest text-slate-300 transition hover:border-emerald-400/30 hover:bg-emerald-500/10 hover:text-emerald-100"
+              >
+                Preview Waitlist <Sparkles size={15} />
+              </button>
+            </article>
+          );
+        })}
       </div>
 
       <AnimatePresence>

@@ -15,13 +15,11 @@ import {
   Sun,
   Moon,
   Activity,
-  Video
 } from 'lucide-react';
 
 const navLinks = [
   { href: '/', label: 'Overview', icon: <LayoutDashboard size={16} />, exact: true },
   { href: '/daily-lessons', label: 'Today', icon: <CalendarDays size={16} /> },
-  { href: '/interview', label: 'Interview', icon: <Video size={16} /> },
   { href: '/pathways', label: 'Odyssey', icon: <Map size={16} /> },
   { href: '/pricing', label: 'Plans', icon: <CreditCard size={16} /> },
   { href: '/architects', label: 'Architects', icon: <Hammer size={16} /> },
@@ -33,16 +31,17 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const level = Math.floor(state.xp / 500) + 1;
   const themeLabel = state.theme === 'dark' ? 'Light mode' : 'Dark mode';
-  const visibleNavLinks = state.isLoggedIn
-    ? [
-        ...navLinks,
-        { href: '/dashboard', label: 'Dashboard', icon: <Gauge size={16} /> },
-      ]
-    : navLinks;
+  const dashboardLink = { href: '/dashboard', label: 'Dashboard', icon: <Gauge size={16} /> };
+  const visibleNavLinks = state.isLoggedIn ? [...navLinks, dashboardLink] : navLinks;
+  const isLinkActive = (link) => (
+    link.exact
+      ? location.pathname === link.href
+      : location.pathname === link.href || location.pathname.startsWith(`${link.href}/`)
+  );
 
   return (
     <header className="site-header sticky top-0 z-[100] border-b border-white/5 bg-[#020617]/80 backdrop-blur-2xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
+      <div className="mx-auto flex max-w-[1760px] items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
         
         {/* --- 1. THE EVOLVING LOGO --- */}
         <Link to="/" className="relative group flex shrink-0 items-center gap-4">
@@ -69,9 +68,7 @@ export function Header() {
         <nav className="header-nav hidden xl:flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/5">
           <LayoutGroup>
             {visibleNavLinks.map((link) => {
-              const isActive = link.exact
-                ? location.pathname === link.href
-                : location.pathname === link.href || location.pathname.startsWith(`${link.href}/`);
+              const isActive = isLinkActive(link);
 
               return (
                 <Link
@@ -79,7 +76,7 @@ export function Header() {
                   to={link.href}
                   className={`
                     nav-link header-nav-link
-                    relative flex items-center gap-2 px-4 py-2 text-xs font-black uppercase tracking-widest transition-all
+                    relative flex items-center gap-1.5 px-3 py-2 text-xs font-black uppercase tracking-[0.12em] transition-all 2xl:px-4
                     ${isActive ? 'nav-link-active text-white' : 'text-slate-400 hover:text-slate-200'}
                   `}
                 >
@@ -115,7 +112,7 @@ export function Header() {
 
           {/* User Progress Badge */}
           {state.isLoggedIn && (
-            <div className="header-control header-progress hidden items-center gap-2 rounded-xl border border-white/5 bg-white/5 px-3 py-2 md:flex">
+            <div className="header-control header-progress hidden items-center gap-2 rounded-xl border border-white/5 bg-white/5 px-3 py-2 2xl:flex">
               <div className="flex items-center gap-3">
                 <Activity size={15} className="text-emerald-400" />
                 <div className="leading-none">
@@ -131,7 +128,7 @@ export function Header() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               onClick={actions.logout}
-              className="header-signout px-4 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all sm:px-5"
+              className="header-signout px-3 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all sm:px-4"
             >
               Sign Out
             </motion.button>

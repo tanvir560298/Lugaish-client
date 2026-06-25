@@ -129,7 +129,7 @@ function LearnerRoleRow({ user, onRoleChange, canManageRoles }) {
   );
 }
 
-function SeatCapacityPanel({ users, seatLimit }) {
+function SeatCapacityPanel({ users, seatLimits }) {
   const courses = [
     { key: 'english', label: 'English Pathway' },
     { key: 'arabic', label: 'Arabic Pathway' },
@@ -150,7 +150,7 @@ function SeatCapacityPanel({ users, seatLimit }) {
           <p className="text-xs font-black uppercase tracking-[0.24em] text-blue-400">Seat capacity</p>
           <h3 className="mt-2 text-xl font-black text-white">Cohort seats and applications</h3>
           <p className="mt-2 text-sm leading-6 text-slate-400">
-            This shows when a course reaches the {seatLimit}-student limit and who has requested a priority seat.
+            This shows when each course reaches its student limit and who has requested a priority seat.
           </p>
         </div>
         <div className="grid h-12 w-12 place-items-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-blue-200">
@@ -160,6 +160,7 @@ function SeatCapacityPanel({ users, seatLimit }) {
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         {courses.map(course => {
+          const seatLimit = seatLimits[course.key] ?? 100;
           const enrolledCount = users.filter(user => user.enrolledPathways?.includes(course.key)).length;
           const remaining = Math.max(seatLimit - enrolledCount, 0);
           const isFull = remaining <= 0;
@@ -223,7 +224,7 @@ function SeatCapacityPanel({ users, seatLimit }) {
 
 function RoleManagementPanel({ canManageRoles, canViewRoles }) {
   const [users, setUsers] = useState([]);
-  const [seatLimit, setSeatLimit] = useState(100);
+  const [seatLimits, setSeatLimits] = useState({ english: 110, arabic: 55 });
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -236,7 +237,10 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
       .then(data => {
         if (!ignore) {
           setUsers(data.users ?? []);
-          setSeatLimit(data.courseSeatLimit ?? 100);
+          setSeatLimits({
+            english: data.courseSeatLimits?.english ?? data.courseSeatLimit ?? 110,
+            arabic: data.courseSeatLimits?.arabic ?? data.courseSeatLimit ?? 55,
+          });
         }
       })
       .catch(error => {
@@ -266,7 +270,7 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
 
   return (
     <div className="space-y-6">
-      {canManageRoles && <SeatCapacityPanel users={users} seatLimit={seatLimit} />}
+      {canManageRoles && <SeatCapacityPanel users={users} seatLimits={seatLimits} />}
 
       <div className="section-card p-6 sm:p-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
