@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { BookOpenCheck, ChevronDown, FilePenLine, GraduationCap, ShieldCheck, TrendingUp, UsersRound } from 'lucide-react';
+import { BookOpenCheck, ChevronDown, ClipboardList, FilePenLine, GraduationCap, ShieldCheck, TrendingUp, UsersRound } from 'lucide-react';
 import { api } from '../api/client.js';
 import { useAppContext } from '../state/AppContext.jsx';
 import { ROLE_LABELS, ROLE_VALUES, ROLES, hasPermission, normalizeRole } from '../utils/roles.js';
@@ -129,8 +129,101 @@ function LearnerRoleRow({ user, onRoleChange, canManageRoles }) {
   );
 }
 
+function SeatCapacityPanel({ users, seatLimit }) {
+  const courses = [
+    { key: 'english', label: 'English Pathway' },
+    { key: 'arabic', label: 'Arabic Pathway' },
+  ];
+
+  const pendingApplications = users.flatMap(user => (
+    user.seatApplications ?? []
+  ).filter(application => application.status === 'pending').map(application => ({
+    ...application,
+    userName: user.name,
+    userEmail: user.email,
+  })));
+
+  return (
+    <div className="section-card p-6 sm:p-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.24em] text-blue-400">Seat capacity</p>
+          <h3 className="mt-2 text-xl font-black text-white">Cohort seats and applications</h3>
+          <p className="mt-2 text-sm leading-6 text-slate-400">
+            This shows when a course reaches the {seatLimit}-student limit and who has requested a priority seat.
+          </p>
+        </div>
+        <div className="grid h-12 w-12 place-items-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-blue-200">
+          <ClipboardList size={22} />
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
+        {courses.map(course => {
+          const enrolledCount = users.filter(user => user.enrolledPathways?.includes(course.key)).length;
+          const remaining = Math.max(seatLimit - enrolledCount, 0);
+          const isFull = remaining <= 0;
+
+          return (
+            <div key={course.key} className={`rounded-2xl border p-5 ${isFull ? 'border-amber-400/30 bg-amber-500/10' : 'border-emerald-400/20 bg-emerald-500/10'}`}>
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h4 className="text-base font-black text-white">{course.label}</h4>
+                  <p className="mt-2 text-sm text-slate-400">{isFull ? 'Cohort full' : `${remaining} seats available`}</p>
+                </div>
+                <span className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-widest ${isFull ? 'border-amber-300/30 bg-amber-400/10 text-amber-100' : 'border-emerald-300/30 bg-emerald-400/10 text-emerald-100'}`}>
+                  {isFull ? 'Full' : 'Open'}
+                </span>
+              </div>
+              <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/10">
+                <div
+                  className={`h-full rounded-full ${isFull ? 'bg-amber-400' : 'bg-emerald-400'}`}
+                  style={{ width: `${Math.min((enrolledCount / seatLimit) * 100, 100)}%` }}
+                />
+              </div>
+              <p className="mt-3 text-xs font-black uppercase tracking-[0.18em] text-slate-400">
+                {enrolledCount}/{seatLimit} enrolled
+              </p>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/20">
+        <div className="bg-white/5 px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+          Pending seat applications
+        </div>
+        {pendingApplications.length ? (
+          pendingApplications.map((application, index) => (
+            <div key={`${application.userEmail}-${application.language}-${application.submittedAt}-${index}`} className="grid gap-3 border-t border-white/10 px-4 py-4 lg:grid-cols-[1fr_0.7fr_0.8fr] lg:items-start">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-black text-white">{application.userName || 'Unnamed learner'}</p>
+                <p className="truncate text-xs font-semibold text-slate-500">{application.userEmail}</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Course</p>
+                <p className="mt-1 text-sm font-semibold capitalize text-slate-200">{application.language}</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Message</p>
+                <p className="mt-1 line-clamp-3 text-sm leading-6 text-slate-300">{application.goal || 'No message added.'}</p>
+                {application.contactPreference && (
+                  <p className="mt-2 text-xs font-semibold text-emerald-200">Contact: {application.contactPreference}</p>
+                )}
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="px-4 py-5 text-sm font-semibold text-slate-400">No pending applications yet.</div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function RoleManagementPanel({ canManageRoles, canViewRoles }) {
   const [users, setUsers] = useState([]);
+  const [seatLimit, setSeatLimit] = useState(100);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -141,7 +234,10 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
     setIsLoading(true);
     api.listUsers()
       .then(data => {
-        if (!ignore) setUsers(data.users ?? []);
+        if (!ignore) {
+          setUsers(data.users ?? []);
+          setSeatLimit(data.courseSeatLimit ?? 100);
+        }
       })
       .catch(error => {
         if (!ignore) setMessage(error.message || 'Could not load users.');
@@ -169,44 +265,48 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
   if (!canViewRoles) return null;
 
   return (
-    <div className="section-card p-6 sm:p-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-400">
-            {canManageRoles ? 'Web developer control' : 'Team role directory'}
-          </p>
-          <h3 className="mt-2 text-xl font-black text-white">{canManageRoles ? 'Role management' : 'Role overview'}</h3>
-          <p className="mt-2 text-sm text-slate-400">
-            {canManageRoles
-              ? 'Promote instructors, editors, or learners after they sign in once.'
-              : 'View learner and staff roles. Only the web developer can make changes.'}
-          </p>
-        </div>
-        <RoleBadge role={canManageRoles ? ROLES.webDeveloper : ROLES.instructor} />
-      </div>
+    <div className="space-y-6">
+      {canManageRoles && <SeatCapacityPanel users={users} seatLimit={seatLimit} />}
 
-      {message && (
-        <p className="mt-5 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-slate-200">
-          {message}
-        </p>
-      )}
-
-      <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/20">
-        <div className={`hidden gap-3 bg-white/5 px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 ${canManageRoles ? 'lg:grid-cols-[1.35fr_0.75fr_190px]' : 'lg:grid-cols-[1.35fr_0.75fr]'} lg:grid`}>
-          <span>User</span>
-          <span>Current role</span>
-          {canManageRoles && <span>Set role</span>}
+      <div className="section-card p-6 sm:p-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-400">
+              {canManageRoles ? 'Web developer control' : 'Team role directory'}
+            </p>
+            <h3 className="mt-2 text-xl font-black text-white">{canManageRoles ? 'Role management' : 'Role overview'}</h3>
+            <p className="mt-2 text-sm text-slate-400">
+              {canManageRoles
+                ? 'Promote instructors, editors, or learners after they sign in once.'
+                : 'View learner and staff roles. Only the web developer can make changes.'}
+            </p>
+          </div>
+          <RoleBadge role={canManageRoles ? ROLES.webDeveloper : ROLES.instructor} />
         </div>
 
-        {isLoading ? (
-          <div className="px-4 py-5 text-sm font-semibold text-slate-400">Loading users...</div>
-        ) : users.length ? (
-          users.map(user => (
-            <LearnerRoleRow key={user.id} user={user} onRoleChange={updateRole} canManageRoles={canManageRoles} />
-          ))
-        ) : (
-          <div className="px-4 py-5 text-sm font-semibold text-slate-400">No users found yet.</div>
+        {message && (
+          <p className="mt-5 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-slate-200">
+            {message}
+          </p>
         )}
+
+        <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/20">
+          <div className={`hidden gap-3 bg-white/5 px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 ${canManageRoles ? 'lg:grid-cols-[1.35fr_0.75fr_190px]' : 'lg:grid-cols-[1.35fr_0.75fr]'} lg:grid`}>
+            <span>User</span>
+            <span>Current role</span>
+            {canManageRoles && <span>Set role</span>}
+          </div>
+
+          {isLoading ? (
+            <div className="px-4 py-5 text-sm font-semibold text-slate-400">Loading users...</div>
+          ) : users.length ? (
+            users.map(user => (
+              <LearnerRoleRow key={user.id} user={user} onRoleChange={updateRole} canManageRoles={canManageRoles} />
+            ))
+          ) : (
+            <div className="px-4 py-5 text-sm font-semibold text-slate-400">No users found yet.</div>
+          )}
+        </div>
       </div>
     </div>
   );

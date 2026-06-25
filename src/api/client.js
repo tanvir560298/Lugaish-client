@@ -26,7 +26,11 @@ async function request(path, options = {}) {
 
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(data.error ?? 'Request failed');
+    const error = new Error(data.error ?? 'Request failed');
+    error.status = response.status;
+    error.code = data.code;
+    error.data = data;
+    throw error;
   }
 
   return data;
@@ -56,6 +60,15 @@ export const api = {
   },
   enrollPathway(payload) {
     return request('/auth/enroll', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+  getEnrollmentStatus(language) {
+    return request(`/auth/enrollment-status/${language}`);
+  },
+  applyForSeat(payload) {
+    return request('/auth/seat-applications', {
       method: 'POST',
       body: JSON.stringify(payload),
     });

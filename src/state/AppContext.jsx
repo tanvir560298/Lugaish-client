@@ -103,16 +103,17 @@ function getFirstLessonId(pathway) {
 
 function normalizeState(state) {
   const activePathway = COURSE_DATA[state.activePathway] ? state.activePathway : defaultState.activePathway;
-  const enrolledPathways = Array.isArray(state.enrolledPathways) && state.enrolledPathways.length
+  const enrolledPathways = Array.isArray(state.enrolledPathways)
     ? state.enrolledPathways.filter(pathway => COURSE_DATA[pathway])
     : [activePathway];
+  const normalizedEnrolledPathways = enrolledPathways.length ? enrolledPathways : [];
 
   return {
     ...state,
     activePathway,
-    enrolledPathways: [...new Set([...(enrolledPathways.length ? enrolledPathways : []), activePathway])],
+    enrolledPathways: [...new Set(normalizedEnrolledPathways)],
     courseActivity: state.courseActivity && typeof state.courseActivity === 'object' ? state.courseActivity : {},
-    courseStartedAt: [...new Set([...(enrolledPathways.length ? enrolledPathways : []), activePathway])].reduce((acc, pathway) => ({
+    courseStartedAt: [...new Set(normalizedEnrolledPathways)].reduce((acc, pathway) => ({
       ...acc,
       [pathway]: state.courseStartedAt?.[pathway] ?? getDateKey(),
     }), {}),
@@ -158,7 +159,11 @@ export function AppProvider({ children }) {
         };
       });
     },
-    enrollPathway(pathway) {
+    async enrollPathway(pathway) {
+      if (state.isLoggedIn) {
+        await api.enrollPathway({ language: pathway });
+      }
+
       setState(prev => ({
         ...prev,
         activePathway: pathway,
@@ -169,8 +174,6 @@ export function AppProvider({ children }) {
           [pathway]: prev.courseStartedAt?.[pathway] ?? getDateKey(),
         },
       }));
-
-      api.enrollPathway({ language: pathway }).catch(() => {});
     },
     setActiveLesson(lessonId, pathway) {
       setState(prev => ({
@@ -268,7 +271,7 @@ export function AppProvider({ children }) {
         permissions: response.user?.permissions ?? getRolePermissions(response.user?.role ?? prev.userRole),
         activePathway: response.user?.languageSelected ?? languageSelected ?? prev.activePathway,
         activeLessonId: getFirstLessonId(response.user?.languageSelected ?? languageSelected ?? prev.activePathway),
-        enrolledPathways: response.user?.enrolledPathways?.length
+        enrolledPathways: Array.isArray(response.user?.enrolledPathways)
           ? response.user.enrolledPathways
           : [
               ...new Set([
@@ -329,7 +332,7 @@ export function AppProvider({ children }) {
         permissions: response.user?.permissions ?? getRolePermissions(response.user?.role ?? prev.userRole),
         activePathway: response.user?.languageSelected ?? languageSelected ?? prev.activePathway,
         activeLessonId: getFirstLessonId(response.user?.languageSelected ?? languageSelected ?? prev.activePathway),
-        enrolledPathways: response.user?.enrolledPathways?.length
+        enrolledPathways: Array.isArray(response.user?.enrolledPathways)
           ? response.user.enrolledPathways
           : [response.user?.languageSelected ?? languageSelected ?? prev.activePathway],
         learnerProfile: {
@@ -383,7 +386,7 @@ export function AppProvider({ children }) {
         return { ...prev, xp, badges, activityData };
       });
     },
-  }), [state.activePathway]);
+  }), [state.activePathway, state.isLoggedIn]);
 
   const value = useMemo(() => ({ state, actions, courseData: COURSE_DATA }), [state, actions]);
 
