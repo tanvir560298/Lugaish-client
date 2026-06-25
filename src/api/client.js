@@ -100,4 +100,19 @@ export const api = {
       body: JSON.stringify(payload),
     });
   },
+  getWeeklyInterview() {
+    return request('/interviews/weekly');
+  },
+  joinWeeklyInterview() {
+    return request('/interviews/join', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
+  },
+  updateInterviewStatus(entryId, payload) {
+    return request(`/interviews/entries/${entryId}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  },
 };

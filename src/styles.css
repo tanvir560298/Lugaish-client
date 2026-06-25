@@ -217,6 +217,82 @@ a {
   color: var(--text-secondary);
 }
 
+.google-login-shell {
+  isolation: isolate;
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.26),
+    0 0 0 0 rgba(16, 185, 129, 0.36);
+  animation: google-login-pulse 2.4s ease-in-out infinite;
+}
+
+.google-login-shell::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  z-index: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg, #38bdf8, #ffffff, #10b981, #38bdf8);
+  opacity: 0.65;
+  filter: blur(10px);
+}
+
+.google-login-shell::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  z-index: 0;
+  border-radius: inherit;
+  background: #ffffff;
+}
+
+.google-login-shine {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.google-login-shine::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  bottom: -40%;
+  left: -35%;
+  width: 26%;
+  transform: rotate(18deg);
+  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.26), transparent);
+  animation: google-login-shine 2.8s ease-in-out infinite;
+}
+
+@keyframes google-login-pulse {
+  0%, 100% {
+    box-shadow:
+      0 18px 40px rgba(15, 23, 42, 0.26),
+      0 0 0 0 rgba(16, 185, 129, 0.34);
+  }
+  50% {
+    box-shadow:
+      0 22px 54px rgba(16, 185, 129, 0.2),
+      0 0 0 8px rgba(16, 185, 129, 0);
+  }
+}
+
+@keyframes google-login-shine {
+  0% {
+    left: -40%;
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  60%, 100% {
+    left: 115%;
+    opacity: 0;
+  }
+}
+
 .badge-pill {
   @apply inline-flex items-center rounded-full border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-slate-300;
   border-color: var(--border-color);

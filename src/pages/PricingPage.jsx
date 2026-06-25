@@ -82,7 +82,7 @@ export function PricingPage() {
           </h1>
           <p className="text-base text-slate-400 sm:text-lg md:text-xl">
             Lugaish is currently in early-access. To celebrate our launch, 
-            we are giving away <span className="text-white font-bold underline decoration-blue-500">Lifetime Premium Access</span> to our first users.
+            we are giving away <span className="text-white font-bold underline decoration-blue-500">Lifetime Premium Access</span> to our first users, including AI-powered practice support for English and Arabic learning.
           </p>
         </div>
 
@@ -118,13 +118,14 @@ export function PricingPage() {
                   <span className="text-5xl font-black italic tracking-tighter sm:text-7xl">FREE</span>
                   <span className="text-lg font-bold text-slate-500 line-through sm:text-2xl">299 BDT</span>
                 </div>
-                <p className="text-slate-400 mt-2 font-medium">Full access to English & Arabic pathways.</p>
+                <p className="text-slate-400 mt-2 font-medium">Full access to AI-assisted English & Arabic pathways.</p>
               </div>
 
               <div className="mb-8 space-y-4 sm:mb-12">
                 {[
                   "Complete English Language Path",
                   "Complete Arabic Language Path",
+                  "AI-Powered Practice Support",
                   "Daily Progress Tracking",
                   "Native Audio Pronunciation",
                   "Founding Member Exclusive Badge",
@@ -186,6 +187,7 @@ export function PricingPage() {
               <div className="mb-8 space-y-4 opacity-50 sm:mb-12">
                 {[
                   "Standard Course Access",
+                  "AI-Assisted Practice Tools",
                   "Daily Progress Tracking",
                   "Community Support",
                   "Basic Audio Tools"

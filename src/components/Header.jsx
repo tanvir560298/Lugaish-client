@@ -14,12 +14,14 @@ import {
   CreditCard,
   Sun,
   Moon,
-  Activity
+  Activity,
+  Video
 } from 'lucide-react';
 
 const navLinks = [
   { href: '/', label: 'Overview', icon: <LayoutDashboard size={16} />, exact: true },
   { href: '/daily-lessons', label: 'Today', icon: <CalendarDays size={16} /> },
+  { href: '/interview', label: 'Interview', icon: <Video size={16} /> },
   { href: '/pathways', label: 'Odyssey', icon: <Map size={16} /> },
   { href: '/pricing', label: 'Plans', icon: <CreditCard size={16} /> },
   { href: '/architects', label: 'Architects', icon: <Hammer size={16} /> },
@@ -43,7 +45,7 @@ export function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
         
         {/* --- 1. THE EVOLVING LOGO --- */}
-        <Link to="/" className="relative group flex items-center gap-4">
+        <Link to="/" className="relative group flex shrink-0 items-center gap-4">
           <motion.div
             whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
             className="relative h-11 w-11 flex items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-600 to-emerald-500 shadow-lg shadow-blue-500/20"
@@ -64,7 +66,7 @@ export function Header() {
         </Link>
 
         {/* --- 2. DESKTOP NAV (Magnetic Style) --- */}
-        <nav className="header-nav hidden lg:flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/5">
+        <nav className="header-nav hidden xl:flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/5">
           <LayoutGroup>
             {visibleNavLinks.map((link) => {
               const isActive = link.exact
@@ -77,7 +79,7 @@ export function Header() {
                   to={link.href}
                   className={`
                     nav-link header-nav-link
-                    relative flex items-center gap-2 px-5 py-2 text-xs font-black uppercase tracking-widest transition-all
+                    relative flex items-center gap-2 px-4 py-2 text-xs font-black uppercase tracking-widest transition-all
                     ${isActive ? 'nav-link-active text-white' : 'text-slate-400 hover:text-slate-200'}
                   `}
                 >
@@ -99,7 +101,7 @@ export function Header() {
         </nav>
 
         {/* --- 3. ACTIONS & USER STATUS --- */}
-        <div className="flex min-w-0 items-center gap-2 sm:gap-4">
+        <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-4">
           
           <button
             type="button"
@@ -146,7 +148,7 @@ export function Header() {
 
           {/* Mobile Menu Toggle */}
           <button
-            className="header-menu header-icon-button lg:hidden p-2 text-white bg-white/5 rounded-xl border border-white/10"
+            className="header-menu header-icon-button xl:hidden p-2 text-white bg-white/5 rounded-xl border border-white/10"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Open navigation menu"
           >
@@ -162,7 +164,7 @@ export function Header() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="mobile-nav lg:hidden border-t border-white/5 bg-[#020617] overflow-hidden"
+            className="mobile-nav xl:hidden border-t border-white/5 bg-[#020617] overflow-hidden"
           >
             <div className="p-4 space-y-2 sm:p-6 sm:space-y-4">
               <button

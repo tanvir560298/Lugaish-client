@@ -17,6 +17,7 @@ const PricingPage = lazy(() => import('./pages/PricingPage.jsx').then(module => 
 const ProgressPage = lazy(() => import('./pages/ProgressPage.jsx').then(module => ({ default: module.ProgressPage })));
 const ProfilePage = lazy(() => import('./pages/ProfilePage.jsx').then(module => ({ default: module.ProfilePage })));
 const ArchitectsPage = lazy(() => import('./pages/ArchitectsPage.jsx').then(module => ({ default: module.ArchitectsPage })));
+const InterviewPage = lazy(() => import('./pages/InterviewPage.jsx').then(module => ({ default: module.InterviewPage })));
 
 function PageFallback() {
   return (
@@ -70,6 +71,7 @@ export default function App() {
             <Route path='/progress' element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
             <Route path='/pathways' element={<ProtectedRoute><PathwaysPage /></ProtectedRoute>} />
             <Route path='/daily-lessons' element={<ProtectedRoute><DailyLessonsPage /></ProtectedRoute>} />
+            <Route path='/interview' element={<ProtectedRoute><InterviewPage /></ProtectedRoute>} />
             <Route path='/leaderboard' element={<Navigate to="/daily-lessons" replace />} />
             <Route path="/architects" element={<ArchitectsPage />} />
             <Route path='*' element={<Navigate to='/' replace />} />

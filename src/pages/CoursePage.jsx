@@ -28,7 +28,7 @@ export function CoursePage() {
       setCourse({
         id: 'english',
         name: 'English Pathway',
-        description: 'Master English communication from basics to fluency',
+        description: 'Master English communication with daily lessons, AI-supported practice, and interview-ready confidence',
         totalDays: 30,
         difficulty: 'Beginner to Advanced',
         modules: [
@@ -42,7 +42,7 @@ export function CoursePage() {
       setCourse({
         id: 'arabic',
         name: 'Arabic Pathway',
-        description: 'Learn Arabic fluently with cultural context',
+        description: 'Learn Arabic with cultural context, daily lessons, and AI-supported practice alongside your pathway',
         totalDays: 30,
         difficulty: 'Beginner to Advanced',
         modules: [

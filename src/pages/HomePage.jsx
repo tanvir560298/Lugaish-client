@@ -79,7 +79,7 @@ export function HomePage() {
               <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-emerald-400 rounded-lg flex items-center justify-center text-white shadow-lg">
                 <Sparkles size={16} />
               </div>
-              <span className="text-xs font-bold text-blue-100 sm:text-sm">Welcome to the future of learning.</span>
+              <span className="text-xs font-bold text-blue-100 sm:text-sm">AI-powered English and Arabic learning.</span>
             </motion.div>
 
             <h1 className="text-5xl font-black leading-[0.9] tracking-tighter sm:text-6xl md:text-8xl lg:text-9xl">
@@ -90,7 +90,7 @@ export function HomePage() {
             </h1>
 
             <p className="max-w-lg text-base font-medium leading-relaxed text-slate-400 sm:text-lg lg:text-xl">
-              Join <span className="text-white">1,200+ early adopters</span> mastering English and Arabic through daily 10-minute "ascents." No fluff, just progress.
+              Join <span className="text-white">1,200+ early adopters</span> mastering English and Arabic through AI-guided practice, daily 10-minute "ascents," and weekly interview preparation.
             </p>
 
             <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:flex-wrap sm:gap-5 sm:pt-4">
@@ -116,11 +116,11 @@ export function HomePage() {
             <div className="flex flex-col gap-3 pt-2 text-slate-500 sm:flex-row sm:items-center sm:gap-6 sm:pt-4">
                <div className="flex items-center gap-2">
                   <CheckCircle2 size={18} className="text-emerald-500" />
-                  <span className="text-xs font-bold uppercase tracking-widest">Free Premium Launch</span>
+                  <span className="text-xs font-bold uppercase tracking-widest">AI-Powered Practice</span>
                </div>
                <div className="flex items-center gap-2">
                   <Flame size={18} className="text-orange-500" />
-                  <span className="text-xs font-bold uppercase tracking-widest">5-Day Streaks</span>
+                  <span className="text-xs font-bold uppercase tracking-widest">Weekly Interview Prep</span>
                </div>
             </div>
           </motion.div>
@@ -186,9 +186,9 @@ export function HomePage() {
         <div className="app-shell">
           <div className="grid gap-5 sm:gap-8 lg:grid-cols-3 lg:gap-12">
             {[
-              { icon: <Zap />, iconClass: "text-blue-500", title: "Instant Impact", desc: "Start speaking from Day 1. Our lessons focus on high-frequency communication." },
-              { icon: <Flame />, iconClass: "text-orange-500", title: "Daily Momentum", desc: "Build a habit that lasts. 10 minutes is all you need to reach new heights." },
-              { icon: <Trophy />, iconClass: "text-emerald-500", title: "Mastery Path", desc: "Unlock certificates and badges as you conquer increasingly complex pathways." }
+              { icon: <Zap />, iconClass: "text-blue-500", title: "AI-Guided Practice", desc: "Use AI-assisted prompts and review to practice English and Arabic with more confidence between lessons." },
+              { icon: <Flame />, iconClass: "text-orange-500", title: "Daily Momentum", desc: "Build a habit that lasts. 10 minutes of focused lessons, practice, and progress tracking keeps you moving." },
+              { icon: <Trophy />, iconClass: "text-emerald-500", title: "Interview Readiness", desc: "Prepare for weekly output checks with guided speaking practice, progress milestones, and structured pathways." }
             ].map((item, i) => (
               <motion.div 
                 key={i}
@@ -220,9 +220,9 @@ export function HomePage() {
               icon={<BookOpen size={34} />}
               badge="English Speaking"
               title="Speak Global English" 
-              desc="The standard for business, travel, and international technology."
+              desc="AI-supported English practice for business, travel, interviews, and confident daily communication."
               color="blue"
-              features={["Native Pronunciation", "Business Meetings", "Daily Slang"]}
+              features={["AI Practice Support", "Business Meetings", "Interview Readiness"]}
               onStart={() => handleStart('english')}
             />
             <PathCard 
@@ -230,9 +230,9 @@ export function HomePage() {
               icon={<Languages size={34} />}
               badge="Arabic Fluency"
               title="Understand Arabic" 
-              desc="Unlock cultural depth and colloquial fluency across the Arab world."
+              desc="AI-assisted Arabic practice with cultural context, everyday phrases, and guided confidence-building."
               color="emerald"
-              features={["Alphabet Basics", "Cultural Context", "Daily Conversation"]}
+              features={["AI Practice Support", "Cultural Context", "Daily Conversation"]}
               onStart={() => handleStart('arabic')}
             />
           </div>
@@ -259,7 +259,7 @@ export function HomePage() {
               </h2>
               
               <p className="mx-auto mb-8 max-w-2xl text-base text-slate-300 sm:mb-12 sm:text-xl">
-                Join the launch phase and get <span className="text-white font-bold underline underline-offset-8 decoration-emerald-500">full premium access for free</span>. 
+                Join the launch phase and get <span className="text-white font-bold underline underline-offset-8 decoration-emerald-500">full premium access for free</span>, including AI-assisted practice support as the platform grows. 
                 Normally 299 BDT/mo — today, it's our gift to you.
               </p>
 

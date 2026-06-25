@@ -400,10 +400,13 @@ export function LoginPage({ mode = 'login' }) {
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={isSubmitting}
-                className="google-login-shell flex min-h-14 w-full items-center justify-center gap-3 rounded-full bg-white px-5 text-sm font-black uppercase tracking-[0.14em] text-slate-950 shadow-xl shadow-black/20 transition hover:-translate-y-0.5 hover:bg-slate-100 disabled:pointer-events-none disabled:opacity-60"
+                className="google-login-shell group relative flex min-h-14 w-full items-center justify-center gap-3 overflow-hidden rounded-full bg-white px-5 text-sm font-black uppercase tracking-[0.14em] text-slate-950 shadow-xl shadow-black/20 transition hover:-translate-y-0.5 hover:bg-slate-100 disabled:pointer-events-none disabled:opacity-60"
               >
-                {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} className="text-emerald-500" />}
-                Continue with Google
+                <span className="google-login-shine" />
+                <span className="relative z-10 flex items-center justify-center gap-3">
+                  {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <Sparkles size={18} className="text-emerald-500" />}
+                  Continue with Google
+                </span>
               </button>
             ) : (
               <div className="rounded-2xl border border-amber-400/30 bg-amber-500/10 px-5 py-4 text-sm font-semibold text-amber-100">

@@ -4,28 +4,28 @@ import { useLocation } from 'react-router-dom';
 const SITE_URL = (import.meta.env.VITE_SITE_URL || 'https://lugaish.vercel.app').replace(/\/$/, '');
 
 const DEFAULT_SEO = {
-  title: 'Lugaish | Arabic & English Learning Platform',
-  description: 'Learn English and Arabic with daily lessons, guided practice, progress tracking, and a focused 10-minute learning routine.',
-  keywords: 'learn English, learn Arabic, English speaking course, Arabic course, language learning, Lugaish',
+  title: 'Lugaish | AI-Powered Arabic & English Learning Platform',
+  description: 'Learn English and Arabic with AI-powered language learning, daily lessons, guided practice, progress tracking, and weekly interview preparation.',
+  keywords: 'AI-powered language learning, AI English learning, AI Arabic learning, learn English, learn Arabic, English speaking course, Arabic course, Lugaish',
   image: `${SITE_URL}/og-image.svg`,
 };
 
 const ROUTE_SEO = {
   '/': DEFAULT_SEO,
   '/signup': {
-    title: 'Sign Up for Lugaish | Start Learning English and Arabic',
-    description: 'Create your Lugaish account with Google and start daily English or Arabic lessons.',
-    keywords: 'Lugaish signup, English learning signup, Arabic learning signup',
+    title: 'Sign Up for Lugaish | Start AI-Powered English and Arabic Learning',
+    description: 'Create your Lugaish account with Google and start AI-assisted daily English or Arabic lessons.',
+    keywords: 'Lugaish signup, AI English learning signup, AI Arabic learning signup',
   },
   '/login': {
     title: 'Sign In to Lugaish | Continue Your Language Lessons',
-    description: 'Sign in to Lugaish and continue your English or Arabic learning progress.',
-    keywords: 'Lugaish login, language learning login',
+    description: 'Sign in to Lugaish and continue your AI-assisted English or Arabic learning progress.',
+    keywords: 'Lugaish login, AI language learning login',
   },
   '/pricing': {
-    title: 'Lugaish Plans | English and Arabic Learning Courses',
-    description: 'Explore Lugaish course plans for English speaking and Arabic fluency practice.',
-    keywords: 'English course plans, Arabic course plans, language learning pricing',
+    title: 'Lugaish Plans | AI-Powered English and Arabic Learning Courses',
+    description: 'Explore Lugaish course plans for AI-assisted English speaking and Arabic fluency practice.',
+    keywords: 'AI English course plans, AI Arabic course plans, language learning pricing',
   },
   '/architects': {
     title: 'Lugaish Architects | Language Learning Team',
@@ -74,17 +74,17 @@ function setStructuredData(data) {
 function getSeoForPath(pathname) {
   if (pathname.startsWith('/course/english')) {
     return {
-      title: 'English Speaking Course | Lugaish',
-      description: 'Build English speaking confidence with guided daily lessons, practice tasks, and progress tracking on Lugaish.',
-      keywords: 'English speaking course, learn English online, daily English lessons',
+      title: 'AI English Speaking Course | Lugaish',
+      description: 'Build English speaking confidence with AI-guided practice, daily lessons, interview preparation, and progress tracking on Lugaish.',
+      keywords: 'AI English learning, English speaking course, learn English online, daily English lessons',
     };
   }
 
   if (pathname.startsWith('/course/arabic')) {
     return {
-      title: 'Arabic Learning Course | Lugaish',
-      description: 'Learn Arabic through focused daily lessons, pronunciation practice, and structured progress on Lugaish.',
-      keywords: 'Arabic course, learn Arabic online, daily Arabic lessons',
+      title: 'AI Arabic Learning Course | Lugaish',
+      description: 'Learn Arabic through AI-assisted practice, focused daily lessons, pronunciation support, and structured progress on Lugaish.',
+      keywords: 'AI Arabic learning, Arabic course, learn Arabic online, daily Arabic lessons',
     };
   }
 
@@ -130,7 +130,7 @@ export function SEO() {
         category: 'Language learning',
         availability: 'https://schema.org/InStock',
       },
-      teaches: ['English speaking', 'Arabic language'],
+      teaches: ['AI-assisted English speaking', 'AI-assisted Arabic language'],
     });
   }, [pathname]);
 
