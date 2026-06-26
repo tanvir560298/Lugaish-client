@@ -112,7 +112,7 @@ export function Header() {
 
           {/* User Progress Badge */}
           {state.isLoggedIn && (
-            <div className="header-control header-progress hidden items-center gap-2 rounded-xl border border-white/5 bg-white/5 px-3 py-2 2xl:flex">
+            <div className="header-control header-progress hidden items-center gap-2 rounded-xl border border-white/5 bg-white/5 px-3 py-2 xl:flex">
               <div className="flex items-center gap-3">
                 <Activity size={15} className="text-emerald-400" />
                 <div className="leading-none">
