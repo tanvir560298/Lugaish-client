@@ -287,14 +287,20 @@ export function HomePage() {
       {/* --- FINAL CTA --- */}
       <footer className="py-16 text-center sm:py-24 lg:py-32">
          <div className="app-shell">
-            <h2 className="mb-6 text-2xl font-black uppercase tracking-widest text-slate-700 sm:mb-8 sm:text-4xl">Ready to climb?</h2>
-            <div className="flex justify-center">
-               <button 
-                 onClick={() => navigate('/login')}
-                 className="flex items-center gap-3 text-lg font-black text-white transition-colors hover:text-blue-400 sm:text-2xl"
-               >
-                 Continue with Google <ArrowRight />
-               </button>
+            <div className="mx-auto max-w-3xl rounded-[2rem] border border-blue-400/20 bg-slate-900/70 px-6 py-10 shadow-[0_30px_90px_rgba(37,99,235,0.18)] sm:rounded-[3rem] sm:px-10 sm:py-14">
+              <p className="mb-4 text-xs font-black uppercase tracking-[0.28em] text-emerald-300">Start your first lesson</p>
+              <h2 className="text-3xl font-black uppercase tracking-[0.12em] text-white sm:text-5xl">Ready to climb?</h2>
+              <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-slate-300 sm:text-base">
+                Sign in with Google and continue your English or Arabic pathway with AI-assisted practice support.
+              </p>
+              <div className="mt-8 flex justify-center">
+                 <button
+                   onClick={() => navigate('/login')}
+                   className="inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-white px-6 py-4 text-base font-black text-slate-950 shadow-[0_18px_50px_rgba(255,255,255,0.18)] transition hover:bg-emerald-300 hover:shadow-[0_22px_60px_rgba(52,211,153,0.24)] sm:w-auto sm:px-10 sm:text-xl"
+                 >
+                   Continue with Google <ArrowRight size={22} />
+                 </button>
+              </div>
             </div>
          </div>
       </footer>
