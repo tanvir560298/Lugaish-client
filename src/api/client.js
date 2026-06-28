@@ -13,16 +13,40 @@ export function setAuthToken(token) {
   }
 }
 
+const RETRY_DELAY_MS = 1200;
+
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function request(path, options = {}) {
   const token = getAuthToken();
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const requestOptions = {
     ...options,
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers ?? {}),
     },
-  });
+  };
+  const canRetry = !options.method || options.method === 'GET';
+  let response;
+
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, requestOptions);
+  } catch (error) {
+    if (canRetry) {
+      await wait(RETRY_DELAY_MS);
+
+      try {
+        response = await fetch(`${API_BASE_URL}${path}`, requestOptions);
+      } catch {
+        throw new Error('Server is temporarily unavailable. Please try again in a moment.');
+      }
+    } else {
+      throw new Error('Server is temporarily unavailable. Please try again in a moment.');
+    }
+  }
 
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
