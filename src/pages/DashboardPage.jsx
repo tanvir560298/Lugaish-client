@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { BookOpenCheck, ChevronDown, ClipboardList, FilePenLine, GraduationCap, ShieldCheck, TrendingUp, UsersRound } from 'lucide-react';
+import { BookOpenCheck, ChevronDown, ClipboardList, FilePenLine, GraduationCap, RefreshCw, ShieldCheck, TrendingUp, UsersRound } from 'lucide-react';
 import { api } from '../api/client.js';
 import { useAppContext } from '../state/AppContext.jsx';
 import { ROLE_LABELS, ROLE_VALUES, ROLES, hasPermission, normalizeRole } from '../utils/roles.js';
@@ -227,16 +227,19 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
   const [seatLimits, setSeatLimits] = useState({ english: 110, arabic: 55 });
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     if (!canViewRoles) return;
 
     let ignore = false;
+    let retryTimer;
     setIsLoading(true);
     api.listUsers()
       .then(data => {
         if (!ignore) {
           setUsers(data.users ?? []);
+          setMessage('');
           setSeatLimits({
             english: data.courseSeatLimits?.english ?? data.courseSeatLimit ?? 110,
             arabic: data.courseSeatLimits?.arabic ?? data.courseSeatLimit ?? 55,
@@ -244,7 +247,10 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
         }
       })
       .catch(error => {
-        if (!ignore) setMessage(error.message || 'Could not load users.');
+        if (!ignore) {
+          setMessage(error.message || 'Could not load users.');
+          retryTimer = setTimeout(() => setReloadKey(value => value + 1), 10000);
+        }
       })
       .finally(() => {
         if (!ignore) setIsLoading(false);
@@ -252,8 +258,9 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
 
     return () => {
       ignore = true;
+      clearTimeout(retryTimer);
     };
-  }, [canViewRoles]);
+  }, [canViewRoles, reloadKey]);
 
   const updateRole = async (userId, role) => {
     setMessage('');
@@ -289,9 +296,18 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
         </div>
 
         {message && (
-          <p className="mt-5 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-slate-200">
-            {message}
-          </p>
+          <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-amber-400/20 bg-amber-400/5 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm font-semibold text-amber-100">{message} Retrying automatically.</p>
+            <button
+              type="button"
+              onClick={() => setReloadKey(value => value + 1)}
+              disabled={isLoading}
+              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-amber-300/25 bg-amber-300/10 px-3 text-xs font-black uppercase tracking-widest text-amber-100 transition hover:bg-amber-300/20 disabled:cursor-wait disabled:opacity-60"
+            >
+              <RefreshCw size={15} className={isLoading ? 'animate-spin' : ''} />
+              Retry now
+            </button>
+          </div>
         )}
 
         <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/20">
