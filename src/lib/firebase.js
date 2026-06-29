@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signInWithRedirect } from 'firebase/auth';
+import { getAuth, getRedirectResult, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -85,4 +85,8 @@ export function waitForFirebaseUser(timeoutMs = 3500) {
       resolve({ idToken, user });
     });
   });
+}
+
+export async function signOutFirebase() {
+  if (auth) await signOut(auth);
 }

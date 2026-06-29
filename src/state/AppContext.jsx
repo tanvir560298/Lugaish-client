@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { api, setAuthToken } from '../api/client.js';
+import { api, getAuthToken, setAuthToken } from '../api/client.js';
 import { COURSE_DATA } from '../data/courseData.js';
 import { ROLES, getRolePermissions, normalizeRole } from '../utils/roles.js';
 
@@ -121,6 +121,7 @@ function normalizeState(state) {
     permissions: Array.isArray(state.permissions) && state.permissions.length
       ? state.permissions
       : getRolePermissions(state.userRole),
+    isLoggedIn: Boolean(state.isLoggedIn && getAuthToken()),
   };
 }
 
@@ -143,6 +144,74 @@ export function AppProvider({ children }) {
   useEffect(() => {
     document.documentElement.dataset.theme = state.theme ?? 'dark';
   }, [state.theme]);
+
+  useEffect(() => {
+    if (!state.isLoggedIn) return;
+
+    let ignore = false;
+
+    async function refreshExpiredSession() {
+      try {
+        const user = await api.currentUser();
+        if (!ignore) {
+          setState(previous => ({
+            ...previous,
+            userName: user?.name ?? previous.userName,
+            userEmail: user?.email ?? previous.userEmail,
+            userRole: normalizeRole(user?.role ?? previous.userRole),
+            permissions: user?.permissions ?? getRolePermissions(user?.role ?? previous.userRole),
+            enrolledPathways: user?.enrolledPathways ?? previous.enrolledPathways,
+            learnerProfile: {
+              ...previous.learnerProfile,
+              ...(user?.learnerProfile ?? {}),
+            },
+          }));
+        }
+      } catch (error) {
+        if (error.status !== 401) return;
+
+        try {
+          const { waitForFirebaseUser } = await import('../lib/firebase.js');
+          const firebaseSession = await waitForFirebaseUser();
+          if (!firebaseSession?.user) {
+            setAuthToken(null);
+            if (!ignore) setState(previous => ({ ...previous, isLoggedIn: false }));
+            return;
+          }
+
+          const response = await api.firebaseLogin({
+            idToken: firebaseSession.idToken,
+            languageSelected: state.activePathway,
+            displayName: firebaseSession.user.displayName || state.userName,
+          });
+
+          setAuthToken(response.token);
+          if (!ignore) {
+            setState(previous => ({
+              ...previous,
+              userName: response.user?.name ?? previous.userName,
+              userEmail: response.user?.email ?? previous.userEmail,
+              userRole: normalizeRole(response.user?.role ?? previous.userRole),
+              permissions: response.user?.permissions ?? getRolePermissions(response.user?.role ?? previous.userRole),
+              enrolledPathways: response.user?.enrolledPathways ?? previous.enrolledPathways,
+              isLoggedIn: true,
+            }));
+          }
+        } catch (refreshError) {
+          if (refreshError?.status === 400 || refreshError?.status === 401 || refreshError?.status === 403) {
+            setAuthToken(null);
+            if (!ignore) setState(previous => ({ ...previous, isLoggedIn: false }));
+          }
+        }
+      }
+    }
+
+    refreshExpiredSession();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const actions = useMemo(() => ({
     switchPathway(pathway) {
@@ -316,7 +385,7 @@ export function AppProvider({ children }) {
               learnerProfile,
             });
       } catch (error) {
-        if (!import.meta.env.DEV && import.meta.env.VITE_REQUIRE_BACKEND_AUTH === 'true') {
+        if (!import.meta.env.DEV || import.meta.env.VITE_REQUIRE_BACKEND_AUTH === 'true') {
           throw error;
         }
 
@@ -344,7 +413,7 @@ export function AppProvider({ children }) {
 
       return response;
     },
-    logout() {
+    async logout() {
       setAuthToken(null);
       setState(prev => ({
         ...prev,
@@ -354,6 +423,13 @@ export function AppProvider({ children }) {
         permissions: [],
         isLoggedIn: false,
       }));
+
+      try {
+        const { signOutFirebase } = await import('../lib/firebase.js');
+        await signOutFirebase();
+      } catch {
+        // Local session is already cleared; Firebase cleanup can safely fail offline.
+      }
     },
     toggleTheme() {
       setState(prev => ({ ...prev, theme: prev.theme === 'dark' ? 'light' : 'dark' }));

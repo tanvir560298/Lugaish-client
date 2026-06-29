@@ -1,5 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5000/api';
+const API_BASE_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:5000/api').replace(/\/$/, '');
 const TOKEN_KEY = 'lugaish_auth_token';
+const REQUEST_TIMEOUT_MS = Math.max(Number(import.meta.env.VITE_API_TIMEOUT_MS) || 15000, 1000);
 
 export function getAuthToken() {
   return localStorage.getItem(TOKEN_KEY);
@@ -19,6 +20,22 @@ function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+async function fetchWithTimeout(url, options) {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } catch (error) {
+    if (error?.name === 'AbortError') {
+      throw new Error('The server took too long to respond. Please try again.');
+    }
+
+    throw error;
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
 async function request(path, options = {}) {
   const token = getAuthToken();
   const requestOptions = {
@@ -33,22 +50,26 @@ async function request(path, options = {}) {
   let response;
 
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, requestOptions);
+    response = await fetchWithTimeout(`${API_BASE_URL}${path}`, requestOptions);
   } catch (error) {
     if (canRetry) {
       await wait(RETRY_DELAY_MS);
 
       try {
-        response = await fetch(`${API_BASE_URL}${path}`, requestOptions);
-      } catch {
-        throw new Error('Server is temporarily unavailable. Please try again in a moment.');
+        response = await fetchWithTimeout(`${API_BASE_URL}${path}`, requestOptions);
+      } catch (retryError) {
+        throw retryError?.message?.includes('too long')
+          ? retryError
+          : new Error('Server is temporarily unavailable. Please try again in a moment.');
       }
     } else {
-      throw new Error('Server is temporarily unavailable. Please try again in a moment.');
+      throw error?.message?.includes('too long')
+        ? error
+        : new Error('Server is temporarily unavailable. Please try again in a moment.');
     }
   }
 
-  const data = await response.json().catch(() => ({}));
+  const data = response.status === 204 ? {} : await response.json().catch(() => ({}));
   if (!response.ok) {
     const error = new Error(data.error ?? 'Request failed');
     error.status = response.status;
@@ -110,6 +131,20 @@ export const api = {
     return request('/lessons/complete', {
       method: 'POST',
       body: JSON.stringify(payload),
+    });
+  },
+  getLesson(language, day) {
+    return request(`/lessons/${language}/${day}`);
+  },
+  addLessonVideo(language, day, payload) {
+    return request(`/lessons/${language}/${day}/videos`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+  deleteLessonVideo(language, day, videoId) {
+    return request(`/lessons/${language}/${day}/videos/${videoId}`, {
+      method: 'DELETE',
     });
   },
   updateProgress(payload) {

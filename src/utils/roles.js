@@ -34,6 +34,7 @@ export const ROLE_PERMISSIONS = {
     'create_post',
     'edit_any_post',
     'publish_post',
+    'manage_lessons',
   ],
 };
 
