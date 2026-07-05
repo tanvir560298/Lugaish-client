@@ -14,10 +14,18 @@ export function setAuthToken(token) {
   }
 }
 
-const RETRY_DELAY_MS = 1200;
+const RETRY_DELAY_MIN_MS = 800;
+const RETRY_DELAY_MAX_MS = 2200;
+const inFlightGetRequests = new Map();
 
 function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function getRetryDelay() {
+  return Math.round(
+    RETRY_DELAY_MIN_MS + Math.random() * (RETRY_DELAY_MAX_MS - RETRY_DELAY_MIN_MS),
+  );
 }
 
 async function fetchWithTimeout(url, options) {
@@ -36,7 +44,7 @@ async function fetchWithTimeout(url, options) {
     window.clearTimeout(timeout);
   }
 }
-async function request(path, options = {}) {
+async function executeRequest(path, options = {}) {
   const token = getAuthToken();
   const requestOptions = {
     ...options,
@@ -53,7 +61,9 @@ async function request(path, options = {}) {
     response = await fetchWithTimeout(`${API_BASE_URL}${path}`, requestOptions);
   } catch (error) {
     if (canRetry) {
-      await wait(RETRY_DELAY_MS);
+      // Spread retries across clients so a waking free-tier server is not hit
+      // by every browser again at exactly the same moment.
+      await wait(getRetryDelay());
 
       try {
         response = await fetchWithTimeout(`${API_BASE_URL}${path}`, requestOptions);
@@ -79,6 +89,23 @@ async function request(path, options = {}) {
   }
 
   return data;
+}
+
+function request(path, options = {}) {
+  const method = options.method ?? 'GET';
+  if (method !== 'GET') return executeRequest(path, options);
+
+  // React can mount a screen twice in development. Reuse an identical active
+  // GET instead of sending duplicate work to the API server.
+  const requestKey = `${getAuthToken() ?? 'anonymous'}:${path}`;
+  const existingRequest = inFlightGetRequests.get(requestKey);
+  if (existingRequest) return existingRequest;
+
+  const pendingRequest = executeRequest(path, options)
+    .finally(() => inFlightGetRequests.delete(requestKey));
+
+  inFlightGetRequests.set(requestKey, pendingRequest);
+  return pendingRequest;
 }
 
 export const api = {

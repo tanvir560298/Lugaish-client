@@ -101,7 +101,7 @@ export function CoursePage() {
           seatsAvailable: 0,
         }));
         setShowApplication(true);
-        setEnrollmentError('This cohort is at capacity right now. Send us a seat request and our team will review it.');
+        setEnrollmentError('All seats for this month are currently filled. New seats will open next month, or you can send us a priority seat request today.');
       } else {
         setEnrollmentError(error.message || 'Could not start the course. Please try again.');
       }
@@ -197,10 +197,16 @@ export function CoursePage() {
           <div className="mt-12 overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/80 p-5 shadow-2xl sm:p-8">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div className="max-w-2xl">
-                <p className="mb-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">Cohort at capacity</p>
-                <h3 className="text-2xl font-black text-white sm:text-3xl">This learning cohort is full.</h3>
+                <p className="mb-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">Seats are full</p>
+                <h3 className="text-2xl font-black text-white sm:text-3xl">This month&apos;s {course.name} cohort is fully booked.</h3>
                 <p className="mt-3 text-sm leading-6 text-slate-400 sm:text-base">
-                  We are keeping this group focused so every learner gets proper attention. Try again when the next cohort opens, or apply for a priority seat if your timing is urgent.
+                  Thank you for your interest! New seats will open next month. Please check back then, or apply for a priority seat and our team will contact you if a place becomes available sooner.
+                </p>
+                <p className="mt-3 text-sm font-semibold text-slate-300">
+                  Need help? Email us at{' '}
+                  <a className="font-black text-emerald-300 underline-offset-4 hover:underline" href="mailto:lugaish2026@gmail.com">
+                    lugaish2026@gmail.com
+                  </a>
                 </p>
                 {typeof enrollmentStatus?.limit === 'number' && (
                   <p className="mt-4 text-xs font-bold uppercase tracking-widest text-slate-500">
@@ -217,13 +223,12 @@ export function CoursePage() {
                 >
                   Apply for a Seat <Send size={17} />
                 </button>
-                <button
-                  type="button"
-                  onClick={() => navigate('/pricing')}
+                <a
+                  href={`mailto:lugaish2026@gmail.com?subject=${encodeURIComponent(`${course.name} seat request`)}`}
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm font-black text-white transition hover:bg-white/10"
                 >
-                  View Plans <ArrowRight size={17} />
-                </button>
+                  Email Us <ArrowRight size={17} />
+                </a>
               </div>
             </div>
 
