@@ -154,6 +154,11 @@ export const api = {
       body: JSON.stringify(payload),
     });
   },
+  removeUser(userId) {
+    return request(`/auth/users/${userId}`, {
+      method: 'DELETE',
+    });
+  },
   completeLesson(payload) {
     return request('/lessons/complete', {
       method: 'POST',

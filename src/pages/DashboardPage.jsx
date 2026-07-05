@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { BookOpenCheck, ChevronDown, ClipboardList, FilePenLine, GraduationCap, RefreshCw, ShieldCheck, TrendingUp, UsersRound } from 'lucide-react';
+import { BookOpenCheck, ChevronDown, ClipboardList, FilePenLine, GraduationCap, RefreshCw, ShieldCheck, Trash2, TrendingUp, UsersRound } from 'lucide-react';
 import { api } from '../api/client.js';
 import { useAppContext } from '../state/AppContext.jsx';
 import { ROLE_LABELS, ROLE_VALUES, ROLES, hasPermission, normalizeRole } from '../utils/roles.js';
@@ -91,11 +91,11 @@ function getInitials(name = '', email = '') {
     .join('') || 'L';
 }
 
-function LearnerRoleRow({ user, onRoleChange, canManageRoles }) {
+function LearnerRoleRow({ user, onRoleChange, onRemove, canManageRoles, isRemoving, isCurrentUser }) {
   const role = normalizeRole(user.role);
 
   return (
-    <div className={`grid gap-4 border-t border-white/10 px-4 py-4 transition hover:bg-white/[0.03] ${canManageRoles ? 'lg:grid-cols-[1.35fr_0.75fr_190px]' : 'lg:grid-cols-[1.35fr_0.75fr]' } lg:items-center`}>
+    <div className={`grid gap-4 border-t border-white/10 px-4 py-4 transition hover:bg-white/[0.03] ${canManageRoles ? 'lg:grid-cols-[1.35fr_0.65fr_280px]' : 'lg:grid-cols-[1.35fr_0.75fr]' } lg:items-center`}>
       <div className="flex min-w-0 items-center gap-4">
         <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-white/10 bg-gradient-to-br from-blue-500/30 via-indigo-500/20 to-emerald-500/30 text-sm font-black text-white">
           {getInitials(user.name, user.email)}
@@ -112,17 +112,29 @@ function LearnerRoleRow({ user, onRoleChange, canManageRoles }) {
       </div>
 
       {canManageRoles && (
-        <div className="relative flex items-center">
-          <select
-            value={role}
-            onChange={event => onRoleChange(user.id, event.target.value)}
-            className="h-11 w-full appearance-none rounded-xl border border-white/10 bg-slate-950 px-3 pr-10 text-xs font-black uppercase tracking-wider text-white outline-none transition focus:border-emerald-400"
+        <div className="flex items-center gap-2">
+          <div className="relative min-w-0 flex-1">
+            <select
+              value={role}
+              onChange={event => onRoleChange(user.id, event.target.value)}
+              className="h-11 w-full appearance-none rounded-xl border border-white/10 bg-slate-950 px-3 pr-10 text-xs font-black uppercase tracking-wider text-white outline-none transition focus:border-emerald-400"
+            >
+              {ROLE_VALUES.map(item => (
+                <option key={item} value={item}>{ROLE_LABELS[item]}</option>
+              ))}
+            </select>
+            <ChevronDown size={16} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          </div>
+          <button
+            type="button"
+            onClick={() => onRemove(user)}
+            disabled={isRemoving || isCurrentUser}
+            title={isCurrentUser ? 'You cannot remove your own account' : `Remove ${user.name || 'member'}`}
+            className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-red-400/25 bg-red-500/10 px-3 text-xs font-black uppercase tracking-wider text-red-300 transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {ROLE_VALUES.map(item => (
-              <option key={item} value={item}>{ROLE_LABELS[item]}</option>
-            ))}
-          </select>
-          <ChevronDown size={16} className="pointer-events-none absolute right-3 text-slate-400" />
+            <Trash2 size={16} />
+            <span className="hidden xl:inline">{isRemoving ? 'Removing...' : 'Remove'}</span>
+          </button>
         </div>
       )}
     </div>
@@ -223,11 +235,13 @@ function SeatCapacityPanel({ users, seatLimits }) {
 }
 
 function RoleManagementPanel({ canManageRoles, canViewRoles }) {
+  const { state } = useAppContext();
   const [users, setUsers] = useState([]);
   const [seatLimits, setSeatLimits] = useState({ english: 110, arabic: 55 });
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [reloadKey, setReloadKey] = useState(0);
+  const [removingUserId, setRemovingUserId] = useState('');
 
   useEffect(() => {
     if (!canViewRoles) return;
@@ -273,6 +287,25 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
     }
   };
 
+  const removeUser = async user => {
+    const confirmed = window.confirm(
+      `Remove ${user.name || user.email}? Their account and learning progress will be permanently deleted.`,
+    );
+    if (!confirmed) return;
+
+    setMessage('');
+    setRemovingUserId(user.id);
+    try {
+      const response = await api.removeUser(user.id);
+      setUsers(previous => previous.filter(item => item.id !== user.id));
+      setMessage(response.message || 'Member removed successfully.');
+    } catch (error) {
+      setMessage(error.message || 'Could not remove this member.');
+    } finally {
+      setRemovingUserId('');
+    }
+  };
+
   if (!canViewRoles) return null;
 
   return (
@@ -311,17 +344,25 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
         )}
 
         <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/20">
-          <div className={`hidden gap-3 bg-white/5 px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 ${canManageRoles ? 'lg:grid-cols-[1.35fr_0.75fr_190px]' : 'lg:grid-cols-[1.35fr_0.75fr]'} lg:grid`}>
+          <div className={`hidden gap-3 bg-white/5 px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 ${canManageRoles ? 'lg:grid-cols-[1.35fr_0.65fr_280px]' : 'lg:grid-cols-[1.35fr_0.75fr]'} lg:grid`}>
             <span>User</span>
             <span>Current role</span>
-            {canManageRoles && <span>Set role</span>}
+            {canManageRoles && <span>Manage member</span>}
           </div>
 
           {isLoading ? (
             <div className="px-4 py-5 text-sm font-semibold text-slate-400">Loading users...</div>
           ) : users.length ? (
             users.map(user => (
-              <LearnerRoleRow key={user.id} user={user} onRoleChange={updateRole} canManageRoles={canManageRoles} />
+              <LearnerRoleRow
+                key={user.id}
+                user={user}
+                onRoleChange={updateRole}
+                onRemove={removeUser}
+                canManageRoles={canManageRoles}
+                isRemoving={removingUserId === user.id}
+                isCurrentUser={user.email?.toLowerCase() === state.userEmail?.toLowerCase()}
+              />
             ))
           ) : (
             <div className="px-4 py-5 text-sm font-semibold text-slate-400">No users found yet.</div>
