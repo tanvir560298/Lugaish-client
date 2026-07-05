@@ -161,7 +161,7 @@ export function HomePage() {
                   </div>
 
                   <div className="pt-4">
-                    <div className="w-full h-14 bg-gradient-to-r from-blue-600 to-emerald-500 rounded-2xl flex items-center justify-center font-black gap-2">
+                    <div className="hero-preview-action w-full h-14 bg-gradient-to-r from-blue-600 to-emerald-500 rounded-2xl flex items-center justify-center font-black gap-2">
                       Continue Ascent <ArrowRight size={18} />
                     </div>
                   </div>
@@ -182,7 +182,7 @@ export function HomePage() {
       </section>
 
       {/* --- THE ASCENT PHILOSOPHY --- */}
-      <section className="relative border-y border-white/5 bg-slate-900/30 py-16 sm:py-24 lg:py-32">
+      <section className="home-features relative border-y border-white/5 bg-slate-900/30 py-16 sm:py-24 lg:py-32">
         <div className="app-shell">
           <div className="grid gap-5 sm:gap-8 lg:grid-cols-3 lg:gap-12">
             {[
@@ -193,7 +193,7 @@ export function HomePage() {
               <motion.div 
                 key={i}
                 {...fadeInUp}
-                className="rounded-[2rem] border border-white/5 bg-slate-950 p-6 transition-all hover:border-blue-500/20 sm:p-8 lg:p-10 group"
+                className={`home-feature-card home-feature-card-${i + 1} rounded-[2rem] border border-white/5 bg-slate-950 p-6 transition-all hover:border-blue-500/20 sm:p-8 lg:p-10 group`}
               >
                 <div className={`w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform ${item.iconClass}`}>
                   {item.icon}
@@ -207,7 +207,7 @@ export function HomePage() {
       </section>
 
       {/* --- PATHWAY SELECTION --- */}
-      <section className="overflow-hidden py-16 sm:py-24 lg:py-32">
+      <section className="home-pathways overflow-hidden py-16 sm:py-24 lg:py-32">
         <div className="app-shell">
           <div className="mb-12 text-center sm:mb-16 lg:mb-20">
             <h2 className="mb-4 text-4xl font-black leading-tight sm:text-5xl md:text-7xl">Choose your <br/>Learning Destination.</h2>
@@ -240,9 +240,9 @@ export function HomePage() {
       </section>
 
       {/* --- THE "ESCAPE" PRICING TEASER --- */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-transparent to-blue-900/10 py-16 sm:py-24 lg:py-32">
+      <section className="home-offer relative overflow-hidden bg-gradient-to-b from-transparent to-blue-900/10 py-16 sm:py-24 lg:py-32">
         <div className="app-shell relative z-10">
-           <div className="glass-card relative overflow-hidden rounded-[2rem] border border-blue-500/20 p-6 text-center sm:rounded-[3rem] sm:p-12 md:p-20 lg:rounded-[4rem]">
+           <div className="home-offer-card glass-card relative overflow-hidden rounded-[2rem] border border-blue-500/20 p-6 text-center sm:rounded-[3rem] sm:p-12 md:p-20 lg:rounded-[4rem]">
               <div className="absolute top-0 left-0 w-full h-full bg-blue-500/5 pointer-events-none" />
               
               {/* Mascot Cameo */}
@@ -285,9 +285,9 @@ export function HomePage() {
       </section>
 
       {/* --- FINAL CTA --- */}
-      <footer className="py-16 text-center sm:py-24 lg:py-32">
+      <footer className="home-final-section py-16 text-center sm:py-24 lg:py-32">
          <div className="app-shell">
-            <div className="mx-auto max-w-3xl rounded-[2rem] border border-blue-400/20 bg-slate-900/70 px-6 py-10 shadow-[0_30px_90px_rgba(37,99,235,0.18)] sm:rounded-[3rem] sm:px-10 sm:py-14">
+            <div className="home-final-card mx-auto max-w-3xl rounded-[2rem] border border-blue-400/20 bg-slate-900/70 px-6 py-10 shadow-[0_30px_90px_rgba(37,99,235,0.18)] sm:rounded-[3rem] sm:px-10 sm:py-14">
               <p className="mb-4 text-xs font-black uppercase tracking-[0.28em] text-emerald-300">Start your first lesson</p>
               <h2 className="text-3xl font-black uppercase tracking-[0.12em] text-white sm:text-5xl">Ready to climb?</h2>
               <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-slate-300 sm:text-base">
@@ -330,14 +330,14 @@ function PathCard({ icon, badge, title, desc, color, features, onStart }) {
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       whileHover={{ y: -10 }}
-      className={`group relative overflow-hidden rounded-[2rem] border border-white/5 bg-slate-900/50 p-6 sm:rounded-[3rem] sm:p-10 lg:rounded-[3.5rem] lg:p-12`}
+      className={`home-path-card home-path-card-${color} group relative overflow-hidden rounded-[2rem] border border-white/5 bg-slate-900/50 p-6 sm:rounded-[3rem] sm:p-10 lg:rounded-[3.5rem] lg:p-12`}
     >
       <div className={`pointer-events-none absolute right-0 top-0 p-8 text-[7rem] font-black ${colorClasses.ghost} transition-opacity group-hover:opacity-10 sm:p-12 sm:text-[12rem]`}>
         {color === 'blue' ? 'EN' : 'AR'}
       </div>
       
       <div className="relative z-10">
-        <div className={`mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 ${colorClasses.dot} text-white shadow-2xl sm:mb-8`}>
+        <div className={`home-path-icon mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 ${colorClasses.dot} text-white shadow-2xl sm:mb-8`}>
           {icon}
         </div>
         <p className="mb-3 text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">{badge}</p>
@@ -355,7 +355,7 @@ function PathCard({ icon, badge, title, desc, color, features, onStart }) {
 
         <button 
           onClick={onStart}
-          className={`w-full rounded-2xl bg-white py-4 text-base font-black text-slate-950 transition-all ${colorClasses.hover} group-hover:text-white sm:py-5 sm:text-lg`}
+          className={`home-path-button w-full rounded-2xl bg-white py-4 text-base font-black text-slate-950 transition-all ${colorClasses.hover} group-hover:text-white sm:py-5 sm:text-lg`}
         >
           Launch Pathway
         </button>
