@@ -438,6 +438,20 @@ function EmailManagementPanel({ defaultTestEmail }) {
     }
   };
 
+  const activateSignupCampaign = async () => {
+    if (!window.confirm('Automatically send the latest campaign once to each new user until 18 July 2026 at 9:00 PM?')) return;
+    setIsBusy(true);
+    setNotice('');
+    try {
+      const response = await api.activateLatestSignupCampaign();
+      setNotice(response.message);
+    } catch (error) {
+      setNotice(error.message || 'Could not enable automatic delivery.');
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
   return (
     <div className="section-card p-6 sm:p-8">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -485,7 +499,10 @@ function EmailManagementPanel({ defaultTestEmail }) {
 
       {status?.recentCampaigns?.length > 0 && (
         <div className="mt-6 space-y-2">
-          <p className="text-xs font-black uppercase tracking-widest text-slate-400">Recent campaigns</p>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-xs font-black uppercase tracking-widest text-slate-400">Recent campaigns</p>
+            <button type="button" onClick={activateSignupCampaign} disabled={isBusy} className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-xs font-black text-emerald-200 disabled:opacity-40">Auto-send latest to new users until 18 July, 9 PM</button>
+          </div>
           {status.recentCampaigns.map(campaign => <div key={campaign._id} className="flex flex-wrap justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300"><span>{campaign.subject}</span><span>{campaign.sentCount}/{campaign.recipientCount} sent · {campaign.status}</span></div>)}
         </div>
       )}

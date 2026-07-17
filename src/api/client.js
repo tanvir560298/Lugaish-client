@@ -226,4 +226,7 @@ export const api = {
       timeoutMs: 120000,
     });
   },
+  activateLatestSignupCampaign() {
+    return request('/email/campaigns/latest/activate-signup', { method: 'POST' });
+  },
 };
