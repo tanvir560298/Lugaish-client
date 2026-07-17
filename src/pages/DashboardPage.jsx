@@ -7,6 +7,7 @@ import { ROLE_LABELS, ROLE_VALUES, ROLES, hasPermission, normalizeRole } from '.
 
 const XP_PER_LEVEL = 500;
 const CONSISTENCY_DAY_COUNT = 14;
+const EMAIL_MANAGER_EMAIL = 'tahmadium@gmail.com';
 
 function getCourseLessons(pathway) {
   return pathway.modules.flatMap(module => module.lessons);
@@ -546,7 +547,8 @@ export function DashboardPage() {
   const canManageLessons = hasPermission(role, 'manage_lessons');
   const canCreatePost = hasPermission(role, 'create_post');
   const canPublish = hasPermission(role, 'publish_post');
-  const canManageEmail = hasPermission(role, 'manage_email');
+  const canManageEmail = hasPermission(role, 'manage_email')
+    && state.userEmail?.toLowerCase() === EMAIL_MANAGER_EMAIL;
 
   return (
     <section className="space-y-10">
