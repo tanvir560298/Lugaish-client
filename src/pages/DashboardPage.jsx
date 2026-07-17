@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { BookOpenCheck, ChevronDown, ClipboardList, FilePenLine, GraduationCap, RefreshCw, ShieldCheck, Trash2, TrendingUp, UsersRound } from 'lucide-react';
+import { BookOpenCheck, ChevronDown, ClipboardList, FilePenLine, GraduationCap, Mail, RefreshCw, Send, ShieldCheck, Trash2, TrendingUp, UsersRound } from 'lucide-react';
 import { api } from '../api/client.js';
 import { useAppContext } from '../state/AppContext.jsx';
 import { ROLE_LABELS, ROLE_VALUES, ROLES, hasPermission, normalizeRole } from '../utils/roles.js';
@@ -380,6 +380,118 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
   );
 }
 
+function EmailManagementPanel({ defaultTestEmail }) {
+  const [status, setStatus] = useState(null);
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [testEmail, setTestEmail] = useState(defaultTestEmail || '');
+  const [confirmation, setConfirmation] = useState('');
+  const [notice, setNotice] = useState('');
+  const [isBusy, setIsBusy] = useState(false);
+
+  const loadStatus = () => api.getMailStatus()
+    .then(setStatus)
+    .catch(error => setNotice(error.message || 'Could not load Gmail status.'));
+
+  useEffect(() => { loadStatus(); }, []);
+
+  const connectGmail = async () => {
+    setIsBusy(true);
+    setNotice('');
+    try {
+      const response = await api.getMailOAuthUrl();
+      window.location.assign(response.url);
+    } catch (error) {
+      setNotice(error.message || 'Could not start Gmail connection.');
+      setIsBusy(false);
+    }
+  };
+
+  const sendTest = async event => {
+    event.preventDefault();
+    setIsBusy(true);
+    setNotice('');
+    try {
+      const response = await api.sendTestEmail({ email: testEmail, subject, message });
+      setNotice(response.message);
+    } catch (error) {
+      setNotice(error.message || 'Test email failed.');
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  const sendCampaign = async () => {
+    if (!window.confirm('Send this message separately to every registered user? This action cannot be undone.')) return;
+    setIsBusy(true);
+    setNotice('');
+    try {
+      const response = await api.sendEmailCampaign({ subject, message, confirmation });
+      setNotice(response.message);
+      setConfirmation('');
+      await loadStatus();
+    } catch (error) {
+      setNotice(error.message || 'Campaign failed.');
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  return (
+    <div className="section-card p-6 sm:p-8">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-400">Restricted mail console</p>
+          <h3 className="mt-2 flex items-center gap-2 text-xl font-black text-white"><Mail size={21} /> Email users</h3>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">Messages are sent individually, so recipients never see another user's email address.</p>
+        </div>
+        <div className={`rounded-full border px-3 py-2 text-xs font-black ${status?.connected ? 'border-emerald-400/30 bg-emerald-500/10 text-emerald-200' : 'border-amber-400/30 bg-amber-500/10 text-amber-100'}`}>
+          {status?.connected ? `Connected: ${status.senderEmail}` : 'Gmail not connected'}
+        </div>
+      </div>
+
+      {notice && <p className="mt-5 rounded-2xl border border-blue-400/20 bg-blue-500/10 px-4 py-3 text-sm font-semibold text-blue-100">{notice}</p>}
+
+      {!status?.configured || !status?.connected ? (
+        <div className="mt-6 rounded-2xl border border-amber-400/20 bg-amber-400/5 p-5">
+          <p className="text-sm text-amber-100">{status?.configured ? 'Connect the approved Gmail sender to continue.' : 'Add the Gmail environment variables to the backend first.'}</p>
+          {status?.configured && (
+            <button type="button" onClick={connectGmail} disabled={isBusy} className="glow-button glow-button-blue mt-4">Connect Gmail</button>
+          )}
+        </div>
+      ) : (
+        <form onSubmit={sendTest} className="mt-6 space-y-5">
+          <label className="block text-sm font-bold text-slate-200">Subject
+            <input value={subject} onChange={event => setSubject(event.target.value)} maxLength={150} required className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white outline-none focus:border-blue-400/50" />
+          </label>
+          <label className="block text-sm font-bold text-slate-200">Message
+            <textarea value={message} onChange={event => setMessage(event.target.value)} maxLength={10000} required rows={7} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white outline-none focus:border-blue-400/50" />
+          </label>
+          <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
+            <label className="block text-sm font-bold text-slate-200">Test recipient
+              <input type="email" value={testEmail} onChange={event => setTestEmail(event.target.value)} required className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white outline-none focus:border-blue-400/50" />
+            </label>
+            <button type="submit" disabled={isBusy} className="glow-button glow-button-blue justify-center"><Send size={17} /> Send test</button>
+          </div>
+          <div className="rounded-2xl border border-red-400/20 bg-red-500/5 p-5">
+            <p className="text-sm font-black text-red-100">Bulk send safety check</p>
+            <p className="mt-2 text-xs leading-5 text-slate-400">First send a test. Only send necessary messages to users who expect them. Maximum {status.maxRecipientsPerCampaign} recipients per campaign.</p>
+            <input value={confirmation} onChange={event => setConfirmation(event.target.value)} placeholder="Type: SEND TO ALL USERS" className="mt-4 w-full rounded-xl border border-red-400/20 bg-slate-950/40 px-4 py-3 text-white outline-none" />
+            <button type="button" onClick={sendCampaign} disabled={isBusy || confirmation !== 'SEND TO ALL USERS' || !subject || !message} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl bg-red-600 px-5 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-40"><Send size={17} /> Send to all registered users</button>
+          </div>
+        </form>
+      )}
+
+      {status?.recentCampaigns?.length > 0 && (
+        <div className="mt-6 space-y-2">
+          <p className="text-xs font-black uppercase tracking-widest text-slate-400">Recent campaigns</p>
+          {status.recentCampaigns.map(campaign => <div key={campaign._id} className="flex flex-wrap justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300"><span>{campaign.subject}</span><span>{campaign.sentCount}/{campaign.recipientCount} sent · {campaign.status}</span></div>)}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function DashboardPage() {
   const { state, actions, courseData } = useAppContext();
   const enrolledPathways = state.enrolledPathways?.length ? state.enrolledPathways : [state.activePathway];
@@ -434,6 +546,7 @@ export function DashboardPage() {
   const canManageLessons = hasPermission(role, 'manage_lessons');
   const canCreatePost = hasPermission(role, 'create_post');
   const canPublish = hasPermission(role, 'publish_post');
+  const canManageEmail = hasPermission(role, 'manage_email');
 
   return (
     <section className="space-y-10">
@@ -567,6 +680,8 @@ export function DashboardPage() {
           )}
 
           <RoleManagementPanel canManageRoles={canManageRoles} canViewRoles={canViewRoles} />
+
+          {canManageEmail && <EmailManagementPanel defaultTestEmail={state.userEmail} />}
 
           <div className="section-card p-6 sm:p-8">
             <div className="mb-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

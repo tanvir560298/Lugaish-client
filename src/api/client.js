@@ -30,10 +30,11 @@ function getRetryDelay() {
 
 async function fetchWithTimeout(url, options) {
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  const { timeoutMs = REQUEST_TIMEOUT_MS, ...fetchOptions } = options;
+  const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    return await fetch(url, { ...options, signal: controller.signal });
+    return await fetch(url, { ...fetchOptions, signal: controller.signal });
   } catch (error) {
     if (error?.name === 'AbortError') {
       throw new Error('The server took too long to respond. Please try again.');
@@ -204,6 +205,25 @@ export const api = {
     return request(`/interviews/entries/${entryId}/status`, {
       method: 'PATCH',
       body: JSON.stringify(payload),
+    });
+  },
+  getMailStatus() {
+    return request('/email/status');
+  },
+  getMailOAuthUrl() {
+    return request('/email/oauth/url');
+  },
+  sendTestEmail(payload) {
+    return request('/email/send-test', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+  sendEmailCampaign(payload) {
+    return request('/email/campaigns', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      timeoutMs: 120000,
     });
   },
 };
