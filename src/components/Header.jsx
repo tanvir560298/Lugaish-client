@@ -43,19 +43,13 @@ export function Header() {
     <header className="site-header sticky top-0 z-[100] border-b border-white/5 bg-[#020617]/80 backdrop-blur-2xl">
       <div className="mx-auto flex max-w-[1760px] items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
         
-        {/* --- 1. THE EVOLVING LOGO --- */}
+        {/* --- 1. LUGAISH BRAND --- */}
         <Link to="/" className="relative group flex shrink-0 items-center gap-4">
           <motion.div
-            whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
-            className="relative h-11 w-11 flex items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-600 to-emerald-500 shadow-lg shadow-blue-500/20"
+            whileHover={{ scale: 1.06 }}
+            className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-lg shadow-blue-500/20 ring-1 ring-white/20"
           >
-            {/* Shimmer Effect */}
-            <motion.div 
-              animate={{ x: [-40, 80] }}
-              transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-              className="absolute inset-0 bg-white/20 -skew-x-12 w-4 opacity-50"
-            />
-            <span className="text-xl font-black text-white italic">L</span>
+            <img src="/favicon.png" alt="Lugaish" className="h-full w-full object-cover" />
           </motion.div>
 
           <div className="hidden sm:block">
