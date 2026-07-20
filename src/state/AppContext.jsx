@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { api, getAuthToken, setAuthToken } from '../api/client.js';
 import { COURSE_DATA } from '../data/courseData.js';
 import { ROLES, getRolePermissions, normalizeRole } from '../utils/roles.js';
+import { COURSE_START_DATE_KEY, getEffectiveCourseStartKey, hasCourseStarted } from '../utils/courseLaunch.js';
 
 const LOCAL_STORAGE_KEY = 'lugaish_state_v1';
 const ACTIVITY_DAY_COUNT = 84;
@@ -115,7 +116,7 @@ function normalizeState(state) {
     courseActivity: state.courseActivity && typeof state.courseActivity === 'object' ? state.courseActivity : {},
     courseStartedAt: [...new Set(normalizedEnrolledPathways)].reduce((acc, pathway) => ({
       ...acc,
-      [pathway]: state.courseStartedAt?.[pathway] ?? getDateKey(),
+      [pathway]: getEffectiveCourseStartKey(state.courseStartedAt?.[pathway]),
     }), {}),
     userRole: normalizeRole(state.userRole),
     permissions: Array.isArray(state.permissions) && state.permissions.length
@@ -240,7 +241,7 @@ export function AppProvider({ children }) {
         enrolledPathways: [...new Set([...(prev.enrolledPathways ?? []), pathway])],
         courseStartedAt: {
           ...(prev.courseStartedAt ?? {}),
-          [pathway]: prev.courseStartedAt?.[pathway] ?? getDateKey(),
+          [pathway]: getEffectiveCourseStartKey(prev.courseStartedAt?.[pathway] ?? COURSE_START_DATE_KEY),
         },
       }));
     },
@@ -259,16 +260,18 @@ export function AppProvider({ children }) {
           : [...prev.completedLessons, lessonId];
         const pathway = prev.activePathway;
         const todayKey = getDateKey();
-        const courseActivity = {
-          ...(prev.courseActivity ?? {}),
-          [pathway]: {
-            ...(prev.courseActivity?.[pathway] ?? {}),
-            [todayKey]: {
-              lessonId,
-              completedAt: new Date().toISOString(),
-            },
-          },
-        };
+        const courseActivity = hasCourseStarted()
+          ? {
+              ...(prev.courseActivity ?? {}),
+              [pathway]: {
+                ...(prev.courseActivity?.[pathway] ?? {}),
+                [todayKey]: {
+                  lessonId,
+                  completedAt: new Date().toISOString(),
+                },
+              },
+            }
+          : prev.courseActivity;
 
         return { ...prev, completedLessons: completed, courseActivity };
       });

@@ -4,6 +4,7 @@ import { BookOpenCheck, ChevronDown, ClipboardList, FilePenLine, GraduationCap, 
 import { api } from '../api/client.js';
 import { useAppContext } from '../state/AppContext.jsx';
 import { ROLE_LABELS, ROLE_VALUES, ROLES, hasPermission, normalizeRole } from '../utils/roles.js';
+import { getEffectiveCourseStartKey, hasCourseStarted } from '../utils/courseLaunch.js';
 
 const XP_PER_LEVEL = 500;
 const CONSISTENCY_DAY_COUNT = 14;
@@ -28,7 +29,7 @@ function getDateFromKey(key) {
 function getCourseConsistency({ courseActivity = {}, courseStartedAt, selectedCourse }) {
   const today = new Date();
   const todayKey = getLocalDateKey(today);
-  const startDate = getDateFromKey(courseStartedAt?.[selectedCourse] ?? todayKey);
+  const startDate = getDateFromKey(getEffectiveCourseStartKey(courseStartedAt?.[selectedCourse]));
   const activity = courseActivity?.[selectedCourse] ?? {};
 
   return Array.from({ length: CONSISTENCY_DAY_COUNT }, (_, index) => {
@@ -514,6 +515,7 @@ export function DashboardPage() {
   const { state, actions, courseData } = useAppContext();
   const enrolledPathways = state.enrolledPathways?.length ? state.enrolledPathways : [state.activePathway];
   const [selectedCourse, setSelectedCourse] = useState(state.activePathway);
+  const courseIsLive = hasCourseStarted();
 
   useEffect(() => {
     if (!enrolledPathways.includes(selectedCourse)) {
@@ -580,7 +582,7 @@ export function DashboardPage() {
             <div className="mt-8 space-y-4 text-left">
               <div className="flex items-center justify-between text-sm text-slate-300">
                 <span>Learning streak</span>
-                <span className="font-semibold text-white">{state.streak} days</span>
+                <span className="font-semibold text-white">{courseIsLive ? `${state.streak} days` : 'Starts Aug 1'}</span>
               </div>
               <div className="flex items-center justify-between text-sm text-slate-300">
                 <span>Rank title</span>

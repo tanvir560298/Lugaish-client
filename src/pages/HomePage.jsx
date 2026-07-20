@@ -2,6 +2,7 @@ import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '../state/AppContext.jsx';
+import { COURSE_START_DATE } from '../utils/courseLaunch.js';
 import { 
   CheckCircle2, 
   BookOpen,
@@ -26,8 +27,6 @@ const fadeInUp = {
   viewport: { once: true },
   transition: { duration: 0.6, ease: "easeOut" }
 };
-
-const COURSE_START_DATE = new Date('2026-08-01T00:00:00+06:00');
 
 function getCourseCountdown() {
   const remaining = Math.max(0, COURSE_START_DATE.getTime() - Date.now());
