@@ -12,7 +12,9 @@ import {
   Sparkles, 
   Flame, 
   Target,
-  ChevronDown
+  ChevronDown,
+  CalendarDays,
+  BellRing
 } from 'lucide-react';
 
 const HeroScene = lazy(() => import('../components/HeroScene.jsx'));
@@ -24,6 +26,72 @@ const fadeInUp = {
   viewport: { once: true },
   transition: { duration: 0.6, ease: "easeOut" }
 };
+
+const COURSE_START_DATE = new Date('2026-08-01T00:00:00+06:00');
+
+function getCourseCountdown() {
+  const remaining = Math.max(0, COURSE_START_DATE.getTime() - Date.now());
+  const days = Math.floor(remaining / 86400000);
+  const hours = Math.floor((remaining % 86400000) / 3600000);
+  const minutes = Math.floor((remaining % 3600000) / 60000);
+
+  return { days, hours, minutes, hasStarted: remaining === 0 };
+}
+
+function CourseLaunchNotice() {
+  const [countdown, setCountdown] = useState(getCourseCountdown);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setCountdown(getCourseCountdown()), 60000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  return (
+    <motion.aside
+      initial={{ opacity: 0, y: -18 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.2, duration: 0.6 }}
+      aria-label="Course launch announcement"
+      className="course-launch-notice relative overflow-hidden rounded-2xl border border-amber-300/25 bg-amber-300/[0.08] p-4 shadow-[0_18px_55px_rgba(245,158,11,0.10)] backdrop-blur-xl sm:p-5"
+    >
+      <div className="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-amber-300/15 blur-3xl" />
+      <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-300 to-orange-500 text-slate-950 shadow-lg shadow-amber-500/20">
+            <BellRing size={19} aria-hidden="true" />
+          </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-300">
+              {countdown.hasStarted ? 'We are live' : 'Course launch announcement'}
+            </p>
+            <p className="mt-1 text-lg font-black leading-tight text-white sm:text-xl">
+              {countdown.hasStarted ? 'অপেক্ষার পালা শেষ—কোর্স এখন শুরু!' : 'অপেক্ষার পালা শেষ হতে চলেছে!'}
+            </p>
+            <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-slate-300 sm:text-sm">
+              <CalendarDays size={15} className="text-amber-300" aria-hidden="true" />
+              {countdown.hasStarted ? 'Your learning journey starts here.' : 'কোর্স শুরু হচ্ছে ১ আগস্ট ২০২৬'}
+            </p>
+          </div>
+        </div>
+
+        {!countdown.hasStarted && (
+          <div className="grid shrink-0 grid-cols-3 gap-2" aria-label={`${countdown.days} days, ${countdown.hours} hours and ${countdown.minutes} minutes remaining`}>
+            {[
+              [countdown.days, 'Days'],
+              [countdown.hours, 'Hours'],
+              [countdown.minutes, 'Min']
+            ].map(([value, label]) => (
+              <div key={label} className="min-w-14 rounded-xl border border-white/10 bg-slate-950/55 px-2 py-2 text-center">
+                <span className="block text-lg font-black tabular-nums text-white">{String(value).padStart(2, '0')}</span>
+                <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400">{label}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </motion.aside>
+  );
+}
 
 export function HomePage() {
   const { state, actions } = useAppContext();
@@ -69,6 +137,8 @@ export function HomePage() {
             transition={{ duration: 0.8 }}
             className="space-y-6 sm:space-y-8"
           >
+            <CourseLaunchNotice />
+
             {/* Mascot Welcome */}
             <motion.div 
               initial={{ scale: 0 }}
