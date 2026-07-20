@@ -1,5 +1,6 @@
 import { useAppContext } from '../state/AppContext.jsx';
 import { useNavigate } from 'react-router-dom';
+import { hasCourseStarted } from '../utils/courseLaunch.js';
 
 export function ProfilePage() {
   const { state, actions } = useAppContext();
@@ -14,6 +15,7 @@ export function ProfilePage() {
   }
 
   const level = Math.floor(state.xp / 500) + 1;
+  const courseIsLive = hasCourseStarted();
 
   return (
     <section className="space-y-8 pb-12 sm:space-y-12 sm:pb-20">
@@ -33,7 +35,7 @@ export function ProfilePage() {
           <div className="mt-8 grid grid-cols-3 gap-2 border-t border-white/10 pt-8 sm:gap-4">
             <div>
               <p className="text-sm text-slate-400">Streak</p>
-              <p className="text-xl font-bold text-yellow-400 sm:text-2xl">🔥 {state.streak}</p>
+              <p className="text-xl font-bold text-yellow-400 sm:text-2xl">{courseIsLive ? `🔥 ${state.streak}` : 'Aug 1'}</p>
             </div>
             <div>
               <p className="text-sm text-slate-400">Lessons</p>

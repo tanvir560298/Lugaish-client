@@ -1,11 +1,13 @@
 import { useAppContext } from '../state/AppContext.jsx';
 import { Link } from 'react-router-dom';
+import { hasCourseStarted } from '../utils/courseLaunch.js';
 
 export function ProgressPage() {
   const { state } = useAppContext();
 
   const level = Math.floor(state.xp / 500) + 1;
   const completionPercent = (state.completedLessons.length / 30) * 100;
+  const courseIsLive = hasCourseStarted();
 
   return (
     <section className="space-y-8 pb-12 sm:space-y-12 sm:pb-20">
@@ -26,7 +28,7 @@ export function ProgressPage() {
           </div>
           <div className="section-card p-5 text-center sm:p-8">
             <p className="text-sm text-slate-400 mb-2">STREAK</p>
-            <p className="text-3xl font-black text-yellow-400 sm:text-4xl">🔥 {state.streak}</p>
+            <p className="text-3xl font-black text-yellow-400 sm:text-4xl">{courseIsLive ? `🔥 ${state.streak}` : 'Starts Aug 1'}</p>
           </div>
           <div className="section-card p-5 text-center sm:p-8">
             <p className="text-sm text-slate-400 mb-2">LESSONS COMPLETED</p>
@@ -87,7 +89,9 @@ export function ProgressPage() {
               <div
                 key={idx}
                 className={`aspect-square w-full rounded-sm border border-white/10 ${
-                  idx % 3 === 0
+                  !courseIsLive
+                    ? 'bg-slate-900/50'
+                    : idx % 3 === 0
                     ? 'bg-emerald-500/60'
                     : idx % 3 === 1
                       ? 'bg-emerald-500/30'
