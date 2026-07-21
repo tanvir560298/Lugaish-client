@@ -120,9 +120,14 @@ export function SpeakingPracticePage() {
   const { state } = useAppContext();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const language = searchParams.get('language') === 'arabic' ? 'arabic' : 'english';
+  const requestedLanguage = searchParams.get('language');
+  const requestedDay = Number(searchParams.get('day'));
+  const hasValidRouteParams = ['english', 'arabic'].includes(requestedLanguage)
+    && Number.isInteger(requestedDay)
+    && requestedDay > 0;
+  const language = hasValidRouteParams ? requestedLanguage : state.activePathway;
   const locale = language === 'arabic' ? 'ar-SA' : 'en-US';
-  const day = Math.max(Number.parseInt(searchParams.get('day') ?? '1', 10) || 1, 1);
+  const day = hasValidRouteParams ? requestedDay : 1;
   const shouldOpenManager = searchParams.get('manage') === '1';
   const isWebDeveloper = state.userRole === ROLES.webDeveloper;
   const [module, setModule] = useState(null);
@@ -148,9 +153,11 @@ export function SpeakingPracticePage() {
   const [voices, setVoices] = useState([]);
   const [selectedVoiceName, setSelectedVoiceName] = useState('');
   const [speechRate, setSpeechRate] = useState(0.92);
+  const [isQuestionAudioPlaying, setIsQuestionAudioPlaying] = useState(false);
   const recognitionRef = useRef(null);
   const interimTranscriptRef = useRef('');
   const audioRef = useRef(null);
+  const utteranceRef = useRef(null);
   const sessionStartedRef = useRef(false);
   const completionSentRef = useRef(false);
   const lastAutoReadKeyRef = useRef('');
@@ -162,7 +169,7 @@ export function SpeakingPracticePage() {
   const currentQuestion = questions[questionIndex];
   const currentResult = results.find(result => result.questionId === currentQuestion?.id);
   const isRtl = language === 'arabic';
-  const isPracticeDay = !module || module.moduleType === 'ai_practice';
+  const isPracticeDay = module?.moduleType === 'ai_practice';
 
   useEffect(() => {
     if (shouldOpenManager && isWebDeveloper) setManagerOpen(true);
@@ -189,35 +196,81 @@ export function SpeakingPracticePage() {
     setLoadNotice(localSet ? 'A private browser draft is available for the Web Developer.' : '');
     setIsRemoteLoading(true);
 
-    api.getSpeakingPractice(language, day)
-      .then(response => {
-        if (ignore) return;
-        const remoteQuestions = Array.isArray(response.questions) ? response.questions : [];
-        const savedModule = {
-          moduleType: response.moduleType ?? 'ai_practice',
-          title: response.title ?? '',
-          description: response.description ?? '',
-          introTitle: response.introTitle ?? '',
-          introText: response.introText ?? '',
-          published: Boolean(response.published ?? response.enabled),
-        };
-        setAccessError(null);
-        setModule(savedModule);
-        setPublishForLearners(savedModule.published);
-        if (sessionStartedRef.current) {
-          setLoadNotice('The saved question set loaded. Your current attempt was kept.');
-          return;
+    if (!hasValidRouteParams) {
+      setAccessError({ status: 400, message: 'Open speaking practice from its server-scheduled Daily Lessons card.' });
+      setLoadNotice('A valid language and scheduled day are required.');
+      setIsRemoteLoading(false);
+      return () => {
+        ignore = true;
+      };
+    }
+
+    async function loadSpeakingPractice() {
+      let scheduledModule = null;
+
+      if (!isWebDeveloper) {
+        const schedule = await api.getDayModules(language);
+        const courseSchedule = schedule.courseSchedule ?? schedule;
+        scheduledModule = Array.isArray(schedule.modules)
+          ? schedule.modules.find(item => Number(item.day) === day)
+          : null;
+
+        if (courseSchedule.courseStarted !== true) {
+          const startText = typeof courseSchedule.courseStartAt === 'string' && courseSchedule.courseStartAt
+            ? ` It is scheduled from ${courseSchedule.courseStartAt.slice(0, 10)}.`
+            : '';
+          const error = new Error(`Your course has not started yet.${startText}`);
+          error.status = 403;
+          throw error;
         }
-        setQuestions(remoteQuestions);
-        setDraftQuestions(remoteQuestions.length || !localSet ? remoteQuestions : localSet);
-        setLoadNotice(isWebDeveloper
-          ? savedModule.moduleType === 'ai_practice'
-            ? savedModule.published
-              ? 'This AI practice day is live for learners.'
-              : 'This AI practice draft is private until you publish it.'
-            : 'Configure this day as AI speaking practice before adding questions.'
-          : 'Read the instructions, then begin the scheduled practice session.');
-      })
+
+        if (!scheduledModule
+          || scheduledModule.moduleType !== 'ai_practice'
+          || scheduledModule.published !== true
+          || scheduledModule.available !== true) {
+          const error = new Error('Only the published AI practice assigned to your currently unlocked server-scheduled date can be opened.');
+          error.status = 403;
+          throw error;
+        }
+      }
+
+      const response = await api.getSpeakingPractice(language, day);
+      if (ignore) return;
+      const remoteQuestions = Array.isArray(response.questions) ? response.questions : [];
+      const savedModule = {
+        moduleType: response.moduleType ?? scheduledModule?.moduleType ?? null,
+        title: response.title ?? scheduledModule?.title ?? '',
+        description: response.description ?? scheduledModule?.description ?? '',
+        introTitle: response.introTitle ?? scheduledModule?.introTitle ?? '',
+        introText: response.introText ?? scheduledModule?.introText ?? '',
+        published: Boolean(response.published ?? response.enabled ?? scheduledModule?.published),
+      };
+
+      if (!isWebDeveloper && (savedModule.moduleType !== 'ai_practice' || !savedModule.published)) {
+        const error = new Error('This day is not a published AI speaking practice session.');
+        error.status = 403;
+        throw error;
+      }
+
+      setAccessError(null);
+      setModule(savedModule);
+      setPublishForLearners(savedModule.published);
+      if (sessionStartedRef.current) {
+        setLoadNotice('The saved question set loaded. Your current attempt was kept.');
+        return;
+      }
+      setQuestions(remoteQuestions);
+      setDraftQuestions(remoteQuestions.length || !localSet ? remoteQuestions : localSet);
+      setLoadNotice(isWebDeveloper
+        ? savedModule.moduleType === 'ai_practice'
+          ? savedModule.published
+            ? 'This AI practice day is live for learners.'
+            : 'This AI practice draft is private until you publish it.'
+          : 'Configure this day as AI speaking practice before adding questions.'
+        : 'Read the instructions, then begin the scheduled practice session.');
+    }
+
+    loadSpeakingPractice()
       .catch(error => {
         if (ignore) return;
         if (!isWebDeveloper) {
@@ -237,7 +290,7 @@ export function SpeakingPracticePage() {
     return () => {
       ignore = true;
     };
-  }, [day, isWebDeveloper, language]);
+  }, [day, hasValidRouteParams, isWebDeveloper, language]);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) return undefined;
@@ -269,6 +322,7 @@ export function SpeakingPracticePage() {
     }
     window.speechSynthesis?.cancel();
     audioRef.current?.pause?.();
+    utteranceRef.current = null;
   }, []);
 
   const abortRecognition = () => {
@@ -287,9 +341,21 @@ export function SpeakingPracticePage() {
   };
 
   const stopQuestionAudio = () => {
+    if (utteranceRef.current) {
+      utteranceRef.current.onstart = null;
+      utteranceRef.current.onend = null;
+      utteranceRef.current.onerror = null;
+      utteranceRef.current = null;
+    }
     window.speechSynthesis?.cancel();
-    audioRef.current?.pause?.();
+    if (audioRef.current) {
+      audioRef.current.onplay = null;
+      audioRef.current.onended = null;
+      audioRef.current.onerror = null;
+      audioRef.current.pause?.();
+    }
     audioRef.current = null;
+    setIsQuestionAudioPlaying(false);
   };
 
   const speakQuestion = () => {
@@ -301,6 +367,7 @@ export function SpeakingPracticePage() {
 
     if (!('speechSynthesis' in window)) {
       setSpeechError('Text-to-speech is not available in this browser.');
+      setIsQuestionAudioPlaying(false);
       return;
     }
 
@@ -309,9 +376,18 @@ export function SpeakingPracticePage() {
     utterance.rate = speechRate;
     utterance.pitch = 1;
     utterance.voice = voices.find(voice => voice.name === selectedVoiceName) ?? pickPreferredVoice(voices, locale) ?? null;
+    utterance.onstart = () => setIsQuestionAudioPlaying(true);
+    utterance.onend = () => {
+      utteranceRef.current = null;
+      setIsQuestionAudioPlaying(false);
+    };
     utterance.onerror = event => {
+      utteranceRef.current = null;
+      setIsQuestionAudioPlaying(false);
       if (!['canceled', 'interrupted'].includes(event.error)) setSpeechError('The browser could not read this question.');
     };
+    utteranceRef.current = utterance;
+    setIsQuestionAudioPlaying(true);
     window.speechSynthesis.speak(utterance);
   };
 
@@ -324,6 +400,17 @@ export function SpeakingPracticePage() {
     return () => window.clearTimeout(timeout);
   }, [currentQuestion, hasBegun, questionIndex]);
 
+  const beginPractice = () => {
+    if (!currentQuestion) return;
+
+    // Calling speech synthesis inside this click handler keeps the initial
+    // question audible on Safari/iOS, which can reject speech started from a
+    // timer after a user gesture. Later questions still use the effect above.
+    lastAutoReadKeyRef.current = `${questionIndex}:${currentQuestion.id}`;
+    setHasBegun(true);
+    speakQuestion();
+  };
+
   const playRecordedQuestion = () => {
     if (!currentQuestion?.audioUrl) return;
     sessionStartedRef.current = true;
@@ -332,8 +419,22 @@ export function SpeakingPracticePage() {
     stopQuestionAudio();
     const audio = new Audio(currentQuestion.audioUrl);
     audioRef.current = audio;
-    audio.onerror = () => setSpeechError('The recorded question audio could not play. Use the browser voice instead.');
-    audio.play().catch(() => setSpeechError('The recorded question audio could not play. Use the browser voice instead.'));
+    audio.onplay = () => setIsQuestionAudioPlaying(true);
+    audio.onended = () => {
+      audioRef.current = null;
+      setIsQuestionAudioPlaying(false);
+    };
+    audio.onerror = () => {
+      audioRef.current = null;
+      setIsQuestionAudioPlaying(false);
+      setSpeechError('The recorded question audio could not play. Use the browser voice instead.');
+    };
+    setIsQuestionAudioPlaying(true);
+    audio.play().catch(() => {
+      audioRef.current = null;
+      setIsQuestionAudioPlaying(false);
+      setSpeechError('The recorded question audio could not play. Use the browser voice instead.');
+    });
   };
 
   const stopListening = () => {
@@ -623,20 +724,20 @@ export function SpeakingPracticePage() {
     );
   }
 
-  if (!isRemoteLoading && module && !isPracticeDay && !isWebDeveloper) {
+  if (!isRemoteLoading && !isWebDeveloper && (!module || !isPracticeDay || !module.published)) {
     return (
       <section className="mx-auto max-w-3xl space-y-6 pb-20">
         <div className="section-card p-8 text-center sm:p-12">
           <Settings2 size={34} className="mx-auto text-amber-300" />
-          <h1 className="mt-5 text-3xl font-black text-white">This day is not an AI practice session</h1>
-          <p className="mt-3 text-slate-400">Return to Daily Lessons and open the learning format scheduled for this day.</p>
+          <h1 className="mt-5 text-3xl font-black text-white">This day is not an open AI practice session</h1>
+          <p className="mt-3 text-slate-400">Only a published, server-scheduled AI practice date can be opened by a learner.</p>
           <button type="button" onClick={() => navigate('/daily-lessons')} className="glow-button glow-button-blue mt-7"><ArrowLeft size={18} /> Daily lessons</button>
         </div>
       </section>
     );
   }
 
-  if (!isWebDeveloper && !hasBegun && !isRemoteLoading && currentQuestion) {
+  if (!hasBegun && !isRemoteLoading && currentQuestion && (!isWebDeveloper || !managerOpen)) {
     return (
       <section className="mx-auto max-w-4xl space-y-6 pb-20">
         <div className="section-card relative overflow-hidden p-8 sm:p-12">
@@ -650,7 +751,7 @@ export function SpeakingPracticePage() {
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4"><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Scoring</p><p className="mt-2 text-2xl font-black text-white">Out of 100</p></div>
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
-              <button type="button" onClick={() => { lastAutoReadKeyRef.current = ''; setHasBegun(true); }} className="glow-button glow-button-blue py-4"><Mic size={18} /> Begin practice</button>
+              <button type="button" onClick={beginPractice} className="glow-button glow-button-blue py-4"><Mic size={18} /> {isWebDeveloper ? 'Begin preview' : 'Begin practice'}</button>
               <button type="button" onClick={() => navigate('/daily-lessons')} className="glow-button glow-button-muted py-4"><ArrowLeft size={18} /> Back to lessons</button>
             </div>
           </div>
@@ -745,7 +846,11 @@ export function SpeakingPracticePage() {
             <div className="mt-5 grid gap-3 md:grid-cols-[minmax(0,1fr)_120px_auto]">
               <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Browser voice<select value={selectedVoiceName} onChange={event => setSelectedVoiceName(event.target.value)} className="mt-2 h-12 w-full rounded-xl border border-white/10 bg-slate-950 px-3 text-sm normal-case tracking-normal text-white">{(languageVoices.length ? languageVoices : voices).map(voice => <option key={`${voice.name}-${voice.lang}`} value={voice.name}>{voice.name} · {voice.lang}</option>)}</select></label>
               <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Speed<select value={speechRate} onChange={event => setSpeechRate(Number(event.target.value))} className="mt-2 h-12 w-full rounded-xl border border-white/10 bg-slate-950 px-3 text-sm normal-case tracking-normal text-white"><option value="0.8">Slow</option><option value="0.92">Natural</option><option value="1">Normal</option></select></label>
-              <div className="grid gap-2 self-end"><button type="button" onClick={speakQuestion} className="glow-button glow-button-muted py-3.5"><Volume2 size={18} /> Read question</button>{currentQuestion.audioUrl && <button type="button" onClick={playRecordedQuestion} className="glow-button glow-button-muted py-3"><Headphones size={17} /> Recorded audio</button>}</div>
+              <div className="grid gap-2 self-end">
+                <button type="button" onClick={speakQuestion} className="glow-button glow-button-muted py-3.5"><Volume2 size={18} /> Read question</button>
+                <button type="button" onClick={stopQuestionAudio} disabled={!isQuestionAudioPlaying} className="glow-button glow-button-muted py-3 disabled:cursor-not-allowed disabled:opacity-40"><CircleStop size={17} /> Stop audio</button>
+                {currentQuestion.audioUrl && <button type="button" onClick={playRecordedQuestion} className="glow-button glow-button-muted py-3"><Headphones size={17} /> Recorded audio</button>}
+              </div>
             </div>
 
             {!recognitionSupported && <div role="status" className="mt-5 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4 text-sm leading-6 text-amber-100">Speech recognition is unavailable in this browser. Use a recent Chrome or Edge browser, or type your answer below for practice.</div>}

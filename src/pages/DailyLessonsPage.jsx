@@ -155,7 +155,15 @@ export function DailyLessonsPage() {
   const { state, actions, courseData } = useAppContext();
   const navigate = useNavigate();
   const [comingSoon, setComingSoon] = useState(null);
-  const [dayModuleData, setDayModuleData] = useState({ modules: [], completedDays: [], currentDay: 1 });
+  const [dayModuleData, setDayModuleData] = useState({
+    modules: [],
+    completedDays: [],
+    currentDay: 0,
+    courseDay: 0,
+    courseStarted: false,
+    courseStartAt: '',
+    courseStartDate: '',
+  });
   const [hasLoadedDayModules, setHasLoadedDayModules] = useState(false);
   const [dayModuleError, setDayModuleError] = useState('');
   const isWebDeveloper = state.userRole === ROLES.webDeveloper;
@@ -163,7 +171,7 @@ export function DailyLessonsPage() {
   const availableToEnroll = Object.keys(courseData).filter(pathway => !enrolledPathways.includes(pathway));
   const pathway = courseData[state.activePathway] ?? courseData.english;
   const staticLessons = useMemo(() => getStaticLessons(pathway), [pathway]);
-  const days = useMemo(
+  const plannedDays = useMemo(
     () => buildDayCards(
       staticLessons,
       dayModuleData.modules ?? [],
@@ -172,6 +180,21 @@ export function DailyLessonsPage() {
     [dayModuleData.modules, isWebDeveloper, staticLessons],
   );
   const hasRemoteDayPlan = hasLoadedDayModules && !dayModuleError;
+  const courseStartedForLearner = dayModuleData.courseStarted === true;
+  const days = useMemo(() => {
+    if (isWebDeveloper) return plannedDays;
+    if (!hasRemoteDayPlan || !courseStartedForLearner) return [];
+
+    // Learners only see dates that the server has explicitly configured,
+    // published, and unlocked. Static courseData must never create a generic
+    // practice/video CTA before the real course schedule says it is ready.
+    return plannedDays.filter(day => (
+      day.configured
+      && day.published
+      && day.available === true
+      && day.day <= dayModuleData.courseDay
+    ));
+  }, [courseStartedForLearner, dayModuleData.courseDay, hasRemoteDayPlan, isWebDeveloper, plannedDays]);
 
   useEffect(() => {
     if (!comingSoon) return undefined;
@@ -188,10 +211,15 @@ export function DailyLessonsPage() {
     api.getDayModules(state.activePathway)
       .then(response => {
         if (ignore) return;
+        const courseSchedule = response.courseSchedule ?? response;
         setDayModuleData({
           modules: Array.isArray(response.modules) ? response.modules : [],
           completedDays: Array.isArray(response.completedDays) ? response.completedDays : [],
-          currentDay: Math.max(Number(response.currentDay) || 1, 1),
+          currentDay: Math.max(Number(response.currentDay) || 0, 0),
+          courseDay: Math.max(Number(response.courseDay ?? courseSchedule.calendarDay) || 0, 0),
+          courseStarted: courseSchedule.courseStarted === true,
+          courseStartAt: typeof courseSchedule.courseStartAt === 'string' ? courseSchedule.courseStartAt : '',
+          courseStartDate: typeof courseSchedule.courseStartDate === 'string' ? courseSchedule.courseStartDate : '',
         });
       })
       .catch(error => {
@@ -300,6 +328,19 @@ export function DailyLessonsPage() {
         </p>
       )}
 
+      {hasRemoteDayPlan && !isWebDeveloper && !courseStartedForLearner && (
+        <p className="rounded-2xl border border-blue-400/20 bg-blue-500/10 px-4 py-4 text-sm leading-6 text-blue-100">
+          Your course has not started yet. Daily lessons and speaking tests will appear here only when the server opens the scheduled course date
+          {dayModuleData.courseStartDate || dayModuleData.courseStartAt ? ` (${dayModuleData.courseStartDate || dayModuleData.courseStartAt})` : ''}.
+        </p>
+      )}
+
+      {hasRemoteDayPlan && !isWebDeveloper && courseStartedForLearner && days.length === 0 && (
+        <p className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm leading-6 text-slate-300">
+          No published learning box is scheduled for you right now. Your course team&apos;s next server-configured date will appear here when it opens.
+        </p>
+      )}
+
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {days.map((day, index) => {
           const presentation = MODULE_PRESENTATION[day.moduleType] ?? null;
@@ -310,7 +351,7 @@ export function DailyLessonsPage() {
           const completed = hasRemoteDayPlan
             ? dayModuleData.completedDays.includes(day.day)
             : Boolean(day.staticLesson && state.completedLessons.includes(day.staticLesson.id));
-          const availableFromServer = day.available ?? day.day <= dayModuleData.currentDay;
+          const availableFromServer = day.available === true;
           const fallbackIsNext = index === 0 || Boolean(days[index - 1]?.staticLesson && state.completedLessons.includes(days[index - 1].staticLesson.id));
           const isLocked = planReadOnlyForLearner || (!isWebDeveloper && (!isPublished || (hasRemoteDayPlan ? !availableFromServer : !fallbackIsNext && !completed)));
           const Icon = presentation?.Icon ?? Clock3;
