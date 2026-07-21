@@ -189,6 +189,12 @@ export const api = {
       method: 'DELETE',
     });
   },
+  completeLessonVideo(language, day, videoId) {
+    return request(`/lessons/${language}/${day}/videos/${videoId}/complete`, {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
+  },
   getSpeakingPractice(language, day) {
     return request(`/lessons/${language}/${day}/speaking-practice`);
   },
