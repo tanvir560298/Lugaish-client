@@ -2,7 +2,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { BookOpen, CheckCircle2, Clock3, Film, ListChecks, Lock, Mic, Play, Plus, Sparkles, TimerReset, Video } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { api } from '../api/client.js';
 import { useAppContext } from '../state/AppContext.jsx';
+import { ROLES } from '../utils/roles.js';
 
 function getLessons(pathway) {
   return pathway.modules.flatMap(module =>
@@ -18,7 +20,8 @@ export function DailyLessonsPage() {
   const { state, actions, courseData } = useAppContext();
   const navigate = useNavigate();
   const [comingSoon, setComingSoon] = useState(null);
-  const canManageLessons = state.permissions?.includes('manage_lessons');
+  const [enabledPracticeDays, setEnabledPracticeDays] = useState([]);
+  const isWebDeveloper = state.userRole === ROLES.webDeveloper;
   const enrolledPathways = state.enrolledPathways?.length ? state.enrolledPathways : [state.activePathway];
   const availableToEnroll = Object.keys(courseData).filter(pathway => !enrolledPathways.includes(pathway));
   const pathway = courseData[state.activePathway] ?? courseData.english;
@@ -30,6 +33,24 @@ export function DailyLessonsPage() {
     const timeout = window.setTimeout(() => setComingSoon(null), 1800);
     return () => window.clearTimeout(timeout);
   }, [comingSoon]);
+
+  useEffect(() => {
+    let ignore = false;
+
+    api.getSpeakingPracticeAvailability(state.activePathway)
+      .then(response => {
+        if (!ignore) {
+          setEnabledPracticeDays(Array.isArray(response.enabledDays) ? response.enabledDays : []);
+        }
+      })
+      .catch(() => {
+        if (!ignore) setEnabledPracticeDays([]);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [state.activePathway]);
 
   const openLesson = (lesson) => {
     actions.setActiveLesson(lesson.id, state.activePathway);
@@ -104,6 +125,7 @@ export function DailyLessonsPage() {
           const completed = state.completedLessons.includes(lesson.id);
           const isNext = !completed && (index === 0 || state.completedLessons.includes(lessons[index - 1]?.id));
           const isLocked = !completed && !isNext;
+          const hasSpeakingPractice = enabledPracticeDays.includes(lesson.dayNumber);
 
           return (
             <article
@@ -156,13 +178,13 @@ export function DailyLessonsPage() {
                   {isLocked ? 'Complete previous day' : completed ? 'Review Lesson' : 'Start Lesson'}
                   {!isLocked && <Sparkles size={15} />}
                 </button>
-                {(!isLocked || canManageLessons) && (
+                {(isWebDeveloper || (!isLocked && hasSpeakingPractice)) && (
                   <button
                     type="button"
-                    onClick={() => navigate(`/speaking-practice?language=${state.activePathway}&day=${lesson.dayNumber}`)}
+                    onClick={() => navigate(`/speaking-practice?language=${state.activePathway}&day=${lesson.dayNumber}${isWebDeveloper ? '&manage=1' : ''}`)}
                     className="flex w-full items-center justify-center gap-2 rounded-2xl border border-blue-400/20 bg-blue-500/10 px-5 py-3 text-xs font-black uppercase tracking-widest text-blue-200 transition hover:bg-blue-500 hover:text-white"
                   >
-                    <Mic size={15} /> Speaking practice
+                    <Mic size={15} /> {isWebDeveloper ? 'Manage AI practice' : 'Speaking practice'}
                   </button>
                 )}
               </div>

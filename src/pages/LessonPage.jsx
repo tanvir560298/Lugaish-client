@@ -3,7 +3,7 @@ import { ArrowLeft, Clock3, ListVideo, LoaderCircle, Mic, Play, Plus, RefreshCw,
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useAppContext, getPathFromState } from '../state/AppContext.jsx';
-import { hasPermission } from '../utils/roles.js';
+import { hasPermission, ROLES } from '../utils/roles.js';
 
 function formatDuration(minutes) {
   const value = Number(minutes) || 0;
@@ -40,6 +40,7 @@ export function LessonPage() {
   const day = Math.max(Number.parseInt(dayParam, 10) || 1, 1);
   const language = state.activePathway;
   const canManageLessons = hasPermission(state.userRole, 'manage_lessons');
+  const isWebDeveloper = state.userRole === ROLES.webDeveloper;
   const staticLessons = useMemo(
     () => pathway.modules.flatMap(module => module.lessons),
     [pathway],
@@ -81,6 +82,7 @@ export function LessonPage() {
   }, [day, language, reloadKey]);
 
   const selectedVideo = lesson.videos.find(video => video._id === selectedVideoId) ?? lesson.videos[0];
+  const canShowSpeakingPractice = isWebDeveloper || Boolean(lesson.speakingPracticeEnabled);
 
   const submitVideo = async event => {
     event.preventDefault();
@@ -249,28 +251,36 @@ export function LessonPage() {
         </div>
       )}
 
-      <div className="section-card flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
-        <div className="flex items-start gap-4">
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-blue-300">
-            <Mic size={22} />
+      {canShowSpeakingPractice && (
+        <div className="section-card flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+          <div className="flex items-start gap-4">
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-blue-300">
+              <Mic size={22} />
+            </div>
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-400">Practice this lesson</p>
+              <h2 className="mt-1 text-xl font-black text-white">AI Speaking Practice</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-400">
+                {isWebDeveloper
+                  ? lesson.speakingPracticeEnabled
+                    ? 'Live for learners. You can edit the question set or preview the test.'
+                    : 'Hidden from learners until you enable this day’s AI practice.'
+                  : `Listen to Day ${day} questions, answer by microphone, and get instant keyword feedback.`}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-400">Practice this lesson</p>
-            <h2 className="mt-1 text-xl font-black text-white">AI Speaking Practice</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-400">Listen to Day {day} questions, answer by microphone, and get instant keyword feedback.</p>
-          </div>
-        </div>
-        <div className="flex shrink-0 flex-wrap gap-3">
-          {canManageLessons && (
-            <button type="button" onClick={() => navigate(`/speaking-practice?language=${language}&day=${day}&manage=1`)} className="glow-button glow-button-muted py-4">
-              <Plus size={18} /> Manage questions
+          <div className="flex shrink-0 flex-wrap gap-3">
+            {isWebDeveloper && (
+              <button type="button" onClick={() => navigate(`/speaking-practice?language=${language}&day=${day}&manage=1`)} className="glow-button glow-button-muted py-4">
+                <Plus size={18} /> Manage questions
+              </button>
+            )}
+            <button type="button" onClick={() => navigate(`/speaking-practice?language=${language}&day=${day}`)} className="glow-button glow-button-blue py-4">
+              <Mic size={18} /> {isWebDeveloper && !lesson.speakingPracticeEnabled ? 'Preview practice' : 'Open practice'}
             </button>
-          )}
-          <button type="button" onClick={() => navigate(`/speaking-practice?language=${language}&day=${day}`)} className="glow-button glow-button-blue py-4">
-            <Mic size={18} /> Open practice
-          </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {canManageLessons && (
         <div className="section-card p-6 sm:p-8">
