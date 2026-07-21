@@ -17,6 +17,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { getLocalSpeakingQuestions } from '../data/speakingQuestions.ts';
 import { useAppContext } from '../state/AppContext.jsx';
+import { hasPermission } from '../utils/roles.js';
 import { scoreSpeakingTranscript } from '../utils/speakingScoring.js';
 
 const RESULT_STORAGE_KEY = 'lugaish_latest_speaking_result_v1';
@@ -108,13 +109,15 @@ export function SpeakingPracticePage() {
   const language = searchParams.get('language') === 'arabic' ? 'arabic' : 'english';
   const locale = language === 'arabic' ? 'ar-SA' : 'en-US';
   const day = Math.max(Number.parseInt(searchParams.get('day') ?? '1', 10) || 1, 1);
-  const canManageLessons = state.permissions?.includes('manage_lessons');
+  const shouldOpenManager = searchParams.get('manage') === '1';
+  const canManageLessons = state.permissions?.includes('manage_lessons')
+    || hasPermission(state.userRole, 'manage_lessons');
   const fallbackQuestions = useMemo(() => getLocalSpeakingQuestions(language), [language]);
   const [questions, setQuestions] = useState(fallbackQuestions);
   const [draftQuestions, setDraftQuestions] = useState(fallbackQuestions);
   const [isRemoteLoading, setIsRemoteLoading] = useState(true);
   const [loadNotice, setLoadNotice] = useState('');
-  const [managerOpen, setManagerOpen] = useState(false);
+  const [managerOpen, setManagerOpen] = useState(shouldOpenManager);
   const [managerMessage, setManagerMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -140,6 +143,11 @@ export function SpeakingPracticePage() {
   const currentQuestion = questions[questionIndex];
   const currentResult = results.find(result => result.questionId === currentQuestion?.id);
   const isRtl = language === 'arabic';
+
+  useEffect(() => {
+    if (!shouldOpenManager || !canManageLessons) return;
+    setManagerOpen(true);
+  }, [canManageLessons, shouldOpenManager]);
 
   useEffect(() => {
     let ignore = false;

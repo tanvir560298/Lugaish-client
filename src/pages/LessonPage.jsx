@@ -260,9 +260,16 @@ export function LessonPage() {
             <p className="mt-2 text-sm leading-6 text-slate-400">Listen to Day {day} questions, answer by microphone, and get instant keyword feedback.</p>
           </div>
         </div>
-        <button type="button" onClick={() => navigate(`/speaking-practice?language=${language}&day=${day}`)} className="glow-button glow-button-blue shrink-0 py-4">
-          <Mic size={18} /> Open practice
-        </button>
+        <div className="flex shrink-0 flex-wrap gap-3">
+          {canManageLessons && (
+            <button type="button" onClick={() => navigate(`/speaking-practice?language=${language}&day=${day}&manage=1`)} className="glow-button glow-button-muted py-4">
+              <Plus size={18} /> Manage questions
+            </button>
+          )}
+          <button type="button" onClick={() => navigate(`/speaking-practice?language=${language}&day=${day}`)} className="glow-button glow-button-blue py-4">
+            <Mic size={18} /> Open practice
+          </button>
+        </div>
       </div>
 
       {canManageLessons && (
