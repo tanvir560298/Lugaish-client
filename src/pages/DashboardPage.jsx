@@ -59,6 +59,8 @@ function RoleBadge({ role }) {
       ? 'border-emerald-400/30 bg-emerald-500/10 text-emerald-100'
       : normalized === ROLES.editor
         ? 'border-amber-400/30 bg-amber-500/10 text-amber-100'
+        : normalized === ROLES.tester
+          ? 'border-violet-400/30 bg-violet-500/10 text-violet-100'
         : 'border-white/10 bg-white/5 text-slate-300';
 
   return (
@@ -567,7 +569,7 @@ export function DashboardPage() {
   const canCreatePost = hasPermission(role, 'create_post');
   const canPublish = hasPermission(role, 'publish_post');
   const canManageEmail = hasPermission(role, 'manage_email')
-    && state.userEmail?.toLowerCase() === EMAIL_MANAGER_EMAIL;
+    && (role === ROLES.tester || state.userEmail?.toLowerCase() === EMAIL_MANAGER_EMAIL);
 
   return (
     <section className="space-y-10">
@@ -648,14 +650,16 @@ export function DashboardPage() {
         </aside>
 
         <div className="space-y-6">
-          {canManageRoles && (
+          {isStaff && (
             <div className="section-card p-6 sm:p-8">
               <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-400">Staff workspace</p>
                   <h2 className="mt-2 text-2xl font-black text-white">{ROLE_LABELS[role]} dashboard</h2>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
-                    Your dashboard now changes based on account role. Learners see progress, staff see publishing and lesson tools, and the web developer can manage roles.
+                    {role === ROLES.tester
+                      ? 'Your course changes are isolated in a private tester sandbox and never alter learner-facing content.'
+                      : 'Your dashboard changes based on account role. Learners see progress, staff see publishing and lesson tools, and the web developer can manage roles.'}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">

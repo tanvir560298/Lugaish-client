@@ -166,7 +166,7 @@ export function DailyLessonsPage() {
   });
   const [hasLoadedDayModules, setHasLoadedDayModules] = useState(false);
   const [dayModuleError, setDayModuleError] = useState('');
-  const isWebDeveloper = state.userRole === ROLES.webDeveloper;
+  const isWebDeveloper = [ROLES.webDeveloper, ROLES.tester].includes(state.userRole);
   const enrolledPathways = state.enrolledPathways?.length ? state.enrolledPathways : [state.activePathway];
   const availableToEnroll = Object.keys(courseData).filter(pathway => !enrolledPathways.includes(pathway));
   const pathway = courseData[state.activePathway] ?? courseData.english;

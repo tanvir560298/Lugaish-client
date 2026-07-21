@@ -53,7 +53,7 @@ export function PathwaysPage() {
   const [unlockedDays, setUnlockedDays] = useState(() => new Set());
   const [courseAccess, setCourseAccess] = useState({ loading: true, started: false, startAt: '', startDate: '', error: '' });
   const containerRef = useRef(null);
-  const isWebDeveloper = state.userRole === ROLES.webDeveloper;
+  const isWebDeveloper = [ROLES.webDeveloper, ROLES.tester].includes(state.userRole);
   const courseReady = isWebDeveloper || courseAccess.started;
 
   useEffect(() => {

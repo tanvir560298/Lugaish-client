@@ -129,7 +129,7 @@ export function SpeakingPracticePage() {
   const locale = language === 'arabic' ? 'ar-SA' : 'en-US';
   const day = hasValidRouteParams ? requestedDay : 1;
   const shouldOpenManager = searchParams.get('manage') === '1';
-  const isWebDeveloper = state.userRole === ROLES.webDeveloper;
+  const isWebDeveloper = [ROLES.webDeveloper, ROLES.tester].includes(state.userRole);
   const [module, setModule] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [draftQuestions, setDraftQuestions] = useState([]);
@@ -820,7 +820,7 @@ export function SpeakingPracticePage() {
               </div>
               <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/[0.06] p-4 text-sm text-slate-300">
                 <input type="checkbox" checked={publishForLearners} onChange={event => setPublishForLearners(event.target.checked)} className="mt-1 h-4 w-4 accent-emerald-400" />
-                <span><strong className="text-white">Publish this AI practice day</strong><br />Only the Web Developer can make the question set visible to learners.</span>
+                <span><strong className="text-white">Publish this AI practice day</strong><br />Tester saves remain inside the tester sandbox and never become visible to learners.</span>
               </label>
               {managerMessage && <p role="status" aria-live="polite" className="mt-4 rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-slate-300">{managerMessage}</p>}
               <button type="button" onClick={saveQuestionSet} disabled={isSaving} className="glow-button glow-button-blue mt-5 w-full py-4 disabled:opacity-50">{isSaving ? <LoaderCircle size={18} className="animate-spin" /> : <Save size={18} />}{isSaving ? 'Saving...' : 'Save AI practice day'}</button>
