@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -9,6 +9,7 @@ import {
   Plus,
   RefreshCw,
   Save,
+  Settings2,
   Sparkles,
   Trash2,
   Volume2,
@@ -17,7 +18,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { getLocalSpeakingQuestions } from '../data/speakingQuestions.ts';
 import { useAppContext } from '../state/AppContext.jsx';
-import { hasPermission } from '../utils/roles.js';
+import { ROLES } from '../utils/roles.js';
 import { scoreSpeakingTranscript } from '../utils/speakingScoring.js';
 
 const RESULT_STORAGE_KEY = 'lugaish_latest_speaking_result_v1';
@@ -62,7 +63,7 @@ function saveLocally(key, value) {
 }
 
 function validateQuestionSet(questions) {
-  if (questions.length > MAX_QUESTIONS) return `A lesson can have at most ${MAX_QUESTIONS} questions.`;
+  if (questions.length > MAX_QUESTIONS) return `A day can have at most ${MAX_QUESTIONS} questions.`;
   const ids = new Set();
 
   for (let index = 0; index < questions.length; index += 1) {
@@ -102,6 +103,19 @@ function pickPreferredVoice(voices, locale) {
     ?? voices[0];
 }
 
+function buildModulePayload(module, language, day, questions, published) {
+  return {
+    moduleType: 'ai_practice',
+    published,
+    title: module?.title || `Day ${day} AI speaking practice`,
+    description: module?.description || 'Listen, speak, and receive instant feedback.',
+    introTitle: module?.introTitle || '',
+    introText: module?.introText || '',
+    questions,
+    language,
+  };
+}
+
 export function SpeakingPracticePage() {
   const { state } = useAppContext();
   const navigate = useNavigate();
@@ -110,16 +124,18 @@ export function SpeakingPracticePage() {
   const locale = language === 'arabic' ? 'ar-SA' : 'en-US';
   const day = Math.max(Number.parseInt(searchParams.get('day') ?? '1', 10) || 1, 1);
   const shouldOpenManager = searchParams.get('manage') === '1';
-  const canManageLessons = state.permissions?.includes('manage_lessons')
-    || hasPermission(state.userRole, 'manage_lessons');
-  const fallbackQuestions = useMemo(() => getLocalSpeakingQuestions(language), [language]);
-  const [questions, setQuestions] = useState(fallbackQuestions);
-  const [draftQuestions, setDraftQuestions] = useState(fallbackQuestions);
+  const isWebDeveloper = state.userRole === ROLES.webDeveloper;
+  const [module, setModule] = useState(null);
+  const [questions, setQuestions] = useState([]);
+  const [draftQuestions, setDraftQuestions] = useState([]);
+  const [publishForLearners, setPublishForLearners] = useState(false);
   const [isRemoteLoading, setIsRemoteLoading] = useState(true);
   const [loadNotice, setLoadNotice] = useState('');
-  const [managerOpen, setManagerOpen] = useState(shouldOpenManager);
+  const [accessError, setAccessError] = useState(null);
+  const [managerOpen, setManagerOpen] = useState(shouldOpenManager && isWebDeveloper);
   const [managerMessage, setManagerMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [hasBegun, setHasBegun] = useState(false);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [transcript, setTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
@@ -128,6 +144,7 @@ export function SpeakingPracticePage() {
   const [speechError, setSpeechError] = useState('');
   const [results, setResults] = useState([]);
   const [isFinished, setIsFinished] = useState(false);
+  const [completionNotice, setCompletionNotice] = useState('');
   const [voices, setVoices] = useState([]);
   const [selectedVoiceName, setSelectedVoiceName] = useState('');
   const [speechRate, setSpeechRate] = useState(0.92);
@@ -135,6 +152,8 @@ export function SpeakingPracticePage() {
   const interimTranscriptRef = useRef('');
   const audioRef = useRef(null);
   const sessionStartedRef = useRef(false);
+  const completionSentRef = useRef(false);
+  const lastAutoReadKeyRef = useRef('');
 
   const RecognitionConstructor = typeof window === 'undefined'
     ? null
@@ -143,53 +162,85 @@ export function SpeakingPracticePage() {
   const currentQuestion = questions[questionIndex];
   const currentResult = results.find(result => result.questionId === currentQuestion?.id);
   const isRtl = language === 'arabic';
+  const isPracticeDay = !module || module.moduleType === 'ai_practice';
 
   useEffect(() => {
-    if (!shouldOpenManager || !canManageLessons) return;
-    setManagerOpen(true);
-  }, [canManageLessons, shouldOpenManager]);
+    if (shouldOpenManager && isWebDeveloper) setManagerOpen(true);
+  }, [isWebDeveloper, shouldOpenManager]);
 
   useEffect(() => {
     let ignore = false;
-    const localSet = readLocalSet(language, day);
-    const localQuestions = localSet !== null ? localSet : fallbackQuestions;
-    setQuestions(localQuestions);
-    setDraftQuestions(localQuestions);
+    const localSet = isWebDeveloper ? readLocalSet(language, day) : null;
+    setModule(null);
+    setQuestions([]);
+    setDraftQuestions(localSet ?? []);
+    setPublishForLearners(false);
+    setHasBegun(false);
     setQuestionIndex(0);
     setTranscript('');
+    setInterimTranscript('');
     setResults([]);
     setIsFinished(false);
+    setCompletionNotice('');
+    setAccessError(null);
     sessionStartedRef.current = false;
-    setLoadNotice(localSet ? 'Using the question set saved in this browser.' : '');
+    completionSentRef.current = false;
+    lastAutoReadKeyRef.current = '';
+    setLoadNotice(localSet ? 'A private browser draft is available for the Web Developer.' : '');
     setIsRemoteLoading(true);
 
     api.getSpeakingPractice(language, day)
       .then(response => {
-        if (ignore || !Array.isArray(response.questions)) return;
+        if (ignore) return;
+        const remoteQuestions = Array.isArray(response.questions) ? response.questions : [];
+        const savedModule = {
+          moduleType: response.moduleType ?? 'ai_practice',
+          title: response.title ?? '',
+          description: response.description ?? '',
+          introTitle: response.introTitle ?? '',
+          introText: response.introText ?? '',
+          published: Boolean(response.published ?? response.enabled),
+        };
+        setAccessError(null);
+        setModule(savedModule);
+        setPublishForLearners(savedModule.published);
         if (sessionStartedRef.current) {
-          setLoadNotice('A published question set became available. Return to this lesson after finishing to load it.');
+          setLoadNotice('The saved question set loaded. Your current attempt was kept.');
           return;
         }
-        setQuestions(response.questions);
-        setDraftQuestions(response.questions);
-        setLoadNotice(response.questions.length ? 'Published lesson question set loaded.' : 'This lesson does not have a published question set yet.');
+        setQuestions(remoteQuestions);
+        setDraftQuestions(remoteQuestions.length || !localSet ? remoteQuestions : localSet);
+        setLoadNotice(isWebDeveloper
+          ? savedModule.moduleType === 'ai_practice'
+            ? savedModule.published
+              ? 'This AI practice day is live for learners.'
+              : 'This AI practice draft is private until you publish it.'
+            : 'Configure this day as AI speaking practice before adding questions.'
+          : 'Read the instructions, then begin the scheduled practice session.');
       })
-      .catch(() => {
-        if (!ignore && !localSet) setLoadNotice('Local prototype questions are ready. Published questions could not be loaded.');
+      .catch(error => {
+        if (ignore) return;
+        if (!isWebDeveloper) {
+          setAccessError({
+            status: error.status,
+            message: error.message || 'This scheduled AI practice session is not available yet.',
+          });
+        }
+        setLoadNotice(error.message || (isWebDeveloper
+          ? 'The day configuration could not be loaded. Try again before publishing.'
+          : 'This AI practice session is not available yet.'));
       })
       .finally(() => {
-        if (!ignore) {
-          setIsRemoteLoading(false);
-        }
+        if (!ignore) setIsRemoteLoading(false);
       });
 
     return () => {
       ignore = true;
     };
-  }, [day, fallbackQuestions, language]);
+  }, [day, isWebDeveloper, language]);
 
   useEffect(() => {
-    if (!('speechSynthesis' in window)) return undefined;
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return undefined;
 
     const updateVoices = () => {
       const availableVoices = window.speechSynthesis.getVoices();
@@ -259,12 +310,19 @@ export function SpeakingPracticePage() {
     utterance.pitch = 1;
     utterance.voice = voices.find(voice => voice.name === selectedVoiceName) ?? pickPreferredVoice(voices, locale) ?? null;
     utterance.onerror = event => {
-      if (!['canceled', 'interrupted'].includes(event.error)) {
-        setSpeechError('The browser could not read this question.');
-      }
+      if (!['canceled', 'interrupted'].includes(event.error)) setSpeechError('The browser could not read this question.');
     };
     window.speechSynthesis.speak(utterance);
   };
+
+  useEffect(() => {
+    if (!hasBegun || !currentQuestion) return undefined;
+    const readKey = `${questionIndex}:${currentQuestion.id}`;
+    if (lastAutoReadKeyRef.current === readKey) return undefined;
+    lastAutoReadKeyRef.current = readKey;
+    const timeout = window.setTimeout(() => speakQuestion(), 80);
+    return () => window.clearTimeout(timeout);
+  }, [currentQuestion, hasBegun, questionIndex]);
 
   const playRecordedQuestion = () => {
     if (!currentQuestion?.audioUrl) return;
@@ -333,9 +391,7 @@ export function SpeakingPracticePage() {
     recognition.onend = () => {
       if (recognitionRef.current === recognition) {
         const remainingInterim = interimTranscriptRef.current;
-        if (remainingInterim) {
-          setTranscript(current => `${current} ${remainingInterim}`.replace(/\s+/g, ' ').trim());
-        }
+        if (remainingInterim) setTranscript(current => `${current} ${remainingInterim}`.replace(/\s+/g, ' ').trim());
         recognitionRef.current = null;
         interimTranscriptRef.current = '';
         setInterimTranscript('');
@@ -395,6 +451,15 @@ export function SpeakingPracticePage() {
     const learnerKey = String(state.userEmail || 'learner').trim().toLowerCase();
     saveLocally(`${RESULT_STORAGE_KEY}:${learnerKey}:${language}:${day}`, savedResult);
     setIsFinished(true);
+
+    if (!isWebDeveloper && results.length === questions.length && !completionSentRef.current) {
+      completionSentRef.current = true;
+      api.completeLesson({ language, day })
+        .then(() => setCompletionNotice('Day complete — the next scheduled day is now unlocked.'))
+        .catch(() => setCompletionNotice('Your test result is saved here. The course progress will refresh when the connection is available.'));
+    } else if (!isWebDeveloper && results.length < questions.length) {
+      setCompletionNotice('Your result is saved, but complete every question to unlock the next scheduled day.');
+    }
   };
 
   const nextQuestion = () => {
@@ -426,17 +491,39 @@ export function SpeakingPracticePage() {
     )));
   };
 
-  const saveQuestionSet = async () => {
-    if (isRemoteLoading) {
-      setManagerMessage('Wait for the published lesson set to finish loading before saving.');
+  const loadStarterQuestions = () => {
+    if (draftQuestions.length) {
+      setManagerMessage('Clear the current draft before loading the starter template.');
       return;
     }
-    sessionStartedRef.current = true;
+    const starterQuestions = getLocalSpeakingQuestions(language).map(question => ({
+      ...question,
+      id: `${question.id}-day-${day}`,
+      audioUrl: question.audioUrl ?? '',
+    }));
+    setDraftQuestions(starterQuestions);
+    setManagerMessage('Starter questions loaded. Edit them before saving this day.');
+  };
+
+  const saveQuestionSet = async () => {
+    if (isRemoteLoading) {
+      setManagerMessage('Wait for the day settings to finish loading before saving.');
+      return;
+    }
+    if (!isPracticeDay) {
+      setManagerMessage('Choose AI speaking practice in the Day setup before adding questions.');
+      return;
+    }
     const validationMessage = validateQuestionSet(draftQuestions);
     if (validationMessage) {
       setManagerMessage(validationMessage);
       return;
     }
+    if (publishForLearners && draftQuestions.length === 0) {
+      setManagerMessage('Add at least one question before publishing AI practice.');
+      return;
+    }
+
     const validQuestions = draftQuestions.map(question => ({
       ...question,
       question: question.question.trim(),
@@ -450,17 +537,33 @@ export function SpeakingPracticePage() {
     const savedLocalCopy = saveLocally(getLocalSetKey(language, day), validQuestions);
 
     try {
-      const response = await api.updateSpeakingPractice(language, day, { questions: validQuestions });
-      const savedQuestions = response.questions ?? validQuestions;
+      const response = await api.updateDayModule(
+        language,
+        day,
+        buildModulePayload(module, language, day, validQuestions, publishForLearners),
+      );
+      const savedModule = response.module;
+      const savedQuestions = savedModule.questions ?? validQuestions;
+      setModule({
+        moduleType: savedModule.moduleType,
+        title: savedModule.title,
+        description: savedModule.description,
+        introTitle: savedModule.introTitle,
+        introText: savedModule.introText,
+        published: savedModule.published,
+      });
       setQuestions(savedQuestions);
       setDraftQuestions(savedQuestions);
-      setManagerMessage('Question set published for this lesson.');
+      setPublishForLearners(Boolean(savedModule.published));
+      setManagerMessage(savedModule.published
+        ? 'AI practice is live for learners on this day.'
+        : 'Private AI practice draft saved. Learners cannot see it yet.');
     } catch (error) {
       setQuestions(validQuestions);
       setDraftQuestions(validQuestions);
       setManagerMessage(savedLocalCopy
-        ? `${error.message || 'Server save is unavailable.'} A local browser copy was saved for prototype testing.`
-        : `${error.message || 'Server save is unavailable.'} Browser storage was also unavailable, so this copy lasts only until the page reloads.`);
+        ? `${error.message || 'Server save is unavailable.'} This browser-only draft is not visible to learners.`
+        : `${error.message || 'Server save is unavailable.'} Browser storage was also unavailable, so this draft lasts only until the page reloads.`);
     } finally {
       abortRecognition();
       stopQuestionAudio();
@@ -481,19 +584,75 @@ export function SpeakingPracticePage() {
     return (
       <section className="mx-auto max-w-4xl space-y-6 pb-20">
         <div className="section-card overflow-hidden p-8 text-center sm:p-12">
-          <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-emerald-500/15 text-emerald-300">
-            <Sparkles size={36} />
-          </div>
+          <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-emerald-500/15 text-emerald-300"><Sparkles size={36} /></div>
           <p className="mt-6 text-xs font-black uppercase tracking-[0.26em] text-emerald-400">Speaking test complete</p>
           <h1 className="mt-3 text-5xl font-black text-white sm:text-7xl">{totalOutOf100}/100</h1>
           <p className="mt-3 text-slate-400">You answered {results.length} of {questions.length} questions. Your latest result is saved on this device.</p>
+          {completionNotice && <p className="mx-auto mt-4 max-w-xl rounded-2xl border border-emerald-400/20 bg-emerald-500/[0.08] px-4 py-3 text-sm text-emerald-100">{completionNotice}</p>}
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
-            <button type="button" onClick={() => navigate('/daily-lessons')} className="glow-button glow-button-muted py-4">
-              <ArrowLeft size={18} /> Daily lessons
-            </button>
-            <button type="button" onClick={() => { setQuestionIndex(0); setResults([]); setTranscript(''); setIsFinished(false); }} className="glow-button glow-button-blue py-4">
-              <RefreshCw size={18} /> Try the test again
-            </button>
+            <button type="button" onClick={() => navigate('/daily-lessons')} className="glow-button glow-button-muted py-4"><ArrowLeft size={18} /> Daily lessons</button>
+            <button type="button" onClick={() => { setQuestionIndex(0); setResults([]); setTranscript(''); setHasBegun(true); setIsFinished(false); lastAutoReadKeyRef.current = ''; }} className="glow-button glow-button-blue py-4"><RefreshCw size={18} /> Try the test again</button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!isRemoteLoading && !isWebDeveloper && accessError) {
+    const isScheduleRestriction = [403, 404, 409].includes(accessError.status);
+    return (
+      <section className="mx-auto max-w-3xl space-y-6 pb-20">
+        <div className="section-card p-8 text-center sm:p-12">
+          <Mic size={34} className="mx-auto text-amber-300" />
+          <h1 className="mt-5 text-3xl font-black text-white">
+            {isScheduleRestriction ? 'This AI practice is not open yet' : 'This AI practice could not be opened'}
+          </h1>
+          <p className="mx-auto mt-3 max-w-xl text-slate-400">
+            {isScheduleRestriction
+              ? 'Open the learning format assigned to your current course day, then return when this practice session is unlocked.'
+              : accessError.message}
+          </p>
+          {isScheduleRestriction && accessError.message && (
+            <p className="mx-auto mt-4 max-w-xl rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+              {accessError.message}
+            </p>
+          )}
+          <button type="button" onClick={() => navigate('/daily-lessons')} className="glow-button glow-button-blue mt-7"><ArrowLeft size={18} /> Daily lessons</button>
+        </div>
+      </section>
+    );
+  }
+
+  if (!isRemoteLoading && module && !isPracticeDay && !isWebDeveloper) {
+    return (
+      <section className="mx-auto max-w-3xl space-y-6 pb-20">
+        <div className="section-card p-8 text-center sm:p-12">
+          <Settings2 size={34} className="mx-auto text-amber-300" />
+          <h1 className="mt-5 text-3xl font-black text-white">This day is not an AI practice session</h1>
+          <p className="mt-3 text-slate-400">Return to Daily Lessons and open the learning format scheduled for this day.</p>
+          <button type="button" onClick={() => navigate('/daily-lessons')} className="glow-button glow-button-blue mt-7"><ArrowLeft size={18} /> Daily lessons</button>
+        </div>
+      </section>
+    );
+  }
+
+  if (!isWebDeveloper && !hasBegun && !isRemoteLoading && currentQuestion) {
+    return (
+      <section className="mx-auto max-w-4xl space-y-6 pb-20">
+        <div className="section-card relative overflow-hidden p-8 sm:p-12">
+          <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl" />
+          <div className="relative max-w-2xl">
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Day {day} · AI speaking practice</p>
+            <h1 className="mt-4 text-4xl font-black leading-tight text-white sm:text-5xl">{module?.introTitle || 'Ready to speak with confidence?'}</h1>
+            <p className="mt-5 text-base leading-8 text-slate-300">{module?.introText || 'Listen to each question, answer by microphone, check your transcript, and receive instant feedback before continuing.'}</p>
+            <div className="mt-7 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4"><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Questions</p><p className="mt-2 text-2xl font-black text-white">{questions.length}</p></div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4"><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Scoring</p><p className="mt-2 text-2xl font-black text-white">Out of 100</p></div>
+            </div>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <button type="button" onClick={() => { lastAutoReadKeyRef.current = ''; setHasBegun(true); }} className="glow-button glow-button-blue py-4"><Mic size={18} /> Begin practice</button>
+              <button type="button" onClick={() => navigate('/daily-lessons')} className="glow-button glow-button-muted py-4"><ArrowLeft size={18} /> Back to lessons</button>
+            </div>
           </div>
         </div>
       </section>
@@ -506,155 +665,115 @@ export function SpeakingPracticePage() {
         <div className="absolute right-0 top-0 h-56 w-56 rounded-full bg-blue-500/10 blur-3xl" />
         <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">AI Speaking Practice · Prototype</p>
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">AI Speaking Practice</p>
             <h1 className="mt-3 text-3xl font-black text-white sm:text-5xl">{language === 'arabic' ? 'Arabic' : 'English'} · Day {day}</h1>
-            <p className="mt-3 max-w-2xl leading-7 text-slate-400">Listen, answer naturally, review your transcript, and receive lightweight keyword-based feedback.</p>
+            <p className="mt-3 max-w-2xl leading-7 text-slate-400">{module?.description || 'Listen, answer naturally, review your transcript, and receive lightweight keyword-based feedback.'}</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            {canManageLessons && (
-              <button type="button" disabled={isRemoteLoading} onClick={() => { sessionStartedRef.current = true; setManagerOpen(open => !open); }} className="glow-button glow-button-muted disabled:cursor-wait disabled:opacity-50">
-                {isRemoteLoading ? <LoaderCircle size={17} className="animate-spin" /> : <Plus size={17} />} {isRemoteLoading ? 'Loading question manager' : 'Manage questions'}
+            {isWebDeveloper && (
+              <button type="button" disabled={isRemoteLoading} onClick={() => setManagerOpen(open => !open)} className="glow-button glow-button-muted disabled:cursor-wait disabled:opacity-50">
+                {isRemoteLoading ? <LoaderCircle size={17} className="animate-spin" /> : <Settings2 size={17} />} {isRemoteLoading ? 'Loading setup' : 'Manage questions'}
               </button>
             )}
-            <button type="button" onClick={() => navigate('/daily-lessons')} className="glow-button glow-button-muted">
-              <ArrowLeft size={17} /> Lessons
-            </button>
+            <button type="button" onClick={() => navigate('/daily-lessons')} className="glow-button glow-button-muted"><ArrowLeft size={17} /> Lessons</button>
           </div>
         </div>
       </div>
 
-      {canManageLessons && managerOpen && (
+      {isWebDeveloper && managerOpen && (
         <div className="section-card p-5 sm:p-8">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.24em] text-blue-400">Learning team tools</p>
-              <h2 className="mt-2 text-2xl font-black text-white">Day {day} question set</h2>
-              <p className="mt-2 text-sm text-slate-400">Separate keywords with commas. An optional audio URL adds a recorded alternative to browser text-to-speech.</p>
+          {!isPracticeDay ? (
+            <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-5 text-amber-100">
+              <h2 className="text-xl font-black">Choose AI practice first</h2>
+              <p className="mt-2 text-sm leading-6">Configure Day {day} as an AI speaking practice session before adding its questions.</p>
+              <button type="button" onClick={() => navigate(`/lesson/${day}?configure=1`)} className="glow-button glow-button-muted mt-5"><Settings2 size={17} /> Configure day</button>
             </div>
-            <button type="button" disabled={draftQuestions.length >= MAX_QUESTIONS} onClick={() => { sessionStartedRef.current = true; setDraftQuestions(current => [...current, createQuestion(language)]); }} className="glow-button glow-button-muted disabled:cursor-not-allowed disabled:opacity-40">
-              <Plus size={17} /> Add question
-            </button>
-          </div>
-          <div className="mt-6 space-y-4">
-            {draftQuestions.map((question, index) => (
-              <div key={question.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
-                <div className="mb-4 flex items-center justify-between">
-                  <p className="text-sm font-black text-white">Question {index + 1}</p>
-                  <button type="button" onClick={() => { sessionStartedRef.current = true; setDraftQuestions(current => current.filter((_, itemIndex) => itemIndex !== index)); }} className="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-red-500/10 hover:text-red-300" aria-label={`Remove question ${index + 1}`}>
-                    <Trash2 size={16} />
-                  </button>
+          ) : (
+            <>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.24em] text-blue-400">Web Developer question editor</p>
+                  <h2 className="mt-2 text-2xl font-black text-white">Day {day} AI question set</h2>
+                  <p className="mt-2 text-sm text-slate-400">Learners see these questions only when this day is published. Separate expected keywords with commas. A hosted audio URL is optional; browser text-to-speech is always available.</p>
                 </div>
-                <div className="grid gap-3 lg:grid-cols-2">
-                  <textarea aria-label={`Question ${index + 1} text`} maxLength={500} value={question.question} onChange={event => updateDraft(index, 'question', event.target.value)} placeholder="Question text" rows={3} dir={isRtl ? 'rtl' : 'ltr'} className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400" />
-                  <textarea aria-label={`Question ${index + 1} sample answer`} maxLength={2000} value={question.sampleAnswer} onChange={event => updateDraft(index, 'sampleAnswer', event.target.value)} placeholder="Sample answer" rows={3} dir={isRtl ? 'rtl' : 'ltr'} className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400" />
-                  <input aria-label={`Question ${index + 1} expected keywords`} value={question.expectedKeywords.join(', ')} onChange={event => updateDraft(index, 'expectedKeywords', event.target.value)} placeholder="Expected keywords, separated by commas" dir={isRtl ? 'rtl' : 'ltr'} className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400" />
-                  <div className="grid gap-3 sm:grid-cols-[120px_1fr]">
-                    <input type="number" min="1" max="100" value={question.maxMarks} onChange={event => updateDraft(index, 'maxMarks', event.target.value)} aria-label={`Question ${index + 1} maximum marks`} className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400" />
-                    <input type="url" maxLength={2048} aria-label={`Question ${index + 1} optional recorded audio URL`} value={question.audioUrl ?? ''} onChange={event => updateDraft(index, 'audioUrl', event.target.value)} placeholder="Optional recorded audio URL" className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400" />
-                  </div>
+                <div className="flex flex-wrap gap-2">
+                  <button type="button" onClick={loadStarterQuestions} disabled={Boolean(draftQuestions.length)} className="glow-button glow-button-muted disabled:cursor-not-allowed disabled:opacity-40"><Sparkles size={17} /> Starter template</button>
+                  <button type="button" disabled={draftQuestions.length >= MAX_QUESTIONS} onClick={() => setDraftQuestions(current => [...current, createQuestion(language)])} className="glow-button glow-button-muted disabled:cursor-not-allowed disabled:opacity-40"><Plus size={17} /> Add question</button>
                 </div>
               </div>
-            ))}
-          </div>
-          {managerMessage && <p role="status" aria-live="polite" className="mt-4 rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-slate-300">{managerMessage}</p>}
-          <button type="button" onClick={saveQuestionSet} disabled={isSaving} className="glow-button glow-button-blue mt-5 w-full py-4 disabled:opacity-50">
-            {isSaving ? <LoaderCircle size={18} className="animate-spin" /> : <Save size={18} />}
-            {isSaving ? 'Saving...' : 'Save this lesson question set'}
-          </button>
+              <div className="mt-6 space-y-4">
+                {draftQuestions.map((question, index) => (
+                  <div key={question.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
+                    <div className="mb-4 flex items-center justify-between"><p className="text-sm font-black text-white">Question {index + 1}</p><button type="button" onClick={() => setDraftQuestions(current => current.filter((_, itemIndex) => itemIndex !== index))} className="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-red-500/10 hover:text-red-300" aria-label={`Remove question ${index + 1}`}><Trash2 size={16} /></button></div>
+                    <div className="grid gap-3 lg:grid-cols-2">
+                      <textarea aria-label={`Question ${index + 1} text`} maxLength={500} value={question.question} onChange={event => updateDraft(index, 'question', event.target.value)} placeholder="Question text" rows={3} dir={isRtl ? 'rtl' : 'ltr'} className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400" />
+                      <textarea aria-label={`Question ${index + 1} sample answer`} maxLength={2000} value={question.sampleAnswer} onChange={event => updateDraft(index, 'sampleAnswer', event.target.value)} placeholder="Sample answer" rows={3} dir={isRtl ? 'rtl' : 'ltr'} className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400" />
+                      <input aria-label={`Question ${index + 1} expected keywords`} value={question.expectedKeywords.join(', ')} onChange={event => updateDraft(index, 'expectedKeywords', event.target.value)} placeholder="Expected keywords, separated by commas" dir={isRtl ? 'rtl' : 'ltr'} className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400" />
+                      <div className="grid gap-3 sm:grid-cols-[120px_1fr]">
+                        <input type="number" min="1" max="100" value={question.maxMarks} onChange={event => updateDraft(index, 'maxMarks', event.target.value)} aria-label={`Question ${index + 1} maximum marks`} className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400" />
+                        <input type="url" maxLength={2048} aria-label={`Question ${index + 1} optional recorded audio URL`} value={question.audioUrl ?? ''} onChange={event => updateDraft(index, 'audioUrl', event.target.value)} placeholder="Optional recorded audio URL" className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/[0.06] p-4 text-sm text-slate-300">
+                <input type="checkbox" checked={publishForLearners} onChange={event => setPublishForLearners(event.target.checked)} className="mt-1 h-4 w-4 accent-emerald-400" />
+                <span><strong className="text-white">Publish this AI practice day</strong><br />Only the Web Developer can make the question set visible to learners.</span>
+              </label>
+              {managerMessage && <p role="status" aria-live="polite" className="mt-4 rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-slate-300">{managerMessage}</p>}
+              <button type="button" onClick={saveQuestionSet} disabled={isSaving} className="glow-button glow-button-blue mt-5 w-full py-4 disabled:opacity-50">{isSaving ? <LoaderCircle size={18} className="animate-spin" /> : <Save size={18} />}{isSaving ? 'Saving...' : 'Save AI practice day'}</button>
+            </>
+          )}
         </div>
       )}
 
-      {!currentQuestion ? (
+      {isRemoteLoading ? (
+        <div className="section-card grid min-h-72 place-items-center"><LoaderCircle size={34} className="animate-spin text-slate-400" /></div>
+      ) : !currentQuestion ? (
         <div className="section-card p-10 text-center">
-          <h2 className="text-2xl font-black text-white">No practice questions yet</h2>
-          <p className="mt-2 text-slate-400">The learning team can add this lesson&apos;s first question set here.</p>
+          <h2 className="text-2xl font-black text-white">No practice questions are live yet</h2>
+          <p className="mt-2 text-slate-400">{isWebDeveloper ? 'Configure the day and add its question set above.' : loadNotice || 'Your course team is preparing this practice session.'}</p>
+          {isWebDeveloper && <button type="button" onClick={() => navigate(`/lesson/${day}?configure=1`)} className="glow-button glow-button-muted mt-6"><Settings2 size={17} /> Configure day</button>}
         </div>
       ) : (
         <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
           <div className="section-card p-5 sm:p-8">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-xs font-black uppercase tracking-[0.22em] text-blue-400">Question {questionIndex + 1} of {questions.length}</p>
-              <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-black text-slate-300">{currentQuestion.maxMarks} marks</span>
-            </div>
-            <div className="mt-5 rounded-2xl border border-blue-400/20 bg-blue-500/10 p-5 sm:p-7" dir={isRtl ? 'rtl' : 'ltr'}>
-              <p className="text-xl font-black leading-9 text-white sm:text-2xl">{currentQuestion.question}</p>
-            </div>
+            <div className="flex flex-wrap items-center justify-between gap-3"><p className="text-xs font-black uppercase tracking-[0.22em] text-blue-400">Question {questionIndex + 1} of {questions.length}</p><span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-black text-slate-300">{currentQuestion.maxMarks} marks</span></div>
+            <div className="mt-5 rounded-2xl border border-blue-400/20 bg-blue-500/10 p-5 sm:p-7" dir={isRtl ? 'rtl' : 'ltr'}><p className="text-xl font-black leading-9 text-white sm:text-2xl">{currentQuestion.question}</p></div>
 
             <div className="mt-5 grid gap-3 md:grid-cols-[minmax(0,1fr)_120px_auto]">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                Browser voice
-                <select value={selectedVoiceName} onChange={event => setSelectedVoiceName(event.target.value)} className="mt-2 h-12 w-full rounded-xl border border-white/10 bg-slate-950 px-3 text-sm normal-case tracking-normal text-white">
-                  {(languageVoices.length ? languageVoices : voices).map(voice => <option key={`${voice.name}-${voice.lang}`} value={voice.name}>{voice.name} · {voice.lang}</option>)}
-                </select>
-              </label>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                Speed
-                <select value={speechRate} onChange={event => setSpeechRate(Number(event.target.value))} className="mt-2 h-12 w-full rounded-xl border border-white/10 bg-slate-950 px-3 text-sm normal-case tracking-normal text-white">
-                  <option value="0.8">Slow</option>
-                  <option value="0.92">Natural</option>
-                  <option value="1">Normal</option>
-                </select>
-              </label>
-              <div className="grid gap-2 self-end">
-                <button type="button" onClick={speakQuestion} className="glow-button glow-button-muted py-3.5"><Volume2 size={18} /> Browser voice</button>
-                {currentQuestion.audioUrl && <button type="button" onClick={playRecordedQuestion} className="glow-button glow-button-muted py-3"><Headphones size={17} /> Recorded audio</button>}
-              </div>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Browser voice<select value={selectedVoiceName} onChange={event => setSelectedVoiceName(event.target.value)} className="mt-2 h-12 w-full rounded-xl border border-white/10 bg-slate-950 px-3 text-sm normal-case tracking-normal text-white">{(languageVoices.length ? languageVoices : voices).map(voice => <option key={`${voice.name}-${voice.lang}`} value={voice.name}>{voice.name} · {voice.lang}</option>)}</select></label>
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Speed<select value={speechRate} onChange={event => setSpeechRate(Number(event.target.value))} className="mt-2 h-12 w-full rounded-xl border border-white/10 bg-slate-950 px-3 text-sm normal-case tracking-normal text-white"><option value="0.8">Slow</option><option value="0.92">Natural</option><option value="1">Normal</option></select></label>
+              <div className="grid gap-2 self-end"><button type="button" onClick={speakQuestion} className="glow-button glow-button-muted py-3.5"><Volume2 size={18} /> Read question</button>{currentQuestion.audioUrl && <button type="button" onClick={playRecordedQuestion} className="glow-button glow-button-muted py-3"><Headphones size={17} /> Recorded audio</button>}</div>
             </div>
 
-            {!recognitionSupported && (
-              <div role="status" className="mt-5 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4 text-sm leading-6 text-amber-100">
-                Speech recognition is unavailable in this browser. Use a recent Chrome or Edge browser, or type your answer below for prototype testing.
-              </div>
-            )}
+            {!recognitionSupported && <div role="status" className="mt-5 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4 text-sm leading-6 text-amber-100">Speech recognition is unavailable in this browser. Use a recent Chrome or Edge browser, or type your answer below for practice.</div>}
 
             <div className="mt-5">
-              <div className="mb-2 flex items-center justify-between gap-3">
-                <label htmlFor="speaking-transcript" className="text-sm font-black text-white">Your transcript</label>
-                {isListening && <span className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-red-300"><span className="h-2 w-2 animate-pulse rounded-full bg-red-400" /> Listening</span>}
-              </div>
+              <div className="mb-2 flex items-center justify-between gap-3"><label htmlFor="speaking-transcript" className="text-sm font-black text-white">Your transcript</label>{isListening && <span className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-red-300"><span className="h-2 w-2 animate-pulse rounded-full bg-red-400" /> Listening</span>}</div>
               <textarea id="speaking-transcript" value={`${transcript}${interimTranscript ? ` ${interimTranscript}` : ''}`} onChange={event => { sessionStartedRef.current = true; setTranscript(event.target.value); interimTranscriptRef.current = ''; setInterimTranscript(''); }} disabled={Boolean(currentResult)} rows={6} dir={isRtl ? 'rtl' : 'ltr'} placeholder="Your spoken words will appear here. You can review or correct them before submitting." className="w-full rounded-2xl border border-white/10 bg-slate-950/80 p-4 leading-7 text-white outline-none transition focus:border-emerald-400 disabled:opacity-70" />
             </div>
-
             {speechError && <p role="alert" className="mt-3 text-sm font-semibold text-amber-300">{speechError}</p>}
 
-            {!currentResult && (
+            {!currentResult ? (
               <>
-                <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                  <button type="button" onClick={startListening} disabled={!recognitionSupported || isListening || isStopping} className="glow-button glow-button-blue py-4 disabled:cursor-not-allowed disabled:opacity-40"><Mic size={18} /> Start speaking</button>
-                  <button type="button" onClick={stopListening} disabled={!isListening || isStopping} className="glow-button glow-button-muted py-4 disabled:cursor-not-allowed disabled:opacity-40"><CircleStop size={18} /> {isStopping ? 'Finishing...' : 'Stop listening'}</button>
-                  <button type="button" onClick={submitAnswer} disabled={isListening || isStopping} className="glow-button glow-button-green py-4 disabled:cursor-not-allowed disabled:opacity-40"><CheckCircle2 size={18} /> Submit answer</button>
-                </div>
+                <div className="mt-5 grid gap-3 sm:grid-cols-3"><button type="button" onClick={startListening} disabled={!recognitionSupported || isListening || isStopping} className="glow-button glow-button-blue py-4 disabled:cursor-not-allowed disabled:opacity-40"><Mic size={18} /> Start speaking</button><button type="button" onClick={stopListening} disabled={!isListening || isStopping} className="glow-button glow-button-muted py-4 disabled:cursor-not-allowed disabled:opacity-40"><CircleStop size={18} /> {isStopping ? 'Finishing...' : 'Stop listening'}</button><button type="button" onClick={submitAnswer} disabled={isListening || isStopping} className="glow-button glow-button-green py-4 disabled:cursor-not-allowed disabled:opacity-40"><CheckCircle2 size={18} /> Submit answer</button></div>
                 <p className="mt-3 text-xs leading-5 text-slate-500">Recognition is supplied by your browser and may use its online speech service. Lugaish does not upload or store your microphone audio.</p>
               </>
-            )}
-
-            {currentResult && (
+            ) : (
               <div aria-live="polite" className="mt-6 rounded-2xl border border-emerald-400/25 bg-emerald-500/[0.08] p-5 sm:p-6">
-                <div className="flex items-center justify-between gap-3">
-                  <h2 className="text-xl font-black text-white">Answer feedback</h2>
-                  <p className="text-2xl font-black text-emerald-300">{currentResult.marks}/{currentResult.maxMarks}</p>
-                </div>
+                <div className="flex items-center justify-between gap-3"><h2 className="text-xl font-black text-white">Answer feedback</h2><p className="text-2xl font-black text-emerald-300">{currentResult.marks}/{currentResult.maxMarks}</p></div>
                 <p className="mt-3 text-sm leading-6 text-slate-300">{currentResult.feedback}</p>
-                <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                  <div><p className="text-xs font-black uppercase tracking-wider text-emerald-400">Matched keywords</p><p className="mt-2 text-sm text-slate-300">{currentResult.matchedKeywords.join(', ') || 'None yet'}</p></div>
-                  <div><p className="text-xs font-black uppercase tracking-wider text-amber-400">Missing keywords</p><p className="mt-2 text-sm text-slate-300">{currentResult.missingKeywords.join(', ') || 'None'}</p></div>
-                </div>
+                <div className="mt-5 grid gap-4 sm:grid-cols-2"><div><p className="text-xs font-black uppercase tracking-wider text-emerald-400">Matched keywords</p><p className="mt-2 text-sm text-slate-300">{currentResult.matchedKeywords.join(', ') || 'None yet'}</p></div><div><p className="text-xs font-black uppercase tracking-wider text-amber-400">Missing keywords</p><p className="mt-2 text-sm text-slate-300">{currentResult.missingKeywords.join(', ') || 'None'}</p></div></div>
                 <div className="mt-5 rounded-xl border border-white/10 bg-slate-950/50 p-4" dir={isRtl ? 'rtl' : 'ltr'}><p className="text-xs font-black uppercase tracking-wider text-slate-500">Sample answer</p><p className="mt-2 text-sm leading-6 text-slate-300">{currentQuestion.sampleAnswer}</p></div>
-                <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                  <button type="button" onClick={retryQuestion} className="glow-button glow-button-muted py-4"><RefreshCw size={18} /> Retry</button>
-                  <button type="button" onClick={nextQuestion} className="glow-button glow-button-blue py-4">{questionIndex === questions.length - 1 ? 'Finish test' : 'Next question'} <Sparkles size={18} /></button>
-                </div>
+                <div className="mt-5 grid gap-3 sm:grid-cols-2"><button type="button" onClick={retryQuestion} className="glow-button glow-button-muted py-4"><RefreshCw size={18} /> Retry</button><button type="button" onClick={nextQuestion} className="glow-button glow-button-blue py-4">{questionIndex === questions.length - 1 ? 'Finish test' : 'Next question'} <Sparkles size={18} /></button></div>
               </div>
             )}
           </div>
 
           <aside className="space-y-4">
-            <div className="section-card p-5">
-              <div className="flex items-center gap-3"><Headphones size={20} className="text-blue-300" /><h2 className="font-black text-white">Test progress</h2></div>
-              <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-emerald-400 transition-all" style={{ width: `${questions.length ? (results.length / questions.length) * 100 : 0}%` }} /></div>
-              <p className="mt-3 text-sm text-slate-400">{results.length}/{questions.length} answered · current score {totalOutOf100}/100</p>
-              {loadNotice && <p className="mt-4 border-t border-white/10 pt-4 text-xs leading-5 text-slate-500">{loadNotice}</p>}
-            </div>
+            <div className="section-card p-5"><div className="flex items-center gap-3"><Headphones size={20} className="text-blue-300" /><h2 className="font-black text-white">Test progress</h2></div><div className="mt-5 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-emerald-400 transition-all" style={{ width: `${questions.length ? (results.length / questions.length) * 100 : 0}%` }} /></div><p className="mt-3 text-sm text-slate-400">{results.length}/{questions.length} answered · current score {totalOutOf100}/100</p>{loadNotice && <p className="mt-4 border-t border-white/10 pt-4 text-xs leading-5 text-slate-500">{loadNotice}</p>}</div>
             <button type="button" onClick={finishTest} className="glow-button glow-button-muted w-full py-4">Finish test now</button>
           </aside>
         </div>

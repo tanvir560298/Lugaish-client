@@ -169,6 +169,15 @@ export const api = {
   getLesson(language, day) {
     return request(`/lessons/${language}/${day}`);
   },
+  getDayModules(language) {
+    return request(`/lessons/${language}/day-modules`);
+  },
+  updateDayModule(language, day, payload) {
+    return request(`/lessons/${language}/${day}/module`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  },
   addLessonVideo(language, day, payload) {
     return request(`/lessons/${language}/${day}/videos`, {
       method: 'POST',
@@ -201,13 +210,18 @@ export const api = {
       body: JSON.stringify(payload),
     });
   },
-  getWeeklyInterview() {
-    return request('/interviews/weekly');
+  getWeeklyInterview({ language, day } = {}) {
+    const query = new URLSearchParams();
+    if (language) query.set('language', language);
+    if (day) query.set('day', String(day));
+    const queryString = query.toString();
+    const suffix = queryString ? `?${queryString}` : '';
+    return request(`/interviews/weekly${suffix}`);
   },
-  joinWeeklyInterview() {
+  joinWeeklyInterview({ language, day } = {}) {
     return request('/interviews/join', {
       method: 'POST',
-      body: JSON.stringify({}),
+      body: JSON.stringify({ language, day }),
     });
   },
   updateInterviewStatus(entryId, payload) {
