@@ -1,16 +1,153 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { BookOpen, CheckCircle2, Clock3, Film, ListChecks, Lock, Mic, Play, Plus, Sparkles, TimerReset, Video } from 'lucide-react';
+import {
+  BookOpen,
+  CheckCircle2,
+  Clock3,
+  Film,
+  Headphones,
+  ListChecks,
+  Lock,
+  Mic,
+  Plus,
+  Settings2,
+  Sparkles,
+  TimerReset,
+  UsersRound,
+  Video,
+} from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { api } from '../api/client.js';
 import { useAppContext } from '../state/AppContext.jsx';
+import { ROLES } from '../utils/roles.js';
 
-function getLessons(pathway) {
-  return pathway.modules.flatMap(module =>
-    module.lessons.map((lesson, index) => ({
+const LEARNER_PREVIEW_DAYS = 8;
+const WEB_DEVELOPER_PLANNING_DAYS = 30;
+
+const MODULE_PRESENTATION = {
+  video: {
+    label: 'Video lesson',
+    startLabel: 'Start lesson',
+    reviewLabel: 'Review lesson',
+    Icon: Film,
+    accent: 'text-blue-300',
+  },
+  ai_practice: {
+    label: 'AI practice session',
+    startLabel: 'Start practice',
+    reviewLabel: 'Review practice',
+    Icon: Mic,
+    accent: 'text-emerald-300',
+  },
+  interview: {
+    label: 'Interview session',
+    startLabel: 'Join interview',
+    reviewLabel: 'Open interview',
+    Icon: UsersRound,
+    accent: 'text-violet-300',
+  },
+};
+
+function getStaticLessons(pathway) {
+  let dayNumber = 0;
+  return pathway.modules.flatMap(module => module.lessons.map(lesson => {
+    dayNumber += 1;
+    return {
       ...lesson,
       moduleTitle: module.title,
-      dayNumber: index + 1,
-    })),
+      dayNumber,
+    };
+  }));
+}
+
+function buildDayCards(staticLessons, remoteModules, minimumDays) {
+  const modulesByDay = new Map(remoteModules.map(module => [module.day, module]));
+  const highestConfiguredDay = remoteModules.reduce((highestDay, module) => Math.max(highestDay, module.day), 0);
+  const dayCount = Math.max(minimumDays, staticLessons.length, highestConfiguredDay);
+
+  return Array.from({ length: dayCount }, (_, index) => {
+    const day = index + 1;
+    const staticLesson = staticLessons[index];
+    const remoteModule = modulesByDay.get(day);
+
+    if (remoteModule) {
+      return {
+        ...remoteModule,
+        day,
+        id: staticLesson?.id ?? `configured-${day}`,
+        staticLesson,
+        configured: true,
+      };
+    }
+
+    if (staticLesson) {
+      return {
+        day,
+        id: staticLesson.id,
+        title: staticLesson.title,
+        description: staticLesson.description,
+        moduleType: 'video',
+        published: true,
+        available: false,
+        questionCount: 0,
+        staticLesson,
+        configured: false,
+      };
+    }
+
+    return {
+      day,
+      id: `placeholder-${day}`,
+      title: 'Coming soon',
+      description: 'This day can be configured as a video lesson, AI practice session, or interview.',
+      moduleType: null,
+      published: false,
+      available: false,
+      questionCount: 0,
+      staticLesson: null,
+      configured: false,
+    };
+  });
+}
+
+function ModuleStats({ day }) {
+  const lesson = day.staticLesson;
+  const baseClass = 'rounded-2xl border border-white/10 bg-white/5 p-3';
+
+  if (day.moduleType === 'ai_practice') {
+    return (
+      <div className="mt-6 grid grid-cols-3 gap-2 text-center">
+        <div className={baseClass}><Mic size={16} className="mx-auto mb-2 text-emerald-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Voice</p></div>
+        <div className={baseClass}><Headphones size={16} className="mx-auto mb-2 text-blue-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{day.questionCount || 0} Questions</p></div>
+        <div className={baseClass}><Sparkles size={16} className="mx-auto mb-2 text-amber-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Feedback</p></div>
+      </div>
+    );
+  }
+
+  if (day.moduleType === 'interview') {
+    return (
+      <div className="mt-6 grid grid-cols-3 gap-2 text-center">
+        <div className={baseClass}><UsersRound size={16} className="mx-auto mb-2 text-violet-300" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Live queue</p></div>
+        <div className={baseClass}><Video size={16} className="mx-auto mb-2 text-blue-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Interview</p></div>
+        <div className={baseClass}><Clock3 size={16} className="mx-auto mb-2 text-amber-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Weekly</p></div>
+      </div>
+    );
+  }
+
+  if (!day.moduleType) {
+    return (
+      <div className="mt-6 rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-3 text-center text-[10px] font-bold uppercase tracking-wider text-slate-500">
+        Waiting for the course plan
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-6 grid grid-cols-3 gap-2 text-center">
+      <div className={baseClass}><Film size={16} className="mx-auto mb-2 text-blue-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Video</p></div>
+      <div className={baseClass}><BookOpen size={16} className="mx-auto mb-2 text-emerald-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{lesson?.cards?.length ?? 0} Cards</p></div>
+      <div className={baseClass}><ListChecks size={16} className="mx-auto mb-2 text-amber-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{lesson?.quiz?.length ?? 0} Quiz</p></div>
+    </div>
   );
 }
 
@@ -18,11 +155,23 @@ export function DailyLessonsPage() {
   const { state, actions, courseData } = useAppContext();
   const navigate = useNavigate();
   const [comingSoon, setComingSoon] = useState(null);
-  const canManageLessons = state.permissions?.includes('manage_lessons');
+  const [dayModuleData, setDayModuleData] = useState({ modules: [], completedDays: [], currentDay: 1 });
+  const [hasLoadedDayModules, setHasLoadedDayModules] = useState(false);
+  const [dayModuleError, setDayModuleError] = useState('');
+  const isWebDeveloper = state.userRole === ROLES.webDeveloper;
   const enrolledPathways = state.enrolledPathways?.length ? state.enrolledPathways : [state.activePathway];
   const availableToEnroll = Object.keys(courseData).filter(pathway => !enrolledPathways.includes(pathway));
   const pathway = courseData[state.activePathway] ?? courseData.english;
-  const lessons = useMemo(() => getLessons(pathway), [pathway]);
+  const staticLessons = useMemo(() => getStaticLessons(pathway), [pathway]);
+  const days = useMemo(
+    () => buildDayCards(
+      staticLessons,
+      dayModuleData.modules ?? [],
+      isWebDeveloper ? WEB_DEVELOPER_PLANNING_DAYS : LEARNER_PREVIEW_DAYS,
+    ),
+    [dayModuleData.modules, isWebDeveloper, staticLessons],
+  );
+  const hasRemoteDayPlan = hasLoadedDayModules && !dayModuleError;
 
   useEffect(() => {
     if (!comingSoon) return undefined;
@@ -31,16 +180,54 @@ export function DailyLessonsPage() {
     return () => window.clearTimeout(timeout);
   }, [comingSoon]);
 
-  const openLesson = (lesson) => {
-    actions.setActiveLesson(lesson.id, state.activePathway);
-    navigate(`/lesson/${lesson.dayNumber}`);
+  useEffect(() => {
+    let ignore = false;
+    setHasLoadedDayModules(false);
+    setDayModuleError('');
+
+    api.getDayModules(state.activePathway)
+      .then(response => {
+        if (ignore) return;
+        setDayModuleData({
+          modules: Array.isArray(response.modules) ? response.modules : [],
+          completedDays: Array.isArray(response.completedDays) ? response.completedDays : [],
+          currentDay: Math.max(Number(response.currentDay) || 1, 1),
+        });
+      })
+      .catch(error => {
+        if (!ignore) setDayModuleError(error.message || 'The latest day plan could not be loaded.');
+      })
+      .finally(() => {
+        if (!ignore) setHasLoadedDayModules(true);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [state.activePathway]);
+
+  const openDay = day => {
+    if (!day.moduleType) {
+      if (isWebDeveloper) navigate(`/lesson/${day.day}?configure=1`);
+      else setComingSoon(`Day ${day.day}`);
+      return;
+    }
+
+    if (day.moduleType === 'ai_practice') {
+      navigate(`/speaking-practice?language=${state.activePathway}&day=${day.day}`);
+      return;
+    }
+
+    if (day.moduleType === 'interview') {
+      navigate(`/interview?language=${state.activePathway}&day=${day.day}`);
+      return;
+    }
+
+    if (day.staticLesson?.id) actions.setActiveLesson(day.staticLesson.id, state.activePathway);
+    navigate(`/lesson/${day.day}`);
   };
 
-  const showComingSoon = (title) => {
-    setComingSoon(title);
-  };
-
-  const enrollCourse = (pathwayKey) => {
+  const enrollCourse = pathwayKey => {
     actions.enrollPathway(pathwayKey);
   };
 
@@ -51,9 +238,9 @@ export function DailyLessonsPage() {
           <div className="absolute inset-y-0 right-0 hidden w-1/2 bg-gradient-to-l from-blue-500/10 to-transparent lg:block" />
           <div className="relative max-w-3xl">
             <p className="mb-3 text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Daily lessons</p>
-            <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl">Pick today&apos;s small learning box.</h1>
+            <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl">Pick today&apos;s learning box.</h1>
             <p className="mt-4 text-base leading-relaxed text-slate-400 sm:text-lg">
-              You start with one course. Add the second course only when you need it, and both lesson tracks will stay here.
+              Each date has one learning format chosen by your course team: a video lesson, AI practice session, or interview.
             </p>
           </div>
         </div>
@@ -99,128 +286,102 @@ export function DailyLessonsPage() {
         )}
       </div>
 
+      {dayModuleError && (
+        <p className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+          {isWebDeveloper
+            ? `${dayModuleError} You can retry when the connection is back.`
+            : `${dayModuleError} The day plan is read-only until it can be verified, so no lesson can be opened from this screen yet.`}
+        </p>
+      )}
+
+      {!hasLoadedDayModules && !isWebDeveloper && (
+        <p className="rounded-2xl border border-blue-400/20 bg-blue-500/10 px-4 py-3 text-sm text-blue-100">
+          Loading your verified course-day plan…
+        </p>
+      )}
+
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {lessons.map((lesson, index) => {
-          const completed = state.completedLessons.includes(lesson.id);
-          const isNext = !completed && (index === 0 || state.completedLessons.includes(lessons[index - 1]?.id));
-          const isLocked = !completed && !isNext;
+        {days.map((day, index) => {
+          const presentation = MODULE_PRESENTATION[day.moduleType] ?? null;
+          const isPublished = Boolean(day.published);
+          const planPendingForLearner = !hasLoadedDayModules && !isWebDeveloper;
+          const planUnavailableForLearner = Boolean(dayModuleError) && !isWebDeveloper;
+          const planReadOnlyForLearner = planPendingForLearner || planUnavailableForLearner;
+          const completed = hasRemoteDayPlan
+            ? dayModuleData.completedDays.includes(day.day)
+            : Boolean(day.staticLesson && state.completedLessons.includes(day.staticLesson.id));
+          const availableFromServer = day.available ?? day.day <= dayModuleData.currentDay;
+          const fallbackIsNext = index === 0 || Boolean(days[index - 1]?.staticLesson && state.completedLessons.includes(days[index - 1].staticLesson.id));
+          const isLocked = planReadOnlyForLearner || (!isWebDeveloper && (!isPublished || (hasRemoteDayPlan ? !availableFromServer : !fallbackIsNext && !completed)));
+          const Icon = presentation?.Icon ?? Clock3;
+          const actionLabel = planPendingForLearner
+            ? 'Loading plan'
+            : planUnavailableForLearner
+              ? 'Plan unavailable'
+            : !day.moduleType
+            ? (isWebDeveloper ? 'Configure day' : 'Coming soon')
+            : isLocked
+              ? (!isPublished ? 'Coming soon' : 'Complete previous day')
+              : completed
+                ? presentation.reviewLabel
+                : presentation.startLabel;
 
           return (
             <article
-              key={lesson.id}
+              key={day.id}
               className={`section-card relative overflow-hidden p-5 transition sm:p-6 ${
-                isNext ? 'border-blue-400/30 shadow-[0_24px_70px_rgba(37,99,235,0.16)]' : ''
-              }`}
+                !isLocked && !completed && day.moduleType ? 'border-blue-400/30 shadow-[0_24px_70px_rgba(37,99,235,0.16)]' : ''
+              } ${!day.moduleType && !isWebDeveloper ? 'border-dashed opacity-70' : ''}`}
             >
               <div className="mb-5 flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">Day {lesson.dayNumber}</p>
-                  <h2 className="mt-2 text-xl font-black leading-tight text-white">{lesson.title}</h2>
+                  <p className={`text-[10px] font-black uppercase tracking-[0.28em] ${presentation?.accent ?? 'text-slate-500'}`}>Day {day.day}{presentation ? ` · ${presentation.label}` : ''}</p>
+                  <h2 className="mt-2 text-xl font-black leading-tight text-white">{day.title}</h2>
                 </div>
                 <div className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl ${
                   completed ? 'bg-emerald-500/15 text-emerald-400' : isLocked ? 'bg-white/5 text-slate-500' : 'bg-blue-500 text-white'
                 }`}>
-                  {completed ? <CheckCircle2 size={20} /> : isLocked ? <Lock size={18} /> : <Play size={18} />}
+                  {completed ? <CheckCircle2 size={20} /> : isLocked ? <Lock size={18} /> : <Icon size={19} />}
                 </div>
               </div>
 
-              <p className="min-h-12 text-sm leading-6 text-slate-400">{lesson.description}</p>
-
-              <div className="mt-6 grid grid-cols-3 gap-2 text-center">
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                  <Film size={16} className="mx-auto mb-2 text-blue-400" />
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Video</p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                  <BookOpen size={16} className="mx-auto mb-2 text-emerald-400" />
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{lesson.cards.length} Cards</p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                  <ListChecks size={16} className="mx-auto mb-2 text-amber-400" />
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{lesson.quiz.length} Quiz</p>
-                </div>
-              </div>
+              <p className="min-h-12 text-sm leading-6 text-slate-400">{day.description}</p>
+              <ModuleStats day={day} />
 
               <div className="mt-6 grid gap-2">
                 <button
                   type="button"
-                  onClick={() => (isLocked ? showComingSoon(`Day ${lesson.dayNumber}`) : openLesson(lesson))}
-                  className={`flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm font-black uppercase tracking-widest transition ${
-                    isLocked
-                      ? 'bg-white/5 text-slate-500 hover:bg-red-500/10 hover:text-red-100'
+                  disabled={planReadOnlyForLearner || (isLocked && !isWebDeveloper)}
+                  onClick={() => {
+                    if (planReadOnlyForLearner) return;
+                    if (isLocked && !isWebDeveloper) {
+                      setComingSoon(!isPublished ? `Day ${day.day}` : 'Complete the previous day');
+                      return;
+                    }
+                    openDay(day);
+                  }}
+                  className={`flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm font-black uppercase tracking-widest transition disabled:cursor-not-allowed ${
+                    isLocked && !isWebDeveloper
+                      ? 'bg-white/5 text-slate-500'
                       : completed
                         ? 'border border-emerald-400/20 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500 hover:text-white'
                         : 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-emerald-500'
                   }`}
                 >
-                  {isLocked ? 'Complete previous day' : completed ? 'Review Lesson' : 'Start Lesson'}
+                  {actionLabel}
                   {!isLocked && <Sparkles size={15} />}
                 </button>
-                {(!isLocked || canManageLessons) && (
+
+                {isWebDeveloper && (
                   <button
                     type="button"
-                    onClick={() => navigate(`/speaking-practice?language=${state.activePathway}&day=${lesson.dayNumber}`)}
-                    className="flex w-full items-center justify-center gap-2 rounded-2xl border border-blue-400/20 bg-blue-500/10 px-5 py-3 text-xs font-black uppercase tracking-widest text-blue-200 transition hover:bg-blue-500 hover:text-white"
+                    onClick={() => navigate(`/lesson/${day.day}?configure=1`)}
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-xs font-black uppercase tracking-widest text-slate-300 transition hover:border-emerald-400/30 hover:bg-emerald-500/10 hover:text-emerald-100"
                   >
-                    <Mic size={15} /> Speaking practice
+                    <Settings2 size={15} /> {day.configured ? 'Configure day' : 'Plan this day'}
                   </button>
                 )}
               </div>
-            </article>
-          );
-        })}
-
-        {Array.from({ length: 6 }).map((_, index) => {
-          const dayNumber = lessons.length + index + 1;
-          const isInterviewDay = dayNumber === 7;
-
-          if (isInterviewDay) {
-            return (
-              <article key={`placeholder-${index}`} className="section-card border-blue-400/30 p-5 shadow-[0_24px_70px_rgba(37,99,235,0.14)] sm:p-6">
-                <div className="mb-5 flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.28em] text-blue-300">Day 7</p>
-                    <h2 className="mt-2 text-xl font-black leading-tight text-white">Weekly Interview Session</h2>
-                  </div>
-                  <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-blue-500 text-white">
-                    <Video size={18} />
-                  </div>
-                </div>
-                <p className="text-sm leading-6 text-slate-400">
-                  Join your weekly output check, get your room serial, and wait respectfully until your turn.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => navigate('/interview')}
-                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 py-4 text-sm font-black uppercase tracking-widest text-white shadow-lg shadow-blue-500/20 transition hover:bg-emerald-500"
-                >
-                  Open Interview Queue <Sparkles size={15} />
-                </button>
-              </article>
-            );
-          }
-
-          return (
-            <article key={`placeholder-${index}`} className="section-card border-dashed p-5 opacity-70 sm:p-6">
-              <div className="mb-5 flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">
-                    Day {dayNumber}
-                  </p>
-                  <h2 className="mt-2 text-xl font-black text-white">Coming Soon</h2>
-                </div>
-                <div className="grid h-11 w-11 place-items-center rounded-2xl bg-white/5 text-slate-500">
-                  <Clock3 size={18} />
-                </div>
-              </div>
-              <p className="text-sm leading-6 text-slate-400">A new daily box can be added here for video, tasks, and practice.</p>
-              <button
-                type="button"
-                onClick={() => showComingSoon(`Day ${dayNumber}`)}
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-sm font-black uppercase tracking-widest text-slate-300 transition hover:border-emerald-400/30 hover:bg-emerald-500/10 hover:text-emerald-100"
-              >
-                Preview Waitlist <Sparkles size={15} />
-              </button>
             </article>
           );
         })}
@@ -250,19 +411,11 @@ export function DailyLessonsPage() {
               >
                 <TimerReset size={42} />
               </motion.div>
-              <p className="mt-6 text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Level loading</p>
-              <h2 className="mt-3 text-3xl font-black text-white">{comingSoon} is coming soon</h2>
+              <p className="mt-6 text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Daily course plan</p>
+              <h2 className="mt-3 text-3xl font-black text-white">{comingSoon} is not open yet</h2>
               <p className="mt-3 text-sm leading-6 text-slate-400">
-                This lesson box is being prepared. Finish the open lesson first and the next level will unlock.
+                Your course team will publish this day when it is ready. Complete the current day to unlock the next scheduled session.
               </p>
-              <div className="mt-6 h-2 overflow-hidden rounded-full bg-white/10">
-                <motion.div
-                  initial={{ x: '-100%' }}
-                  animate={{ x: '100%' }}
-                  transition={{ repeat: Infinity, duration: 1.1, ease: 'easeInOut' }}
-                  className="h-full w-1/2 rounded-full bg-gradient-to-r from-blue-500 to-emerald-400"
-                />
-              </div>
             </motion.div>
           </motion.div>
         )}

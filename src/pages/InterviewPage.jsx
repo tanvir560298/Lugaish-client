@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertCircle, CheckCircle2, Clock3, ExternalLink, Loader2, Mail, UsersRound, Video } from 'lucide-react';
+import { AlertCircle, ArrowLeft, CheckCircle2, Clock3, ExternalLink, Loader2, Mail, UsersRound, Video } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 
 function formatTime(value) {
@@ -93,6 +94,15 @@ function RoomPanel({ room, entries, canManageQueue, onStatusChange, updatingEntr
 }
 
 export function InterviewPage() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const requestedLanguage = searchParams.get('language');
+  const requestedDay = Number(searchParams.get('day'));
+  const hasScheduledContext = ['english', 'arabic'].includes(requestedLanguage)
+    && Number.isInteger(requestedDay)
+    && requestedDay > 0;
+  const language = hasScheduledContext ? requestedLanguage : null;
+  const day = hasScheduledContext ? requestedDay : null;
   const [session, setSession] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isJoining, setIsJoining] = useState(false);
@@ -101,15 +111,24 @@ export function InterviewPage() {
   const [error, setError] = useState('');
 
   async function loadSession() {
-    const data = await api.getWeeklyInterview();
+    const data = await api.getWeeklyInterview({ language, day });
     setSession(data);
   }
 
   useEffect(() => {
     let ignore = false;
     setIsLoading(true);
+    setError('');
+    setSession(null);
 
-    api.getWeeklyInterview()
+    if (!hasScheduledContext) {
+      setIsLoading(false);
+      return () => {
+        ignore = true;
+      };
+    }
+
+    api.getWeeklyInterview({ language, day })
       .then(data => {
         if (!ignore) setSession(data);
       })
@@ -123,7 +142,7 @@ export function InterviewPage() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [day, hasScheduledContext, language]);
 
   const entriesByRoom = useMemo(() => {
     const grouped = {};
@@ -134,13 +153,19 @@ export function InterviewPage() {
   }, [session?.entries]);
 
   async function handleJoin() {
+    if (!session?.canJoinInterview) return;
     setError('');
     setMessage('');
     setIsJoining(true);
 
     try {
-      const response = await api.joinWeeklyInterview();
-      setMessage(response.message);
+      const response = await api.joinWeeklyInterview({ language, day });
+      try {
+        await api.completeLesson({ language, day });
+        setMessage(`${response.message} This scheduled day is complete, so your next learning day is unlocked.`);
+      } catch {
+        setMessage(`${response.message} Your queue place is saved; course progress will refresh when the connection is available.`);
+      }
       await loadSession();
       window.open(response.entry.meetUrl, '_blank', 'noopener,noreferrer');
     } catch (err) {
@@ -166,6 +191,19 @@ export function InterviewPage() {
     }
   }
 
+  if (!hasScheduledContext) {
+    return (
+      <section className="mx-auto max-w-3xl space-y-6 pb-20">
+        <div className="section-card p-8 text-center sm:p-12">
+          <Video size={36} className="mx-auto text-amber-300" />
+          <h1 className="mt-5 text-3xl font-black text-white">Choose a scheduled interview day</h1>
+          <p className="mx-auto mt-3 max-w-xl text-slate-400">Interview access is linked to a specific course day. Open it from Daily Lessons when your course team schedules an interview for you.</p>
+          <button type="button" onClick={() => navigate('/daily-lessons')} className="glow-button glow-button-blue mt-7"><ArrowLeft size={18} /> Daily lessons</button>
+        </div>
+      </section>
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="grid min-h-[60svh] place-items-center">
@@ -174,8 +212,24 @@ export function InterviewPage() {
     );
   }
 
+  if (error && !session) {
+    return (
+      <section className="mx-auto max-w-3xl space-y-6 pb-20">
+        <div className="section-card p-8 text-center sm:p-12">
+          <AlertCircle size={36} className="mx-auto text-amber-300" />
+          <h1 className="mt-5 text-3xl font-black text-white">This interview session is not open yet</h1>
+          <p className="mx-auto mt-3 max-w-xl text-slate-400">Return to Daily Lessons and open the learning format assigned to your current course day.</p>
+          <p className="mx-auto mt-4 max-w-xl rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">{error}</p>
+          <button type="button" onClick={() => navigate('/daily-lessons')} className="glow-button glow-button-blue mt-7"><ArrowLeft size={18} /> Daily lessons</button>
+        </div>
+      </section>
+    );
+  }
+
   const ownEntry = session?.ownEntry;
   const canManageQueue = Boolean(session?.canManageQueue);
+  const canJoinInterview = Boolean(session?.canJoinInterview);
+  const dayModule = session?.dayModule;
 
   return (
     <section className="space-y-8 pb-20">
@@ -183,16 +237,16 @@ export function InterviewPage() {
         <div className="app-shell grid gap-8 lg:grid-cols-[1fr_320px] lg:items-center">
           <div>
             <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-blue-400/20 bg-blue-500/10 px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-blue-200">
-              <Video size={14} /> Weekly interview
+              <Video size={14} /> Day {dayModule?.day ?? day} · scheduled interview
             </p>
-            <h1 className="text-4xl font-black leading-tight text-white sm:text-5xl">Join the weekly interview session.</h1>
+            <h1 className="text-4xl font-black leading-tight text-white sm:text-5xl">{dayModule?.introTitle || dayModule?.title || 'Join the interview session.'}</h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300 sm:text-base">
-              Tap the button once to receive your room and serial. Please wait and be respectful to everyone while you wait for your serial.
+              {dayModule?.introText || dayModule?.description || 'Tap the button once to receive your room and serial. Please wait and be respectful to everyone while you wait for your serial.'}
             </p>
           </div>
 
           <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-5">
-            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">This week</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">Scheduled queue</p>
             <p className="mt-2 text-3xl font-black text-white">{session?.totalAssigned ?? 0}/{session?.totalCapacity ?? 100}</p>
             <p className="mt-1 text-sm font-semibold text-slate-400">learners assigned</p>
           </div>
@@ -247,7 +301,7 @@ export function InterviewPage() {
                     Open Assigned Meet <ExternalLink size={17} />
                   </a>
                 </div>
-              ) : (
+              ) : canJoinInterview ? (
                 <div className="mt-6 space-y-5">
                   <p className="text-sm leading-6 text-slate-400">
                     You have not joined this week&apos;s interview queue yet. The system will assign you to the first available room.
@@ -259,8 +313,12 @@ export function InterviewPage() {
                     className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 py-4 text-sm font-black uppercase tracking-widest text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isJoining ? <Loader2 className="animate-spin" size={18} /> : <Video size={18} />}
-                    {isJoining ? 'Assigning...' : 'Join Weekly Interview Session'}
+                    {isJoining ? 'Assigning...' : 'Join scheduled interview'}
                   </button>
+                </div>
+              ) : (
+                <div className="mt-6 rounded-2xl border border-blue-400/20 bg-blue-500/[0.08] p-5 text-sm leading-6 text-blue-100">
+                  Preview mode is active. Web Developers can review this scheduled interview day, but cannot join the learner queue.
                 </div>
               )}
             </div>
