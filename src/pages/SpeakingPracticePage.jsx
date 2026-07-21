@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -15,9 +15,8 @@ import {
 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client.js';
-import { getLocalSpeakingQuestions } from '../data/speakingQuestions.ts';
 import { useAppContext } from '../state/AppContext.jsx';
-import { hasPermission } from '../utils/roles.js';
+import { ROLES } from '../utils/roles.js';
 import { scoreSpeakingTranscript } from '../utils/speakingScoring.js';
 
 const RESULT_STORAGE_KEY = 'lugaish_latest_speaking_result_v1';
@@ -110,11 +109,10 @@ export function SpeakingPracticePage() {
   const locale = language === 'arabic' ? 'ar-SA' : 'en-US';
   const day = Math.max(Number.parseInt(searchParams.get('day') ?? '1', 10) || 1, 1);
   const shouldOpenManager = searchParams.get('manage') === '1';
-  const canManageLessons = state.permissions?.includes('manage_lessons')
-    || hasPermission(state.userRole, 'manage_lessons');
-  const fallbackQuestions = useMemo(() => getLocalSpeakingQuestions(language), [language]);
-  const [questions, setQuestions] = useState(fallbackQuestions);
-  const [draftQuestions, setDraftQuestions] = useState(fallbackQuestions);
+  const isWebDeveloper = state.userRole === ROLES.webDeveloper;
+  const [questions, setQuestions] = useState([]);
+  const [draftQuestions, setDraftQuestions] = useState([]);
+  const [practiceEnabled, setPracticeEnabled] = useState(false);
   const [isRemoteLoading, setIsRemoteLoading] = useState(true);
   const [loadNotice, setLoadNotice] = useState('');
   const [managerOpen, setManagerOpen] = useState(shouldOpenManager);
@@ -145,37 +143,60 @@ export function SpeakingPracticePage() {
   const isRtl = language === 'arabic';
 
   useEffect(() => {
-    if (!shouldOpenManager || !canManageLessons) return;
+    if (!shouldOpenManager || !isWebDeveloper) return;
     setManagerOpen(true);
-  }, [canManageLessons, shouldOpenManager]);
+  }, [isWebDeveloper, shouldOpenManager]);
 
   useEffect(() => {
     let ignore = false;
-    const localSet = readLocalSet(language, day);
-    const localQuestions = localSet !== null ? localSet : fallbackQuestions;
-    setQuestions(localQuestions);
-    setDraftQuestions(localQuestions);
+    const localSet = isWebDeveloper ? readLocalSet(language, day) : null;
+    const localQuestions = localSet ?? [];
+    setQuestions(isWebDeveloper ? localQuestions : []);
+    setDraftQuestions(isWebDeveloper ? localQuestions : []);
+    setPracticeEnabled(false);
     setQuestionIndex(0);
     setTranscript('');
     setResults([]);
     setIsFinished(false);
     sessionStartedRef.current = false;
-    setLoadNotice(localSet ? 'Using the question set saved in this browser.' : '');
+    setLoadNotice(localSet ? 'Using the private draft saved in this browser.' : '');
     setIsRemoteLoading(true);
 
     api.getSpeakingPractice(language, day)
       .then(response => {
-        if (ignore || !Array.isArray(response.questions)) return;
+        if (ignore) return;
+        const remoteQuestions = Array.isArray(response.questions) ? response.questions : [];
+        const enabled = Boolean(response.enabled);
         if (sessionStartedRef.current) {
-          setLoadNotice('A published question set became available. Return to this lesson after finishing to load it.');
+          setPracticeEnabled(enabled);
+          setLoadNotice('The saved lesson settings loaded. Your current edits were kept.');
           return;
         }
-        setQuestions(response.questions);
-        setDraftQuestions(response.questions);
-        setLoadNotice(response.questions.length ? 'Published lesson question set loaded.' : 'This lesson does not have a published question set yet.');
+        setPracticeEnabled(enabled);
+        setQuestions(remoteQuestions);
+        setDraftQuestions(isWebDeveloper ? remoteQuestions : []);
+        setLoadNotice(isWebDeveloper
+          ? enabled
+            ? 'AI practice is live for learners.'
+            : 'This question set is private. Enable it when learners should see the test.'
+          : enabled
+            ? 'AI practice is ready for this lesson.'
+            : 'AI practice is not available for this lesson yet.');
       })
       .catch(() => {
-        if (!ignore && !localSet) setLoadNotice('Local prototype questions are ready. Published questions could not be loaded.');
+        if (ignore) return;
+        setPracticeEnabled(false);
+        if (isWebDeveloper && localSet) {
+          setQuestions(localQuestions);
+          setDraftQuestions(localQuestions);
+          setLoadNotice('The server draft could not be loaded. This browser-only draft is not visible to learners.');
+          return;
+        }
+        setQuestions([]);
+        setDraftQuestions([]);
+        setLoadNotice(isWebDeveloper
+          ? 'The lesson question set could not be loaded. Try again before publishing.'
+          : 'AI practice is not available for this lesson yet.');
       })
       .finally(() => {
         if (!ignore) {
@@ -186,7 +207,7 @@ export function SpeakingPracticePage() {
     return () => {
       ignore = true;
     };
-  }, [day, fallbackQuestions, language]);
+  }, [day, isWebDeveloper, language]);
 
   useEffect(() => {
     if (!('speechSynthesis' in window)) return undefined;
@@ -437,6 +458,10 @@ export function SpeakingPracticePage() {
       setManagerMessage(validationMessage);
       return;
     }
+    if (practiceEnabled && draftQuestions.length === 0) {
+      setManagerMessage('Add at least one question before enabling AI practice for learners.');
+      return;
+    }
     const validQuestions = draftQuestions.map(question => ({
       ...question,
       question: question.question.trim(),
@@ -450,17 +475,23 @@ export function SpeakingPracticePage() {
     const savedLocalCopy = saveLocally(getLocalSetKey(language, day), validQuestions);
 
     try {
-      const response = await api.updateSpeakingPractice(language, day, { questions: validQuestions });
+      const response = await api.updateSpeakingPractice(language, day, {
+        enabled: practiceEnabled,
+        questions: validQuestions,
+      });
       const savedQuestions = response.questions ?? validQuestions;
       setQuestions(savedQuestions);
       setDraftQuestions(savedQuestions);
-      setManagerMessage('Question set published for this lesson.');
+      setPracticeEnabled(Boolean(response.enabled));
+      setManagerMessage(response.enabled
+        ? 'AI practice is live for learners on this day.'
+        : 'Private draft saved. Learners cannot see this AI practice yet.');
     } catch (error) {
       setQuestions(validQuestions);
       setDraftQuestions(validQuestions);
       setManagerMessage(savedLocalCopy
-        ? `${error.message || 'Server save is unavailable.'} A local browser copy was saved for prototype testing.`
-        : `${error.message || 'Server save is unavailable.'} Browser storage was also unavailable, so this copy lasts only until the page reloads.`);
+        ? `${error.message || 'Server save is unavailable.'} This browser-only draft is not visible to learners.`
+        : `${error.message || 'Server save is unavailable.'} Browser storage was also unavailable, so this draft lasts only until the page reloads.`);
     } finally {
       abortRecognition();
       stopQuestionAudio();
@@ -500,6 +531,23 @@ export function SpeakingPracticePage() {
     );
   }
 
+  if (!isWebDeveloper && !isRemoteLoading && !practiceEnabled) {
+    return (
+      <section className="mx-auto max-w-3xl space-y-6 pb-20">
+        <div className="section-card p-8 text-center sm:p-12">
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl border border-blue-400/20 bg-blue-500/10 text-blue-300">
+            <Mic size={28} />
+          </div>
+          <h1 className="mt-6 text-3xl font-black text-white">AI practice is not available yet</h1>
+          <p className="mx-auto mt-3 max-w-xl leading-7 text-slate-400">Your learning team has not enabled the AI speaking test for Day {day} yet. It will appear here as soon as it is published.</p>
+          <button type="button" onClick={() => navigate('/daily-lessons')} className="glow-button glow-button-muted mt-8 py-4">
+            <ArrowLeft size={18} /> Back to lessons
+          </button>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="speaking-practice-page space-y-6 pb-20">
       <div className="section-card relative overflow-hidden p-6 sm:p-8 lg:p-10">
@@ -511,7 +559,7 @@ export function SpeakingPracticePage() {
             <p className="mt-3 max-w-2xl leading-7 text-slate-400">Listen, answer naturally, review your transcript, and receive lightweight keyword-based feedback.</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            {canManageLessons && (
+            {isWebDeveloper && (
               <button type="button" disabled={isRemoteLoading} onClick={() => { sessionStartedRef.current = true; setManagerOpen(open => !open); }} className="glow-button glow-button-muted disabled:cursor-wait disabled:opacity-50">
                 {isRemoteLoading ? <LoaderCircle size={17} className="animate-spin" /> : <Plus size={17} />} {isRemoteLoading ? 'Loading question manager' : 'Manage questions'}
               </button>
@@ -523,51 +571,75 @@ export function SpeakingPracticePage() {
         </div>
       </div>
 
-      {canManageLessons && managerOpen && (
+      {isWebDeveloper && managerOpen && (
         <div className="section-card p-5 sm:p-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.24em] text-blue-400">Learning team tools</p>
+              <p className="text-xs font-black uppercase tracking-[0.24em] text-blue-400">Web Developer tools</p>
               <h2 className="mt-2 text-2xl font-black text-white">Day {day} question set</h2>
-              <p className="mt-2 text-sm text-slate-400">Separate keywords with commas. An optional audio URL adds a recorded alternative to browser text-to-speech.</p>
+              <p className="mt-2 text-sm text-slate-400">Only you can edit this set. Separate keywords with commas; an optional audio URL adds a recorded alternative to browser text-to-speech.</p>
             </div>
-            <button type="button" disabled={draftQuestions.length >= MAX_QUESTIONS} onClick={() => { sessionStartedRef.current = true; setDraftQuestions(current => [...current, createQuestion(language)]); }} className="glow-button glow-button-muted disabled:cursor-not-allowed disabled:opacity-40">
+            <button type="button" disabled={isRemoteLoading || draftQuestions.length >= MAX_QUESTIONS} onClick={() => { sessionStartedRef.current = true; setDraftQuestions(current => [...current, createQuestion(language)]); }} className="glow-button glow-button-muted disabled:cursor-not-allowed disabled:opacity-40">
               <Plus size={17} /> Add question
             </button>
           </div>
+          <label className="mt-6 flex cursor-pointer items-start gap-4 rounded-2xl border border-emerald-400/25 bg-emerald-500/[0.08] p-4">
+            <input
+              type="checkbox"
+              checked={practiceEnabled}
+              disabled={isRemoteLoading}
+              onChange={event => {
+                sessionStartedRef.current = true;
+                setPracticeEnabled(event.target.checked);
+              }}
+              className="mt-1 h-5 w-5 accent-emerald-400 disabled:cursor-wait"
+            />
+            <span>
+              <span className="block font-black text-white">Enable AI practice for learners</span>
+              <span className="mt-1 block text-sm leading-6 text-slate-400">
+                {practiceEnabled
+                  ? 'This day is live: enrolled learners can open and complete the AI speaking test.'
+                  : 'This is a private draft: learners cannot see the AI speaking test for this day.'}
+              </span>
+            </span>
+          </label>
           <div className="mt-6 space-y-4">
             {draftQuestions.map((question, index) => (
               <div key={question.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
                 <div className="mb-4 flex items-center justify-between">
                   <p className="text-sm font-black text-white">Question {index + 1}</p>
-                  <button type="button" onClick={() => { sessionStartedRef.current = true; setDraftQuestions(current => current.filter((_, itemIndex) => itemIndex !== index)); }} className="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-red-500/10 hover:text-red-300" aria-label={`Remove question ${index + 1}`}>
+                  <button type="button" disabled={isRemoteLoading} onClick={() => { sessionStartedRef.current = true; setDraftQuestions(current => current.filter((_, itemIndex) => itemIndex !== index)); }} className="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-red-500/10 hover:text-red-300 disabled:cursor-wait disabled:opacity-40" aria-label={`Remove question ${index + 1}`}>
                     <Trash2 size={16} />
                   </button>
                 </div>
                 <div className="grid gap-3 lg:grid-cols-2">
-                  <textarea aria-label={`Question ${index + 1} text`} maxLength={500} value={question.question} onChange={event => updateDraft(index, 'question', event.target.value)} placeholder="Question text" rows={3} dir={isRtl ? 'rtl' : 'ltr'} className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400" />
-                  <textarea aria-label={`Question ${index + 1} sample answer`} maxLength={2000} value={question.sampleAnswer} onChange={event => updateDraft(index, 'sampleAnswer', event.target.value)} placeholder="Sample answer" rows={3} dir={isRtl ? 'rtl' : 'ltr'} className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400" />
-                  <input aria-label={`Question ${index + 1} expected keywords`} value={question.expectedKeywords.join(', ')} onChange={event => updateDraft(index, 'expectedKeywords', event.target.value)} placeholder="Expected keywords, separated by commas" dir={isRtl ? 'rtl' : 'ltr'} className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400" />
+                  <textarea disabled={isRemoteLoading} aria-label={`Question ${index + 1} text`} maxLength={500} value={question.question} onChange={event => updateDraft(index, 'question', event.target.value)} placeholder="Question text" rows={3} dir={isRtl ? 'rtl' : 'ltr'} className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400 disabled:cursor-wait disabled:opacity-50" />
+                  <textarea disabled={isRemoteLoading} aria-label={`Question ${index + 1} sample answer`} maxLength={2000} value={question.sampleAnswer} onChange={event => updateDraft(index, 'sampleAnswer', event.target.value)} placeholder="Sample answer" rows={3} dir={isRtl ? 'rtl' : 'ltr'} className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400 disabled:cursor-wait disabled:opacity-50" />
+                  <input disabled={isRemoteLoading} aria-label={`Question ${index + 1} expected keywords`} value={question.expectedKeywords.join(', ')} onChange={event => updateDraft(index, 'expectedKeywords', event.target.value)} placeholder="Expected keywords, separated by commas" dir={isRtl ? 'rtl' : 'ltr'} className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400 disabled:cursor-wait disabled:opacity-50" />
                   <div className="grid gap-3 sm:grid-cols-[120px_1fr]">
-                    <input type="number" min="1" max="100" value={question.maxMarks} onChange={event => updateDraft(index, 'maxMarks', event.target.value)} aria-label={`Question ${index + 1} maximum marks`} className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400" />
-                    <input type="url" maxLength={2048} aria-label={`Question ${index + 1} optional recorded audio URL`} value={question.audioUrl ?? ''} onChange={event => updateDraft(index, 'audioUrl', event.target.value)} placeholder="Optional recorded audio URL" className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400" />
+                    <input disabled={isRemoteLoading} type="number" min="1" max="100" value={question.maxMarks} onChange={event => updateDraft(index, 'maxMarks', event.target.value)} aria-label={`Question ${index + 1} maximum marks`} className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400 disabled:cursor-wait disabled:opacity-50" />
+                    <input disabled={isRemoteLoading} type="url" maxLength={2048} aria-label={`Question ${index + 1} optional recorded audio URL`} value={question.audioUrl ?? ''} onChange={event => updateDraft(index, 'audioUrl', event.target.value)} placeholder="Optional recorded audio URL" className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400 disabled:cursor-wait disabled:opacity-50" />
                   </div>
                 </div>
               </div>
             ))}
           </div>
           {managerMessage && <p role="status" aria-live="polite" className="mt-4 rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-slate-300">{managerMessage}</p>}
-          <button type="button" onClick={saveQuestionSet} disabled={isSaving} className="glow-button glow-button-blue mt-5 w-full py-4 disabled:opacity-50">
+          <button type="button" onClick={saveQuestionSet} disabled={isSaving || isRemoteLoading} className="glow-button glow-button-blue mt-5 w-full py-4 disabled:opacity-50">
             {isSaving ? <LoaderCircle size={18} className="animate-spin" /> : <Save size={18} />}
-            {isSaving ? 'Saving...' : 'Save this lesson question set'}
+            {isSaving ? 'Saving...' : practiceEnabled ? 'Save and publish AI practice' : 'Save private question draft'}
           </button>
         </div>
       )}
 
-      {!currentQuestion ? (
+      {isRemoteLoading ? (
+        <div className="section-card flex items-center justify-center gap-3 p-10 text-center text-slate-300">
+          <LoaderCircle size={22} className="animate-spin text-blue-300" /> Checking this lesson&apos;s AI practice availability…
+        </div>
+      ) : !currentQuestion ? (
         <div className="section-card p-10 text-center">
           <h2 className="text-2xl font-black text-white">No practice questions yet</h2>
-          <p className="mt-2 text-slate-400">The learning team can add this lesson&apos;s first question set here.</p>
+          <p className="mt-2 text-slate-400">The Web Developer can add this lesson&apos;s first private question set here.</p>
         </div>
       ) : (
         <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">

@@ -183,6 +183,9 @@ export const api = {
   getSpeakingPractice(language, day) {
     return request(`/lessons/${language}/${day}/speaking-practice`);
   },
+  getSpeakingPracticeAvailability(language) {
+    return request(`/lessons/${language}/speaking-practice-availability`);
+  },
   updateSpeakingPractice(language, day, payload) {
     return request(`/lessons/${language}/${day}/speaking-practice`, {
       method: 'PUT',
