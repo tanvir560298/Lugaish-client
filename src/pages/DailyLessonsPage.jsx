@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { BookOpen, CheckCircle2, Clock3, Film, ListChecks, Lock, Play, Plus, Sparkles, TimerReset, Video } from 'lucide-react';
+import { BookOpen, CheckCircle2, Clock3, Film, ListChecks, Lock, Mic, Play, Plus, Sparkles, TimerReset, Video } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../state/AppContext.jsx';
@@ -18,6 +18,7 @@ export function DailyLessonsPage() {
   const { state, actions, courseData } = useAppContext();
   const navigate = useNavigate();
   const [comingSoon, setComingSoon] = useState(null);
+  const canManageLessons = state.permissions?.includes('manage_lessons');
   const enrolledPathways = state.enrolledPathways?.length ? state.enrolledPathways : [state.activePathway];
   const availableToEnroll = Object.keys(courseData).filter(pathway => !enrolledPathways.includes(pathway));
   const pathway = courseData[state.activePathway] ?? courseData.english;
@@ -140,20 +141,31 @@ export function DailyLessonsPage() {
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={() => (isLocked ? showComingSoon(`Day ${lesson.dayNumber}`) : openLesson(lesson))}
-                className={`mt-6 flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm font-black uppercase tracking-widest transition ${
-                  isLocked
-                    ? 'bg-white/5 text-slate-500 hover:bg-red-500/10 hover:text-red-100'
-                    : completed
-                      ? 'border border-emerald-400/20 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500 hover:text-white'
-                      : 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-emerald-500'
-                }`}
-              >
-                {isLocked ? 'Complete previous day' : completed ? 'Review Lesson' : 'Start Lesson'}
-                {!isLocked && <Sparkles size={15} />}
-              </button>
+              <div className="mt-6 grid gap-2">
+                <button
+                  type="button"
+                  onClick={() => (isLocked ? showComingSoon(`Day ${lesson.dayNumber}`) : openLesson(lesson))}
+                  className={`flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm font-black uppercase tracking-widest transition ${
+                    isLocked
+                      ? 'bg-white/5 text-slate-500 hover:bg-red-500/10 hover:text-red-100'
+                      : completed
+                        ? 'border border-emerald-400/20 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500 hover:text-white'
+                        : 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-emerald-500'
+                  }`}
+                >
+                  {isLocked ? 'Complete previous day' : completed ? 'Review Lesson' : 'Start Lesson'}
+                  {!isLocked && <Sparkles size={15} />}
+                </button>
+                {(!isLocked || canManageLessons) && (
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/speaking-practice?language=${state.activePathway}&day=${lesson.dayNumber}`)}
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl border border-blue-400/20 bg-blue-500/10 px-5 py-3 text-xs font-black uppercase tracking-widest text-blue-200 transition hover:bg-blue-500 hover:text-white"
+                  >
+                    <Mic size={15} /> Speaking practice
+                  </button>
+                )}
+              </div>
             </article>
           );
         })}

@@ -180,6 +180,15 @@ export const api = {
       method: 'DELETE',
     });
   },
+  getSpeakingPractice(language, day) {
+    return request(`/lessons/${language}/${day}/speaking-practice`);
+  },
+  updateSpeakingPractice(language, day, payload) {
+    return request(`/lessons/${language}/${day}/speaking-practice`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  },
   updateProgress(payload) {
     return request('/progress/update', {
       method: 'POST',
