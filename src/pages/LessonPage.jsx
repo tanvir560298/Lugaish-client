@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Clock3, ListVideo, LoaderCircle, Play, Plus, RefreshCw, Trash2, Video } from 'lucide-react';
+import { ArrowLeft, Clock3, ListVideo, LoaderCircle, Mic, Play, Plus, RefreshCw, Trash2, Video } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useAppContext, getPathFromState } from '../state/AppContext.jsx';
@@ -248,6 +248,22 @@ export function LessonPage() {
           </aside>
         </div>
       )}
+
+      <div className="section-card flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+        <div className="flex items-start gap-4">
+          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-blue-300">
+            <Mic size={22} />
+          </div>
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-400">Practice this lesson</p>
+            <h2 className="mt-1 text-xl font-black text-white">AI Speaking Practice</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-400">Listen to Day {day} questions, answer by microphone, and get instant keyword feedback.</p>
+          </div>
+        </div>
+        <button type="button" onClick={() => navigate(`/speaking-practice?language=${language}&day=${day}`)} className="glow-button glow-button-blue shrink-0 py-4">
+          <Mic size={18} /> Open practice
+        </button>
+      </div>
 
       {canManageLessons && (
         <div className="section-card p-6 sm:p-8">
