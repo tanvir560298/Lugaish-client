@@ -1,7 +1,9 @@
-import React, { useMemo, useState, useRef } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence, useMotionValueEvent } from 'framer-motion';
+import { api } from '../api/client.js';
 import { useAppContext } from '../state/AppContext.jsx';
+import { ROLES } from '../utils/roles.js';
 import { 
   Trophy, Egg, Bird, Flame, Zap, Eye, ArrowRight, 
   Sparkles, Compass, Mountain, Sun, Crown, Lock, CheckCircle2,
@@ -49,7 +51,40 @@ export function PathwaysPage() {
   const [activeTab, setActiveTab] = useState('english');
   const [unlockTaps, setUnlockTaps] = useState({});
   const [unlockedDays, setUnlockedDays] = useState(() => new Set());
+  const [courseAccess, setCourseAccess] = useState({ loading: true, started: false, startAt: '', startDate: '', error: '' });
   const containerRef = useRef(null);
+  const isWebDeveloper = state.userRole === ROLES.webDeveloper;
+  const courseReady = isWebDeveloper || courseAccess.started;
+
+  useEffect(() => {
+    if (isWebDeveloper) {
+      setCourseAccess({ loading: false, started: true, startAt: '', startDate: '', error: '' });
+      return undefined;
+    }
+
+    let ignore = false;
+    setCourseAccess(current => ({ ...current, loading: true, started: false, error: '' }));
+    api.getDayModules(activeTab)
+      .then(response => {
+        if (!ignore) {
+          const courseSchedule = response.courseSchedule ?? response;
+          setCourseAccess({
+            loading: false,
+            started: courseSchedule.courseStarted === true,
+            startAt: typeof courseSchedule.courseStartAt === 'string' ? courseSchedule.courseStartAt : '',
+            startDate: typeof courseSchedule.courseStartDate === 'string' ? courseSchedule.courseStartDate : '',
+            error: '',
+          });
+        }
+      })
+      .catch(error => {
+        if (!ignore) setCourseAccess({ loading: false, started: false, startAt: '', startDate: '', error: error.message || 'Course schedule unavailable.' });
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [activeTab, isWebDeveloper]);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -90,6 +125,7 @@ export function PathwaysPage() {
   }, [pathData, state.completedLessons]);
 
   function handleLockedTap(day) {
+    if (!courseReady) return;
     const currentTaps = unlockTaps[day.id] ?? 0;
     const nextTaps = Math.min(currentTaps + 1, 3);
 
@@ -150,6 +186,15 @@ export function PathwaysPage() {
       </header>
 
       <main className="relative mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-28 lg:py-40">
+        {!isWebDeveloper && !courseReady && (
+          <div className="relative z-30 mx-auto mb-12 max-w-2xl rounded-2xl border border-amber-300/20 bg-slate-950/80 p-5 text-center text-sm leading-6 text-amber-100 backdrop-blur-xl">
+            {courseAccess.loading
+              ? 'Checking the server course schedule…'
+              : courseAccess.error
+                ? `${courseAccess.error} Pathway lessons remain locked until the schedule can be verified.`
+                : `This pathway is a preview. Its lesson links will unlock from the server-scheduled course launch${courseAccess.startDate || courseAccess.startAt ? ` (${courseAccess.startDate || courseAccess.startAt})` : ''}.`}
+          </div>
+        )}
         
         {/* THE FLOATING CHARACTER */}
         <div className="pointer-events-none fixed left-1/2 top-1/2 z-50 hidden -translate-x-1/2 -translate-y-1/2 md:block">
@@ -169,7 +214,8 @@ export function PathwaysPage() {
              const isToday = !completed && idx === nextLessonIndex;
              const isTomorrow = !completed && idx === nextLessonIndex + 1;
              const isUnlocked = unlockedDays.has(day.id);
-             const isLocked = !completed && !isToday && !isTomorrow && !isUnlocked;
+             const courseLocked = !courseReady;
+             const isLocked = courseLocked || (!completed && !isToday && !isTomorrow && !isUnlocked);
              
              if (day.isWeekly) {
                return (
@@ -191,11 +237,12 @@ export function PathwaysPage() {
                  isToday={isToday}
                  isTomorrow={isTomorrow}
                  isLocked={isLocked}
+                 courseLocked={courseLocked}
                  isUnlocked={isUnlocked}
                  tapCount={unlockTaps[day.id] ?? 0}
                  onLockedTap={() => handleLockedTap(day)}
                  onAction={() => {
-                   if (day.isPlaceholder) return;
+                   if (!courseReady || day.isPlaceholder) return;
                    actions.setActiveLesson(day.id, activeTab);
                    navigate(`/lesson/${day.dayNumber}`);
                  }}
@@ -254,7 +301,7 @@ function WeeklyBreakthrough({ day, text, isPassed }) {
 
 /* ---------------- STORY NODE ---------------- */
 
-function StoryNode({ day, index, completed, isToday, isTomorrow, isLocked, isUnlocked, tapCount, onLockedTap, onAction }) {
+function StoryNode({ day, index, completed, isToday, isTomorrow, isLocked, courseLocked, isUnlocked, tapCount, onLockedTap, onAction }) {
   const isLeft = index % 2 === 0;
   const alignment = isLeft ? 'justify-start' : 'justify-start sm:justify-end';
   const tapsLeft = Math.max(3 - tapCount, 0);
@@ -334,9 +381,9 @@ function StoryNode({ day, index, completed, isToday, isTomorrow, isLocked, isUnl
                 ))}
               </div>
               <div>
-                <p className="text-sm font-black uppercase tracking-widest text-white">I am almost dead</p>
+                <p className="text-sm font-black uppercase tracking-widest text-white">{courseLocked ? 'Course not started' : 'I am almost dead'}</p>
                 <p className="mt-2 text-xs font-bold text-slate-300">
-                  Tap {tapsLeft} more {tapsLeft === 1 ? 'time' : 'times'} to unlock me
+                  {courseLocked ? 'This lesson opens from the verified server schedule.' : `Tap ${tapsLeft} more ${tapsLeft === 1 ? 'time' : 'times'} to unlock me`}
                 </p>
               </div>
             </div>

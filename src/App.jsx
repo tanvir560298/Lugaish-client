@@ -1,8 +1,10 @@
-import { Suspense, lazy, useEffect } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { api } from './api/client.js';
 import { Layout } from './components/Layout.jsx';
 import { SEO } from './components/SEO.jsx';
 import { AppProvider, useAppContext } from './state/AppContext.jsx';
+import { ROLES } from './utils/roles.js';
 
 const HomePage = lazy(() => import('./pages/HomePage.jsx').then(module => ({ default: module.HomePage })));
 const DashboardPage = lazy(() => import('./pages/DashboardPage.jsx').then(module => ({ default: module.DashboardPage })));
@@ -49,6 +51,91 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
+function formatLaunchDate(value, dateKey = '') {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateKey);
+  if (match) {
+    const [year, month, day] = match.slice(1).map(Number);
+    return new Intl.DateTimeFormat(undefined, { dateStyle: 'long', timeZone: 'UTC' })
+      .format(new Date(Date.UTC(year, month - 1, day)));
+  }
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat(undefined, { dateStyle: 'long' }).format(date);
+}
+
+function CourseLaunchGuard({ children }) {
+  const { state } = useAppContext();
+  const [reloadKey, setReloadKey] = useState(0);
+  const [launchState, setLaunchState] = useState({ loading: true, started: false, startAt: '', startDate: '', error: '' });
+  const isWebDeveloper = state.userRole === ROLES.webDeveloper;
+
+  useEffect(() => {
+    if (isWebDeveloper) {
+      setLaunchState({ loading: false, started: true, startAt: '', startDate: '', error: '' });
+      return undefined;
+    }
+
+    let ignore = false;
+    setLaunchState(current => ({ ...current, loading: true, error: '' }));
+    api.getDayModules(state.activePathway)
+      .then(response => {
+        if (ignore) return;
+        const courseSchedule = response.courseSchedule ?? response;
+        setLaunchState({
+          loading: false,
+          started: courseSchedule.courseStarted === true,
+          startAt: typeof courseSchedule.courseStartAt === 'string' ? courseSchedule.courseStartAt : '',
+          startDate: typeof courseSchedule.courseStartDate === 'string' ? courseSchedule.courseStartDate : '',
+          error: '',
+        });
+      })
+      .catch(error => {
+        if (!ignore) {
+          setLaunchState({
+            loading: false,
+            started: false,
+            startAt: '',
+            startDate: '',
+            error: error.message || 'The course launch status could not be verified.',
+          });
+        }
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [isWebDeveloper, reloadKey, state.activePathway]);
+
+  if (isWebDeveloper || launchState.started) return children;
+  if (launchState.loading) return <PageFallback />;
+
+  return (
+    <section className="mx-auto grid min-h-[60svh] max-w-3xl place-items-center py-10">
+      <div className="section-card w-full p-8 text-center sm:p-12">
+        <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Course schedule</p>
+        <h1 className="mt-4 text-3xl font-black text-white sm:text-4xl">
+          {launchState.error ? 'Course access is temporarily unavailable' : 'Your course has not started yet'}
+        </h1>
+        <p className="mx-auto mt-4 max-w-xl leading-7 text-slate-400">
+          {launchState.error
+            ? `${launchState.error} Learning pages stay locked until the server can verify your course schedule.`
+            : `Lessons, speaking practice, interviews, and quizzes will open from the server-scheduled launch${launchState.startAt || launchState.startDate ? ` on ${formatLaunchDate(launchState.startAt, launchState.startDate)}` : ''}.`}
+        </p>
+        {launchState.error && (
+          <button type="button" onClick={() => setReloadKey(value => value + 1)} className="glow-button glow-button-muted mt-7">
+            Retry schedule check
+          </button>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function ProtectedCourseRoute({ children }) {
+  return <ProtectedRoute><CourseLaunchGuard>{children}</CourseLaunchGuard></ProtectedRoute>;
+}
+
 export default function App() {
   return (
     <AppProvider>
@@ -63,17 +150,17 @@ export default function App() {
             <Route path='/auth' element={<Navigate to="/login" replace />} />
             <Route path='/pricing' element={<PricingPage />} />
             <Route path='/course/:language' element={<ProtectedRoute><CoursePage /></ProtectedRoute>} />
-            <Route path='/today' element={<ProtectedRoute><TodayPage /></ProtectedRoute>} />
-            <Route path='/lesson' element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
-            <Route path='/lesson/:day' element={<ProtectedRoute><LessonPage /></ProtectedRoute>} />
-            <Route path='/quiz' element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
+            <Route path='/today' element={<ProtectedCourseRoute><TodayPage /></ProtectedCourseRoute>} />
+            <Route path='/lesson' element={<ProtectedCourseRoute><LessonPage /></ProtectedCourseRoute>} />
+            <Route path='/lesson/:day' element={<ProtectedCourseRoute><LessonPage /></ProtectedCourseRoute>} />
+            <Route path='/quiz' element={<ProtectedCourseRoute><QuizPage /></ProtectedCourseRoute>} />
             <Route path='/dashboard' element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path='/profile' element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path='/progress' element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
             <Route path='/pathways' element={<ProtectedRoute><PathwaysPage /></ProtectedRoute>} />
-            <Route path='/daily-lessons' element={<ProtectedRoute><DailyLessonsPage /></ProtectedRoute>} />
-            <Route path='/interview' element={<ProtectedRoute><InterviewPage /></ProtectedRoute>} />
-            <Route path='/speaking-practice' element={<ProtectedRoute><SpeakingPracticePage /></ProtectedRoute>} />
+            <Route path='/daily-lessons' element={<ProtectedCourseRoute><DailyLessonsPage /></ProtectedCourseRoute>} />
+            <Route path='/interview' element={<ProtectedCourseRoute><InterviewPage /></ProtectedCourseRoute>} />
+            <Route path='/speaking-practice' element={<ProtectedCourseRoute><SpeakingPracticePage /></ProtectedCourseRoute>} />
             <Route path='/leaderboard' element={<Navigate to="/daily-lessons" replace />} />
             <Route path="/architects" element={<ArchitectsPage />} />
             <Route path='*' element={<Navigate to='/' replace />} />
