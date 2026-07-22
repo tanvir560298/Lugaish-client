@@ -102,6 +102,17 @@ export function HomePage() {
   const yOffset = useTransform(scrollYProgress, [0, 1], [0, -100]);
 
   useEffect(() => {
+    const connection = navigator.connection ?? navigator.mozConnection ?? navigator.webkitConnection;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const hasLargeViewport = window.matchMedia('(min-width: 1024px)').matches;
+    const hasConstrainedConnection = Boolean(
+      connection?.saveData || ['slow-2g', '2g'].includes(connection?.effectiveType),
+    );
+
+    // The WebGL scene is decorative. Keep it out of the download path for
+    // phones, reduced-motion users, and learners trying to conserve data.
+    if (!hasLargeViewport || prefersReducedMotion || hasConstrainedConnection) return undefined;
+
     const scheduleHeroScene = window.requestIdleCallback ?? ((callback) => window.setTimeout(callback, 250));
     const cancelHeroScene = window.cancelIdleCallback ?? window.clearTimeout;
     const id = scheduleHeroScene(() => setShowHeroScene(true));

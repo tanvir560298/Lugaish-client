@@ -289,7 +289,33 @@ export function AppProvider({ children }) {
       return api.submitQuiz({
         ...payload,
         responses: responses.map(selectedAnswer => ({ selectedAnswer })),
-      }).catch(() => {});
+      });
+    },
+    recordServerQuizCompletion(lessonId, result) {
+      setState(prev => {
+        const completedLessons = prev.completedLessons.includes(lessonId)
+          ? prev.completedLessons
+          : [...prev.completedLessons, lessonId];
+        const xp = Number.isFinite(Number(result?.totalXP)) ? Number(result.totalXP) : prev.xp;
+        const streak = Number.isFinite(Number(result?.streak)) ? Number(result.streak) : prev.streak;
+        const badges = [...prev.badges];
+        if (xp >= 500 && !badges.includes('visionary-voice')) badges.push('visionary-voice');
+        if (computeLevel(xp) >= 4 && !badges.includes('rhetorical-elite')) badges.push('rhetorical-elite');
+
+        const pathway = prev.activePathway;
+        const todayKey = getDateKey();
+        const courseActivity = hasCourseStarted() && Number(result?.xpAwarded) > 0
+          ? {
+              ...(prev.courseActivity ?? {}),
+              [pathway]: {
+                ...(prev.courseActivity?.[pathway] ?? {}),
+                [todayKey]: { lessonId, completedAt: new Date().toISOString() },
+              },
+            }
+          : prev.courseActivity;
+
+        return { ...prev, completedLessons, xp, streak, badges, courseActivity };
+      });
     },
     login(profile) {
       const nextProfile = typeof profile === 'string'
