@@ -172,7 +172,13 @@ export function SpeakingPracticePage() {
   const currentResult = results.find(result => result.questionId === currentQuestion?.id);
   const isRtl = language === 'arabic';
   const isPracticeDay = module?.moduleType === 'ai_practice';
-  const practiceMode = module?.practiceMode === 'ask' ? 'ask' : 'respond';
+  // Day 3 is always the reverse-conversation day in both pathways. Keeping
+  // this client-side invariant prevents stale server content from making the
+  // assistant read the learner's question aloud.
+  const practiceMode = day === 3 || module?.practiceMode === 'ask' ? 'ask' : 'respond';
+  const askModeInstruction = language === 'arabic'
+    ? 'Read the Arabic question shown on screen, say it into the microphone, and the assistant will answer you in Arabic.'
+    : 'Read the English question shown on screen, say it into the microphone, and the assistant will answer you in English.';
 
   useEffect(() => {
     if (shouldOpenManager && isWebDeveloper) setManagerOpen(true);
@@ -796,6 +802,12 @@ export function SpeakingPracticePage() {
             <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Day {day} · AI speaking practice</p>
             <h1 className="mt-4 text-4xl font-black leading-tight text-white sm:text-5xl">{module?.introTitle || 'Ready to speak with confidence?'}</h1>
             <p className="mt-5 text-base leading-8 text-slate-300">{module?.introText || (practiceMode === 'ask' ? 'Read each question aloud. The assistant will recognize it and answer in Arabic.' : 'Listen to each question, answer by microphone, check your transcript, and receive instant feedback before continuing.')}</p>
+            {practiceMode === 'ask' && (
+              <div className="mt-6 rounded-2xl border border-blue-400/25 bg-blue-500/10 p-5 text-sm font-semibold leading-7 text-blue-50">
+                <strong className="block text-base text-white">Today, you ask the questions.</strong>
+                {askModeInstruction}
+              </div>
+            )}
             <div className="mt-7 grid gap-3 sm:grid-cols-2">
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4"><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Questions</p><p className="mt-2 text-2xl font-black text-white">{questions.length}</p></div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4"><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Scoring</p><p className="mt-2 text-2xl font-black text-white">Out of 100</p></div>
@@ -830,6 +842,13 @@ export function SpeakingPracticePage() {
           </div>
         </div>
       </div>
+
+      {practiceMode === 'ask' && !isRemoteLoading && (
+        <div className="rounded-2xl border border-blue-400/25 bg-blue-500/10 px-5 py-4 text-sm font-semibold leading-7 text-blue-50">
+          <strong className="mr-1 text-white">Today, you ask the questions.</strong>
+          Read what is written on screen, say the question into the microphone, and the assistant will answer after scoring your spoken question.
+        </div>
+      )}
 
       {isWebDeveloper && managerOpen && (
         <div className="section-card p-5 sm:p-8">
