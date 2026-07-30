@@ -430,11 +430,20 @@ export function SpeakingPracticePage() {
   const beginPractice = () => {
     if (!currentQuestion) return;
 
+    setHasBegun(true);
+    if (practiceMode === 'ask') {
+      // On the reverse-conversation day the learner must read the displayed
+      // question aloud. The assistant stays silent until it recognizes the
+      // learner's question, then answers in Arabic.
+      abortRecognition();
+      stopQuestionAudio();
+      return;
+    }
+
     // Calling speech synthesis inside this click handler keeps the initial
     // question audible on Safari/iOS, which can reject speech started from a
     // timer after a user gesture. Later questions still use the effect above.
     lastAutoReadKeyRef.current = `${questionIndex}:${currentQuestion.id}`;
-    setHasBegun(true);
     speakQuestion();
   };
 
