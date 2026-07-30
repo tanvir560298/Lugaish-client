@@ -22,7 +22,7 @@ import { useAppContext } from '../state/AppContext.jsx';
 import { ROLES } from '../utils/roles.js';
 
 const LEARNER_PREVIEW_DAYS = 8;
-const WEB_DEVELOPER_PLANNING_DAYS = 30;
+const WEB_DEVELOPER_PLANNING_DAYS = 90;
 
 function formatScheduledDate(dateKey) {
   if (typeof dateKey !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return '';
