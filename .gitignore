@@ -26,6 +26,7 @@ pnpm-debug.log*
 
 # Server and legacy sources are not part of the client repo
 backend/
+backend-server/
 legacy/
 
 # Local helper artifacts

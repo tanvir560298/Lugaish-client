@@ -113,6 +113,7 @@ function buildModulePayload(module, language, day, questions, published) {
     introText: module?.introText || '',
     questions,
     language,
+    practiceMode: module?.practiceMode === 'ask' ? 'ask' : 'respond',
   };
 }
 
@@ -155,6 +156,7 @@ export function SpeakingPracticePage() {
   const [speechRate, setSpeechRate] = useState(0.92);
   const [isQuestionAudioPlaying, setIsQuestionAudioPlaying] = useState(false);
   const recognitionRef = useRef(null);
+  const recognitionConfidenceRef = useRef(null);
   const interimTranscriptRef = useRef('');
   const audioRef = useRef(null);
   const utteranceRef = useRef(null);
@@ -170,6 +172,7 @@ export function SpeakingPracticePage() {
   const currentResult = results.find(result => result.questionId === currentQuestion?.id);
   const isRtl = language === 'arabic';
   const isPracticeDay = module?.moduleType === 'ai_practice';
+  const practiceMode = module?.practiceMode === 'ask' ? 'ask' : 'respond';
 
   useEffect(() => {
     if (shouldOpenManager && isWebDeveloper) setManagerOpen(true);
@@ -244,6 +247,7 @@ export function SpeakingPracticePage() {
         introTitle: response.introTitle ?? scheduledModule?.introTitle ?? '',
         introText: response.introText ?? scheduledModule?.introText ?? '',
         published: Boolean(response.published ?? response.enabled ?? scheduledModule?.published),
+        practiceMode: response.practiceMode === 'ask' ? 'ask' : 'respond',
       };
 
       if (!isWebDeveloper && (savedModule.moduleType !== 'ai_practice' || !savedModule.published)) {
@@ -391,8 +395,31 @@ export function SpeakingPracticePage() {
     window.speechSynthesis.speak(utterance);
   };
 
+  const speakAiResponse = text => {
+    if (!text || !('speechSynthesis' in window)) return;
+    stopQuestionAudio();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = locale;
+    utterance.rate = speechRate;
+    utterance.pitch = 1;
+    utterance.voice = voices.find(voice => voice.name === selectedVoiceName) ?? pickPreferredVoice(voices, locale) ?? null;
+    utterance.onstart = () => setIsQuestionAudioPlaying(true);
+    utterance.onend = () => {
+      utteranceRef.current = null;
+      setIsQuestionAudioPlaying(false);
+    };
+    utterance.onerror = () => {
+      utteranceRef.current = null;
+      setIsQuestionAudioPlaying(false);
+      setSpeechError('The browser could not read the Arabic response. You can still read it on screen.');
+    };
+    utteranceRef.current = utterance;
+    setIsQuestionAudioPlaying(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
   useEffect(() => {
-    if (!hasBegun || !currentQuestion) return undefined;
+    if (!hasBegun || !currentQuestion || practiceMode === 'ask') return undefined;
     const readKey = `${questionIndex}:${currentQuestion.id}`;
     if (lastAutoReadKeyRef.current === readKey) return undefined;
     lastAutoReadKeyRef.current = readKey;
@@ -455,6 +482,7 @@ export function SpeakingPracticePage() {
     stopQuestionAudio();
     setSpeechError('');
     setInterimTranscript('');
+    recognitionConfidenceRef.current = null;
 
     const recognition = new RecognitionConstructor();
     recognition.lang = locale;
@@ -465,7 +493,13 @@ export function SpeakingPracticePage() {
       let interimText = '';
       for (let index = event.resultIndex; index < event.results.length; index += 1) {
         const text = event.results[index][0]?.transcript ?? '';
-        if (event.results[index].isFinal) finalText += `${text} `;
+        if (event.results[index].isFinal) {
+          finalText += `${text} `;
+          const confidence = Number(event.results[index][0]?.confidence);
+          if (Number.isFinite(confidence) && confidence > 0) {
+            recognitionConfidenceRef.current = Math.max(recognitionConfidenceRef.current ?? 0, confidence);
+          }
+        }
         else interimText += text;
       }
       if (finalText) setTranscript(current => `${current} ${finalText}`.replace(/\s+/g, ' ').trim());
@@ -520,9 +554,14 @@ export function SpeakingPracticePage() {
       return;
     }
     stopListening();
-    const result = scoreSpeakingTranscript(currentQuestion, transcript);
+    const result = scoreSpeakingTranscript(currentQuestion, transcript, {
+      recognitionConfidence: recognitionConfidenceRef.current,
+    });
     setResults(current => [...current.filter(item => item.questionId !== currentQuestion.id), result]);
     setSpeechError('');
+    if (practiceMode === 'ask' && result.marks >= Math.ceil(result.maxMarks * 0.5)) {
+      window.setTimeout(() => speakAiResponse(currentQuestion.aiResponse), 120);
+    }
   };
 
   const retryQuestion = () => {
@@ -531,6 +570,7 @@ export function SpeakingPracticePage() {
     setTranscript('');
     setInterimTranscript('');
     setSpeechError('');
+    recognitionConfidenceRef.current = null;
     setResults(current => current.filter(item => item.questionId !== currentQuestion?.id));
   };
 
@@ -652,6 +692,7 @@ export function SpeakingPracticePage() {
         introTitle: savedModule.introTitle,
         introText: savedModule.introText,
         published: savedModule.published,
+        practiceMode: savedModule.practiceMode === 'ask' ? 'ask' : 'respond',
       });
       setQuestions(savedQuestions);
       setDraftQuestions(savedQuestions);
@@ -745,13 +786,13 @@ export function SpeakingPracticePage() {
           <div className="relative max-w-2xl">
             <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Day {day} · AI speaking practice</p>
             <h1 className="mt-4 text-4xl font-black leading-tight text-white sm:text-5xl">{module?.introTitle || 'Ready to speak with confidence?'}</h1>
-            <p className="mt-5 text-base leading-8 text-slate-300">{module?.introText || 'Listen to each question, answer by microphone, check your transcript, and receive instant feedback before continuing.'}</p>
+            <p className="mt-5 text-base leading-8 text-slate-300">{module?.introText || (practiceMode === 'ask' ? 'Read each question aloud. The assistant will recognize it and answer in Arabic.' : 'Listen to each question, answer by microphone, check your transcript, and receive instant feedback before continuing.')}</p>
             <div className="mt-7 grid gap-3 sm:grid-cols-2">
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4"><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Questions</p><p className="mt-2 text-2xl font-black text-white">{questions.length}</p></div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4"><p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Scoring</p><p className="mt-2 text-2xl font-black text-white">Out of 100</p></div>
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
-              <button type="button" onClick={beginPractice} className="glow-button glow-button-blue py-4"><Mic size={18} /> {isWebDeveloper ? 'Begin preview' : 'Begin practice'}</button>
+              <button type="button" onClick={beginPractice} className="glow-button glow-button-blue py-4"><Mic size={18} /> {isWebDeveloper ? 'Begin preview' : practiceMode === 'ask' ? 'Start asking' : 'Begin practice'}</button>
               <button type="button" onClick={() => navigate('/daily-lessons')} className="glow-button glow-button-muted py-4"><ArrowLeft size={18} /> Back to lessons</button>
             </div>
           </div>
@@ -768,7 +809,7 @@ export function SpeakingPracticePage() {
           <div>
             <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">AI Speaking Practice</p>
             <h1 className="mt-3 text-3xl font-black text-white sm:text-5xl">{language === 'arabic' ? 'Arabic' : 'English'} · Day {day}</h1>
-            <p className="mt-3 max-w-2xl leading-7 text-slate-400">{module?.description || 'Listen, answer naturally, review your transcript, and receive lightweight keyword-based feedback.'}</p>
+            <p className="mt-3 max-w-2xl leading-7 text-slate-400">{module?.description || (practiceMode === 'ask' ? 'Read each Arabic question aloud and listen to the assistant’s response.' : 'Listen, answer naturally, review your transcript, and receive phrase-based feedback.')}</p>
           </div>
           <div className="flex flex-wrap gap-3">
             {isWebDeveloper && (
@@ -841,13 +882,16 @@ export function SpeakingPracticePage() {
         <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
           <div className="section-card p-5 sm:p-8">
             <div className="flex flex-wrap items-center justify-between gap-3"><p className="text-xs font-black uppercase tracking-[0.22em] text-blue-400">Question {questionIndex + 1} of {questions.length}</p><span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-black text-slate-300">{currentQuestion.maxMarks} marks</span></div>
-            <div className="mt-5 rounded-2xl border border-blue-400/20 bg-blue-500/10 p-5 sm:p-7" dir={isRtl ? 'rtl' : 'ltr'}><p className="text-xl font-black leading-9 text-white sm:text-2xl">{currentQuestion.question}</p></div>
+            <div className="mt-5 rounded-2xl border border-blue-400/20 bg-blue-500/10 p-5 sm:p-7" dir={isRtl ? 'rtl' : 'ltr'}>
+              {practiceMode === 'ask' && <p className="mb-2 text-xs font-black uppercase tracking-wider text-blue-300">Read this question aloud</p>}
+              <p className="text-xl font-black leading-9 text-white sm:text-2xl">{currentQuestion.question}</p>
+            </div>
 
             <div className="mt-5 grid gap-3 md:grid-cols-[minmax(0,1fr)_120px_auto]">
               <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Browser voice<select value={selectedVoiceName} onChange={event => setSelectedVoiceName(event.target.value)} className="mt-2 h-12 w-full rounded-xl border border-white/10 bg-slate-950 px-3 text-sm normal-case tracking-normal text-white">{(languageVoices.length ? languageVoices : voices).map(voice => <option key={`${voice.name}-${voice.lang}`} value={voice.name}>{voice.name} · {voice.lang}</option>)}</select></label>
               <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Speed<select value={speechRate} onChange={event => setSpeechRate(Number(event.target.value))} className="mt-2 h-12 w-full rounded-xl border border-white/10 bg-slate-950 px-3 text-sm normal-case tracking-normal text-white"><option value="0.8">Slow</option><option value="0.92">Natural</option><option value="1">Normal</option></select></label>
               <div className="grid gap-2 self-end">
-                <button type="button" onClick={speakQuestion} className="glow-button glow-button-muted py-3.5"><Volume2 size={18} /> Read question</button>
+                {practiceMode !== 'ask' && <button type="button" onClick={speakQuestion} className="glow-button glow-button-muted py-3.5"><Volume2 size={18} /> Read question</button>}
                 <button type="button" onClick={stopQuestionAudio} disabled={!isQuestionAudioPlaying} className="glow-button glow-button-muted py-3 disabled:cursor-not-allowed disabled:opacity-40"><CircleStop size={17} /> Stop audio</button>
                 {currentQuestion.audioUrl && <button type="button" onClick={playRecordedQuestion} className="glow-button glow-button-muted py-3"><Headphones size={17} /> Recorded audio</button>}
               </div>
@@ -856,7 +900,7 @@ export function SpeakingPracticePage() {
             {!recognitionSupported && <div role="status" className="mt-5 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4 text-sm leading-6 text-amber-100">Speech recognition is unavailable in this browser. Use a recent Chrome or Edge browser, or type your answer below for practice.</div>}
 
             <div className="mt-5">
-              <div className="mb-2 flex items-center justify-between gap-3"><label htmlFor="speaking-transcript" className="text-sm font-black text-white">Your transcript</label>{isListening && <span className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-red-300"><span className="h-2 w-2 animate-pulse rounded-full bg-red-400" /> Listening</span>}</div>
+              <div className="mb-2 flex items-center justify-between gap-3"><label htmlFor="speaking-transcript" className="text-sm font-black text-white">{practiceMode === 'ask' ? 'Your spoken question' : 'Your transcript'}</label>{isListening && <span className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-red-300"><span className="h-2 w-2 animate-pulse rounded-full bg-red-400" /> Listening</span>}</div>
               <textarea id="speaking-transcript" value={`${transcript}${interimTranscript ? ` ${interimTranscript}` : ''}`} onChange={event => { sessionStartedRef.current = true; setTranscript(event.target.value); interimTranscriptRef.current = ''; setInterimTranscript(''); }} disabled={Boolean(currentResult)} rows={6} dir={isRtl ? 'rtl' : 'ltr'} placeholder="Your spoken words will appear here. You can review or correct them before submitting." className="w-full rounded-2xl border border-white/10 bg-slate-950/80 p-4 leading-7 text-white outline-none transition focus:border-emerald-400 disabled:opacity-70" />
             </div>
             {speechError && <p role="alert" className="mt-3 text-sm font-semibold text-amber-300">{speechError}</p>}
@@ -870,6 +914,14 @@ export function SpeakingPracticePage() {
               <div aria-live="polite" className="mt-6 rounded-2xl border border-emerald-400/25 bg-emerald-500/[0.08] p-5 sm:p-6">
                 <div className="flex items-center justify-between gap-3"><h2 className="text-xl font-black text-white">Answer feedback</h2><p className="text-2xl font-black text-emerald-300">{currentResult.marks}/{currentResult.maxMarks}</p></div>
                 <p className="mt-3 text-sm leading-6 text-slate-300">{currentResult.feedback}</p>
+                {currentResult.recognitionConfidence !== null && <p className="mt-2 text-xs font-semibold text-slate-400">Browser recognition confidence: {currentResult.recognitionConfidence}%</p>}
+                {practiceMode === 'ask' && currentQuestion.aiResponse && (
+                  <div className="mt-5 rounded-xl border border-blue-400/20 bg-blue-500/10 p-4" dir="rtl">
+                    <p className="text-xs font-black uppercase tracking-wider text-blue-300">إجابة المساعد · AI response</p>
+                    <p className="mt-2 text-base leading-8 text-white">{currentQuestion.aiResponse}</p>
+                    <button type="button" onClick={() => speakAiResponse(currentQuestion.aiResponse)} className="glow-button glow-button-muted mt-3 py-2.5"><Volume2 size={17} /> Hear answer</button>
+                  </div>
+                )}
                 <div className="mt-5 grid gap-4 sm:grid-cols-2"><div><p className="text-xs font-black uppercase tracking-wider text-emerald-400">Matched keywords</p><p className="mt-2 text-sm text-slate-300">{currentResult.matchedKeywords.join(', ') || 'None yet'}</p></div><div><p className="text-xs font-black uppercase tracking-wider text-amber-400">Missing keywords</p><p className="mt-2 text-sm text-slate-300">{currentResult.missingKeywords.join(', ') || 'None'}</p></div></div>
                 <div className="mt-5 rounded-xl border border-white/10 bg-slate-950/50 p-4" dir={isRtl ? 'rtl' : 'ltr'}><p className="text-xs font-black uppercase tracking-wider text-slate-500">Sample answer</p><p className="mt-2 text-sm leading-6 text-slate-300">{currentQuestion.sampleAnswer}</p></div>
                 <div className="mt-5 grid gap-3 sm:grid-cols-2"><button type="button" onClick={retryQuestion} className="glow-button glow-button-muted py-4"><RefreshCw size={18} /> Retry</button><button type="button" onClick={nextQuestion} className="glow-button glow-button-blue py-4">{questionIndex === questions.length - 1 ? 'Finish test' : 'Next question'} <Sparkles size={18} /></button></div>

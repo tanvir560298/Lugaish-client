@@ -3,6 +3,8 @@ import {
   ArrowLeft,
   CheckCircle2,
   Clock3,
+  ExternalLink,
+  FileText,
   ListVideo,
   Lock,
   LoaderCircle,
@@ -18,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client.js';
+import { LEARNING_RESOURCES } from '../data/learningResources.js';
 import { useAppContext, getPathFromState } from '../state/AppContext.jsx';
 import { ROLES } from '../utils/roles.js';
 
@@ -69,6 +72,17 @@ function formatDuration(minutes) {
   const hours = Math.floor(value / 60);
   const remainingMinutes = value % 60;
   return remainingMinutes ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
+}
+
+function formatScheduledDate(dateKey) {
+  if (typeof dateKey !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return '';
+  const [year, month, day] = dateKey.split('-').map(Number);
+  return new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Asia/Dhaka',
+  }).format(new Date(Date.UTC(year, month - 1, day)));
 }
 
 function getModuleForm(lesson, staticLesson, day) {
@@ -172,7 +186,7 @@ function ModuleTypePanel({ lesson, language, day, isWebDeveloper, navigate }) {
 }
 
 export function LessonPage() {
-  const { state, courseData } = useAppContext();
+  const { state, actions, courseData } = useAppContext();
   const pathway = getPathFromState(state, courseData);
   const navigate = useNavigate();
   const { day: dayParam = '1' } = useParams();
@@ -282,8 +296,10 @@ export function LessonPage() {
   );
   const completedVideoCount = lessonVideos.filter(isVideoCompleted).length;
   const moduleType = lesson.moduleType ?? 'video';
+  const scheduledDate = formatScheduledDate(lesson.daySchedule?.scheduledFor);
   const title = lesson.title || staticLesson?.title || `Day ${day} learning session`;
   const description = lesson.description || staticLesson?.description || 'Follow the course team\'s plan for this day.';
+  const dayResources = (LEARNING_RESOURCES[language] ?? []).filter(resource => resource.day === day);
 
   const submitVideo = async event => {
     event.preventDefault();
@@ -335,6 +351,12 @@ export function LessonPage() {
     if (isWebDeveloper || moduleType !== 'video' || !lessonVideos.length) return;
     if (!allVideosCompleted) {
       setVideoCompletionMessage('Mark each playlist video complete before finishing this video day.');
+      return;
+    }
+
+    if (lesson.quiz?.length && staticLesson?.id) {
+      actions.setActiveLesson(staticLesson.id, language);
+      navigate('/quiz');
       return;
     }
 
@@ -476,7 +498,10 @@ export function LessonPage() {
             <div>
               <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-400">Web Developer course setup</p>
               <h2 className="mt-1 text-xl font-black text-white">Choose what learners receive on Day {day}</h2>
-              <p className="mt-2 text-sm leading-6 text-slate-400">Publish only when this day is ready. Learners receive one module type, not a separate practice button.</p>
+              <p className="mt-2 text-sm leading-6 text-slate-400">
+                {scheduledDate && <strong className="text-emerald-200">Scheduled for {scheduledDate}. </strong>}
+                Uploading or publishing early does not change this date. Learners must also complete the previous day before this one unlocks.
+              </p>
               {isLoading && <p className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-blue-200"><LoaderCircle size={16} className="animate-spin" /> Loading this day&apos;s saved setup…</p>}
             </div>
           </div>
@@ -692,12 +717,46 @@ export function LessonPage() {
               </div>
               {allVideosCompleted && <button type="button" onClick={completeVideoDay} disabled={isVideoCompleting} className="glow-button glow-button-blue shrink-0 py-4 disabled:cursor-wait disabled:opacity-60">
                 {isVideoCompleting ? <LoaderCircle size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
-                {isVideoCompleting ? 'Finishing day...' : 'Finish video day'}
+                {isVideoCompleting ? 'Finishing day...' : lesson.quiz?.length ? 'Start MCQ exam' : 'Finish video day'}
               </button>}
             </div>
           )}
         </>
       ))}
+
+      {!isConfigurationView && !isLoading && !error && dayResources.length > 0 && (
+        <section className="section-card overflow-hidden p-6 sm:p-8" aria-labelledby="day-resources-title">
+          <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Day {day} · Beyond the class</p>
+          <h2 id="day-resources-title" className="mt-2 text-2xl font-black text-white">Optional Arabic learning resource</h2>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400">
+            If you would like to learn something new after today&apos;s class, this PDF is for you.
+            Read it at your own pace, practise what you discover, and take your Arabic learning one step further.
+          </p>
+
+          <div className="mt-6 grid gap-3">
+            {dayResources.map(resource => (
+              <article key={resource.id} className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 sm:flex-row sm:items-center">
+                <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-300">
+                  <FileText size={22} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-black uppercase tracking-widest text-emerald-400">PDF {String(resource.sequence).padStart(2, '0')}</p>
+                  <h3 className="mt-1 font-black text-white">{resource.title}</h3>
+                  <p className="mt-1 text-sm leading-6 text-slate-400">{resource.description}</p>
+                </div>
+                <a
+                  href={resource.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-5 py-3 text-xs font-black uppercase tracking-widest text-white transition hover:bg-emerald-400"
+                >
+                  Open PDF <ExternalLink size={15} />
+                </a>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
     </section>
   );
 }

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppContext, getLessonFromState } from '../state/AppContext.jsx';
 
 export function QuizPage() {
-  const { actions, courseData } = useAppContext();
+  const { state, actions, courseData } = useAppContext();
   const activeLesson = getLessonFromState(state, courseData);
   const navigate = useNavigate();
   const [questionIndex, setQuestionIndex] = useState(0);

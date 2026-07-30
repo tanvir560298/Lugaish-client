@@ -24,6 +24,17 @@ import { ROLES } from '../utils/roles.js';
 const LEARNER_PREVIEW_DAYS = 8;
 const WEB_DEVELOPER_PLANNING_DAYS = 30;
 
+function formatScheduledDate(dateKey) {
+  if (typeof dateKey !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return '';
+  const [year, month, day] = dateKey.split('-').map(Number);
+  return new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Asia/Dhaka',
+  }).format(new Date(Date.UTC(year, month - 1, day)));
+}
+
 const MODULE_PRESENTATION = {
   video: {
     label: 'Video lesson',
@@ -344,6 +355,7 @@ export function DailyLessonsPage() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {days.map((day, index) => {
           const presentation = MODULE_PRESENTATION[day.moduleType] ?? null;
+          const scheduledDate = formatScheduledDate(day.daySchedule?.scheduledFor);
           const isPublished = Boolean(day.published);
           const planPendingForLearner = !hasLoadedDayModules && !isWebDeveloper;
           const planUnavailableForLearner = Boolean(dayModuleError) && !isWebDeveloper;
@@ -377,6 +389,7 @@ export function DailyLessonsPage() {
               <div className="mb-5 flex items-start justify-between gap-3">
                 <div>
                   <p className={`text-[10px] font-black uppercase tracking-[0.28em] ${presentation?.accent ?? 'text-slate-500'}`}>Day {day.day}{presentation ? ` · ${presentation.label}` : ''}</p>
+                  {scheduledDate && <p className="mt-1 text-xs font-bold text-slate-500">{scheduledDate}</p>}
                   <h2 className="mt-2 text-xl font-black leading-tight text-white">{day.title}</h2>
                 </div>
                 <div className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl ${
