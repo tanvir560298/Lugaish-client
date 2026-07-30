@@ -55,3 +55,24 @@ test('question reading uses phrase coverage and recognition confidence', () => {
   assert.equal(result.marks, 10);
   assert.equal(result.recognitionConfidence, 75);
 });
+
+test('English first-meeting scoring judges meaning instead of exact sentences', () => {
+  const question = {
+    ...baseQuestion,
+    language: 'english',
+    conversationStep: 3,
+    scoringStrategy: 'english_first_meeting',
+  };
+  assert.ok(scoreSpeakingTranscript(question, 'My hometown is Sylhet.').marks >= 7);
+  assert.ok(scoreSpeakingTranscript(question, 'I live in Dhaka now.').marks < 5);
+});
+
+test('English return-question step accepts natural personal questions', () => {
+  const result = scoreSpeakingTranscript({
+    ...baseQuestion,
+    language: 'english',
+    conversationStep: 7,
+    scoringStrategy: 'english_first_meeting',
+  }, 'What subject do you study?');
+  assert.ok(result.marks >= 9);
+});

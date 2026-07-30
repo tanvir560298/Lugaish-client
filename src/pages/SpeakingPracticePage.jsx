@@ -62,6 +62,46 @@ function saveLocally(key, value) {
   }
 }
 
+function buildFirstMeetingReport(results, totalQuestions) {
+  const answered = results.length;
+  const conversationMarks = results.reduce((total, result) => total + result.marks, 0);
+  const flowMarks = Math.round((answered / Math.max(totalQuestions, 1)) * 10);
+  const confidenceValues = results
+    .map(result => result.recognitionConfidence)
+    .filter(value => Number.isFinite(value));
+  const confidenceMarks = confidenceValues.length
+    ? Math.round(confidenceValues.reduce((total, value) => total + value, 0) / confidenceValues.length / 10)
+    : Math.round((conversationMarks / Math.max(answered * 10, 1)) * 10);
+  const continuationMarks = Math.round((results.filter(result => result.marks >= 5).length / Math.max(totalQuestions, 1)) * 10);
+  const score = Math.min(100, conversationMarks + flowMarks + confidenceMarks + continuationMarks);
+  const level = score >= 85 ? 'Excellent' : score >= 70 ? 'Good' : score >= 50 ? 'Developing' : 'Needs Practice';
+  const strongAnswers = results.filter(result => result.marks >= 8).length;
+  const corrections = [];
+
+  for (const result of results) {
+    const answer = result.transcript.trim();
+    if (/\bi from\b/i.test(answer)) corrections.push(`Instead of “${answer}”, say “I am from …”`);
+    else if (/\bi am study\b/i.test(answer)) corrections.push(`Instead of “${answer}”, say “I study …” or “I am studying …”`);
+    else if (result.marks < 7 && answer.split(/\s+/).length <= 2) corrections.push(`Make “${answer}” a complete sentence with “I am …” or “I …”`);
+    if (corrections.length === 2) break;
+  }
+
+  return {
+    score,
+    level,
+    strengths: [
+      `${answered} of ${totalQuestions} conversation steps completed`,
+      `${strongAnswers} clear and detailed answer${strongAnswers === 1 ? '' : 's'}`,
+      continuationMarks >= 8 ? 'You kept the conversation moving naturally' : 'You communicated useful personal information',
+    ],
+    improvements: [
+      conversationMarks < 50 ? 'Use complete sentences more often' : 'Add one extra detail or reason to your shorter answers',
+      continuationMarks < 8 ? 'Practice asking a return question to continue the conversation' : 'Keep speaking clearly and at a steady pace',
+    ],
+    corrections,
+  };
+}
+
 function validateQuestionSet(questions) {
   if (questions.length > MAX_QUESTIONS) return `A day can have at most ${MAX_QUESTIONS} questions.`;
   const ids = new Set();
@@ -177,6 +217,7 @@ export function SpeakingPracticePage() {
   // assistant read the learner's question aloud.
   const practiceMode = day === 3 || module?.practiceMode === 'ask' ? 'ask' : 'respond';
   const isEnglishClassmateConversation = language === 'english' && (day === 2 || day === 3);
+  const isEnglishFirstMeeting = language === 'english' && day === 2 && currentQuestion?.scoringStrategy === 'english_first_meeting';
   const askModeInstruction = language === 'arabic'
     ? 'Read the Arabic question shown on screen, say it into the microphone, and the assistant will answer you in Arabic.'
     : 'Read the English question shown on screen, say it into the microphone, and the assistant will answer you in English.';
@@ -573,8 +614,24 @@ export function SpeakingPracticePage() {
     const result = scoreSpeakingTranscript(currentQuestion, transcript, {
       recognitionConfidence: recognitionConfidenceRef.current,
     });
-    setResults(current => [...current.filter(item => item.questionId !== currentQuestion.id), result]);
+    const completedResults = [...results.filter(item => item.questionId !== currentQuestion.id), result];
+    setResults(completedResults);
     setSpeechError('');
+    if (isEnglishFirstMeeting) {
+      window.setTimeout(() => {
+        if (questionIndex >= questions.length - 1) {
+          finishTest(completedResults);
+          return;
+        }
+        abortRecognition();
+        stopQuestionAudio();
+        setQuestionIndex(index => index + 1);
+        setTranscript('');
+        setInterimTranscript('');
+        setSpeechError('');
+      }, 900);
+      return;
+    }
     if (practiceMode === 'ask' && result.marks >= Math.ceil(result.maxMarks * 0.5)) {
       window.setTimeout(() => speakAiResponse(currentQuestion.aiResponse), 120);
     }
@@ -590,31 +647,34 @@ export function SpeakingPracticePage() {
     setResults(current => current.filter(item => item.questionId !== currentQuestion?.id));
   };
 
-  const finishTest = () => {
+  const finishTest = (completedResults = results) => {
     abortRecognition();
     stopQuestionAudio();
-    const earnedMarks = results.reduce((total, result) => total + result.marks, 0);
+    const earnedMarks = completedResults.reduce((total, result) => total + result.marks, 0);
     const availableMarks = questions.reduce((total, question) => total + Number(question.maxMarks || 0), 0);
-    const totalOutOf100 = availableMarks ? Math.round((earnedMarks / availableMarks) * 100) : 0;
+    const firstMeetingReport = language === 'english' && day === 2
+      ? buildFirstMeetingReport(completedResults, questions.length)
+      : null;
+    const totalOutOf100 = firstMeetingReport?.score ?? (availableMarks ? Math.round((earnedMarks / availableMarks) * 100) : 0);
     const savedResult = {
       language,
       day,
       completedAt: new Date().toISOString(),
       totalMarks: totalOutOf100,
-      answeredQuestions: results.length,
+      answeredQuestions: completedResults.length,
       totalQuestions: questions.length,
-      results: results.map(({ transcript: _transcript, ...result }) => result),
+      results: completedResults.map(({ transcript: _transcript, ...result }) => result),
     };
     const learnerKey = String(state.userEmail || 'learner').trim().toLowerCase();
     saveLocally(`${RESULT_STORAGE_KEY}:${learnerKey}:${language}:${day}`, savedResult);
     setIsFinished(true);
 
-    if (!isWebDeveloper && results.length === questions.length && !completionSentRef.current) {
+    if (!isWebDeveloper && completedResults.length === questions.length && !completionSentRef.current) {
       completionSentRef.current = true;
       api.completeLesson({ language, day })
         .then(() => setCompletionNotice('Day complete — the next scheduled day is now unlocked.'))
         .catch(() => setCompletionNotice('Your test result is saved here. The course progress will refresh when the connection is available.'));
-    } else if (!isWebDeveloper && results.length < questions.length) {
+    } else if (!isWebDeveloper && completedResults.length < questions.length) {
       setCompletionNotice('Your result is saved, but complete every question to unlock the next scheduled day.');
     }
   };
@@ -736,6 +796,10 @@ export function SpeakingPracticePage() {
   const earnedMarks = results.reduce((total, result) => total + result.marks, 0);
   const availableMarks = questions.reduce((total, question) => total + Number(question.maxMarks || 0), 0);
   const totalOutOf100 = availableMarks ? Math.round((earnedMarks / availableMarks) * 100) : 0;
+  const firstMeetingReport = language === 'english' && day === 2
+    ? buildFirstMeetingReport(results, questions.length)
+    : null;
+  const displayedTotal = firstMeetingReport?.score ?? totalOutOf100;
   const languageVoices = voices.filter(voice => voice.lang?.toLowerCase().startsWith(locale.slice(0, 2).toLowerCase()));
 
   if (isFinished) {
@@ -744,8 +808,31 @@ export function SpeakingPracticePage() {
         <div className="section-card overflow-hidden p-8 text-center sm:p-12">
           <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-emerald-500/15 text-emerald-300"><Sparkles size={36} /></div>
           <p className="mt-6 text-xs font-black uppercase tracking-[0.26em] text-emerald-400">Speaking test complete</p>
-          <h1 className="mt-3 text-5xl font-black text-white sm:text-7xl">{totalOutOf100}/100</h1>
+          <h1 className="mt-3 text-5xl font-black text-white sm:text-7xl">{displayedTotal}/100</h1>
+          {firstMeetingReport && <p className="mt-3 text-xl font-black text-emerald-300">Level: {firstMeetingReport.level}</p>}
           <p className="mt-3 text-slate-400">You answered {results.length} of {questions.length} questions. Your latest result is saved on this device.</p>
+          {firstMeetingReport && (
+            <div className="mx-auto mt-7 grid max-w-3xl gap-4 text-left md:grid-cols-2">
+              <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/[0.08] p-5">
+                <h2 className="font-black text-white">Strength</h2>
+                <ul className="mt-3 space-y-2 text-sm text-slate-300">{firstMeetingReport.strengths.map(item => <li key={item}>• {item}</li>)}</ul>
+              </div>
+              <div className="rounded-2xl border border-amber-400/20 bg-amber-500/[0.08] p-5">
+                <h2 className="font-black text-white">Improvement</h2>
+                <ul className="mt-3 space-y-2 text-sm text-slate-300">{firstMeetingReport.improvements.map(item => <li key={item}>• {item}</li>)}</ul>
+              </div>
+              <div className="rounded-2xl border border-blue-400/20 bg-blue-500/[0.08] p-5 md:col-span-2">
+                <h2 className="font-black text-white">Better sentences</h2>
+                {firstMeetingReport.corrections.length
+                  ? <ul className="mt-3 space-y-2 text-sm text-slate-300">{firstMeetingReport.corrections.map(item => <li key={item}>• {item}</li>)}</ul>
+                  : <p className="mt-3 text-sm text-slate-300">Your answers were understandable. Keep using complete sentences and add small details.</p>}
+              </div>
+              <div className="rounded-2xl border border-purple-400/20 bg-purple-500/[0.08] p-5 md:col-span-2">
+                <h2 className="font-black text-white">Speaking mission</h2>
+                <p className="mt-2 text-sm text-slate-300">Record a 30-second introduction about your name, hometown, current area, and study or work.</p>
+              </div>
+            </div>
+          )}
           {completionNotice && <p className="mx-auto mt-4 max-w-xl rounded-2xl border border-emerald-400/20 bg-emerald-500/[0.08] px-4 py-3 text-sm text-emerald-100">{completionNotice}</p>}
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
             <button type="button" onClick={() => navigate('/daily-lessons')} className="glow-button glow-button-muted py-4"><ArrowLeft size={18} /> Daily lessons</button>
@@ -942,6 +1029,12 @@ export function SpeakingPracticePage() {
                 <div className="mt-5 grid gap-3 sm:grid-cols-3"><button type="button" onClick={startListening} disabled={!recognitionSupported || isListening || isStopping} className="glow-button glow-button-blue py-4 disabled:cursor-not-allowed disabled:opacity-40"><Mic size={18} /> Start speaking</button><button type="button" onClick={stopListening} disabled={!isListening || isStopping} className="glow-button glow-button-muted py-4 disabled:cursor-not-allowed disabled:opacity-40"><CircleStop size={18} /> {isStopping ? 'Finishing...' : 'Stop listening'}</button><button type="button" onClick={submitAnswer} disabled={isListening || isStopping} className="glow-button glow-button-green py-4 disabled:cursor-not-allowed disabled:opacity-40"><CheckCircle2 size={18} /> Submit answer</button></div>
                 <p className="mt-3 text-xs leading-5 text-slate-500">Recognition is supplied by your browser and may use its online speech service. Lugaish does not upload or store your microphone audio.</p>
               </>
+            ) : isEnglishFirstMeeting ? (
+              <div aria-live="polite" className="mt-6 rounded-2xl border border-emerald-400/25 bg-emerald-500/[0.08] p-5 text-center">
+                <Sparkles size={22} className="mx-auto text-emerald-300" />
+                <h2 className="mt-3 text-lg font-black text-white">Thanks—Rafi is continuing the conversation…</h2>
+                <p className="mt-2 text-sm text-slate-300">Your score stays private until the final report.</p>
+              </div>
             ) : (
               <div aria-live="polite" className="mt-6 rounded-2xl border border-emerald-400/25 bg-emerald-500/[0.08] p-5 sm:p-6">
                 <div className="flex items-center justify-between gap-3"><h2 className="text-xl font-black text-white">Answer feedback</h2><p className="text-2xl font-black text-emerald-300">{currentResult.marks}/{currentResult.maxMarks}</p></div>
@@ -962,8 +1055,8 @@ export function SpeakingPracticePage() {
           </div>
 
           <aside className="space-y-4">
-            <div className="section-card p-5"><div className="flex items-center gap-3"><Headphones size={20} className="text-blue-300" /><h2 className="font-black text-white">Test progress</h2></div><div className="mt-5 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-emerald-400 transition-all" style={{ width: `${questions.length ? (results.length / questions.length) * 100 : 0}%` }} /></div><p className="mt-3 text-sm text-slate-400">{results.length}/{questions.length} answered · current score {totalOutOf100}/100</p>{loadNotice && <p className="mt-4 border-t border-white/10 pt-4 text-xs leading-5 text-slate-500">{loadNotice}</p>}</div>
-            <button type="button" onClick={finishTest} className="glow-button glow-button-muted w-full py-4">Finish test now</button>
+            <div className="section-card p-5"><div className="flex items-center gap-3"><Headphones size={20} className="text-blue-300" /><h2 className="font-black text-white">Conversation progress</h2></div><div className="mt-5 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-emerald-400 transition-all" style={{ width: `${questions.length ? (results.length / questions.length) * 100 : 0}%` }} /></div><p className="mt-3 text-sm text-slate-400">{results.length}/{questions.length} answered{isEnglishFirstMeeting ? ' · score shown at the end' : ` · current score ${totalOutOf100}/100`}</p>{loadNotice && <p className="mt-4 border-t border-white/10 pt-4 text-xs leading-5 text-slate-500">{loadNotice}</p>}</div>
+            {!isEnglishFirstMeeting && <button type="button" onClick={() => finishTest()} className="glow-button glow-button-muted w-full py-4">Finish test now</button>}
           </aside>
         </div>
       )}

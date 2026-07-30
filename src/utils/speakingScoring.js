@@ -25,7 +25,90 @@ function scoreAcceptedResponse(question, transcript) {
   return Math.max(...accepted.map(response => phraseCoverage(transcript, response, question.language)));
 }
 
+const ENGLISH_MEETING_SIGNALS = {
+  1: {
+    relevant: value => value.split(' ').filter(Boolean).some(token => !['hi', 'hello', 'hey', 'im', 'i', 'am', 'my', 'name', 'is'].includes(token)),
+    required: value => /\b(i am|i m|im|my name is)\b/.test(value) || value.split(' ').length <= 3,
+  },
+  2: {
+    relevant: value => /\b(yes|yeah|yep|no|not|first day|new)\b/.test(value),
+    required: value => /\b(yes|yeah|yep|no|not)\b/.test(value),
+  },
+  3: {
+    relevant: value => /\b(from|come from|hometown|village|city|country|bangladesh)\b/.test(value) || value.split(' ').length <= 3,
+    required: value => /\b(from|hometown|bangladesh|dhaka|rangpur|chittagong|chattogram|sylhet|rajshahi|khulna|barishal|mymensingh|comilla|cumilla)\b/.test(value) || value.split(' ').length <= 3,
+  },
+  4: {
+    relevant: value => /\b(live|living|stay|staying|now|dhaka|mirpur|uttara)\b/.test(value) || value.split(' ').length <= 3,
+    required: value => /\b(live|living|stay|staying|dhaka|mirpur|uttara|rangpur|chittagong|chattogram|sylhet|rajshahi|khulna)\b/.test(value) || value.split(' ').length <= 3,
+  },
+  5: {
+    relevant: value => /\b(student|study|studying|work|working|job|teacher|employee|business|freelancer)\b/.test(value),
+    required: value => /\b(student|study|studying|work|working|job|teacher|employee|freelancer)\b/.test(value),
+  },
+  6: {
+    relevant: value => value.split(' ').length > 0,
+    required: value => /\b(study|studying|subject|science|english|arabic|business|engineering|medicine|technology|work|working|teacher|developer|designer|company|job)\b/.test(value) || value.split(' ').length <= 4,
+  },
+  7: {
+    relevant: value => /\b(what|where|when|why|how|who|which|are|do|did|can|could|would|is)\b/.test(value),
+    required: value => /\b(what|where|when|why|how|who|which|are you|do you|did you|can you|is your)\b/.test(value),
+  },
+};
+
+function scoreEnglishFirstMeeting(question, transcript, recognitionConfidence) {
+  const answer = normalizeSpeakingText(transcript, 'english');
+  const words = answer.split(' ').filter(Boolean);
+  const signals = ENGLISH_MEETING_SIGNALS[Number(question.conversationStep)] ?? ENGLISH_MEETING_SIGNALS[6];
+  const relevant = signals.relevant(answer);
+  const required = signals.required(answer);
+  const understandable = words.length > 0 && relevant;
+  const completeSentence = words.length >= 3 && (
+    /\b(i|im|my|this|it|yes|no|what|where|how|are|do|can)\b/.test(answer)
+  );
+  const grammar = completeSentence && !/\bi from\b|\bi live (at|in the) dhaka\b|\bi am study\b/.test(answer);
+  const extraDetail = words.length >= 7 || /\b(because|with|and|but|also|too|excited)\b/.test(answer);
+  const natural = words.length >= 4 || (Number(question.conversationStep) === 7 && required);
+
+  const rubricMarks = (relevant ? 3 : 0)
+    + (required ? 2 : 0)
+    + (understandable ? 2 : 0)
+    + (grammar ? 1 : 0)
+    + (extraDetail ? 1 : 0)
+    + (natural ? 1 : 0);
+  const marks = Number(question.conversationStep) === 7
+    ? rubricMarks
+    : words.length <= 2
+      ? Math.min(rubricMarks, 6)
+      : !extraDetail && words.length <= 6
+        ? Math.min(rubricMarks, 8)
+        : rubricMarks;
+  const confidence = Number(recognitionConfidence);
+  const hasConfidence = Number.isFinite(confidence) && confidence > 0 && confidence <= 1;
+
+  return {
+    questionId: question.id,
+    transcript: transcript.trim(),
+    marks,
+    maxMarks: 10,
+    matchedKeywords: required ? ['meaning understood'] : [],
+    missingKeywords: required ? [] : ['answer the question clearly'],
+    recognitionConfidence: hasConfidence ? Math.round(confidence * 100) : null,
+    feedback: marks >= 9
+      ? 'Excellent—clear, natural, and easy to understand.'
+      : marks >= 7
+        ? 'Good answer. Rafi understood you and can continue naturally.'
+        : marks >= 5
+          ? 'Your meaning is understandable. A fuller sentence will make it stronger.'
+          : 'Rafi could not clearly understand that answer. Try answering the question directly.',
+  };
+}
+
 export function scoreSpeakingTranscript(question, transcript, { recognitionConfidence } = {}) {
+  if (question.scoringStrategy === 'english_first_meeting') {
+    return scoreEnglishFirstMeeting(question, transcript, recognitionConfidence);
+  }
+
   const normalizedAnswer = normalizeSpeakingText(transcript, question.language);
   const keywords = question.expectedKeywords.filter(Boolean);
   const searchableAnswer = question.language === 'arabic'
