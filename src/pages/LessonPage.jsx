@@ -706,6 +706,28 @@ export function LessonPage() {
             </aside>
           </div>
 
+          {isWebDeveloper && lesson.quiz?.length > 0 && staticLesson?.id && (
+            <div className="section-card flex flex-col gap-4 border-blue-400/20 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.24em] text-blue-300">Staff preview</p>
+                <h2 className="mt-2 text-xl font-black text-white">Day {day} MCQ exam · {lesson.quiz.length} questions</h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+                  Preview every question and answer without changing learner progress, XP, or course completion.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  actions.setActiveLesson(staticLesson.id, language);
+                  navigate(`/quiz?preview=1&day=${day}`);
+                }}
+                className="glow-button glow-button-blue shrink-0 py-4"
+              >
+                Preview MCQ exam
+              </button>
+            </div>
+          )}
+
           {!isWebDeveloper && lessonVideos.length > 0 && (
             <div className="section-card flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
               <div>

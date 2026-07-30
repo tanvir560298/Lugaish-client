@@ -1,12 +1,15 @@
 import { useMemo, useState } from 'react';
 import { CheckCircle2, LoaderCircle, RotateCcw, XCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppContext, getLessonFromState } from '../state/AppContext.jsx';
 
 export function QuizPage() {
   const { state, actions, courseData } = useAppContext();
   const activeLesson = getLessonFromState(state, courseData);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isPreview = searchParams.get('preview') === '1';
+  const previewDay = Math.max(Number(searchParams.get('day')) || 1, 1);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [answerChecked, setAnswerChecked] = useState(false);
@@ -42,6 +45,13 @@ export function QuizPage() {
   };
 
   const finishQuiz = async () => {
+    if (isPreview) {
+      setXpEarned(0);
+      setServerScore(score);
+      setIsCompleted(true);
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitError('');
 
@@ -87,7 +97,7 @@ export function QuizPage() {
       <div className="section-card p-5 sm:p-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-slate-400">Quiz challenge</p>
+            <p className="text-sm uppercase tracking-[0.3em] text-slate-400">{isPreview ? 'Staff MCQ preview' : 'Quiz challenge'}</p>
             <h1 className="mt-2 text-2xl font-black text-white sm:text-3xl">{activeLesson.title}</h1>
           </div>
           {!isCompleted && <div className="rounded-[2rem] border border-white/10 bg-slate-900/80 px-4 py-3 text-sm text-slate-300">{progress}</div>}
@@ -96,13 +106,13 @@ export function QuizPage() {
         {isCompleted ? (
           <div className="mt-10 grid gap-6 text-center">
             <div className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-gradient-to-br from-green-500 to-blue-500 text-4xl">🏆</div>
-            <h2 className="text-3xl font-black text-white">Quiz completed!</h2>
-            <p className="text-slate-400">Review every answer below and revisit the ones that need more practice.</p>
+            <h2 className="text-3xl font-black text-white">{isPreview ? 'MCQ preview completed!' : 'Quiz completed!'}</h2>
+            <p className="text-slate-400">{isPreview ? 'This preview did not change XP, progress, or learner completion.' : 'Review every answer below and revisit the ones that need more practice.'}</p>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/80 p-6">
                 <p className="text-sm uppercase tracking-[0.24em] text-slate-400">XP earned</p>
                 <p className="mt-3 text-3xl font-black text-green-300">+{xpEarned}</p>
-                {!xpEarned && <p className="mt-2 text-xs text-slate-500">XP was already earned for this lesson.</p>}
+                {!xpEarned && <p className="mt-2 text-xs text-slate-500">{isPreview ? 'Preview mode does not award XP.' : 'XP was already earned for this lesson.'}</p>}
               </div>
               <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/80 p-6">
                 <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Accuracy</p>
@@ -130,7 +140,9 @@ export function QuizPage() {
 
             <div className="flex flex-col justify-center gap-3 sm:flex-row">
               {(serverScore ?? score) < questions.length && <button type="button" className="glow-button glow-button-muted justify-center" onClick={restartMistakes}><RotateCcw size={18} /> Practise again</button>}
-              <button type="button" className="glow-button glow-button-blue justify-center" onClick={() => navigate('/dashboard')}>Go to dashboard</button>
+              <button type="button" className="glow-button glow-button-blue justify-center" onClick={() => navigate(isPreview ? `/lesson/${previewDay}` : '/dashboard')}>
+                {isPreview ? 'Back to lesson' : 'Go to dashboard'}
+              </button>
             </div>
           </div>
         ) : (
