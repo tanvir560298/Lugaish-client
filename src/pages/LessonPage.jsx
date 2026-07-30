@@ -193,7 +193,7 @@ export function LessonPage() {
   const [searchParams] = useSearchParams();
   const day = Math.max(Number.parseInt(dayParam, 10) || 1, 1);
   const language = state.activePathway;
-  const isWebDeveloper = [ROLES.webDeveloper, ROLES.tester].includes(state.userRole);
+  const isWebDeveloper = [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor].includes(state.userRole);
   const staticLessons = useMemo(() => pathway.modules.flatMap(module => module.lessons), [pathway]);
   const staticLesson = staticLessons[day - 1] ?? null;
   const [lesson, setLesson] = useState({ videos: [], moduleType: 'video', modulePublished: true });

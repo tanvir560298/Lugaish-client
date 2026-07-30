@@ -130,7 +130,7 @@ export function SpeakingPracticePage() {
   const locale = language === 'arabic' ? 'ar-SA' : 'en-US';
   const day = hasValidRouteParams ? requestedDay : 1;
   const shouldOpenManager = searchParams.get('manage') === '1';
-  const isWebDeveloper = [ROLES.webDeveloper, ROLES.tester].includes(state.userRole);
+  const isWebDeveloper = [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor].includes(state.userRole);
   const [module, setModule] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [draftQuestions, setDraftQuestions] = useState([]);
