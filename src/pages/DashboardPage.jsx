@@ -471,6 +471,8 @@ function EmailManagementPanel({ defaultTestEmail }) {
 
       {notice && <p className="mt-5 rounded-2xl border border-blue-400/20 bg-blue-500/10 px-4 py-3 text-sm font-semibold text-blue-100">{notice}</p>}
 
+      {status?.connectionError && <p className="mt-5 rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm font-semibold text-amber-100">{status.connectionError}</p>}
+
       {!status?.configured || !status?.connected ? (
         <div className="mt-6 rounded-2xl border border-amber-400/20 bg-amber-400/5 p-5">
           <p className="text-sm text-amber-100">{status?.configured ? 'Connect the approved Gmail sender to continue.' : 'Add the Gmail environment variables to the backend first.'}</p>
