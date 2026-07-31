@@ -388,6 +388,7 @@ function EmailManagementPanel({ defaultTestEmail }) {
   const [status, setStatus] = useState(null);
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const [audience, setAudience] = useState('english');
   const [testEmail, setTestEmail] = useState(defaultTestEmail || '');
   const [confirmation, setConfirmation] = useState('');
   const [notice, setNotice] = useState('');
@@ -426,11 +427,11 @@ function EmailManagementPanel({ defaultTestEmail }) {
   };
 
   const sendCampaign = async () => {
-    if (!window.confirm('Send this message separately to every registered user? This action cannot be undone.')) return;
+    if (!window.confirm(`Send this message separately to enrolled ${audience} students only? This action cannot be undone.`)) return;
     setIsBusy(true);
     setNotice('');
     try {
-      const response = await api.sendEmailCampaign({ subject, message, confirmation });
+      const response = await api.sendEmailCampaign({ subject, message, audience, confirmation });
       setNotice(response.message);
       setConfirmation('');
       await loadStatus();
@@ -492,10 +493,17 @@ function EmailManagementPanel({ defaultTestEmail }) {
             <button type="submit" disabled={isBusy} className="glow-button glow-button-blue justify-center"><Send size={17} /> Send test</button>
           </div>
           <div className="rounded-2xl border border-red-400/20 bg-red-500/5 p-5">
-            <p className="text-sm font-black text-red-100">Bulk send safety check</p>
-            <p className="mt-2 text-xs leading-5 text-slate-400">First send a test. Only send necessary messages to users who expect them. Maximum {status.maxRecipientsPerCampaign} recipients per campaign.</p>
-            <input value={confirmation} onChange={event => setConfirmation(event.target.value)} placeholder="Type: SEND TO ALL USERS" className="mt-4 w-full rounded-xl border border-red-400/20 bg-slate-950/40 px-4 py-3 text-white outline-none" />
-            <button type="button" onClick={sendCampaign} disabled={isBusy || confirmation !== 'SEND TO ALL USERS' || !subject || !message} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl bg-red-600 px-5 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-40"><Send size={17} /> Send to all registered users</button>
+            <p className="text-sm font-black text-red-100">Course audience</p>
+            <div className="mt-3 grid grid-cols-2 gap-2 rounded-xl border border-white/10 bg-slate-950/40 p-1">
+              {['english', 'arabic'].map(course => (
+                <button key={course} type="button" onClick={() => { setAudience(course); setConfirmation(''); }} className={`rounded-lg px-3 py-3 text-xs font-black uppercase tracking-wider transition ${audience === course ? 'bg-white text-slate-950' : 'text-slate-400 hover:bg-white/10'}`}>
+                  {course} students
+                </button>
+              ))}
+            </div>
+            <p className="mt-3 text-xs leading-5 text-slate-400">Only students enrolled in the selected course will receive this message. First send a test. Maximum {status.maxRecipientsPerCampaign} recipients per campaign.</p>
+            <input value={confirmation} onChange={event => setConfirmation(event.target.value)} placeholder={`Type: SEND TO ${audience.toUpperCase()} STUDENTS`} className="mt-4 w-full rounded-xl border border-red-400/20 bg-slate-950/40 px-4 py-3 text-white outline-none" />
+            <button type="button" onClick={sendCampaign} disabled={isBusy || confirmation !== `SEND TO ${audience.toUpperCase()} STUDENTS` || !subject || !message} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl bg-red-600 px-5 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-40"><Send size={17} /> Send to {audience} students</button>
           </div>
         </form>
       )}
@@ -504,9 +512,9 @@ function EmailManagementPanel({ defaultTestEmail }) {
         <div className="mt-6 space-y-2">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs font-black uppercase tracking-widest text-slate-400">Recent campaigns</p>
-            <button type="button" onClick={activateSignupCampaign} disabled={isBusy} className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-xs font-black text-emerald-200 disabled:opacity-40">Auto-send latest to new users until 18 July, 9 PM</button>
+            <button type="button" onClick={activateSignupCampaign} disabled={isBusy} className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-xs font-black text-emerald-200 disabled:opacity-40">Auto-send latest course campaign until course start</button>
           </div>
-          {status.recentCampaigns.map(campaign => <div key={campaign._id} className="flex flex-wrap justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300"><span>{campaign.subject}</span><span>{campaign.sentCount}/{campaign.recipientCount} sent · {campaign.status}</span></div>)}
+          {status.recentCampaigns.map(campaign => <div key={campaign._id} className="flex flex-wrap justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300"><span>{campaign.subject} · {campaign.audience ?? 'legacy audience'}</span><span>{campaign.sentCount}/{campaign.recipientCount} sent · {campaign.status}</span></div>)}
         </div>
       )}
     </div>
