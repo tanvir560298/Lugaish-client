@@ -76,6 +76,7 @@ export function CoursePage() {
   }, [language, state.isLoggedIn]);
 
   const isFull = enrollmentStatus?.isFull && !enrollmentStatus?.isEnrolled;
+  const enrollmentClosed = enrollmentStatus?.enrollmentOpen === false && !enrollmentStatus?.isEnrolled;
 
   async function handleStartCourse() {
     setEnrollmentError('');
@@ -91,7 +92,16 @@ export function CoursePage() {
       await actions.enrollPathway(language);
       navigate('/today');
     } catch (error) {
-      if (error.status === 409 || error.code === 'COURSE_FULL') {
+      if (error.code === 'COURSE_ALREADY_STARTED') {
+        setEnrollmentStatus(prev => ({
+          ...(prev ?? {}),
+          isFull: true,
+          isEnrolled: false,
+          enrollmentOpen: false,
+          courseStartAt: error.data?.courseStartAt ?? prev?.courseStartAt,
+        }));
+        setEnrollmentError('This course has already started. Please wait for the next session to enroll.');
+      } else if (error.status === 409 || error.code === 'COURSE_FULL') {
         setEnrollmentStatus(prev => ({
           ...(prev ?? {}),
           isFull: true,
@@ -193,14 +203,20 @@ export function CoursePage() {
           </div>
         )}
 
-        {isFull ? (
+        {isFull || enrollmentClosed ? (
           <div className="mt-12 overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/80 p-5 shadow-2xl sm:p-8">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div className="max-w-2xl">
-                <p className="mb-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">Seats are full</p>
-                <h3 className="text-2xl font-black text-white sm:text-3xl">This month&apos;s {course.name} cohort is fully booked.</h3>
+                <p className="mb-3 text-xs font-black uppercase tracking-[0.24em] text-amber-300">
+                  {enrollmentClosed ? 'Course already started' : 'Seats are full'}
+                </p>
+                <h3 className="text-2xl font-black text-white sm:text-3xl">
+                  {enrollmentClosed ? `You can join the next ${course.name} session.` : `This month&apos;s ${course.name} cohort is fully booked.`}
+                </h3>
                 <p className="mt-3 text-sm leading-6 text-slate-400 sm:text-base">
-                  Thank you for your interest! New seats will open next month. Please check back then, or apply for a priority seat and our team will contact you if a place becomes available sooner.
+                  {enrollmentClosed
+                    ? 'Your account and the rest of the website are still available. Keep your learning goal close, and please wait for the next session to begin.'
+                    : 'Thank you for your interest! New seats will open next month. Please check back then, or apply for a priority seat and our team will contact you if a place becomes available sooner.'}
                 </p>
                 <p className="mt-3 text-sm font-semibold text-slate-300">
                   Need help? Email us at{' '}
@@ -215,7 +231,7 @@ export function CoursePage() {
                 )}
               </div>
 
-              <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
+              {!enrollmentClosed && <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
                 <button
                   type="button"
                   onClick={() => setShowApplication(prev => !prev)}
@@ -229,10 +245,10 @@ export function CoursePage() {
                 >
                   Email Us <ArrowRight size={17} />
                 </a>
-              </div>
+              </div>}
             </div>
 
-            {showApplication && (
+            {!enrollmentClosed && showApplication && (
               <form onSubmit={handleApplicationSubmit} className="mt-8 grid gap-4 border-t border-white/10 pt-8">
                 <div className="grid gap-4 lg:grid-cols-3">
                   <label className="lg:col-span-2">
