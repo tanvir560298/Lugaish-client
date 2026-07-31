@@ -443,7 +443,7 @@ function EmailManagementPanel({ defaultTestEmail }) {
   };
 
   const activateSignupCampaign = async () => {
-    if (!window.confirm('Automatically send the latest campaign once to each new user until 18 July 2026 at 9:00 PM?')) return;
+    if (!window.confirm('Automatically send the latest course campaign once to each matching new student until the course starts?')) return;
     setIsBusy(true);
     setNotice('');
     try {
