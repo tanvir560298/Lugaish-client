@@ -62,6 +62,35 @@ function saveLocally(key, value) {
   }
 }
 
+function buildEnglishMeetingReply(question, transcript) {
+  const answer = String(transcript ?? '').trim();
+  const normalized = answer.toLowerCase();
+  const step = Number(question?.conversationStep);
+
+  if (step === 1) return 'Nice to meet you! I’m Rafi. Is this your first day here?';
+  if (step === 2) {
+    return /\b(no|not|already)\b/.test(normalized)
+      ? 'Oh, so you already know this place a little. Where are you from?'
+      : 'It’s my first day too. Don’t worry—we can learn together. Where are you from?';
+  }
+  if (step === 3) return 'That sounds like a nice place. Where do you live now?';
+  if (step === 4) return 'Thanks for telling me. Are you a student, or do you work?';
+  if (step === 5) {
+    return /\b(work|working|job|employee|freelancer|business)\b/.test(normalized)
+      ? 'That’s interesting. What kind of work do you do?'
+      : 'That’s great. What do you study?';
+  }
+  if (step === 6) return 'That sounds interesting. What would you like to ask me?';
+  if (step === 7) {
+    if (/\b(where|from|hometown)\b/.test(normalized)) return 'I’m from Dhaka. It’s busy, but I like it. It was nice meeting you!';
+    if (/\b(study|subject)\b/.test(normalized)) return 'I study English and communication. It was nice meeting you!';
+    if (/\b(work|job|do)\b/.test(normalized)) return 'I’m a student right now. It was nice meeting you!';
+    return 'That’s a good question. I’m a student, and I’m from Dhaka. It was nice meeting you!';
+  }
+
+  return question?.aiResponse || 'Thanks for telling me. Let’s keep talking.';
+}
+
 function buildFirstMeetingReport(results, totalQuestions) {
   const answered = results.length;
   const conversationMarks = results.reduce((total, result) => total + result.marks, 0);
@@ -195,6 +224,7 @@ export function SpeakingPracticePage() {
   const [selectedVoiceName, setSelectedVoiceName] = useState('');
   const [speechRate, setSpeechRate] = useState(0.92);
   const [isQuestionAudioPlaying, setIsQuestionAudioPlaying] = useState(false);
+  const [conversationReply, setConversationReply] = useState('');
   const recognitionRef = useRef(null);
   const recognitionConfidenceRef = useRef(null);
   const interimTranscriptRef = useRef('');
@@ -203,6 +233,7 @@ export function SpeakingPracticePage() {
   const sessionStartedRef = useRef(false);
   const completionSentRef = useRef(false);
   const lastAutoReadKeyRef = useRef('');
+  const conversationTimerRef = useRef(null);
 
   const RecognitionConstructor = typeof window === 'undefined'
     ? null
@@ -375,6 +406,7 @@ export function SpeakingPracticePage() {
     window.speechSynthesis?.cancel();
     audioRef.current?.pause?.();
     utteranceRef.current = null;
+    window.clearTimeout(conversationTimerRef.current);
   }, []);
 
   const abortRecognition = () => {
@@ -618,7 +650,11 @@ export function SpeakingPracticePage() {
     setResults(completedResults);
     setSpeechError('');
     if (isEnglishFirstMeeting) {
-      window.setTimeout(() => {
+      const reply = buildEnglishMeetingReply(currentQuestion, transcript);
+      setConversationReply(reply);
+      speakAiResponse(reply);
+      window.clearTimeout(conversationTimerRef.current);
+      conversationTimerRef.current = window.setTimeout(() => {
         if (questionIndex >= questions.length - 1) {
           finishTest(completedResults);
           return;
@@ -629,7 +665,8 @@ export function SpeakingPracticePage() {
         setTranscript('');
         setInterimTranscript('');
         setSpeechError('');
-      }, 900);
+        setConversationReply('');
+      }, 3200);
       return;
     }
     if (practiceMode === 'ask' && result.marks >= Math.ceil(result.maxMarks * 0.5)) {
@@ -643,6 +680,7 @@ export function SpeakingPracticePage() {
     setTranscript('');
     setInterimTranscript('');
     setSpeechError('');
+    setConversationReply('');
     recognitionConfidenceRef.current = null;
     setResults(current => current.filter(item => item.questionId !== currentQuestion?.id));
   };
@@ -690,6 +728,7 @@ export function SpeakingPracticePage() {
     setTranscript('');
     setInterimTranscript('');
     setSpeechError('');
+    setConversationReply('');
   };
 
   const updateDraft = (index, field, value) => {
@@ -1006,6 +1045,14 @@ export function SpeakingPracticePage() {
               <p className="text-xl font-black leading-9 text-white sm:text-2xl">{currentQuestion.question}</p>
             </div>
 
+            {isEnglishFirstMeeting && currentQuestion.sampleAnswer && !currentResult && (
+              <div className="mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-500/[0.07] p-4 sm:p-5">
+                <p className="text-xs font-black uppercase tracking-wider text-emerald-300">Need an idea? You could say</p>
+                <p className="mt-2 text-base leading-7 text-white">“{currentQuestion.sampleAnswer}”</p>
+                <p className="mt-2 text-xs leading-5 text-slate-400">Use this as a guide, or answer naturally with your own information. You do not need to copy it exactly.</p>
+              </div>
+            )}
+
             <div className="mt-5 grid gap-3 md:grid-cols-[minmax(0,1fr)_120px_auto]">
               <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Browser voice<select value={selectedVoiceName} onChange={event => setSelectedVoiceName(event.target.value)} className="mt-2 h-12 w-full rounded-xl border border-white/10 bg-slate-950 px-3 text-sm normal-case tracking-normal text-white">{(languageVoices.length ? languageVoices : voices).map(voice => <option key={`${voice.name}-${voice.lang}`} value={voice.name}>{voice.name} · {voice.lang}</option>)}</select></label>
               <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Speed<select value={speechRate} onChange={event => setSpeechRate(Number(event.target.value))} className="mt-2 h-12 w-full rounded-xl border border-white/10 bg-slate-950 px-3 text-sm normal-case tracking-normal text-white"><option value="0.8">Slow</option><option value="0.92">Natural</option><option value="1">Normal</option></select></label>
@@ -1032,8 +1079,9 @@ export function SpeakingPracticePage() {
             ) : isEnglishFirstMeeting ? (
               <div aria-live="polite" className="mt-6 rounded-2xl border border-emerald-400/25 bg-emerald-500/[0.08] p-5 text-center">
                 <Sparkles size={22} className="mx-auto text-emerald-300" />
-                <h2 className="mt-3 text-lg font-black text-white">Thanks—Rafi is continuing the conversation…</h2>
-                <p className="mt-2 text-sm text-slate-300">Your score stays private until the final report.</p>
+                <p className="mt-3 text-xs font-black uppercase tracking-wider text-emerald-300">Rafi replies</p>
+                <h2 className="mt-2 text-lg font-black leading-8 text-white">{conversationReply || 'Thanks for telling me. Let’s keep talking.'}</h2>
+                <p className="mt-2 text-sm text-slate-300">Listen to Rafi’s reply. The next part of the conversation will appear automatically, and your score stays private until the final report.</p>
               </div>
             ) : (
               <div aria-live="polite" className="mt-6 rounded-2xl border border-emerald-400/25 bg-emerald-500/[0.08] p-5 sm:p-6">
