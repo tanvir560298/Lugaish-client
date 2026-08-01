@@ -8,6 +8,7 @@ const LOCAL_STORAGE_KEY = 'lugaish_state_v1';
 const ACTIVITY_DAY_COUNT = 84;
 const WEB_DEVELOPER_EMAILS = new Set(['tahmadium@gmail.com']);
 const TESTER_EMAILS = new Set(['chatgpt.tanvir1@gmail.com']);
+const INTERN_EMAILS = new Set(['shakibalam601@gmail.com', 'rjhassan2k19@gmail.com']);
 
 const defaultState = {
   xp: 0,
@@ -392,7 +393,9 @@ export function AppProvider({ children }) {
       const firebaseEmail = firebaseUser?.email?.toLowerCase() || '';
       const localDevRole = WEB_DEVELOPER_EMAILS.has(firebaseEmail)
         ? ROLES.webDeveloper
-        : TESTER_EMAILS.has(firebaseEmail) ? ROLES.tester : ROLES.learner;
+        : TESTER_EMAILS.has(firebaseEmail)
+          ? ROLES.tester
+          : INTERN_EMAILS.has(firebaseEmail) ? ROLES.intern : ROLES.learner;
       const localDevUser = {
         token: 'local-dev-firebase-session',
         user: {
