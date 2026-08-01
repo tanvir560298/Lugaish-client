@@ -199,7 +199,7 @@ export function SpeakingPracticePage() {
   const locale = language === 'arabic' ? 'ar-SA' : 'en-US';
   const day = hasValidRouteParams ? requestedDay : 1;
   const shouldOpenManager = searchParams.get('manage') === '1';
-  const isWebDeveloper = [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor].includes(state.userRole);
+  const isWebDeveloper = [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
   const [module, setModule] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [draftQuestions, setDraftQuestions] = useState([]);
@@ -1003,7 +1003,7 @@ export function SpeakingPracticePage() {
               <div className="mt-6 space-y-4">
                 {draftQuestions.map((question, index) => (
                   <div key={question.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
-                    <div className="mb-4 flex items-center justify-between"><p className="text-sm font-black text-white">Question {index + 1}</p><button type="button" onClick={() => setDraftQuestions(current => current.filter((_, itemIndex) => itemIndex !== index))} className="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-red-500/10 hover:text-red-300" aria-label={`Remove question ${index + 1}`}><Trash2 size={16} /></button></div>
+                    <div className="mb-4 flex items-center justify-between"><p className="text-sm font-black text-white">Question {index + 1}</p>{!(state.userRole === ROLES.intern && questions.some(saved => saved.id === question.id)) && <button type="button" onClick={() => setDraftQuestions(current => current.filter((_, itemIndex) => itemIndex !== index))} className="grid h-9 w-9 place-items-center rounded-lg text-slate-500 hover:bg-red-500/10 hover:text-red-300" aria-label={`Remove question ${index + 1}`}><Trash2 size={16} /></button>}</div>
                     <div className="grid gap-3 lg:grid-cols-2">
                       <textarea aria-label={`Question ${index + 1} text`} maxLength={500} value={question.question} onChange={event => updateDraft(index, 'question', event.target.value)} placeholder="Question text" rows={3} dir={isRtl ? 'rtl' : 'ltr'} className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400" />
                       <textarea aria-label={`Question ${index + 1} sample answer`} maxLength={2000} value={question.sampleAnswer} onChange={event => updateDraft(index, 'sampleAnswer', event.target.value)} placeholder="Sample answer" rows={3} dir={isRtl ? 'rtl' : 'ltr'} className="rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-emerald-400" />

@@ -68,7 +68,7 @@ function CourseLaunchGuard({ children }) {
   const { state } = useAppContext();
   const [reloadKey, setReloadKey] = useState(0);
   const [launchState, setLaunchState] = useState({ loading: true, started: false, startAt: '', startDate: '', error: '' });
-  const isWebDeveloper = [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor].includes(state.userRole);
+  const isWebDeveloper = [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
 
   useEffect(() => {
     if (isWebDeveloper) {

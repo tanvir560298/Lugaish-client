@@ -61,6 +61,8 @@ function RoleBadge({ role }) {
         ? 'border-amber-400/30 bg-amber-500/10 text-amber-100'
         : normalized === ROLES.tester
           ? 'border-violet-400/30 bg-violet-500/10 text-violet-100'
+          : normalized === ROLES.intern
+            ? 'border-cyan-400/30 bg-cyan-500/10 text-cyan-100'
         : 'border-white/10 bg-white/5 text-slate-300';
 
   return (
@@ -669,6 +671,8 @@ export function DashboardPage() {
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
                     {role === ROLES.tester
                       ? 'Your course changes are isolated in a private tester sandbox and never alter learner-facing content.'
+                      : role === ROLES.intern
+                        ? 'You can add, edit, upload, and publish website content. Existing content and accounts cannot be deleted from your Intern account.'
                       : 'Your dashboard changes based on account role. Learners see progress, staff see publishing and lesson tools, and the web developer can manage roles.'}
                   </p>
                 </div>

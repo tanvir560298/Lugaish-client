@@ -193,7 +193,8 @@ export function LessonPage() {
   const [searchParams] = useSearchParams();
   const day = Math.max(Number.parseInt(dayParam, 10) || 1, 1);
   const language = state.activePathway;
-  const isWebDeveloper = [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor].includes(state.userRole);
+  const isWebDeveloper = [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
+  const canDeleteExistingContent = state.userRole !== ROLES.intern;
   const staticLessons = useMemo(() => pathway.modules.flatMap(module => module.lessons), [pathway]);
   const staticLesson = staticLessons[day - 1] ?? null;
   const [lesson, setLesson] = useState({ videos: [], moduleType: 'video', modulePublished: true });
@@ -617,7 +618,7 @@ export function LessonPage() {
                           <div key={video._id ?? getVideoIdentity(video, index)} className="flex items-center gap-4 px-4 py-4">
                             <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-sm font-black text-blue-200">{index + 1}</div>
                             <div className="min-w-0 flex-1"><p className="truncate text-sm font-black text-white">{video.title}</p><p className="mt-1 flex items-center gap-2 text-xs font-semibold text-slate-500"><Clock3 size={13} /> {formatDuration(video.durationMinutes)} · YouTube</p></div>
-                            <button type="button" title="Remove video" aria-label={`Remove ${video.title}`} onClick={() => removeVideo(video._id)} className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/10 text-slate-400 transition hover:border-red-400/30 hover:bg-red-400/10 hover:text-red-300"><Trash2 size={17} /></button>
+                            {canDeleteExistingContent && <button type="button" title="Remove video" aria-label={`Remove ${video.title}`} onClick={() => removeVideo(video._id)} className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/10 text-slate-400 transition hover:border-red-400/30 hover:bg-red-400/10 hover:text-red-300"><Trash2 size={17} /></button>}
                           </div>
                         ))}
                       </div>
