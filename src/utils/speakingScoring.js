@@ -56,6 +56,49 @@ const ENGLISH_MEETING_SIGNALS = {
   },
 };
 
+const ENGLISH_SELF_INTRODUCTION_SIGNALS = {
+  1: {
+    relevant: value => /\b(well|good|fine|great|thanks|thank|hello|hi|doing)\b/.test(value) || value.split(' ').length <= 3,
+    required: value => /\b(well|good|fine|great|thanks|thank|doing)\b/.test(value) || value.split(' ').length <= 3,
+  },
+  2: {
+    relevant: value => /\b(name|called|my|i'm|i am)\b/.test(value),
+    required: value => /\b(name|called|i'm|i am|my name)\b/.test(value),
+  },
+  3: {
+    relevant: value => /\b(from|hometown|bangladesh|rangpur|dhaka|city|country|live)\b/.test(value),
+    required: value => /\b(from|hometown|bangladesh|rangpur|dhaka|city|country)\b/.test(value),
+  },
+  4: {
+    relevant: value => /\b(live|living|stay|now|dhaka|rangpur|city|area)\b/.test(value),
+    required: value => /\b(live|living|stay|now|dhaka|rangpur|area|city)\b/.test(value),
+  },
+  5: {
+    relevant: value => /\b(student|study|work|job|university|college|employee|freelancer|business)\b/.test(value),
+    required: value => /\b(student|study|work|job|university|college|employee|freelancer|business)\b/.test(value),
+  },
+  6: {
+    relevant: value => /\b(study|study|subject|business|computer|science|engineering|administration|work|job)\b/.test(value),
+    required: value => /\b(study|subject|business|computer|science|engineering|administration|work|job)\b/.test(value),
+  },
+  7: {
+    relevant: value => /\b(enjoy|hobby|free|time|read|watch|music|movie|sport|game|travel)\b/.test(value),
+    required: value => /\b(enjoy|hobby|free|time|read|watch|music|movie|sport|game|travel)\b/.test(value),
+  },
+  8: {
+    relevant: value => /\b(learn|english|reason|because|want|improve|career|study|work)\b/.test(value),
+    required: value => /\b(english|learn|reason|because|want|improve|career|study|work)\b/.test(value),
+  },
+  9: {
+    relevant: value => /\b(goal|future|want|plan|dream|career|travel)\b/.test(value),
+    required: value => /\b(goal|future|want|plan|dream|career|travel)\b/.test(value),
+  },
+  10: {
+    relevant: value => /\b(name|from|live|student|study|work|goal|future|english|hometown)\b/.test(value),
+    required: value => /\b(name|from|live|student|study|work|goal|future|english|hometown)\b/.test(value),
+  },
+};
+
 function scoreEnglishFirstMeeting(question, transcript, recognitionConfidence) {
   const answer = normalizeSpeakingText(transcript, 'english');
   const words = answer.split(' ').filter(Boolean);
@@ -104,9 +147,55 @@ function scoreEnglishFirstMeeting(question, transcript, recognitionConfidence) {
   };
 }
 
+function scoreEnglishSelfIntroduction(question, transcript, recognitionConfidence) {
+  const answer = normalizeSpeakingText(transcript, 'english');
+  const words = answer.split(' ').filter(Boolean);
+  const signals = ENGLISH_SELF_INTRODUCTION_SIGNALS[Number(question.conversationStep)] ?? ENGLISH_SELF_INTRODUCTION_SIGNALS[10];
+  const relevant = signals.relevant(answer);
+  const required = signals.required(answer);
+  const understandable = words.length > 0 && relevant;
+  const completeSentence = words.length >= 3 || /\b(i|my|am|is|live|study|work|from|name|goal|english)\b/.test(answer);
+  const expanded = words.length >= 7 || /\b(because|and|also|but|with|like|enjoy|want|goal|future)\b/.test(answer);
+  const natural = words.length >= 4 || (Number(question.conversationStep) === 10 && required);
+  const introReady = Number(question.conversationStep) === 10
+    ? required && expanded && completeSentence
+    : relevant && required;
+
+  const rubricMarks = (relevant ? 2 : 0)
+    + (required ? 2 : 0)
+    + (understandable ? 2 : 0)
+    + (completeSentence ? 1 : 0)
+    + (expanded ? 1 : 0)
+    + (natural ? 1 : 0)
+    + (introReady ? 1 : 0);
+  const marks = Math.min(10, rubricMarks);
+  const confidence = Number(recognitionConfidence);
+  const hasConfidence = Number.isFinite(confidence) && confidence > 0 && confidence <= 1;
+
+  return {
+    questionId: question.id,
+    transcript: transcript.trim(),
+    marks,
+    maxMarks: 10,
+    matchedKeywords: required ? ['meaning understood'] : [],
+    missingKeywords: required ? [] : ['answer the question clearly'],
+    recognitionConfidence: hasConfidence ? Math.round(confidence * 100) : null,
+    feedback: marks >= 9
+      ? 'Excellent—your answer was clear, complete, and easy to follow.'
+      : marks >= 7
+        ? 'Good answer. You gave useful details and stayed on topic.'
+        : marks >= 5
+          ? 'Your meaning is understandable. Add one more detail or reason to strengthen it.'
+          : 'Try answering the question more directly and include a little more detail.',
+  };
+}
+
 export function scoreSpeakingTranscript(question, transcript, { recognitionConfidence } = {}) {
   if (question.scoringStrategy === 'english_first_meeting') {
     return scoreEnglishFirstMeeting(question, transcript, recognitionConfidence);
+  }
+  if (question.scoringStrategy === 'english_self_introduction') {
+    return scoreEnglishSelfIntroduction(question, transcript, recognitionConfidence);
   }
 
   const normalizedAnswer = normalizeSpeakingText(transcript, question.language);

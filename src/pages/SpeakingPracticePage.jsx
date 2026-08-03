@@ -246,8 +246,9 @@ export function SpeakingPracticePage() {
   // Day 3 is always the reverse-conversation day in both pathways. Keeping
   // this client-side invariant prevents stale server content from making the
   // assistant read the learner's question aloud.
-  const practiceMode = day === 3 || module?.practiceMode === 'ask' ? 'ask' : 'respond';
+  const practiceMode = day === 3 || day === 6 || module?.practiceMode === 'ask' ? 'ask' : 'respond';
   const isEnglishClassmateConversation = language === 'english' && (day === 2 || day === 3);
+  const isEnglishSelfIntroductionDay = language === 'english' && (day === 5 || day === 6);
   const isEnglishFirstMeeting = language === 'english' && day === 2 && currentQuestion?.scoringStrategy === 'english_first_meeting';
   const askModeInstruction = language === 'arabic'
     ? 'Read the Arabic question shown on screen, say it into the microphone, and the assistant will answer you in Arabic.'
@@ -514,7 +515,7 @@ export function SpeakingPracticePage() {
     if (practiceMode === 'ask') {
       // On the reverse-conversation day the learner must read the displayed
       // question aloud. The assistant stays silent until it recognizes the
-      // learner's question, then answers in Arabic.
+      // learner's question, then answers.
       abortRecognition();
       stopQuestionAudio();
       return;
@@ -928,10 +929,10 @@ export function SpeakingPracticePage() {
           <div className="relative max-w-2xl">
             <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Day {day} · AI speaking practice</p>
             <h1 className="mt-4 text-4xl font-black leading-tight text-white sm:text-5xl">{module?.introTitle || 'Ready to speak with confidence?'}</h1>
-            <p className="mt-5 text-base leading-8 text-slate-300">{module?.introText || (practiceMode === 'ask' ? 'Read each question aloud. The assistant will recognize it and answer in Arabic.' : 'Listen to each question, answer by microphone, check your transcript, and receive instant feedback before continuing.')}</p>
+            <p className="mt-5 text-base leading-8 text-slate-300">{module?.introText || (practiceMode === 'ask' ? 'Read each question aloud. The assistant will recognize it and answer in English or Arabic.' : 'Listen to each question, answer by microphone, check your transcript, and receive instant feedback before continuing.')}</p>
             {practiceMode === 'ask' && (
               <div className="mt-6 rounded-2xl border border-blue-400/25 bg-blue-500/10 p-5 text-sm font-semibold leading-7 text-blue-50">
-                <strong className="block text-base text-white">{isEnglishClassmateConversation ? 'Today, you are Rafi and you start the conversation.' : 'Today, you ask the questions.'}</strong>
+                <strong className="block text-base text-white">{isEnglishClassmateConversation ? 'Today, you are Rafi and you start the conversation.' : isEnglishSelfIntroductionDay ? 'Today, you ask the questions as the interviewer.' : 'Today, you ask the questions.'}</strong>
                 {askModeInstruction}
               </div>
             )}
@@ -957,7 +958,7 @@ export function SpeakingPracticePage() {
           <div>
             <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">AI Speaking Practice</p>
             <h1 className="mt-3 text-3xl font-black text-white sm:text-5xl">{language === 'arabic' ? 'Arabic' : 'English'} · Day {day}</h1>
-            <p className="mt-3 max-w-2xl leading-7 text-slate-400">{module?.description || (practiceMode === 'ask' ? 'Read each Arabic question aloud and listen to the assistant’s response.' : 'Listen, answer naturally, review your transcript, and receive phrase-based feedback.')}</p>
+            <p className="mt-3 max-w-2xl leading-7 text-slate-400">{module?.description || (practiceMode === 'ask' ? 'Read each question aloud and listen to the assistant’s response.' : 'Listen, answer naturally, review your transcript, and receive phrase-based feedback.')}</p>
           </div>
           <div className="flex flex-wrap gap-3">
             {isWebDeveloper && (
@@ -972,10 +973,12 @@ export function SpeakingPracticePage() {
 
       {practiceMode === 'ask' && !isRemoteLoading && (
         <div className="rounded-2xl border border-blue-400/25 bg-blue-500/10 px-5 py-4 text-sm font-semibold leading-7 text-blue-50">
-          <strong className="mr-1 text-white">{isEnglishClassmateConversation ? 'You are Rafi; the assistant is Sami.' : 'Today, you ask the questions.'}</strong>
+          <strong className="mr-1 text-white">{isEnglishClassmateConversation ? 'You are Rafi; the assistant is Sami.' : isEnglishSelfIntroductionDay ? 'You are the interviewer; the assistant is Sami.' : 'Today, you ask the questions.'}</strong>
           {isEnglishClassmateConversation
             ? 'Read Rafi’s written line aloud. After your speech is scored, Sami will answer and continue the conversation.'
-            : 'Read what is written on screen, say the question into the microphone, and the assistant will answer after scoring your spoken question.'}
+            : isEnglishSelfIntroductionDay
+              ? 'Read each question aloud, then let the assistant answer as Sami. Focus on clear questions and a natural interview flow.'
+              : 'Read what is written on screen, say the question into the microphone, and the assistant will answer after scoring your spoken question.'}
         </div>
       )}
 
@@ -1040,7 +1043,7 @@ export function SpeakingPracticePage() {
           <div className="section-card p-5 sm:p-8">
             <div className="flex flex-wrap items-center justify-between gap-3"><p className="text-xs font-black uppercase tracking-[0.22em] text-blue-400">Question {questionIndex + 1} of {questions.length}</p><span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-black text-slate-300">{currentQuestion.maxMarks} marks</span></div>
             <div className="mt-5 rounded-2xl border border-blue-400/20 bg-blue-500/10 p-5 sm:p-7" dir={isRtl ? 'rtl' : 'ltr'}>
-              {practiceMode === 'ask' && <p className="mb-2 text-xs font-black uppercase tracking-wider text-blue-300">{isEnglishClassmateConversation ? 'Rafi · Read this line aloud' : 'Read this question aloud'}</p>}
+              {practiceMode === 'ask' && <p className="mb-2 text-xs font-black uppercase tracking-wider text-blue-300">{isEnglishClassmateConversation ? 'Rafi · Read this line aloud' : isEnglishSelfIntroductionDay ? 'Interviewer · Read this question aloud' : 'Read this question aloud'}</p>}
               {practiceMode !== 'ask' && isEnglishClassmateConversation && <p className="mb-2 text-xs font-black uppercase tracking-wider text-blue-300">Rafi says</p>}
               <p className="text-xl font-black leading-9 text-white sm:text-2xl">{currentQuestion.question}</p>
             </div>
@@ -1066,7 +1069,7 @@ export function SpeakingPracticePage() {
             {!recognitionSupported && <div role="status" className="mt-5 rounded-2xl border border-amber-400/30 bg-amber-500/10 p-4 text-sm leading-6 text-amber-100">Speech recognition is unavailable in this browser. Use a recent Chrome or Edge browser, or type your answer below for practice.</div>}
 
             <div className="mt-5">
-              <div className="mb-2 flex items-center justify-between gap-3"><label htmlFor="speaking-transcript" className="text-sm font-black text-white">{isEnglishClassmateConversation ? (practiceMode === 'ask' ? 'Your line as Rafi' : 'Your reply as Sami') : practiceMode === 'ask' ? 'Your spoken question' : 'Your transcript'}</label>{isListening && <span className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-red-300"><span className="h-2 w-2 animate-pulse rounded-full bg-red-400" /> Listening</span>}</div>
+              <div className="mb-2 flex items-center justify-between gap-3"><label htmlFor="speaking-transcript" className="text-sm font-black text-white">{isEnglishClassmateConversation ? (practiceMode === 'ask' ? 'Your line as Rafi' : 'Your reply as Sami') : isEnglishSelfIntroductionDay ? (practiceMode === 'ask' ? 'Your spoken interview question' : 'Your self-introduction answer') : practiceMode === 'ask' ? 'Your spoken question' : 'Your transcript'}</label>{isListening && <span className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-red-300"><span className="h-2 w-2 animate-pulse rounded-full bg-red-400" /> Listening</span>}</div>
               <textarea id="speaking-transcript" value={`${transcript}${interimTranscript ? ` ${interimTranscript}` : ''}`} onChange={event => { sessionStartedRef.current = true; setTranscript(event.target.value); interimTranscriptRef.current = ''; setInterimTranscript(''); }} disabled={Boolean(currentResult)} rows={6} dir={isRtl ? 'rtl' : 'ltr'} placeholder="Your spoken words will appear here. You can review or correct them before submitting." className="w-full rounded-2xl border border-white/10 bg-slate-950/80 p-4 leading-7 text-white outline-none transition focus:border-emerald-400 disabled:opacity-70" />
             </div>
             {speechError && <p role="alert" className="mt-3 text-sm font-semibold text-amber-300">{speechError}</p>}
