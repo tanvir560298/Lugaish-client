@@ -747,7 +747,7 @@ export function LessonPage() {
         </>
       ))}
 
-      {!isConfigurationView && !isLoading && !error && dayResources.length > 0 && (
+      {!isLoading && !error && dayResources.length > 0 && (
         <section className="section-card overflow-hidden p-6 sm:p-8" aria-labelledby="day-resources-title">
           <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Day {day} · Beyond the class</p>
           <h2 id="day-resources-title" className="mt-2 text-2xl font-black text-white">Optional Arabic learning resource</h2>
