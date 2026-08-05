@@ -172,6 +172,9 @@ export function HomePage() {
             <p className="max-w-lg text-base font-medium leading-relaxed text-slate-400 sm:text-lg lg:text-xl">
               Join <span className="text-white">1,200+ early adopters</span> mastering English and Arabic through AI-guided practice, daily 10-minute "ascents," and weekly interview preparation.
             </p>
+            <p className="max-w-lg text-sm font-medium leading-relaxed text-slate-500 sm:text-base lg:text-base">
+              Built and maintained by web developer Tanvir Ahmad. Arabic instruction by Ishaat Alhumaidi.
+            </p>
 
             <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:flex-wrap sm:gap-5 sm:pt-4">
               <motion.button

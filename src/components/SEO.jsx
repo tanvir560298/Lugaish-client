@@ -124,6 +124,15 @@ export function SEO() {
       name: 'Lugaish',
       url: SITE_URL,
       description: DEFAULT_SEO.description,
+      founder: {
+        '@type': 'Person',
+        name: 'Tanvir Ahmad',
+        jobTitle: 'Web Developer',
+      },
+      author: {
+        '@type': 'Person',
+        name: 'Tanvir Ahmad',
+      },
       sameAs: [],
       offers: {
         '@type': 'Offer',
