@@ -55,6 +55,9 @@ export function ArchitectsPage() {
           <p className="mx-auto max-w-2xl text-base font-medium leading-relaxed text-slate-400 sm:text-xl">
             A collective of instructors, engineers, and creators dedicated to transforming how the world communicates.
           </p>
+          <p className="mx-auto max-w-2xl text-base font-medium leading-relaxed text-slate-300 sm:text-xl">
+            Developed by Tanvir Ahmad. Arabic Instruction by Ishaat Alhumaidi.
+          </p>
         </div>
       </section>
 

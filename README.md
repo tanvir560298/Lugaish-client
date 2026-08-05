@@ -198,6 +198,11 @@ POST   /api/quiz/submit         - Submit answers (protected)
 - Protected API endpoints with middleware
 - CORS configured for frontend domain
 - Environment variables for secrets (.env)
+
+## 🙌 Contributors
+
+- **Developer / Creator:** Tanvir Ahmad
+- **Arabic Instructor:** Ishaat Alhumaidi
 - MongoDB ObjectId for user isolation
 
 ## 💡 Future Enhancements
