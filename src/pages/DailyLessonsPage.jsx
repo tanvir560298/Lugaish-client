@@ -430,7 +430,11 @@ export function DailyLessonsPage() {
                 <div>
                   <p className={`text-[10px] font-black uppercase tracking-[0.28em] ${presentation?.accent ?? 'text-slate-500'}`}>Day {day.day}{presentation ? ` · ${presentation.label}` : ''}</p>
                   {scheduledDate && <p className="mt-1 text-xs font-bold text-slate-500">{scheduledDate}</p>}
-                  <h2 className="mt-2 text-xl font-black leading-tight text-white">{day.title}</h2>
+                  <h2 className="mt-2 text-xl font-black leading-tight text-white">
+                    {state.activePathway === 'arabic'
+                      ? (day.day % 2 !== 0 ? `Day ${day.day} PDF` : `Day ${day.day} Quiz`)
+                      : day.title}
+                  </h2>
                 </div>
                 <div className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl ${
                   completed ? 'bg-emerald-500/15 text-emerald-400' : isLocked ? 'bg-white/5 text-slate-500' : 'bg-blue-500 text-white'
@@ -439,7 +443,11 @@ export function DailyLessonsPage() {
                 </div>
               </div>
 
-              <p className="min-h-12 text-sm leading-6 text-slate-400">{day.description}</p>
+              <p className="min-h-12 text-sm leading-6 text-slate-400">
+                {state.activePathway === 'arabic'
+                  ? (day.day % 2 !== 0 ? "Read the day's PDF learning resource." : "Complete the day's review quiz.")
+                  : day.description}
+              </p>
               <ModuleStats day={day} language={state.activePathway} />
 
               <div className="mt-6 grid gap-2">

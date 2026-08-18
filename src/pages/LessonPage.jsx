@@ -711,8 +711,8 @@ export function LessonPage() {
 
           {language === 'arabic' && day % 2 !== 0 && (
             <div className="section-card overflow-hidden p-6 sm:p-8">
-              <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Day {day} · PDF Learning Day</p>
-              <h2 className="mt-2 text-3xl font-black text-white">PDF Learning Day</h2>
+              <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Day {day} · PDF</p>
+              <h2 className="mt-2 text-3xl font-black text-white">Day {day} PDF</h2>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400">
                 Read the PDF carefully and mark the day complete.
               </p>
@@ -760,13 +760,13 @@ export function LessonPage() {
             </div>
           )}
 
-          {language === 'arabic' && day % 2 === 0 && (
+           {language === 'arabic' && day % 2 === 0 && (
             <div className="section-card overflow-hidden p-6 sm:p-8 text-center max-w-2xl mx-auto">
               <div className="mx-auto grid h-20 w-20 place-items-center rounded-2xl bg-amber-500/15 text-amber-300">
                 <FileText size={36} className="text-amber-300" />
               </div>
-              <p className="mt-6 text-xs font-black uppercase tracking-[0.28em] text-amber-300">Day {day} · Quiz Day</p>
-              <h2 className="mt-2 text-2xl font-black text-white">Quiz Day</h2>
+              <p className="mt-6 text-xs font-black uppercase tracking-[0.28em] text-amber-300">Day {day} · Quiz</p>
+              <h2 className="mt-2 text-2xl font-black text-white">Day {day} Quiz</h2>
               <p className="mt-3 text-sm leading-6 text-slate-400">
                 Complete the quiz to finish today's lesson.
               </p>
