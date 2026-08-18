@@ -377,17 +377,17 @@ export function DailyLessonsPage() {
           if (state.activePathway === 'arabic') {
             if (day.day % 2 !== 0) {
               presentation = {
-                label: 'PDF Study Session',
-                startLabel: 'Open PDF task',
-                reviewLabel: 'Review PDF task',
+                label: 'PDF Learning Day',
+                startLabel: 'Open PDF',
+                reviewLabel: 'Review PDF',
                 Icon: BookOpen,
                 accent: 'text-emerald-300',
               };
             } else {
               presentation = {
-                label: 'Quiz Practice Session',
-                startLabel: 'Start MCQ Quiz',
-                reviewLabel: 'Review MCQ Quiz',
+                label: 'Quiz Day',
+                startLabel: 'Start Quiz',
+                reviewLabel: 'Review Quiz',
                 Icon: ListChecks,
                 accent: 'text-amber-300',
               };

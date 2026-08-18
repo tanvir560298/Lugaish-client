@@ -711,10 +711,10 @@ export function LessonPage() {
 
           {language === 'arabic' && day % 2 !== 0 && (
             <div className="section-card overflow-hidden p-6 sm:p-8">
-              <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Day {day} · Core Reading Task</p>
-              <h2 className="mt-2 text-3xl font-black text-white">Daily PDF Learning Resource</h2>
+              <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Day {day} · PDF Learning Day</p>
+              <h2 className="mt-2 text-3xl font-black text-white">PDF Learning Day</h2>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400">
-                Read this PDF carefully, follow the practice examples, and mark this day complete when you are finished.
+                Read the PDF carefully and mark the day complete.
               </p>
 
               <div className="mt-8 grid gap-4">
@@ -744,7 +744,7 @@ export function LessonPage() {
                 <div className="mt-8 border-t border-white/10 pt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <h3 className="font-bold text-white">Finish today's reading</h3>
-                    <p className="text-xs text-slate-400">Marking this day complete awards you 100 XP and unlocks tomorrow's quiz practice.</p>
+                    <p className="text-xs text-slate-400">Marking this day complete awards you 100 XP and unlocks tomorrow's quiz.</p>
                   </div>
                   <button
                     type="button"
@@ -753,7 +753,7 @@ export function LessonPage() {
                     className="glow-button glow-button-blue shrink-0 py-4 disabled:opacity-60"
                   >
                     {isVideoCompleting ? <LoaderCircle size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
-                    {isVideoCompleting ? 'Completing day...' : 'Finish reading day'}
+                    {isVideoCompleting ? 'Completing day...' : 'Complete PDF Day'}
                   </button>
                 </div>
               )}
@@ -765,10 +765,10 @@ export function LessonPage() {
               <div className="mx-auto grid h-20 w-20 place-items-center rounded-2xl bg-amber-500/15 text-amber-300">
                 <FileText size={36} className="text-amber-300" />
               </div>
-              <p className="mt-6 text-xs font-black uppercase tracking-[0.28em] text-amber-300">Day {day} · Daily Challenge</p>
-              <h2 className="mt-2 text-2xl font-black text-white">MCQ Quiz Practice Session</h2>
+              <p className="mt-6 text-xs font-black uppercase tracking-[0.28em] text-amber-300">Day {day} · Quiz Day</p>
+              <h2 className="mt-2 text-2xl font-black text-white">Quiz Day</h2>
               <p className="mt-3 text-sm leading-6 text-slate-400">
-                Test your knowledge and practice your Arabic leadership terms today. Complete the quiz challenge to finish this lesson day and earn 100 XP.
+                Complete the quiz to finish today's lesson.
               </p>
 
               <div className="mt-8 flex justify-center">
@@ -782,7 +782,7 @@ export function LessonPage() {
                   }}
                   className="glow-button glow-button-blue py-4 px-8"
                 >
-                  Start MCQ Quiz
+                  Start Quiz
                 </button>
               </div>
             </div>
