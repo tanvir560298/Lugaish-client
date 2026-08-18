@@ -271,14 +271,16 @@ export function DailyLessonsPage() {
       return;
     }
 
-    if (day.moduleType === 'ai_practice') {
-      navigate(`/speaking-practice?language=${state.activePathway}&day=${day.day}`);
-      return;
-    }
+    if (state.activePathway !== 'arabic') {
+      if (day.moduleType === 'ai_practice') {
+        navigate(`/speaking-practice?language=${state.activePathway}&day=${day.day}`);
+        return;
+      }
 
-    if (day.moduleType === 'interview') {
-      navigate(`/interview?language=${state.activePathway}&day=${day.day}`);
-      return;
+      if (day.moduleType === 'interview') {
+        navigate(`/interview?language=${state.activePathway}&day=${day.day}`);
+        return;
+      }
     }
 
     if (day.staticLesson?.id) actions.setActiveLesson(day.staticLesson.id, state.activePathway);
