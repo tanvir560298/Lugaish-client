@@ -640,7 +640,7 @@ export function LessonPage() {
         </div>
       ) : isLoading ? (
         <div className="section-card grid min-h-72 place-items-center"><LoaderCircle size={34} className="animate-spin text-slate-400" /></div>
-      ) : moduleType !== 'video' ? (
+      ) : (moduleType !== 'video' && language !== 'arabic') ? (
         <ModuleTypePanel lesson={lesson} language={language} day={day} isWebDeveloper={isWebDeveloper} navigate={navigate} />
       ) : (
         <>
