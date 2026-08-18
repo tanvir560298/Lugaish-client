@@ -644,68 +644,149 @@ export function LessonPage() {
         <ModuleTypePanel lesson={lesson} language={language} day={day} isWebDeveloper={isWebDeveloper} navigate={navigate} />
       ) : (
         <>
-          <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
-            <div className="overflow-hidden rounded-lg border border-white/10 bg-slate-950 shadow-2xl shadow-black/20">
-              {selectedVideo && !selectedVideoLocked && selectedVideo.youtubeId ? (
-                <iframe
-                  key={selectedVideo.youtubeId}
-                  className="aspect-video w-full"
-                  src={`https://www.youtube-nocookie.com/embed/${selectedVideo.youtubeId}?rel=0`}
-                  title={selectedVideo.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                />
-              ) : selectedVideo ? <LockedVideoPlaceholder videoNumber={selectedVideoIndex + 1} /> : <VideoPlaceholder isWebDeveloper={isWebDeveloper} />}
+          {language !== 'arabic' && (
+            <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+              <div className="overflow-hidden rounded-lg border border-white/10 bg-slate-950 shadow-2xl shadow-black/20">
+                {selectedVideo && !selectedVideoLocked && selectedVideo.youtubeId ? (
+                  <iframe
+                    key={selectedVideo.youtubeId}
+                    className="aspect-video w-full"
+                    src={`https://www.youtube-nocookie.com/embed/${selectedVideo.youtubeId}?rel=0`}
+                    title={selectedVideo.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                  />
+                ) : selectedVideo ? <LockedVideoPlaceholder videoNumber={selectedVideoIndex + 1} /> : <VideoPlaceholder isWebDeveloper={isWebDeveloper} />}
 
-              {selectedVideo && (
-                <div className="flex flex-col gap-3 border-t border-white/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                {selectedVideo && (
+                  <div className="flex flex-col gap-3 border-t border-white/10 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-lg font-black text-white">{selectedVideo.title}</p>
+                      <p className="mt-1 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400"><Clock3 size={14} />{formatDuration(selectedVideo.durationMinutes)}</p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${selectedVideoCompleted ? 'text-emerald-300' : 'text-red-300'}`}>
+                        {selectedVideoCompleted ? <CheckCircle2 size={17} /> : <Video size={17} />} {selectedVideoCompleted ? 'Completed' : 'YouTube lesson'}
+                      </span>
+                      {!isWebDeveloper && !selectedVideoCompleted && (
+                        <button type="button" onClick={markSelectedVideoComplete} disabled={isVideoProgressSaving || selectedVideoLocked} className="glow-button glow-button-muted py-2.5 text-xs disabled:cursor-not-allowed disabled:opacity-50">
+                          {isVideoProgressSaving ? <LoaderCircle size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
+                          {isVideoProgressSaving
+                            ? 'Saving...'
+                            : selectedVideoIndex === lessonVideos.length - 1 ? 'Mark final video complete' : `Mark video ${selectedVideoIndex + 1} complete`}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <aside className="overflow-hidden rounded-lg border border-white/10 bg-slate-900/70">
+                <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
+                  <div className="flex items-center gap-2"><ListVideo size={19} className="text-emerald-300" /><h2 className="font-black text-white">Lesson playlist</h2></div>
+                  <span className="text-xs font-black text-slate-400">{lessonVideos.length} videos</span>
+                </div>
+                <div className="max-h-[34rem] space-y-2 overflow-y-auto p-3">
+                  {lessonVideos.length ? lessonVideos.map((video, index) => {
+                    const isSelected = index === selectedVideoIndex;
+                    const videoCompleted = isVideoCompleted(video, index);
+                    const videoLocked = isVideoLocked(video, index);
+                    return (
+                      <div key={video._id ?? getVideoIdentity(video, index)} className={`flex gap-3 rounded-lg border p-2 transition ${isSelected ? 'border-emerald-400/40 bg-emerald-400/10' : videoLocked ? 'border-transparent bg-white/[0.02] opacity-65' : 'border-transparent bg-white/[0.03] hover:border-white/10 hover:bg-white/[0.06]'}`}>
+                        <button type="button" disabled={videoLocked} onClick={() => setSelectedVideoId(video._id)} className="flex min-w-0 flex-1 gap-3 text-left disabled:cursor-not-allowed">
+                          <div className="relative aspect-video w-28 shrink-0 overflow-hidden rounded-md bg-slate-950">
+                            {!videoLocked && video.youtubeId && <img src={`https://i.ytimg.com/vi/${video.youtubeId}/mqdefault.jpg`} alt="" className="h-full w-full object-cover" loading="lazy" />}
+                            <span className="absolute inset-0 grid place-items-center bg-black/35"><span className={`grid h-8 w-8 place-items-center rounded-full ${videoCompleted ? 'bg-emerald-400 text-slate-950' : videoLocked ? 'bg-slate-800 text-slate-300' : 'bg-white/90 text-slate-950'}`}>{videoCompleted ? <CheckCircle2 size={15} /> : videoLocked ? <Lock size={14} /> : <Play size={14} fill="currentColor" />}</span></span>
+                          </div>
+                          <span className="min-w-0 py-1"><span className="block text-[10px] font-black uppercase tracking-widest text-slate-500">Video {index + 1}</span><span className="mt-1 line-clamp-2 block text-sm font-bold leading-5 text-white">{video.title}</span><span className={`mt-2 flex items-center gap-1 text-xs font-semibold ${videoCompleted ? 'text-emerald-300' : videoLocked ? 'text-slate-500' : 'text-slate-400'}`}>{videoCompleted ? <><CheckCircle2 size={12} /> Complete</> : videoLocked ? <><Lock size={12} /> Complete previous video</> : <><Clock3 size={12} /> {formatDuration(video.durationMinutes)}</>}</span></span>
+                        </button>
+                      </div>
+                    );
+                  }) : <div className="px-4 py-12 text-center text-sm leading-6 text-slate-400">The playlist is empty. Videos added by the learning team will appear here.</div>}
+                </div>
+              </aside>
+            </div>
+          )}
+
+          {language === 'arabic' && day % 2 !== 0 && (
+            <div className="section-card overflow-hidden p-6 sm:p-8">
+              <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Day {day} · Core Reading Task</p>
+              <h2 className="mt-2 text-3xl font-black text-white">Daily PDF Learning Resource</h2>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400">
+                Read this PDF carefully, follow the practice examples, and mark this day complete when you are finished.
+              </p>
+
+              <div className="mt-8 grid gap-4">
+                {dayResources.map(resource => (
+                  <article key={resource.id} className="flex flex-col gap-5 rounded-2xl border border-white/10 bg-white/5 p-5 sm:flex-row sm:items-center">
+                    <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-emerald-500/15 text-emerald-300">
+                      <FileText size={28} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-black uppercase tracking-widest text-emerald-400">PDF {String(resource.sequence).padStart(2, '0')}</p>
+                      <h3 className="mt-1 text-lg font-black text-white">{resource.title}</h3>
+                      <p className="mt-1 text-sm leading-6 text-slate-400">{resource.description}</p>
+                    </div>
+                    <a
+                      href={resource.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-6 py-4 text-sm font-black uppercase tracking-widest text-white transition hover:bg-emerald-400"
+                    >
+                      Open PDF <ExternalLink size={16} />
+                    </a>
+                  </article>
+                ))}
+              </div>
+
+              {!isWebDeveloper && (
+                <div className="mt-8 border-t border-white/10 pt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-lg font-black text-white">{selectedVideo.title}</p>
-                    <p className="mt-1 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400"><Clock3 size={14} />{formatDuration(selectedVideo.durationMinutes)}</p>
+                    <h3 className="font-bold text-white">Finish today's reading</h3>
+                    <p className="text-xs text-slate-400">Marking this day complete awards you 100 XP and unlocks tomorrow's quiz practice.</p>
                   </div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className={`inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest ${selectedVideoCompleted ? 'text-emerald-300' : 'text-red-300'}`}>
-                      {selectedVideoCompleted ? <CheckCircle2 size={17} /> : <Video size={17} />} {selectedVideoCompleted ? 'Completed' : 'YouTube lesson'}
-                    </span>
-                    {!isWebDeveloper && !selectedVideoCompleted && (
-                      <button type="button" onClick={markSelectedVideoComplete} disabled={isVideoProgressSaving || selectedVideoLocked} className="glow-button glow-button-muted py-2.5 text-xs disabled:cursor-not-allowed disabled:opacity-50">
-                        {isVideoProgressSaving ? <LoaderCircle size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
-                        {isVideoProgressSaving
-                          ? 'Saving...'
-                          : selectedVideoIndex === lessonVideos.length - 1 ? 'Mark final video complete' : `Mark video ${selectedVideoIndex + 1} complete`}
-                      </button>
-                    )}
-                  </div>
+                  <button
+                    type="button"
+                    onClick={completeVideoDay}
+                    disabled={isVideoCompleting}
+                    className="glow-button glow-button-blue shrink-0 py-4 disabled:opacity-60"
+                  >
+                    {isVideoCompleting ? <LoaderCircle size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
+                    {isVideoCompleting ? 'Completing day...' : 'Finish reading day'}
+                  </button>
                 </div>
               )}
             </div>
+          )}
 
-            <aside className="overflow-hidden rounded-lg border border-white/10 bg-slate-900/70">
-              <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
-                <div className="flex items-center gap-2"><ListVideo size={19} className="text-emerald-300" /><h2 className="font-black text-white">Lesson playlist</h2></div>
-                <span className="text-xs font-black text-slate-400">{lessonVideos.length} videos</span>
+          {language === 'arabic' && day % 2 === 0 && (
+            <div className="section-card overflow-hidden p-6 sm:p-8 text-center max-w-2xl mx-auto">
+              <div className="mx-auto grid h-20 w-20 place-items-center rounded-2xl bg-amber-500/15 text-amber-300">
+                <FileText size={36} className="text-amber-300" />
               </div>
-              <div className="max-h-[34rem] space-y-2 overflow-y-auto p-3">
-                {lessonVideos.length ? lessonVideos.map((video, index) => {
-                  const isSelected = index === selectedVideoIndex;
-                  const videoCompleted = isVideoCompleted(video, index);
-                  const videoLocked = isVideoLocked(video, index);
-                  return (
-                    <div key={video._id ?? getVideoIdentity(video, index)} className={`flex gap-3 rounded-lg border p-2 transition ${isSelected ? 'border-emerald-400/40 bg-emerald-400/10' : videoLocked ? 'border-transparent bg-white/[0.02] opacity-65' : 'border-transparent bg-white/[0.03] hover:border-white/10 hover:bg-white/[0.06]'}`}>
-                      <button type="button" disabled={videoLocked} onClick={() => setSelectedVideoId(video._id)} className="flex min-w-0 flex-1 gap-3 text-left disabled:cursor-not-allowed">
-                        <div className="relative aspect-video w-28 shrink-0 overflow-hidden rounded-md bg-slate-950">
-                          {!videoLocked && video.youtubeId && <img src={`https://i.ytimg.com/vi/${video.youtubeId}/mqdefault.jpg`} alt="" className="h-full w-full object-cover" loading="lazy" />}
-                          <span className="absolute inset-0 grid place-items-center bg-black/35"><span className={`grid h-8 w-8 place-items-center rounded-full ${videoCompleted ? 'bg-emerald-400 text-slate-950' : videoLocked ? 'bg-slate-800 text-slate-300' : 'bg-white/90 text-slate-950'}`}>{videoCompleted ? <CheckCircle2 size={15} /> : videoLocked ? <Lock size={14} /> : <Play size={14} fill="currentColor" />}</span></span>
-                        </div>
-                        <span className="min-w-0 py-1"><span className="block text-[10px] font-black uppercase tracking-widest text-slate-500">Video {index + 1}</span><span className="mt-1 line-clamp-2 block text-sm font-bold leading-5 text-white">{video.title}</span><span className={`mt-2 flex items-center gap-1 text-xs font-semibold ${videoCompleted ? 'text-emerald-300' : videoLocked ? 'text-slate-500' : 'text-slate-400'}`}>{videoCompleted ? <><CheckCircle2 size={12} /> Complete</> : videoLocked ? <><Lock size={12} /> Complete previous video</> : <><Clock3 size={12} /> {formatDuration(video.durationMinutes)}</>}</span></span>
-                      </button>
-                    </div>
-                  );
-                }) : <div className="px-4 py-12 text-center text-sm leading-6 text-slate-400">The playlist is empty. Videos added by the learning team will appear here.</div>}
+              <p className="mt-6 text-xs font-black uppercase tracking-[0.28em] text-amber-300">Day {day} · Daily Challenge</p>
+              <h2 className="mt-2 text-2xl font-black text-white">MCQ Quiz Practice Session</h2>
+              <p className="mt-3 text-sm leading-6 text-slate-400">
+                Test your knowledge and practice your Arabic leadership terms today. Complete the quiz challenge to finish this lesson day and earn 100 XP.
+              </p>
+
+              <div className="mt-8 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (staticLesson?.id) {
+                      actions.setActiveLesson(staticLesson.id, language);
+                      navigate('/quiz');
+                    }
+                  }}
+                  className="glow-button glow-button-blue py-4 px-8"
+                >
+                  Start MCQ Quiz
+                </button>
               </div>
-            </aside>
-          </div>
+            </div>
+          )}
 
           {isWebDeveloper && lesson.quiz?.length > 0 && staticLesson?.id && (
             <div className="section-card flex flex-col gap-4 border-blue-400/20 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
@@ -729,7 +810,7 @@ export function LessonPage() {
             </div>
           )}
 
-          {!isWebDeveloper && lessonVideos.length > 0 && (
+          {language !== 'arabic' && !isWebDeveloper && lessonVideos.length > 0 && (
             <div className="section-card flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-400">Video sequence</p>
@@ -747,12 +828,12 @@ export function LessonPage() {
         </>
       ))}
 
-      {!isLoading && !error && dayResources.length > 0 && (
+      {language !== 'arabic' && !isLoading && !error && dayResources.length > 0 && (
         <section className="section-card overflow-hidden p-6 sm:p-8" aria-labelledby="day-resources-title">
           <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Day {day} · Beyond the class</p>
           <h2 id="day-resources-title" className="mt-2 text-2xl font-black text-white">Optional Arabic learning resource</h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400">
-            If you would like to learn something new after today&apos;s class, this PDF is for you.
+            If you would like to learn something new after today's class, this PDF is for you.
             Read it at your own pace, practise what you discover, and take your Arabic learning one step further.
           </p>
 

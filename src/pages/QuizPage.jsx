@@ -58,6 +58,9 @@ export function QuizPage() {
     try {
       const result = await actions.submitQuiz(activeLesson.id, responses);
       actions.recordServerQuizCompletion(activeLesson.id, result);
+      if (activeLesson.id.startsWith('ar-')) {
+        actions.completeLesson(activeLesson.id);
+      }
       setXpEarned(Number(result?.xpAwarded) || 0);
       setServerScore(Number.isFinite(Number(result?.correctAnswers)) ? Number(result.correctAnswers) : score);
       setIsCompleted(true);

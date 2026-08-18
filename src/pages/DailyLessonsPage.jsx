@@ -4,6 +4,7 @@ import {
   CheckCircle2,
   Clock3,
   Film,
+  FileText,
   Headphones,
   ListChecks,
   Lock,
@@ -121,9 +122,27 @@ function buildDayCards(staticLessons, remoteModules, minimumDays) {
   });
 }
 
-function ModuleStats({ day }) {
+function ModuleStats({ day, language }) {
   const lesson = day.staticLesson;
   const baseClass = 'rounded-2xl border border-white/10 bg-white/5 p-3';
+
+  if (language === 'arabic') {
+    if (day.day % 2 !== 0) {
+      return (
+        <div className="mt-6 grid grid-cols-2 gap-2 text-center">
+          <div className={baseClass}><FileText size={16} className="mx-auto mb-2 text-emerald-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">PDF Study</p></div>
+          <div className={baseClass}><BookOpen size={16} className="mx-auto mb-2 text-blue-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Reading Task</p></div>
+        </div>
+      );
+    } else {
+      return (
+        <div className="mt-6 grid grid-cols-2 gap-2 text-center">
+          <div className={baseClass}><ListChecks size={16} className="mx-auto mb-2 text-amber-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">MCQ Quiz</p></div>
+          <div className={baseClass}><Sparkles size={16} className="mx-auto mb-2 text-emerald-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Practice</p></div>
+        </div>
+      );
+    }
+  }
 
   if (day.moduleType === 'ai_practice') {
     return (
@@ -354,7 +373,26 @@ export function DailyLessonsPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {days.map((day, index) => {
-          const presentation = MODULE_PRESENTATION[day.moduleType] ?? null;
+          let presentation = MODULE_PRESENTATION[day.moduleType] ?? null;
+          if (state.activePathway === 'arabic') {
+            if (day.day % 2 !== 0) {
+              presentation = {
+                label: 'PDF Study Session',
+                startLabel: 'Open PDF task',
+                reviewLabel: 'Review PDF task',
+                Icon: BookOpen,
+                accent: 'text-emerald-300',
+              };
+            } else {
+              presentation = {
+                label: 'Quiz Practice Session',
+                startLabel: 'Start MCQ Quiz',
+                reviewLabel: 'Review MCQ Quiz',
+                Icon: ListChecks,
+                accent: 'text-amber-300',
+              };
+            }
+          }
           const scheduledDate = formatScheduledDate(day.daySchedule?.scheduledFor);
           const isPublished = Boolean(day.published);
           const planPendingForLearner = !hasLoadedDayModules && !isWebDeveloper;
@@ -400,7 +438,7 @@ export function DailyLessonsPage() {
               </div>
 
               <p className="min-h-12 text-sm leading-6 text-slate-400">{day.description}</p>
-              <ModuleStats day={day} />
+              <ModuleStats day={day} language={state.activePathway} />
 
               <div className="mt-6 grid gap-2">
                 <button
