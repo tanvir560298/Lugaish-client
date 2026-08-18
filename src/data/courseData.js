@@ -108,6 +108,23 @@ export const COURSE_DATA = {
               { text: 'A great leader builds other leaders.', translation: 'Arabic phrase practice coming soon.' },
               { text: 'Shared teamwork is the key to lasting success.', translation: 'Arabic phrase practice coming soon.' },
             ],
+            quiz: [],
+          },
+          // Day 2
+          {
+            id: 'ar-les-2',
+            title: 'Lesson 2: Speaking With Impact',
+            description: 'Practice simple Arabic-linked words for speaking, delivery, and persuasion.',
+            langCode: 'ar-SA',
+            cards: [
+              { word: 'Eloquence', translation: 'Balaghah', type: 'noun', explanation: 'Balaghah means clear, powerful, and fitting expression.', example: 'Use it when speech sounds graceful and convincing.' },
+              { word: 'Persuasion', translation: 'Iqna', type: 'noun', explanation: 'Iqna means helping someone accept an idea through reasons.', example: 'Use it when presenting an argument or proposal.' },
+              { word: 'Delivery', translation: 'Ilqa', type: 'noun', explanation: 'Ilqa means how you present words with voice and presence.', example: 'Use it when practicing speeches or presentations.' },
+            ],
+            phrases: [
+              { text: 'A kind persuasive word opens hearts and minds.', translation: 'Arabic phrase practice coming soon.' },
+              { text: 'Speak clearly so people can understand your message.', translation: 'Arabic phrase practice coming soon.' },
+            ],
             quiz: [
               {
                 question: 'কেউ যদি আপনাকে "السَّلَامُ عَلَيْكُمْ" (আসসালামু আলাইকুম) বলে, তবে সঠিক উত্তর কোনটি হবে?',
@@ -168,30 +185,6 @@ export const COURSE_DATA = {
                 options: ['أَنَا بَنْغْلَادِيْش', 'أَنَا مِنْ بَنْغْلَادِيْشِيَّة', 'أَنَا بَنْغْلَادِيْشِيَّةٌ (আমি বাংলাদেশি - স্ত্রীলিঙ্গ)', 'أَنَا بَنْغْلَادِيْشِيٌّ'],
                 answer: 2,
                 explanation: 'নারী বক্তার জন্য সঠিক রূপ “আনা বাংলাদেশিয়্যাতুন।”',
-              },
-            ],
-          },
-          // Day 2
-          {
-            id: 'ar-les-2',
-            title: 'Lesson 2: Speaking With Impact',
-            description: 'Practice simple Arabic-linked words for speaking, delivery, and persuasion.',
-            langCode: 'ar-SA',
-            cards: [
-              { word: 'Eloquence', translation: 'Balaghah', type: 'noun', explanation: 'Balaghah means clear, powerful, and fitting expression.', example: 'Use it when speech sounds graceful and convincing.' },
-              { word: 'Persuasion', translation: 'Iqna', type: 'noun', explanation: 'Iqna means helping someone accept an idea through reasons.', example: 'Use it when presenting an argument or proposal.' },
-              { word: 'Delivery', translation: 'Ilqa', type: 'noun', explanation: 'Ilqa means how you present words with voice and presence.', example: 'Use it when practicing speeches or presentations.' },
-            ],
-            phrases: [
-              { text: 'A kind persuasive word opens hearts and minds.', translation: 'Arabic phrase practice coming soon.' },
-              { text: 'Speak clearly so people can understand your message.', translation: 'Arabic phrase practice coming soon.' },
-            ],
-            quiz: [
-              {
-                question: 'Which word means persuasion?',
-                options: ['Balaghah', 'Ilqa', 'Iqna', 'Nazahah'],
-                answer: 2,
-                explanation: 'Iqna means persuasion.',
               },
             ],
           },
