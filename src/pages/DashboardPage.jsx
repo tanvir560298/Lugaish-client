@@ -3,7 +3,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { BookOpenCheck, ChevronDown, ClipboardList, FilePenLine, GraduationCap, Mail, RefreshCw, Send, ShieldCheck, Trash2, TrendingUp, UsersRound } from 'lucide-react';
 import { api } from '../api/client.js';
 import { useAppContext } from '../state/AppContext.jsx';
-import { ROLE_LABELS, ROLE_VALUES, ROLES, hasPermission, normalizeRole } from '../utils/roles.js';
+import { ROLE_LABELS, ROLE_VALUES, ROLES, getViewedRole, hasPermission } from '../utils/roles.js';
 import { getEffectiveCourseStartKey, hasCourseStarted } from '../utils/courseLaunch.js';
 
 const XP_PER_LEVEL = 500;
@@ -573,7 +573,7 @@ export function DashboardPage() {
   const xpInLevel = state.xp % XP_PER_LEVEL;
   const remaining = XP_PER_LEVEL - xpInLevel;
   const levelProgress = Math.round((xpInLevel / XP_PER_LEVEL) * 100);
-  const role = normalizeRole(state.userRole);
+  const role = getViewedRole(state);
   const isStaff = role !== ROLES.learner;
   const canManageRoles = hasPermission(role, 'manage_roles');
   const canViewRoles = isStaff;

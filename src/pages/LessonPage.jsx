@@ -22,7 +22,7 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { LEARNING_RESOURCES } from '../data/learningResources.js';
 import { useAppContext, getPathFromState } from '../state/AppContext.jsx';
-import { ROLES } from '../utils/roles.js';
+import { ROLES, isStudentPreview } from '../utils/roles.js';
 
 const VIDEO_PROGRESS_STORAGE_PREFIX = 'lugaish_lesson_video_progress_v1';
 
@@ -193,7 +193,7 @@ export function LessonPage() {
   const [searchParams] = useSearchParams();
   const day = Math.max(Number.parseInt(dayParam, 10) || 1, 1);
   const language = state.activePathway;
-  const isWebDeveloper = [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
+  const isWebDeveloper = !isStudentPreview(state) && [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
   const canDeleteExistingContent = state.userRole !== ROLES.intern;
   const staticLessons = useMemo(() => pathway.modules.flatMap(module => module.lessons), [pathway]);
   const staticLesson = staticLessons[day - 1] ?? null;

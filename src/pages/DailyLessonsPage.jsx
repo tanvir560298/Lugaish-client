@@ -20,7 +20,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useAppContext } from '../state/AppContext.jsx';
-import { ROLES } from '../utils/roles.js';
+import { ROLES, isStudentPreview } from '../utils/roles.js';
 
 const LEARNER_PREVIEW_DAYS = 8;
 const WEB_DEVELOPER_PLANNING_DAYS = 90;
@@ -196,7 +196,7 @@ export function DailyLessonsPage() {
   });
   const [hasLoadedDayModules, setHasLoadedDayModules] = useState(false);
   const [dayModuleError, setDayModuleError] = useState('');
-  const isWebDeveloper = [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
+  const isWebDeveloper = !isStudentPreview(state) && [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
   const enrolledPathways = state.enrolledPathways?.length ? state.enrolledPathways : [state.activePathway];
   const availableToEnroll = Object.keys(courseData).filter(pathway => !enrolledPathways.includes(pathway));
   const pathway = courseData[state.activePathway] ?? courseData.english;

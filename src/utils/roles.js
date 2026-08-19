@@ -78,3 +78,12 @@ export function getRolePermissions(role) {
 export function hasPermission(role, permission) {
   return getRolePermissions(role).includes(permission);
 }
+
+export function isStudentPreview(state) {
+  return normalizeRole(state?.userRole) === ROLES.webDeveloper
+    && state?.webDeveloperMode === 'tester';
+}
+
+export function getViewedRole(state) {
+  return isStudentPreview(state) ? ROLES.learner : normalizeRole(state?.userRole);
+}

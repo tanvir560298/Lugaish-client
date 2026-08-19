@@ -15,7 +15,10 @@ import {
   Sun,
   Moon,
   Activity,
+  Code2,
+  Eye,
 } from 'lucide-react';
+import { ROLES } from '../utils/roles.js';
 
 const navLinks = [
   { href: '/', label: 'Overview', icon: <LayoutDashboard size={16} />, exact: true },
@@ -33,6 +36,8 @@ export function Header() {
   const themeLabel = state.theme === 'dark' ? 'Light mode' : 'Dark mode';
   const dashboardLink = { href: '/dashboard', label: 'Dashboard', icon: <Gauge size={16} /> };
   const visibleNavLinks = state.isLoggedIn ? [...navLinks, dashboardLink] : navLinks;
+  const canSwitchMode = state.userRole === ROLES.webDeveloper;
+  const isTesterMode = canSwitchMode && state.webDeveloperMode === 'tester';
   const isLinkActive = (link) => (
     link.exact
       ? location.pathname === link.href
@@ -93,6 +98,18 @@ export function Header() {
 
         {/* --- 3. ACTIONS & USER STATUS --- */}
         <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-4">
+          {canSwitchMode && (
+            <button
+              type="button"
+              onClick={actions.toggleWebDeveloperMode}
+              className={`header-control hidden items-center gap-2 rounded-xl border px-3 py-2 text-[10px] font-black uppercase tracking-wider transition lg:inline-flex ${isTesterMode ? 'border-amber-400/30 bg-amber-500/10 text-amber-200' : 'border-violet-400/30 bg-violet-500/10 text-violet-200'}`}
+              aria-pressed={isTesterMode}
+              title={isTesterMode ? 'Switch to Web Developer mode' : 'Preview the website as a student'}
+            >
+              {isTesterMode ? <Eye size={16} /> : <Code2 size={16} />}
+              {isTesterMode ? 'Tester mode' : 'Developer mode'}
+            </button>
+          )}
           
           <button
             type="button"
@@ -172,6 +189,17 @@ export function Header() {
                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Your progress</p>
                   <p className="mt-1 text-base font-black text-white">{state.userName || 'Learner'} · Level {level} · {state.xp} XP</p>
                 </div>
+              )}
+
+              {canSwitchMode && (
+                <button
+                  type="button"
+                  onClick={actions.toggleWebDeveloperMode}
+                  className={`flex w-full items-center justify-between rounded-2xl border px-3 py-3 text-sm font-black uppercase tracking-wider ${isTesterMode ? 'border-amber-400/30 bg-amber-500/10 text-amber-100' : 'border-violet-400/30 bg-violet-500/10 text-violet-100'}`}
+                >
+                  <span>{isTesterMode ? 'Tester mode' : 'Developer mode'}</span>
+                  {isTesterMode ? <Eye size={18} /> : <Code2 size={18} />}
+                </button>
               )}
 
               {visibleNavLinks.map((link) => (

@@ -18,7 +18,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { getLocalSpeakingQuestions } from '../data/speakingQuestions.ts';
 import { useAppContext } from '../state/AppContext.jsx';
-import { ROLES } from '../utils/roles.js';
+import { ROLES, isStudentPreview } from '../utils/roles.js';
 import { scoreSpeakingTranscript } from '../utils/speakingScoring.js';
 
 const RESULT_STORAGE_KEY = 'lugaish_latest_speaking_result_v1';
@@ -199,7 +199,7 @@ export function SpeakingPracticePage() {
   const locale = language === 'arabic' ? 'ar-SA' : 'en-US';
   const day = hasValidRouteParams ? requestedDay : 1;
   const shouldOpenManager = searchParams.get('manage') === '1';
-  const isWebDeveloper = [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
+  const isWebDeveloper = !isStudentPreview(state) && [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
   const [module, setModule] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [draftQuestions, setDraftQuestions] = useState([]);

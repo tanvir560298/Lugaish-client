@@ -4,7 +4,7 @@ import { api } from './api/client.js';
 import { Layout } from './components/Layout.jsx';
 import { SEO } from './components/SEO.jsx';
 import { AppProvider, useAppContext } from './state/AppContext.jsx';
-import { ROLES } from './utils/roles.js';
+import { ROLES, isStudentPreview } from './utils/roles.js';
 
 const HomePage = lazy(() => import('./pages/HomePage.jsx').then(module => ({ default: module.HomePage })));
 const DashboardPage = lazy(() => import('./pages/DashboardPage.jsx').then(module => ({ default: module.DashboardPage })));
@@ -68,7 +68,8 @@ function CourseLaunchGuard({ children }) {
   const { state } = useAppContext();
   const [reloadKey, setReloadKey] = useState(0);
   const [launchState, setLaunchState] = useState({ loading: true, started: false, startAt: '', startDate: '', error: '' });
-  const isWebDeveloper = [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
+  const isWebDeveloper = !isStudentPreview(state)
+    && [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
 
   useEffect(() => {
     if (isWebDeveloper) {

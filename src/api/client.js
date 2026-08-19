@@ -18,6 +18,15 @@ const RETRY_DELAY_MIN_MS = 800;
 const RETRY_DELAY_MAX_MS = 2200;
 const inFlightGetRequests = new Map();
 
+function isLearnerPreviewRequest() {
+  try {
+    const savedState = JSON.parse(localStorage.getItem('lugaish_state_v1') || '{}');
+    return savedState.userRole === 'web_developer' && savedState.webDeveloperMode === 'tester';
+  } catch {
+    return false;
+  }
+}
+
 function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -47,11 +56,13 @@ async function fetchWithTimeout(url, options) {
 }
 async function executeRequest(path, options = {}) {
   const token = getAuthToken();
+  const learnerPreview = isLearnerPreviewRequest();
   const requestOptions = {
     ...options,
     headers: {
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(learnerPreview ? { 'X-Lugaish-Learner-Preview': '1' } : {}),
       ...(options.headers ?? {}),
     },
   };
@@ -98,7 +109,7 @@ function request(path, options = {}) {
 
   // React can mount a screen twice in development. Reuse an identical active
   // GET instead of sending duplicate work to the API server.
-  const requestKey = `${getAuthToken() ?? 'anonymous'}:${path}`;
+  const requestKey = `${getAuthToken() ?? 'anonymous'}:${isLearnerPreviewRequest() ? 'learner-preview' : 'normal'}:${path}`;
   const existingRequest = inFlightGetRequests.get(requestKey);
   if (existingRequest) return existingRequest;
 

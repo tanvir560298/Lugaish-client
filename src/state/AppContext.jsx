@@ -24,6 +24,7 @@ const defaultState = {
   userName: '',
   userEmail: '',
   userRole: ROLES.learner,
+  webDeveloperMode: 'developer',
   permissions: [],
   learnerProfile: {
     profession: '',
@@ -121,6 +122,7 @@ function normalizeState(state) {
       [pathway]: getEffectiveCourseStartKey(state.courseStartedAt?.[pathway]),
     }), {}),
     userRole: normalizeRole(state.userRole),
+    webDeveloperMode: state.webDeveloperMode === 'tester' ? 'tester' : 'developer',
     permissions: Array.isArray(state.permissions) && state.permissions.length
       ? state.permissions
       : getRolePermissions(state.userRole),
@@ -468,6 +470,15 @@ export function AppProvider({ children }) {
     },
     toggleTheme() {
       setState(prev => ({ ...prev, theme: prev.theme === 'dark' ? 'light' : 'dark' }));
+    },
+    toggleWebDeveloperMode() {
+      setState(prev => {
+        if (normalizeRole(prev.userRole) !== ROLES.webDeveloper) return prev;
+        return {
+          ...prev,
+          webDeveloperMode: prev.webDeveloperMode === 'tester' ? 'developer' : 'tester',
+        };
+      });
     },
     addXP(amount) {
       setState(prev => {

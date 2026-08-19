@@ -1,14 +1,16 @@
 import { useMemo, useState } from 'react';
-import { CheckCircle2, LoaderCircle, RotateCcw, XCircle } from 'lucide-react';
+import confetti from 'canvas-confetti';
+import { CheckCircle2, LoaderCircle, PartyPopper, RotateCcw, Sparkles, XCircle } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppContext, getLessonFromState } from '../state/AppContext.jsx';
+import { isStudentPreview } from '../utils/roles.js';
 
 export function QuizPage() {
   const { state, actions, courseData } = useAppContext();
   const activeLesson = getLessonFromState(state, courseData);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const isPreview = searchParams.get('preview') === '1';
+  const isPreview = searchParams.get('preview') === '1' || isStudentPreview(state);
   const previewDay = Math.max(Number(searchParams.get('day')) || 1, 1);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState(null);
@@ -19,6 +21,7 @@ export function QuizPage() {
   const [submitError, setSubmitError] = useState('');
   const [xpEarned, setXpEarned] = useState(0);
   const [serverScore, setServerScore] = useState(null);
+  const [highScoreCelebration, setHighScoreCelebration] = useState(false);
 
   const questions = activeLesson.quiz ?? [];
   const question = questions[questionIndex];
@@ -26,6 +29,15 @@ export function QuizPage() {
   const score = responses.reduce((total, response, index) => (
     total + (response === questions[index]?.answer ? 1 : 0)
   ), 0);
+
+  const celebrateHighScore = () => {
+    const colors = ['#34d399', '#60a5fa', '#fbbf24', '#c084fc', '#ffffff'];
+    confetti({ particleCount: 90, spread: 75, startVelocity: 45, origin: { x: 0.2, y: 0.72 }, colors });
+    confetti({ particleCount: 90, spread: 75, startVelocity: 45, origin: { x: 0.8, y: 0.72 }, colors });
+    window.setTimeout(() => {
+      confetti({ particleCount: 120, spread: 110, origin: { y: 0.55 }, colors });
+    }, 350);
+  };
 
   if (!question) {
     return (
@@ -39,7 +51,11 @@ export function QuizPage() {
 
   const checkAnswer = () => {
     if (selectedIndex === null || answerChecked) return;
-    setResponses(previous => [...previous, selectedIndex]);
+    setResponses(previous => {
+      const next = previous.slice(0, questionIndex);
+      next[questionIndex] = selectedIndex;
+      return next;
+    });
     setAnswerChecked(true);
     setSubmitError('');
   };
@@ -52,17 +68,33 @@ export function QuizPage() {
       return;
     }
 
+    const finalResponses = responses.length === questions.length
+      ? responses
+      : [...responses.slice(0, questionIndex), selectedIndex];
+    if (finalResponses.length !== questions.length || finalResponses.some(answer => !Number.isSafeInteger(answer))) {
+      setSubmitError('Please answer every question before finishing the quiz.');
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitError('');
 
     try {
-      const result = await actions.submitQuiz(activeLesson.id, responses);
+      const result = await actions.submitQuiz(activeLesson.id, finalResponses);
       actions.recordServerQuizCompletion(activeLesson.id, result);
       if (activeLesson.id.startsWith('ar-')) {
         actions.completeLesson(activeLesson.id);
       }
       setXpEarned(Number(result?.xpAwarded) || 0);
-      setServerScore(Number.isFinite(Number(result?.correctAnswers)) ? Number(result.correctAnswers) : score);
+      const correctAnswers = Number.isFinite(Number(result?.correctAnswers)) ? Number(result.correctAnswers) : score;
+      const percentage = Number.isFinite(Number(result?.score))
+        ? Number(result.score)
+        : Math.round((correctAnswers / questions.length) * 100);
+      setServerScore(correctAnswers);
+      if (percentage > 80) {
+        setHighScoreCelebration(true);
+        celebrateHighScore();
+      }
       setIsCompleted(true);
     } catch (error) {
       setSubmitError(error.message || 'Your result could not be saved. Please try again.');
@@ -91,6 +123,7 @@ export function QuizPage() {
     setSubmitError('');
     setXpEarned(0);
     setServerScore(null);
+    setHighScoreCelebration(false);
   };
 
   const selectedIsCorrect = selectedIndex === question.answer;
@@ -111,6 +144,17 @@ export function QuizPage() {
             <div className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-gradient-to-br from-green-500 to-blue-500 text-4xl">🏆</div>
             <h2 className="text-3xl font-black text-white">{isPreview ? 'MCQ preview completed!' : 'Quiz completed!'}</h2>
             <p className="text-slate-400">{isPreview ? 'This preview did not change XP, progress, or learner completion.' : 'Review every answer below and revisit the ones that need more practice.'}</p>
+            {highScoreCelebration && (
+              <div className="relative overflow-hidden rounded-[2rem] border border-amber-300/30 bg-gradient-to-br from-amber-500/20 via-violet-500/15 to-emerald-500/20 p-6 shadow-2xl shadow-amber-500/10">
+                <Sparkles className="absolute right-5 top-5 text-amber-300" size={24} />
+                <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-amber-300 text-slate-950 shadow-lg shadow-amber-400/30">
+                  <PartyPopper size={28} />
+                </div>
+                <p className="mt-4 text-xs font-black uppercase tracking-[0.3em] text-amber-200">Outstanding achievement</p>
+                <h3 className="mt-2 text-2xl font-black text-white">Brilliant work, {state.userName || 'Learner'}!</h3>
+                <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-200">You scored above 80%. Your focus and consistency are turning today&apos;s lesson into real language confidence.</p>
+              </div>
+            )}
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/80 p-6">
                 <p className="text-sm uppercase tracking-[0.24em] text-slate-400">XP earned</p>

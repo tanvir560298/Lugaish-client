@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, useSpring, AnimatePresence, useMotionValueEvent } from 'framer-motion';
 import { api } from '../api/client.js';
 import { useAppContext } from '../state/AppContext.jsx';
-import { ROLES } from '../utils/roles.js';
+import { ROLES, isStudentPreview } from '../utils/roles.js';
 import { 
   Trophy, Egg, Bird, Flame, Zap, Eye, ArrowRight, 
   Sparkles, Compass, Mountain, Sun, Crown, Lock, CheckCircle2,
@@ -53,7 +53,7 @@ export function PathwaysPage() {
   const [unlockedDays, setUnlockedDays] = useState(() => new Set());
   const [courseAccess, setCourseAccess] = useState({ loading: true, started: false, startAt: '', startDate: '', error: '' });
   const containerRef = useRef(null);
-  const isWebDeveloper = [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
+  const isWebDeveloper = !isStudentPreview(state) && [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
   const courseReady = isWebDeveloper || courseAccess.started;
 
   useEffect(() => {
