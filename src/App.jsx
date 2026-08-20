@@ -79,7 +79,7 @@ function CourseLaunchGuard({ children }) {
 
     let ignore = false;
     setLaunchState(current => ({ ...current, loading: true, error: '' }));
-    api.getDayModules(state.activePathway)
+    api.getDayModules(state.activePathway, { learnerPreview: isStudentPreview(state) })
       .then(response => {
         if (ignore) return;
         const courseSchedule = response.courseSchedule ?? response;
@@ -106,7 +106,7 @@ function CourseLaunchGuard({ children }) {
     return () => {
       ignore = true;
     };
-  }, [isWebDeveloper, reloadKey, state.activePathway]);
+  }, [isWebDeveloper, reloadKey, state.activePathway, state.userRole, state.webDeveloperMode]);
 
   if (isWebDeveloper || launchState.started) return children;
   if (launchState.loading) return <PageFallback />;

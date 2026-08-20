@@ -242,7 +242,7 @@ export function DailyLessonsPage() {
     setHasLoadedDayModules(false);
     setDayModuleError('');
 
-    api.getDayModules(state.activePathway)
+    api.getDayModules(state.activePathway, { learnerPreview: isStudentPreview(state) })
       .then(response => {
         if (ignore) return;
         const courseSchedule = response.courseSchedule ?? response;
@@ -266,7 +266,7 @@ export function DailyLessonsPage() {
     return () => {
       ignore = true;
     };
-  }, [state.activePathway]);
+  }, [state.activePathway, state.userRole, state.webDeveloperMode]);
 
   const openDay = day => {
     if (!day.moduleType) {
@@ -400,6 +400,7 @@ export function DailyLessonsPage() {
             }
           }
           const scheduledDate = formatScheduledDate(day.daySchedule?.scheduledFor);
+          const isCurrentDay = !isWebDeveloper && day.day === dayModuleData.courseDay;
           const isPublished = Boolean(day.published);
           const planPendingForLearner = !hasLoadedDayModules && !isWebDeveloper;
           const planUnavailableForLearner = Boolean(dayModuleError) && !isWebDeveloper;
@@ -432,9 +433,17 @@ export function DailyLessonsPage() {
               key={day.id}
               className={`section-card relative overflow-hidden p-5 transition sm:p-6 ${
                 !isLocked && !completed && day.moduleType ? 'border-blue-400/30 shadow-[0_24px_70px_rgba(37,99,235,0.16)]' : ''
-              } ${!day.moduleType && !isWebDeveloper ? 'border-dashed opacity-70' : ''}`}
+              } ${isCurrentDay ? 'border-cyan-300/80 ring-2 ring-cyan-300/50 shadow-[0_0_35px_rgba(34,211,238,0.65),0_0_90px_rgba(37,99,235,0.38)]' : ''} ${!day.moduleType && !isWebDeveloper ? 'border-dashed opacity-70' : ''}`}
             >
-              <div className="mb-5 flex items-start justify-between gap-3">
+              {isCurrentDay && (
+                <>
+                  <div className="pointer-events-none absolute inset-0 animate-pulse bg-gradient-to-br from-cyan-300/15 via-blue-500/5 to-transparent" />
+                  <div className="absolute right-20 top-5 z-10 rounded-full border border-cyan-200/50 bg-cyan-300 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-slate-950 shadow-[0_0_24px_rgba(103,232,249,0.9)]">
+                    Today
+                  </div>
+                </>
+              )}
+              <div className="relative mb-5 flex items-start justify-between gap-3">
                 <div>
                   <p className={`text-[10px] font-black uppercase tracking-[0.28em] ${presentation?.accent ?? 'text-slate-500'}`}>Day {day.day}{presentation ? ` · ${presentation.label}` : ''}</p>
                   {scheduledDate && <p className="mt-1 text-xs font-bold text-slate-500">{scheduledDate}</p>}

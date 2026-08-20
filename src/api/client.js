@@ -109,7 +109,8 @@ function request(path, options = {}) {
 
   // React can mount a screen twice in development. Reuse an identical active
   // GET instead of sending duplicate work to the API server.
-  const requestKey = `${getAuthToken() ?? 'anonymous'}:${isLearnerPreviewRequest() ? 'learner-preview' : 'normal'}:${path}`;
+  const explicitLearnerPreview = options.headers?.['X-Lugaish-Learner-Preview'] === '1';
+  const requestKey = `${getAuthToken() ?? 'anonymous'}:${explicitLearnerPreview || isLearnerPreviewRequest() ? 'learner-preview' : 'normal'}:${path}`;
   const existingRequest = inFlightGetRequests.get(requestKey);
   if (existingRequest) return existingRequest;
 
@@ -180,8 +181,10 @@ export const api = {
   getLesson(language, day) {
     return request(`/lessons/${language}/${day}`);
   },
-  getDayModules(language) {
-    return request(`/lessons/${language}/day-modules`);
+  getDayModules(language, { learnerPreview = false } = {}) {
+    return request(`/lessons/${language}/day-modules`, {
+      headers: learnerPreview ? { 'X-Lugaish-Learner-Preview': '1' } : {},
+    });
   },
   updateDayModule(language, day, payload) {
     return request(`/lessons/${language}/${day}/module`, {
