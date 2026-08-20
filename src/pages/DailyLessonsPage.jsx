@@ -218,13 +218,17 @@ export function DailyLessonsPage() {
     // Learners only see dates that the server has explicitly configured,
     // published, and unlocked. Static courseData must never create a generic
     // practice/video CTA before the real course schedule says it is ready.
-    return plannedDays.filter(day => (
-      day.configured
-      && day.published
-      && day.available === true
-      && day.day <= dayModuleData.courseDay
-    ));
-  }, [courseStartedForLearner, dayModuleData.courseDay, hasRemoteDayPlan, isWebDeveloper, plannedDays]);
+    return plannedDays.filter(day => {
+      if (day.day > dayModuleData.courseDay) return false;
+
+      // Arabic has a bundled PDF/quiz curriculum. Keep the calendar sequence
+      // contiguous even if a legacy database row is temporarily missing, so
+      // Day 4 cannot disappear while later days remain visible.
+      if (state.activePathway === 'arabic' && day.staticLesson) return true;
+
+      return day.configured && day.published && day.available === true;
+    });
+  }, [courseStartedForLearner, dayModuleData.courseDay, hasRemoteDayPlan, isWebDeveloper, plannedDays, state.activePathway]);
 
   useEffect(() => {
     if (!comingSoon) return undefined;
@@ -403,7 +407,11 @@ export function DailyLessonsPage() {
           const completed = hasRemoteDayPlan
             ? dayModuleData.completedDays.includes(day.day)
             : Boolean(day.staticLesson && state.completedLessons.includes(day.staticLesson.id));
-          const availableFromServer = day.available === true;
+          const availableFromServer = day.available === true || (
+            state.activePathway === 'arabic'
+            && Boolean(day.staticLesson)
+            && day.day <= dayModuleData.courseDay
+          );
           const fallbackIsNext = index === 0 || Boolean(days[index - 1]?.staticLesson && state.completedLessons.includes(days[index - 1].staticLesson.id));
           const isLocked = planReadOnlyForLearner || (!isWebDeveloper && (!isPublished || (hasRemoteDayPlan ? !availableFromServer : !fallbackIsNext && !completed)));
           const Icon = presentation?.Icon ?? Clock3;
