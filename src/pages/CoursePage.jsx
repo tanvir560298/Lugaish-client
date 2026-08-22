@@ -27,15 +27,14 @@ export function CoursePage() {
     if (language === 'english') {
       setCourse({
         id: 'english',
-        name: 'English Pathway',
-        description: 'Master English communication with daily lessons, AI-supported practice, and interview-ready confidence',
+        name: 'English Spelling Masterclass',
+        description: 'Master English spelling and core rules with daily PDF lessons and quizzes.',
         totalDays: 30,
         difficulty: 'Beginner to Advanced',
         modules: [
-          { title: 'Beginner Basics', lessons: 5, days: '1-5' },
-          { title: 'Basic Conversation', lessons: 7, days: '6-12' },
-          { title: 'Daily Speaking', lessons: 8, days: '13-20' },
-          { title: 'Advanced Vocabulary', lessons: 10, days: '21-30' },
+          { title: 'Core Spelling Rules', lessons: 10, days: '1-10' },
+          { title: 'Common Spelling Pitfalls', lessons: 10, days: '11-20' },
+          { title: 'Advanced Spelling Patterns', lessons: 10, days: '21-30' },
         ],
       });
     } else if (language === 'arabic') {

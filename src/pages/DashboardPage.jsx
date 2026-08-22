@@ -149,7 +149,7 @@ function LearnerRoleRow({ user, onRoleChange, onRemove, canManageRoles, isRemovi
 
 function SeatCapacityPanel({ users, seatLimits }) {
   const courses = [
-    { key: 'english', label: 'English Pathway' },
+    { key: 'english', label: 'English Spelling Masterclass' },
     { key: 'arabic', label: 'Arabic Pathway' },
   ];
 

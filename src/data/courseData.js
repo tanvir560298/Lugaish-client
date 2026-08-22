@@ -1,84 +1,52 @@
 export const COURSE_DATA = {
   english: {
-    title: 'English Pathway',
+    title: 'English Spelling Masterclass Pathway',
     flag: '🇬🇧',
-    description: 'Build fluent communication and leadership skills for global impact.',
+    description: 'Master English spelling rules and vocabulary with daily PDF lessons and quizzes.',
     accent: 'blue',
     modules: [
       {
         id: 'en-mod-1',
-        title: 'Everyday Leadership Interactions',
-        description: 'Introduce yourself with confidence and practice persuasive teamwork language.',
-        lessons: [
-          {
-            id: 'en-les-1',
-            title: 'Introducing Yourself & Vision',
-            description: 'Master the personal introduction and articulate a compelling vision.',
-            langCode: 'en-US',
-            cards: [
-              { word: 'Initiative', translation: 'Taking the first step', type: 'noun', explanation: 'The power to start action confidently and independently.', example: 'Taking initiative makes every team move forward.' },
-              { word: 'Visionary', translation: 'Future-focused thinker', type: 'adjective', explanation: 'Thinking beyond the present to shape a bold future.', example: 'A visionary leader inspires others with a clear purpose.' },
-              { word: 'Collaborate', translation: 'Work together', type: 'verb', explanation: 'Working together to create stronger ideas and solutions.', example: 'Great teams collaborate across differences to achieve results.' },
-              { word: 'Empower', translation: 'Give confidence and ability', type: 'verb', explanation: 'Giving others the confidence and resources to take action.', example: 'A good leader empowers teammates to own success.' },
-            ],
-            phrases: [
-              { text: 'I believe we can make a difference by working together.', translation: 'Use this to express teamwork and shared impact.' },
-              { text: 'My vision for this project is to foster community growth.', translation: 'Use this to explain a future-focused goal.' },
-              { text: 'Let\'s align our goals and share the responsibility.', translation: 'Use this to invite teamwork and accountability.' },
-            ],
-            quiz: [
-              {
-                question: "Which word means 'the ability to assess and initiate things independently'?",
-                options: ['Empower', 'Initiative', 'Collaborate', 'Visionary'],
-                answer: 1,
-                explanation: 'Initiative refers to taking the first step or starting something independently.',
-              },
-              {
-                question: 'Complete the sentence: "A ______ leader inspires others with their long-term ideas."',
-                options: ['collaborate', 'initiative', 'visionary', 'empower'],
-                answer: 2,
-                explanation: '"Visionary" is the adjective that describes planning for the future with imagination and foresight.',
-              },
-              {
-                question: "Which phrase best matches 'Collaborate'?",
-                options: ['Give up quickly', 'Work together', 'Speak louder', 'Start alone'],
-                answer: 1,
-                explanation: 'Collaborate means to work together toward a shared result.',
-              },
-            ],
-          },
-          {
-            id: 'en-les-2',
-            title: 'Public Speaking Basics',
-            description: 'Learn how to capture attention, use vocal variety, and deliver powerful speeches.',
-            langCode: 'en-US',
-            cards: [
-              { word: 'Eloquence', translation: 'Powerful expression', type: 'noun', explanation: 'Fluent or persuasive speaking or writing.', example: 'Her eloquence moved the audience to take action.' },
-              { word: 'Articulate', translation: 'Express clearly', type: 'verb', explanation: 'Express an idea or feeling clearly and fluently.', example: 'A leader must be able to articulate their thoughts under pressure.' },
-              { word: 'Resonance', translation: 'Deep impact', type: 'noun', explanation: 'A quality of sound or message that feels strong and memorable.', example: 'A voice with resonance commands attention in a large hall.' },
-              { word: 'Persuade', translation: 'Convince with reasons', type: 'verb', explanation: 'Cause someone to do or believe something through reasoning.', example: 'He used stories to persuade the council to fund the center.' },
-            ],
-            phrases: [
-              { text: 'Speaking from the heart builds trust with your audience.', translation: 'Use this when discussing authentic communication.' },
-              { text: 'Clear communication is the bridge between confusion and clarity.', translation: 'Use this to explain why simple language matters.' },
-            ],
-            quiz: [
-              {
-                question: 'Choose the correct word for: "fluent or persuasive speaking or writing"',
-                options: ['Articulate', 'Resonance', 'Eloquence', 'Persuade'],
-                answer: 2,
-                explanation: 'Eloquence represents fluent, powerful, and persuasive speech or writing.',
-              },
-              {
-                question: 'What is the primary goal of public speaking in leadership?',
-                options: ['To speak as fast as possible', 'To hide personal feelings', 'To persuade and inspire the audience', 'To read directly from a script'],
-                answer: 2,
-                explanation: 'Leadership public speaking aims to connect, persuade, and inspire others to act.',
-              },
-            ],
-          },
-        ],
-      },
+        title: 'English Spelling Masterclass',
+        description: 'A comprehensive 30-day curriculum covering the most critical spelling rules.',
+        lessons: Array.from({ length: 30 }, (_, index) => {
+          const day = index + 1;
+          if (day % 2 !== 0) {
+            return {
+              id: `en-les-${day}`,
+              title: `Lesson ${day}: English Spelling (PDF)`,
+              description: `Review English spelling rules and root words on Day ${day}.`,
+              langCode: 'en-US',
+              cards: [],
+              phrases: [],
+              quiz: [],
+            };
+          } else {
+            const spellingQuizzes = [
+              [
+                { question: 'Choose the correct spelling:', options: ['Receive', 'Recieve', 'Receve', 'Recive'], answer: 0, explanation: 'Remember "i before e except after c".' },
+                { question: 'Select the correct spelling:', options: ['Believe', 'Beleive', 'Belive', 'Beleev'], answer: 0, explanation: 'In "believe", i comes before e.' },
+                { question: 'Which word is spelled correctly?', options: ['Separate', 'Seperate', 'Seperat', 'Separret'], answer: 0, explanation: 'The word is "separate" with an "a" in the middle.' }
+              ],
+              [
+                { question: 'Identify the correct spelling:', options: ['Definitely', 'Definately', 'Definetely', 'Definatly'], answer: 0, explanation: 'It comes from "finite", so it has "definite" + "ly".' },
+                { question: 'Choose the correct spelling:', options: ['Until', 'Untill', 'Untile', 'Untyl'], answer: 0, explanation: '"Until" ends with a single "l".' },
+                { question: 'Select the correct spelling:', options: ['Calendar', 'Calender', 'Calandar', 'Calander'], answer: 0, explanation: 'The correct spelling is "calendar".' }
+              ]
+            ];
+            const qIdx = Math.floor(day / 2) % spellingQuizzes.length;
+            return {
+              id: `en-les-${day}`,
+              title: `Lesson ${day}: Spelling Practice Quiz`,
+              description: `Complete the review quiz to finish Day ${day}.`,
+              langCode: 'en-US',
+              cards: [],
+              phrases: [],
+              quiz: spellingQuizzes[qIdx],
+            };
+          }
+        }),
+      }
     ],
   },
   arabic: {

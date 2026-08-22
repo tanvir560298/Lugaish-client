@@ -13,14 +13,14 @@ export function LearningResourceNotification() {
   useEffect(() => {
     let ignore = false;
 
-    if (!state.isLoggedIn || state.activePathway !== 'arabic') {
+    if (!state.isLoggedIn || !['arabic', 'english'].includes(state.activePathway)) {
       setLatestResource(null);
       setIsOpen(false);
       return undefined;
     }
 
     setIsOpen(false);
-    api.getDayModules('arabic')
+    api.getDayModules(state.activePathway)
       .then(response => {
         if (ignore) return;
         const availableDays = new Set(
@@ -28,7 +28,7 @@ export function LearningResourceNotification() {
             .filter(module => module.available === true)
             .map(module => Number(module.day)),
         );
-        const availableUnseenResources = LEARNING_RESOURCES.arabic
+        const availableUnseenResources = (LEARNING_RESOURCES[state.activePathway] ?? [])
           .filter(resource => (
             availableDays.has(resource.day)
             && localStorage.getItem(`lugaish_resource_seen_${resource.id}`) !== 'true'
@@ -90,14 +90,14 @@ export function LearningResourceNotification() {
               <BellRing size={30} />
             </div>
             <p className="mt-6 text-xs font-black uppercase tracking-[0.28em] text-emerald-400">
-              New Arabic learning resource
+              New {state.activePathway === 'arabic' ? 'Arabic' : 'English'} learning resource
             </p>
             <h2 id="resource-notification-title" className="mt-3 pr-8 text-3xl font-black text-white">
               Keep learning beyond the class
             </h2>
             <p className="mt-4 text-sm leading-7 text-slate-300">
               If you would like to learn something new after today&apos;s class, this PDF is for you.
-              Read it at your own pace, practise what you discover, and take your Arabic learning one step further.
+              Read it at your own pace, practise what you discover, and take your {state.activePathway === 'arabic' ? 'Arabic' : 'English'} learning one step further.
             </p>
 
             <div className="mt-6 flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">

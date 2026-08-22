@@ -640,11 +640,11 @@ export function LessonPage() {
         </div>
       ) : isLoading ? (
         <div className="section-card grid min-h-72 place-items-center"><LoaderCircle size={34} className="animate-spin text-slate-400" /></div>
-      ) : (moduleType !== 'video' && language !== 'arabic') ? (
+      ) : (moduleType !== 'video' && !['arabic', 'english'].includes(language)) ? (
         <ModuleTypePanel lesson={lesson} language={language} day={day} isWebDeveloper={isWebDeveloper} navigate={navigate} />
       ) : (
         <>
-          {language !== 'arabic' && (
+          {!['arabic', 'english'].includes(language) && (
             <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
               <div className="overflow-hidden rounded-lg border border-white/10 bg-slate-950 shadow-2xl shadow-black/20">
                 {selectedVideo && !selectedVideoLocked && selectedVideo.youtubeId ? (
@@ -709,7 +709,7 @@ export function LessonPage() {
             </div>
           )}
 
-          {language === 'arabic' && day % 2 !== 0 && (
+          {['arabic', 'english'].includes(language) && day % 2 !== 0 && (
             <div className="section-card overflow-hidden p-6 sm:p-8">
               <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Day {day} · PDF</p>
               <h2 className="mt-2 text-3xl font-black text-white">Day {day} PDF</h2>
@@ -760,7 +760,7 @@ export function LessonPage() {
             </div>
           )}
 
-           {language === 'arabic' && day % 2 === 0 && (
+           {['arabic', 'english'].includes(language) && day % 2 === 0 && (
             <div className="section-card overflow-hidden p-6 sm:p-8 text-center max-w-2xl mx-auto">
               <div className="mx-auto grid h-20 w-20 place-items-center rounded-2xl bg-amber-500/15 text-amber-300">
                 <FileText size={36} className="text-amber-300" />
@@ -810,7 +810,7 @@ export function LessonPage() {
             </div>
           )}
 
-          {language !== 'arabic' && !isWebDeveloper && lessonVideos.length > 0 && (
+          {!['arabic', 'english'].includes(language) && !isWebDeveloper && lessonVideos.length > 0 && (
             <div className="section-card flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-400">Video sequence</p>
@@ -828,7 +828,7 @@ export function LessonPage() {
         </>
       ))}
 
-      {language !== 'arabic' && !isLoading && !error && dayResources.length > 0 && (
+      {!['arabic', 'english'].includes(language) && !isLoading && !error && dayResources.length > 0 && (
         <section className="section-card overflow-hidden p-6 sm:p-8" aria-labelledby="day-resources-title">
           <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Day {day} · Beyond the class</p>
           <h2 id="day-resources-title" className="mt-2 text-2xl font-black text-white">Optional Arabic learning resource</h2>

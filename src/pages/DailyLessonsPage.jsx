@@ -126,7 +126,7 @@ function ModuleStats({ day, language }) {
   const lesson = day.staticLesson;
   const baseClass = 'rounded-2xl border border-white/10 bg-white/5 p-3';
 
-  if (language === 'arabic') {
+  if (['arabic', 'english'].includes(language)) {
     if (day.day % 2 !== 0) {
       return (
         <div className="mt-6 grid grid-cols-2 gap-2 text-center">
@@ -221,10 +221,10 @@ export function DailyLessonsPage() {
     return plannedDays.filter(day => {
       if (day.day > dayModuleData.courseDay) return false;
 
-      // Arabic has a bundled PDF/quiz curriculum. Keep the calendar sequence
+      // Arabic & English have a bundled PDF/quiz curriculum. Keep the calendar sequence
       // contiguous even if a legacy database row is temporarily missing, so
       // Day 4 cannot disappear while later days remain visible.
-      if (state.activePathway === 'arabic' && day.staticLesson) return true;
+      if (['arabic', 'english'].includes(state.activePathway) && day.staticLesson) return true;
 
       return day.configured && day.published && day.available === true;
     });
@@ -275,7 +275,7 @@ export function DailyLessonsPage() {
       return;
     }
 
-    if (state.activePathway !== 'arabic') {
+    if (!['arabic', 'english'].includes(state.activePathway)) {
       if (day.moduleType === 'ai_practice') {
         navigate(`/speaking-practice?language=${state.activePathway}&day=${day.day}`);
         return;
@@ -380,7 +380,7 @@ export function DailyLessonsPage() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {days.map((day, index) => {
           let presentation = MODULE_PRESENTATION[day.moduleType] ?? null;
-          if (state.activePathway === 'arabic') {
+          if (['arabic', 'english'].includes(state.activePathway)) {
             if (day.day % 2 !== 0) {
               presentation = {
                 label: 'PDF Learning Day',
@@ -409,7 +409,7 @@ export function DailyLessonsPage() {
             ? dayModuleData.completedDays.includes(day.day)
             : Boolean(day.staticLesson && state.completedLessons.includes(day.staticLesson.id));
           const availableFromServer = day.available === true || (
-            state.activePathway === 'arabic'
+            ['arabic', 'english'].includes(state.activePathway)
             && Boolean(day.staticLesson)
             && day.day <= dayModuleData.courseDay
           );
@@ -448,7 +448,7 @@ export function DailyLessonsPage() {
                   <p className={`text-[10px] font-black uppercase tracking-[0.28em] ${presentation?.accent ?? 'text-slate-500'}`}>Day {day.day}{presentation ? ` · ${presentation.label}` : ''}</p>
                   {scheduledDate && <p className="mt-1 text-xs font-bold text-slate-500">{scheduledDate}</p>}
                   <h2 className="mt-2 text-xl font-black leading-tight text-white">
-                    {state.activePathway === 'arabic'
+                    {['arabic', 'english'].includes(state.activePathway)
                       ? (day.day % 2 !== 0 ? `Day ${day.day} PDF` : `Day ${day.day} Quiz`)
                       : day.title}
                   </h2>
@@ -461,7 +461,7 @@ export function DailyLessonsPage() {
               </div>
 
               <p className="min-h-12 text-sm leading-6 text-slate-400">
-                {state.activePathway === 'arabic'
+                {['arabic', 'english'].includes(state.activePathway)
                   ? (day.day % 2 !== 0 ? "Read the day's PDF learning resource." : "Complete the day's review quiz.")
                   : day.description}
               </p>

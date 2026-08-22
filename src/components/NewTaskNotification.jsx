@@ -11,19 +11,19 @@ export function NewTaskNotification() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (!state.isLoggedIn || state.activePathway !== 'arabic') {
+    if (!state.isLoggedIn || !['arabic', 'english'].includes(state.activePathway)) {
       setIsVisible(false);
       return;
     }
 
     let ignore = false;
-    api.getDayModules('arabic')
+    api.getDayModules(state.activePathway)
       .then(response => {
         if (ignore) return;
         const cDay = response.courseDay;
         if (cDay) {
           setCourseDay(cDay);
-          const lastDismissed = localStorage.getItem(`lugaish_arabic_last_dismissed_day`);
+          const lastDismissed = localStorage.getItem(`lugaish_${state.activePathway}_last_dismissed_day`);
           // Show if the user has not dismissed this day's notification yet
           if (String(lastDismissed) !== String(cDay)) {
             setIsVisible(true);
@@ -38,7 +38,7 @@ export function NewTaskNotification() {
   }, [state.isLoggedIn, state.activePathway, location.pathname]);
 
   const handleDismiss = () => {
-    localStorage.setItem(`lugaish_arabic_last_dismissed_day`, String(courseDay));
+    localStorage.setItem(`lugaish_${state.activePathway}_last_dismissed_day`, String(courseDay));
     setIsVisible(false);
   };
 
