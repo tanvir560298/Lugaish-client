@@ -101,6 +101,19 @@ export const COURSE_DATA = {
                 { question: 'All manufacturing production costs must come ________ soon.', options: ['Doun', 'Downe', 'Down', 'Dawn'], answer: 2, explanation: "'Down' is the correct spelling for lower in position or value." },
                 { question: 'Make sure you take a ________ and legally compliant decision.', options: ['Sound', 'Sownd', 'Saund', 'Sounde'], answer: 0, explanation: "'Sound' is the correct spelling for logical, healthy, or secure." }
               ];
+            } else if (day === 12) {
+              quizQuestions = [
+                { question: 'What is the current market ________ of this product.', options: ['Prise', 'Price', 'Pryce', 'Prizze'], answer: 1, explanation: "'Price' is the correct spelling for amount of money expected." },
+                { question: 'Always leave enough ________ for official signatures.', options: ['Space', 'Spase', 'Spas', 'Spaice'], answer: 0, explanation: "'Space' is the correct spelling for empty area." },
+                { question: 'Turn to ________ number ten in the employee handbook.', options: ['Paj', 'Page', 'Pag', 'Paije'], answer: 1, explanation: "'Page' is the correct spelling for one side of a sheet of paper." },
+                { question: 'They manage a very ________ audit client base.', options: ['Larj', 'Largee', 'Large', 'Larrge'], answer: 2, explanation: "'Large' is the correct spelling for big size or quantity." },
+                { question: 'We received a 10% special cash ________ on the bulk invoice.', options: ['Discoumt', 'Discownt', 'Discount', 'Disckount'], answer: 2, explanation: "'Discount' is the correct spelling for deduction from the price." },
+                { question: 'The merchant issued a full ________ for the damaged stock.', options: ['Refund', 'Refunde', 'Refand', 'Reffund'], answer: 0, explanation: "'Refund' is the correct spelling for paying back money." },
+                { question: 'The internal auditor will ________ the trial balance tomorrow.', options: ['Prepair', 'Prepare', 'Prepere', 'Praepare'], answer: 1, explanation: "'Prepare' is the correct spelling for make ready." },
+                { question: 'Always avoid any form of ________ commercial practice.', options: ['Unfaire', 'Unfair', 'Unfere', 'Unfayre'], answer: 1, explanation: "'Unfair' is the correct spelling for not equitable or honest." },
+                { question: 'The client asked us to ________ all major investment risks.', options: ['Disclose', 'Discloze', 'Discloas', 'Disclosee'], answer: 0, explanation: "'Disclose' is the correct spelling for reveal or make known." },
+                { question: 'The manager was ________ to attend the financial review.', options: ['Unabell', 'Unabel', 'Unable', 'Unayble'], answer: 2, explanation: "'Unable' is the correct spelling for lacking necessary power or skill." }
+              ];
             }
             return {
               id: `en-les-${day}`,
