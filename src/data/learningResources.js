@@ -69,7 +69,7 @@ export const LEARNING_RESOURCES = {
       day: 15,
       title: 'English Supplementary Learning PDF 08',
       description: 'Continue building confidence with this optional Day 15 English learning resource.',
-      url: 'https://drive.google.com/file/d/placeholder-english-pdf-08/view?usp=sharing',
+      url: 'https://drive.google.com/file/d/1NICtGu40jbQGdSaPtHQRwPs5ZvjyjPTc/view?usp=sharing',
       type: 'PDF',
     },
     {
