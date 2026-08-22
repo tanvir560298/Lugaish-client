@@ -75,6 +75,19 @@ export const COURSE_DATA = {
                 { question: 'Make sure to ________ the gift box with colored paper.', options: ['Rap', 'Wrap', 'Wrapp', 'Rappe'], answer: 1, explanation: "'Wrap' is the correct spelling for cover or enclose in paper." },
                 { question: 'Do not forget to ________ the contract below.', options: ['Sine', 'Syne', 'Sign', 'Cign'], answer: 2, explanation: "'Sign' is the correct spelling for writing your name to authorize something." }
               ];
+            } else if (day === 8) {
+              quizQuestions = [
+                { question: 'We will finalize the audit report by next ________.', options: ['Weak', 'Week', 'Weke', 'Weake'], answer: 1, explanation: "'Week' is the correct spelling for a period of seven days." },
+                { question: 'Our project ________ achieved the monthly performance target.', options: ['Teem', 'Team', 'Teme', 'Tiam'], answer: 1, explanation: "'Team' is the correct spelling for a group of players or workers." },
+                { question: 'We closed a profitable new business ________ with the client.', options: ['Deel', 'Deal', 'Dele', 'Daal'], answer: 1, explanation: "'Deal' is the correct spelling for a business agreement or transaction." },
+                { question: 'The board members will ________ tomorrow morning.', options: ['Meat', 'Meete', 'Meet', 'Mite'], answer: 2, explanation: "'Meet' is the correct spelling for coming together or assembling." },
+                { question: 'Please ________ the invoice figures before making payment.', options: ['Chek', 'Check', 'Cheque', 'Ckheck'], answer: 1, explanation: "'Check' is the correct spelling for examining or verifying." },
+                { question: 'I ________ we should approve this financial proposal.', options: ['Thinck', 'Think', 'Thinc', 'Thynk'], answer: 1, explanation: "'Think' is the correct spelling for having a belief or opinion." },
+                { question: '________ report requires immediate management approval?', options: ['Witch', 'Which', 'Wchich', 'Whitch'], answer: 1, explanation: "'Which' is the correct spelling to ask for a choice among alternatives." },
+                { question: 'Always maintain accurate physical ________ records.', options: ['Cashe', 'Cask', 'Cash', 'Cashh'], answer: 2, explanation: "'Cash' is the correct spelling for physical money or currency." },
+                { question: '________ does the general meeting officially begin?', options: ['Wen', 'When', 'Whan', 'Whean'], answer: 1, explanation: "'When' is the correct spelling to ask at what time." },
+                { question: 'The company agreed to ________ its technical resources.', options: ['Share', 'Shair', 'Shar', 'Shaer'], answer: 0, explanation: "'Share' is the correct spelling for dividing or distributing portion." }
+              ];
             }
             return {
               id: `en-les-${day}`,
