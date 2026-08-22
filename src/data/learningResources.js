@@ -96,7 +96,7 @@ export const LEARNING_RESOURCES = {
       day: 21,
       title: 'English Supplementary Learning PDF 11',
       description: 'Reinforce your progress with this optional Day 21 English spelling resource.',
-      url: 'https://drive.google.com/file/d/placeholder-english-pdf-11/view?usp=sharing',
+      url: 'https://drive.google.com/file/d/1oRexh6qTBzT0zcSyZAeTqMRFTzV45TY5/view?usp=sharing',
       type: 'PDF',
     },
     {
