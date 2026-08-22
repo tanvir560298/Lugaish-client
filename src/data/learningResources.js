@@ -114,7 +114,7 @@ export const LEARNING_RESOURCES = {
       day: 25,
       title: 'English Supplementary Learning PDF 13',
       description: 'Strengthen spelling accuracy with this optional Day 25 learning resource.',
-      url: 'https://drive.google.com/file/d/placeholder-english-pdf-13/view?usp=sharing',
+      url: 'https://drive.google.com/file/d/1CY1nIi1kDu_mAk4YDKTM4FZ5-AGYQydV/view?usp=sharing',
       type: 'PDF',
     },
     {
