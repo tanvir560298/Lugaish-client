@@ -35,18 +35,34 @@ export const COURSE_DATA = {
               ]
             ];
             const qIdx = Math.floor(day / 2) % spellingQuizzes.length;
-            const quizQuestions = day === 2 ? [
-              { question: 'Please write your full ________ on the registration form.', options: ['Naam', 'Name', 'Naym', 'Naim'], answer: 1, explanation: "'Name' is the correct English spelling. 'Naam' is Bengali/Hindi pronunciation." },
-              { question: 'We must manage our study ________ properly.', options: ['Taim', 'Tyme', 'Time', 'Timme'], answer: 2, explanation: "'Time' is the correct spelling for duration or period." },
-              { question: 'We need a solid action ________ for this project.', options: ['Plane', 'Plan', 'Plann', 'Plen'], answer: 1, explanation: "'Plan' means a scheme or method of acting, whereas 'Plane' is an airplane or flat surface." },
-              { question: 'The total production ________ is very low.', options: ['Cost', 'Coste', 'Caust', 'Coast'], answer: 0, explanation: "'Cost' is the correct spelling for price or expense." },
-              { question: 'Every new business involves some financial ________.', options: ['Risc', 'Risk', 'Riske', 'Risck'], answer: 1, explanation: "'Risk' is the correct spelling for danger or hazard." },
-              { question: 'The organization approved a new growth ________.', options: ['Fand', 'Funde', 'Fund', 'Phund'], answer: 2, explanation: "'Fund' is the correct spelling for a sum of money saved or made available." },
-              { question: 'Keep your study ________ clean and organized.', options: ['Desk', 'Deske', 'Dask', 'Desck'], answer: 0, explanation: "'Desk' is the correct spelling for a reading or writing table." },
-              { question: 'I read an English ________ every morning.', options: ['Boke', 'Bookk', 'Book', 'Buke'], answer: 2, explanation: "'Book' is the correct spelling for a written or printed work." },
-              { question: 'Smart ________ always produces the best results.', options: ['Wrok', 'Work', 'Wark', 'Worke'], answer: 1, explanation: "'Work' is the correct spelling for activity involving work/effort." },
-              { question: 'We must ________ each other in difficult situations.', options: ['Halp', 'Helpp', 'Hlep', 'Help'], answer: 3, explanation: "'Help' is the correct spelling for assist or support." }
-            ] : spellingQuizzes[qIdx];
+            let quizQuestions = spellingQuizzes[qIdx];
+            if (day === 2) {
+              quizQuestions = [
+                { question: 'Please write your full ________ on the registration form.', options: ['Naam', 'Name', 'Naym', 'Naim'], answer: 1, explanation: "'Name' is the correct English spelling. 'Naam' is Bengali/Hindi pronunciation." },
+                { question: 'We must manage our study ________ properly.', options: ['Taim', 'Tyme', 'Time', 'Timme'], answer: 2, explanation: "'Time' is the correct spelling for duration or period." },
+                { question: 'We need a solid action ________ for this project.', options: ['Plane', 'Plan', 'Plann', 'Plen'], answer: 1, explanation: "'Plan' means a scheme or method of acting, whereas 'Plane' is an airplane or flat surface." },
+                { question: 'The total production ________ is very low.', options: ['Cost', 'Coste', 'Caust', 'Coast'], answer: 0, explanation: "'Cost' is the correct spelling for price or expense." },
+                { question: 'Every new business involves some financial ________.', options: ['Risc', 'Risk', 'Riske', 'Risck'], answer: 1, explanation: "'Risk' is the correct spelling for danger or hazard." },
+                { question: 'The organization approved a new growth ________.', options: ['Fand', 'Funde', 'Fund', 'Phund'], answer: 2, explanation: "'Fund' is the correct spelling for a sum of money saved or made available." },
+                { question: 'Keep your study ________ clean and organized.', options: ['Desk', 'Deske', 'Dask', 'Desck'], answer: 0, explanation: "'Desk' is the correct spelling for a reading or writing table." },
+                { question: 'I read an English ________ every morning.', options: ['Boke', 'Bookk', 'Book', 'Buke'], answer: 2, explanation: "'Book' is the correct spelling for a written or printed work." },
+                { question: 'Smart ________ always produces the best results.', options: ['Wrok', 'Work', 'Wark', 'Worke'], answer: 1, explanation: "'Work' is the correct spelling for activity involving work/effort." },
+                { question: 'We must ________ each other in difficult situations.', options: ['Halp', 'Helpp', 'Hlep', 'Help'], answer: 3, explanation: "'Help' is the correct spelling for assist or support." }
+              ];
+            } else if (day === 4) {
+              quizQuestions = [
+                { question: 'Please pay the monthly electricity ________ on time.', options: ['Bil', 'Bill', 'Bile', 'Bll'], answer: 1, explanation: "'Bill' is the correct spelling for a statement of charges." },
+                { question: 'He studied hard to ________ the final examination.', options: ['Pas', 'Pase', 'Pass', 'Paas'], answer: 2, explanation: "'Pass' is the correct spelling for succeeding in an exam." },
+                { question: 'I will ________ you after the meeting ends.', options: ['Call', 'Cal', 'Caul', 'Cale'], answer: 0, explanation: "'Call' is the correct spelling for contact by phone or summon." },
+                { question: 'The company suffered a heavy financial ________ this quarter.', options: ['Los', 'Lose', 'Loss', 'Loos'], answer: 2, explanation: "'Loss' is the correct spelling for deficit or failure to keep." },
+                { question: 'Our office ________ are very professional and cooperative.', options: ['Staf', 'Staff', 'Staffe', 'Steff'], answer: 1, explanation: "'Staff' is the correct spelling for a group of employees." },
+                { question: 'Join the English spelling ________ at 8 PM sharp.', options: ['Clas', 'Classe', 'Class', 'Claas'], answer: 2, explanation: "'Class' is the correct spelling for a course of instruction." },
+                { question: 'They ________ high-quality organic goods.', options: ['Sel', 'Sell', 'Selle', 'Cel'], answer: 1, explanation: "'Sell' is the correct spelling for exchange for money." },
+                { question: 'Always ________ the exact truth to your team.', options: ['Tel', 'Tell', 'Telle', 'Teal'], answer: 1, explanation: "'Tell' is the correct spelling for speak or communicate." },
+                { question: 'Do not let your focus and attention ________.', options: ['Fal', 'Fall', 'Fawl', 'Fale'], answer: 1, explanation: "'Fall' is the correct spelling for drop or decrease." },
+                { question: 'The meeting room was ________ of executives.', options: ['Ful', 'Fule', 'Full', 'Fool'], answer: 2, explanation: "'Full' is the correct spelling for containing all that can be held." }
+              ];
+            }
             return {
               id: `en-les-${day}`,
               title: `Lesson ${day}: Spelling Practice Quiz`,
