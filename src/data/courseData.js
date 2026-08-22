@@ -218,6 +218,19 @@ export const COURSE_DATA = {
                 { question: 'The company faced a legal ________ for late delivery.', options: ['Claim', 'Claime', 'Claym', 'Clame'], answer: 0, explanation: "'Claim' is the correct spelling for demand or assertion." },
                 { question: 'The manager has full ________ to approve the budget.', options: ['Authoriti', 'Authority', 'Authoraty', 'Authourity'], answer: 1, explanation: "'Authority' is the correct spelling for power or right to give orders." }
               ];
+            } else if (day === 30) {
+              quizQuestions = [
+                { question: 'Both companies reached an agreeable ________ yesterday.', options: ['Settlement', 'Settelment', 'Settlemant', 'Setlement'], answer: 0, explanation: "'Settlement' is the correct spelling for resolution of a dispute or financial account." },
+                { question: 'The supplier agreed to ________ the product dispatch.', options: ['Expedite', 'Expydite', 'Expeditte', 'Expidite'], answer: 0, explanation: "'Expedite' is the correct spelling for making an action or process happen sooner or be accomplished more quickly." },
+                { question: 'Check the payment terms in the trade ________.', options: ['Agreemant', 'Agreement', 'Agrement', 'Agreament'], answer: 1, explanation: "'Agreement' is the correct spelling for a negotiated and typically legally binding arrangement." },
+                { question: 'We settled the commercial ________ through arbitration.', options: ['Disput', 'Dispute', 'Dispyute', 'Dispuite'], answer: 1, explanation: "'Dispute' is the correct spelling for a disagreement or argument." },
+                { question: 'Auditors must ________ the physical inventory count.', options: ['Verfy', 'Verify', 'Verifey', 'Verrify'], answer: 1, explanation: "'Verify' is the correct spelling for making sure that something is true, accurate, or justified." },
+                { question: 'The CFO will ________ the revised financial statements.', options: ['Authorize', 'Authorise', 'Both A & B are correct', 'Autharize'], answer: 2, explanation: "Both 'Authorize' (US spelling) and 'Authorise' (UK spelling) are correct spellings." },
+                { question: 'Ensure total ________ of all material transactions.', options: ['Disclozure', 'Disclosure', 'Discloasure', 'Disclosur'], answer: 1, explanation: "'Disclosure' is the correct spelling for the action of making new or secret information known." },
+                { question: 'Please ________ the variance in production overheads.', options: ['Quantifi', 'Quantify', 'Quantifey', 'Qwantify'], answer: 1, explanation: "'Quantify' is the correct spelling for expressing or measuring the quantity of." },
+                { question: 'The management decided to ________ the credit limit.', options: ['Modifi', 'Modify', 'Modifey', 'Modefy'], answer: 1, explanation: "'Modify' is the correct spelling for making partial or minor changes to something." },
+                { question: 'The consultant will ________ on the proposed tax merger.', options: ['Advise', 'Advice', 'Advize', 'Advicee'], answer: 0, explanation: "'Advise' is the correct spelling for the verb meaning to offer suggestions about the best course of action." }
+              ];
             }
             return {
               id: `en-les-${day}`,
