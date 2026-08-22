@@ -62,6 +62,19 @@ export const COURSE_DATA = {
                 { question: 'Do not let your focus and attention ________.', options: ['Fal', 'Fall', 'Fawl', 'Fale'], answer: 1, explanation: "'Fall' is the correct spelling for drop or decrease." },
                 { question: 'The meeting room was ________ of executives.', options: ['Ful', 'Fule', 'Full', 'Fool'], answer: 2, explanation: "'Full' is the correct spelling for containing all that can be held." }
               ];
+            } else if (day === 6) {
+              quizQuestions = [
+                { question: 'I ________ the exact answer to this question.', options: ['Now', 'Know', 'Kno', 'Knaw'], answer: 1, explanation: "'Know' is the correct spelling for having information." },
+                { question: 'He injured his right ________ while playing football.', options: ['Nee', 'Knee', 'Knea', 'Kne'], answer: 1, explanation: "'Knee' is the correct spelling for the joint between the thigh and the lower leg." },
+                { question: 'Keep the sharp kitchen ________ in a safe place.', options: ['Nife', 'Knife', 'Knif', 'Knaif'], answer: 1, explanation: "'Knife' is the correct spelling for the cutting tool." },
+                { question: 'Tie a tight ________ at the end of the rope.', options: ['Not', 'Knott', 'Knot', 'Note'], answer: 2, explanation: "'Knot' is the correct spelling for a fastening made by tying a piece of string or rope." },
+                { question: 'Please ________ on the door before entering the room.', options: ['Nock', 'Knock', 'Knok', 'Nok'], answer: 1, explanation: "'Knock' is the correct spelling for striking a surface to attract attention." },
+                { question: 'Please ________ your name clearly on the official document.', options: ['Right', 'Write', 'Rite', 'Writte'], answer: 1, explanation: "'Write' is the correct spelling for marking letters/words on paper." },
+                { question: 'This calculation gives a completely ________ result.', options: ['Rong', 'Wrong', 'Wraung', 'Wroang'], answer: 1, explanation: "'Wrong' is the correct spelling for incorrect." },
+                { question: 'He is wearing a brand-new ________ watch.', options: ['Rist', 'Wrisst', 'Wrist', 'Wryst'], answer: 2, explanation: "'Wrist' is the correct spelling for the joint connecting the hand with the forearm." },
+                { question: 'Make sure to ________ the gift box with colored paper.', options: ['Rap', 'Wrap', 'Wrapp', 'Rappe'], answer: 1, explanation: "'Wrap' is the correct spelling for cover or enclose in paper." },
+                { question: 'Do not forget to ________ the contract below.', options: ['Sine', 'Syne', 'Sign', 'Cign'], answer: 2, explanation: "'Sign' is the correct spelling for writing your name to authorize something." }
+              ];
             }
             return {
               id: `en-les-${day}`,
