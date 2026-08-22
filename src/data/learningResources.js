@@ -118,5 +118,23 @@ export const LEARNING_RESOURCES = {
       url: 'https://drive.google.com/file/d/1MtNiidBU_0prn0EaqYVEMt_ng66cqU0Q/view?usp=sharing',
       type: 'PDF',
     },
+    {
+      id: 'arabic-pdf-14',
+      sequence: 14,
+      day: 27,
+      title: 'Arabic Supplementary Learning PDF 14',
+      description: 'Learn family vocabulary, possessive pronouns, and masculine and feminine pointers in Arabic.',
+      url: 'https://drive.google.com/file/d/1L5mulFYCCyvGN1ysm62HDBhCPJwAUVq6/view?usp=sharing',
+      type: 'PDF',
+    },
+    {
+      id: 'arabic-pdf-15',
+      sequence: 15,
+      day: 29,
+      title: 'Arabic Supplementary Learning PDF 15',
+      description: 'Practice family introductions, professions, feminine possession, and gender agreement in Arabic.',
+      url: 'https://drive.google.com/file/d/1qQ-ssJzX019LVFZNR6O-3Clh3XrNmVih/view?usp=sharing',
+      type: 'PDF',
+    },
   ],
 };
