@@ -132,7 +132,7 @@ export const LEARNING_RESOURCES = {
       day: 29,
       title: 'English Supplementary Learning PDF 15',
       description: 'Master advanced spelling logic with this final optional Day 29 learning resource.',
-      url: 'https://drive.google.com/file/d/placeholder-english-pdf-15/view?usp=sharing',
+      url: 'https://drive.google.com/file/d/15iAX3J0kNFO7zDBh6OwP525k1XGAHSd9/view?usp=sharing',
       type: 'PDF',
     },
   ],
