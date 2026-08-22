@@ -123,7 +123,7 @@ export const LEARNING_RESOURCES = {
       day: 27,
       title: 'English Supplementary Learning PDF 14',
       description: 'Review core grammar rules with this optional Day 27 English spelling resource.',
-      url: 'https://drive.google.com/file/d/placeholder-english-pdf-14/view?usp=sharing',
+      url: 'https://drive.google.com/file/d/1rdPpqxmaY6fMyEgdfGok8wqSxgEtjt3U/view?usp=sharing',
       type: 'PDF',
     },
     {
