@@ -66,6 +66,8 @@ export function QuizPage() {
     if (isPreview) {
       setXpEarned(0);
       setServerScore(score);
+      setHighScoreCelebration(true);
+      celebrateHighScore();
       setIsCompleted(true);
       return;
     }
@@ -141,7 +143,7 @@ export function QuizPage() {
         {isCompleted ? (
           <div className="mt-10 grid gap-6 text-center">
             <div className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-gradient-to-br from-green-500 to-blue-500 text-4xl">🏆</div>
-            <h2 className="text-3xl font-black text-white">{isStaffPreview ? 'MCQ preview completed!' : 'Quiz completed!'}</h2>
+            <h2 className="text-3xl font-black text-white">Congratulations! Quiz completed!</h2>
             <p className="text-slate-400">{isPreview ? 'This preview did not change XP, progress, or learner completion.' : 'Review every answer below and revisit the ones that need more practice.'}</p>
             {highScoreCelebration && (
               <div className="relative overflow-hidden rounded-[2rem] border border-amber-300/30 bg-gradient-to-br from-amber-500/20 via-violet-500/15 to-emerald-500/20 p-6 shadow-2xl shadow-amber-500/10">
@@ -151,7 +153,11 @@ export function QuizPage() {
                 </div>
                 <p className="mt-4 text-xs font-black uppercase tracking-[0.3em] text-amber-200">Outstanding achievement</p>
                 <h3 className="mt-2 text-2xl font-black text-white">Brilliant work, {state.userName || 'Learner'}!</h3>
-                <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-200">Quiz complete — you earned 500 XP! Your focus and consistency are turning today&apos;s lesson into real language confidence.</p>
+                <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-200">
+                  {isPreview
+                    ? 'Quiz preview complete! Developer preview keeps learner XP and course progress unchanged.'
+                    : 'Quiz complete — you earned 500 XP! Your focus and consistency are turning today\'s lesson into real language confidence.'}
+                </p>
               </div>
             )}
             <div className="grid gap-4 sm:grid-cols-2">
