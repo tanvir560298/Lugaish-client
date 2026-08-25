@@ -93,6 +93,7 @@ async function executeRequest(path, options = {}) {
 
   const data = response.status === 204 ? {} : await response.json().catch(() => ({}));
   if (!response.ok) {
+    if (response.status === 401 && token) setAuthToken(null);
     const error = new Error(data.error ?? 'Request failed');
     error.status = response.status;
     error.code = data.code;
