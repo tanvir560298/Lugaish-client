@@ -10,7 +10,9 @@ export function QuizPage() {
   const activeLesson = getLessonFromState(state, courseData);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const isPreview = searchParams.get('preview') === '1' || isStudentPreview(state);
+  const isTesterMode = isStudentPreview(state);
+  const isStaffPreview = searchParams.get('preview') === '1' && !isTesterMode;
+  const isPreview = isStaffPreview || isTesterMode;
   const previewDay = Math.max(Number(searchParams.get('day')) || 1, 1);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState(null);
@@ -88,7 +90,7 @@ export function QuizPage() {
         ? Number(result.score)
         : Math.round((correctAnswers / questions.length) * 100);
       setServerScore(correctAnswers);
-      if (percentage > 80) {
+      if (Number(result?.xpAwarded) > 0) {
         setHighScoreCelebration(true);
         celebrateHighScore();
       }
@@ -130,7 +132,7 @@ export function QuizPage() {
       <div className="section-card p-5 sm:p-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-slate-400">{isPreview ? 'Staff MCQ preview' : 'Quiz challenge'}</p>
+            <p className="text-sm uppercase tracking-[0.3em] text-slate-400">{isStaffPreview ? 'Staff MCQ preview' : 'Quiz challenge'}</p>
             <h1 className="mt-2 text-2xl font-black text-white sm:text-3xl">{activeLesson.title}</h1>
           </div>
           {!isCompleted && <div className="rounded-[2rem] border border-white/10 bg-slate-900/80 px-4 py-3 text-sm text-slate-300">{progress}</div>}
@@ -139,7 +141,7 @@ export function QuizPage() {
         {isCompleted ? (
           <div className="mt-10 grid gap-6 text-center">
             <div className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-gradient-to-br from-green-500 to-blue-500 text-4xl">🏆</div>
-            <h2 className="text-3xl font-black text-white">{isPreview ? 'MCQ preview completed!' : 'Quiz completed!'}</h2>
+            <h2 className="text-3xl font-black text-white">{isStaffPreview ? 'MCQ preview completed!' : 'Quiz completed!'}</h2>
             <p className="text-slate-400">{isPreview ? 'This preview did not change XP, progress, or learner completion.' : 'Review every answer below and revisit the ones that need more practice.'}</p>
             {highScoreCelebration && (
               <div className="relative overflow-hidden rounded-[2rem] border border-amber-300/30 bg-gradient-to-br from-amber-500/20 via-violet-500/15 to-emerald-500/20 p-6 shadow-2xl shadow-amber-500/10">
@@ -149,7 +151,7 @@ export function QuizPage() {
                 </div>
                 <p className="mt-4 text-xs font-black uppercase tracking-[0.3em] text-amber-200">Outstanding achievement</p>
                 <h3 className="mt-2 text-2xl font-black text-white">Brilliant work, {state.userName || 'Learner'}!</h3>
-                <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-200">You scored above 80%. Your focus and consistency are turning today&apos;s lesson into real language confidence.</p>
+                <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-200">Quiz complete — you earned 500 XP! Your focus and consistency are turning today&apos;s lesson into real language confidence.</p>
               </div>
             )}
             <div className="grid gap-4 sm:grid-cols-2">
@@ -184,8 +186,8 @@ export function QuizPage() {
 
             <div className="flex flex-col justify-center gap-3 sm:flex-row">
               {(serverScore ?? score) < questions.length && <button type="button" className="glow-button glow-button-muted justify-center" onClick={restartMistakes}><RotateCcw size={18} /> Practise again</button>}
-              <button type="button" className="glow-button glow-button-blue justify-center" onClick={() => navigate(isPreview ? `/lesson/${previewDay}` : '/dashboard')}>
-                {isPreview ? 'Back to lesson' : 'Go to dashboard'}
+              <button type="button" className="glow-button glow-button-blue justify-center" onClick={() => navigate(isStaffPreview ? `/lesson/${previewDay}` : '/daily-lessons')}>
+                {isStaffPreview ? 'Back to lesson' : 'Back to daily lessons'}
               </button>
             </div>
           </div>

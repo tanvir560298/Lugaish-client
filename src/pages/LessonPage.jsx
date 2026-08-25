@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import confetti from 'canvas-confetti';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -210,6 +211,7 @@ export function LessonPage() {
   const [videoProgressMessage, setVideoProgressMessage] = useState('');
   const [isVideoCompleting, setIsVideoCompleting] = useState(false);
   const [videoCompletionMessage, setVideoCompletionMessage] = useState('');
+  const [pdfReward, setPdfReward] = useState(null);
   const [moduleForm, setModuleForm] = useState(() => getModuleForm(null, staticLesson, day));
   const [isModuleSaving, setIsModuleSaving] = useState(false);
   const [moduleMessage, setModuleMessage] = useState('');
@@ -235,7 +237,15 @@ export function LessonPage() {
       .then(data => {
         if (ignore) return;
         const videos = Array.isArray(data.videos) ? data.videos : [];
-        const normalizedLesson = { ...data, videos, moduleType: data.moduleType ?? 'video', modulePublished: data.modulePublished !== false };
+        const normalizedLesson = {
+          ...data,
+          videos,
+          // PDF/quiz curricula are bundled with the client. Keep those quizzes
+          // available to staff even when a matching database lesson is absent.
+          quiz: Array.isArray(data.quiz) && data.quiz.length ? data.quiz : (staticLesson?.quiz ?? []),
+          moduleType: data.moduleType ?? 'video',
+          modulePublished: data.modulePublished !== false,
+        };
         setLesson(normalizedLesson);
         setModuleForm(getModuleForm(normalizedLesson, staticLesson, day));
         setSelectedVideoId(current => videos.some(video => video._id === current) ? current : videos[0]?._id ?? '');
@@ -369,6 +379,27 @@ export function LessonPage() {
       window.setTimeout(() => navigate('/daily-lessons'), 650);
     } catch (requestError) {
       setVideoCompletionMessage(requestError.message || 'The video day could not be marked complete. Please try again.');
+      setIsVideoCompleting(false);
+    }
+  };
+
+  const completePdfDay = async () => {
+    if (isWebDeveloper || isVideoCompleting) return;
+    setIsVideoCompleting(true);
+    setVideoCompletionMessage('');
+    try {
+      const result = await api.completeLesson({ language, day });
+      if (staticLesson?.id) actions.recordServerQuizCompletion(staticLesson.id, result);
+      const awarded = Number(result?.xpAwarded) || 0;
+      setPdfReward({ awarded, alreadyCompleted: Boolean(result?.alreadyCompleted) });
+      if (awarded) {
+        const colors = ['#34d399', '#60a5fa', '#fbbf24', '#c084fc', '#ffffff'];
+        confetti({ particleCount: 120, spread: 90, startVelocity: 50, origin: { x: 0.2, y: 0.7 }, colors });
+        confetti({ particleCount: 120, spread: 90, startVelocity: 50, origin: { x: 0.8, y: 0.7 }, colors });
+      }
+    } catch (requestError) {
+      setVideoCompletionMessage(requestError.message || 'The PDF day could not be completed. Please try again.');
+    } finally {
       setIsVideoCompleting(false);
     }
   };
@@ -744,17 +775,26 @@ export function LessonPage() {
                 <div className="mt-8 border-t border-white/10 pt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <h3 className="font-bold text-white">Finish today's reading</h3>
-                    <p className="text-xs text-slate-400">Marking this day complete awards you 100 XP and unlocks tomorrow's quiz.</p>
+                    <p className="text-xs text-slate-400">Marking this day complete awards you 500 XP. Tomorrow&apos;s quiz opens on its scheduled day.</p>
                   </div>
                   <button
                     type="button"
-                    onClick={completeVideoDay}
-                    disabled={isVideoCompleting}
+                    onClick={completePdfDay}
+                    disabled={isVideoCompleting || pdfReward?.awarded > 0}
                     className="glow-button glow-button-blue shrink-0 py-4 disabled:opacity-60"
                   >
                     {isVideoCompleting ? <LoaderCircle size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
-                    {isVideoCompleting ? 'Completing day...' : 'Complete PDF Day'}
+                    {isVideoCompleting ? 'Completing day...' : pdfReward?.awarded > 0 ? 'Done · +500 XP' : 'Done'}
                   </button>
+                </div>
+              )}
+              {videoCompletionMessage && <p className="mt-4 text-sm font-semibold text-amber-200">{videoCompletionMessage}</p>}
+              {pdfReward && (
+                <div className="mt-6 rounded-[2rem] border border-amber-300/30 bg-gradient-to-br from-amber-500/20 via-violet-500/15 to-emerald-500/20 p-6 text-center shadow-2xl shadow-amber-500/10">
+                  <div className="text-5xl">{pdfReward.awarded ? '🎉' : '✅'}</div>
+                  <h3 className="mt-3 text-2xl font-black text-white">{pdfReward.awarded ? 'Fantastic work!' : 'You already finished this day!'}</h3>
+                  <p className="mt-2 text-sm text-slate-200">{pdfReward.awarded ? 'Your consistency paid off — 500 XP has been added to your progress.' : 'Your 500 XP reward was saved when you first completed it.'}</p>
+                  <button type="button" onClick={() => navigate('/daily-lessons')} className="glow-button glow-button-green mt-5">Back to daily lessons</button>
                 </div>
               )}
             </div>
@@ -777,7 +817,7 @@ export function LessonPage() {
                   onClick={() => {
                     if (staticLesson?.id) {
                       actions.setActiveLesson(staticLesson.id, language);
-                      navigate('/quiz');
+                      navigate(isWebDeveloper ? `/quiz?preview=1&day=${day}` : '/quiz');
                     }
                   }}
                   className="glow-button glow-button-blue py-4 px-8"
@@ -788,11 +828,11 @@ export function LessonPage() {
             </div>
           )}
 
-          {isWebDeveloper && lesson.quiz?.length > 0 && staticLesson?.id && (
+          {isWebDeveloper && staticLesson?.quiz?.length > 0 && staticLesson?.id && (
             <div className="section-card flex flex-col gap-4 border-blue-400/20 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.24em] text-blue-300">Staff preview</p>
-                <h2 className="mt-2 text-xl font-black text-white">Day {day} MCQ exam · {lesson.quiz.length} questions</h2>
+                <h2 className="mt-2 text-xl font-black text-white">Day {day} MCQ exam · {staticLesson.quiz.length} questions</h2>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
                   Preview every question and answer without changing learner progress, XP, or course completion.
                 </p>

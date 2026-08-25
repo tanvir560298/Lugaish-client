@@ -219,6 +219,9 @@ export function DailyLessonsPage() {
     // published, and unlocked. Static courseData must never create a generic
     // practice/video CTA before the real course schedule says it is ready.
     return plannedDays.filter(day => {
+      // The bundled PDF/quiz courses are true "today" feeds for learners and
+      // Web Developer tester mode. Do not expose backlog or future days.
+      if (['arabic', 'english'].includes(state.activePathway) && day.day !== dayModuleData.courseDay) return false;
       if (day.day > dayModuleData.courseDay) return false;
 
       // Arabic & English have a bundled PDF/quiz curriculum. Keep the calendar sequence
