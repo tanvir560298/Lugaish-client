@@ -1201,3 +1201,9 @@ a {
   background: linear-gradient(135deg, #ffffff, #dbeafe) !important;
   color: #0f172a !important;
 }
+@media print {
+  body * { visibility: hidden !important; }
+  .certificate-print, .certificate-print * { visibility: visible !important; }
+  .certificate-print { position: absolute; inset: 0; width: 100%; border-radius: 0 !important; box-shadow: none !important; }
+  .no-print { display: none !important; }
+}

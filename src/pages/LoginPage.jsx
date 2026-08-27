@@ -7,6 +7,7 @@ import { getGoogleRedirectLoginResult, isFirebaseConfigured, signInWithGoogle, s
 import { useAppContext } from '../state/AppContext.jsx';
 
 const GOOGLE_REDIRECT_CONTEXT_KEY = 'lugaish_google_redirect_context';
+const REFERRAL_CODE_KEY = 'lugaish_referral_code';
 const SIGNUP_ENABLED = false;
 
 function getFriendlyAuthError(error) {
@@ -109,6 +110,7 @@ export function LoginPage({ mode = 'login' }) {
   const location = useLocation();
   const redirectTo = location.state?.from?.pathname ?? '/dashboard';
   const isSignup = SIGNUP_ENABLED && (mode === 'signup' || location.pathname === '/signup');
+  const incomingReferralCode = new URLSearchParams(location.search).get('ref')?.trim().toUpperCase() || '';
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -161,11 +163,17 @@ export function LoginPage({ mode = 'login' }) {
             referralSource: context.learnerProfile?.referralSource ?? '',
           }
         : undefined,
+      referralCode: context.referralCode || localStorage.getItem(REFERRAL_CODE_KEY) || '',
     });
+    localStorage.removeItem(REFERRAL_CODE_KEY);
     setIsSuccess(true);
     celebrate();
     setTimeout(() => navigate(redirectTo, { replace: true }), 200);
   };
+
+  useEffect(() => {
+    if (incomingReferralCode) localStorage.setItem(REFERRAL_CODE_KEY, incomingReferralCode.slice(0, 20));
+  }, [incomingReferralCode]);
 
   useEffect(() => {
     if (!isFirebaseConfigured) return;
@@ -215,6 +223,7 @@ export function LoginPage({ mode = 'login' }) {
         courseDuration: form.courseDuration,
         referralSource: form.referralSource,
       },
+      referralCode: incomingReferralCode || localStorage.getItem(REFERRAL_CODE_KEY) || '',
     };
 
     try {

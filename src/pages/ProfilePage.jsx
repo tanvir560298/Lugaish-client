@@ -1,10 +1,33 @@
 import { useAppContext } from '../state/AppContext.jsx';
 import { useNavigate } from 'react-router-dom';
 import { hasCourseStarted } from '../utils/courseLaunch.js';
+import { useEffect, useMemo, useState } from 'react';
+import { Award, Check, Copy, Crown, LoaderCircle, Share2 } from 'lucide-react';
+import { api } from '../api/client.js';
 
 export function ProfilePage() {
   const { state, actions } = useAppContext();
   const navigate = useNavigate();
+  const [achievementSummary, setAchievementSummary] = useState(null);
+  const [achievementError, setAchievementError] = useState('');
+  const [claiming, setClaiming] = useState('');
+  const [copied, setCopied] = useState(false);
+  const issuedKeys = useMemo(() => new Set(
+    (achievementSummary?.certificates ?? []).map(item => `${item.language}:${item.milestone}`),
+  ), [achievementSummary?.certificates]);
+
+  const loadAchievements = async () => {
+    try {
+      setAchievementError('');
+      setAchievementSummary(await api.getAchievementSummary());
+    } catch (error) {
+      setAchievementError(error.message || 'Achievements are temporarily unavailable.');
+    }
+  };
+
+  useEffect(() => {
+    if (state.isLoggedIn) loadAchievements();
+  }, [state.isLoggedIn]);
 
   if (!state.isLoggedIn) {
     return (
@@ -16,6 +39,38 @@ export function ProfilePage() {
 
   const level = Math.floor(state.xp / 500) + 1;
   const courseIsLive = hasCourseStarted();
+  const claimable = (achievementSummary?.courseProgress ?? []).flatMap(course => (
+    course.eligibleMilestones
+      .filter(milestone => !issuedKeys.has(`${course.language}:${milestone}`))
+      .map(milestone => ({ language: course.language, milestone }))
+  ));
+  const referralCode = achievementSummary?.referralCode || state.referralCode;
+  const referralLink = referralCode ? `${window.location.origin}/login?ref=${referralCode}` : '';
+
+  const claimCertificate = async ({ language, milestone }) => {
+    const key = `${language}:${milestone}`;
+    setClaiming(key);
+    try {
+      await api.claimCertificate(language, milestone);
+      await loadAchievements();
+    } catch (error) {
+      setAchievementError(error.message || 'Certificate could not be issued.');
+    } finally {
+      setClaiming('');
+    }
+  };
+
+  const shareReferral = async () => {
+    if (!referralLink) return;
+    const shareData = { title: 'Join me on Lugaish', text: 'Start your Arabic or English learning journey with me on Lugaish.', url: referralLink };
+    if (navigator.share) {
+      await navigator.share(shareData).catch(() => {});
+      return;
+    }
+    await navigator.clipboard?.writeText(referralLink);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1800);
+  };
 
   return (
     <section className="space-y-8 pb-12 sm:space-y-12 sm:pb-20">
@@ -35,7 +90,7 @@ export function ProfilePage() {
           <div className="mt-8 grid grid-cols-3 gap-2 border-t border-white/10 pt-8 sm:gap-4">
             <div>
               <p className="text-sm text-slate-400">Streak</p>
-              <p className="text-xl font-bold text-yellow-400 sm:text-2xl">{courseIsLive ? `🔥 ${state.streak}` : 'Aug 1'}</p>
+              <p className="text-xl font-bold text-yellow-400 sm:text-2xl">{courseIsLive ? `🔥 ${achievementSummary?.currentStreak ?? state.streak}` : 'Aug 1'}</p>
             </div>
             <div>
               <p className="text-sm text-slate-400">Lessons</p>
@@ -68,9 +123,71 @@ export function ProfilePage() {
             </div>
             <div className="flex justify-between items-center">
               <p className="text-slate-300">Premium Status</p>
-              <p className="font-bold text-emerald-400">🔓 Active</p>
+              <p className={`font-bold ${state.isPremium ? 'text-emerald-400' : 'text-amber-300'}`}>
+                {state.isPremium ? '🔓 Premium active' : '👑 Free plan · Premium coming soon'}
+              </p>
             </div>
           </div>
+        </div>
+
+        <div className="section-card p-5 sm:p-8">
+          <div className="flex items-center gap-3">
+            <Award className="text-amber-300" />
+            <div>
+              <h3 className="text-2xl font-bold text-white">Milestone Certificates</h3>
+              <p className="mt-1 text-sm text-slate-400">Complete Days 1–7, 14, 21 and 30 to unlock verified Lugaish certificates.</p>
+            </div>
+          </div>
+
+          {achievementError && <p className="mt-5 rounded-2xl border border-red-400/20 bg-red-500/10 p-4 text-sm text-red-100">{achievementError}</p>}
+          {!achievementSummary && !achievementError && <LoaderCircle className="mx-auto mt-8 animate-spin text-blue-300" />}
+
+          {claimable.length > 0 && (
+            <div className="mt-6 grid gap-3">
+              {claimable.map(item => {
+                const key = `${item.language}:${item.milestone}`;
+                return (
+                  <button key={key} type="button" onClick={() => claimCertificate(item)} disabled={claiming === key} className="glow-button glow-button-green justify-center py-4 disabled:opacity-60">
+                    {claiming === key ? <LoaderCircle size={18} className="animate-spin" /> : <Award size={18} />}
+                    Claim {item.milestone}-Day {item.language === 'arabic' ? 'Arabic' : 'English'} Certificate
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="mt-6 grid gap-4">
+            {(achievementSummary?.certificates ?? []).map(certificate => (
+              <article key={certificate.certificateCode} className="rounded-3xl border border-amber-300/25 bg-gradient-to-br from-amber-500/15 to-blue-500/10 p-5">
+                <p className="text-xs font-black uppercase tracking-[0.24em] text-amber-300">Verified achievement</p>
+                <h4 className="mt-2 text-xl font-black text-white">{certificate.milestone}-Day {certificate.language === 'arabic' ? 'Arabic' : 'English'} Milestone</h4>
+                <p className="mt-2 text-xs text-slate-400">Certificate {certificate.certificateCode}</p>
+                <button type="button" onClick={() => navigate(`/certificate/${certificate.certificateCode}`)} className="glow-button glow-button-blue mt-4 w-full justify-center">View, print & share</button>
+              </article>
+            ))}
+            {achievementSummary && !achievementSummary.certificates?.length && !claimable.length && (
+              <p className="rounded-2xl border border-dashed border-white/10 p-5 text-center text-sm text-slate-400">Your first certificate unlocks after completing Days 1–7.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="section-card p-5 sm:p-8">
+          <div className="flex items-center gap-3"><Share2 className="text-blue-300" /><h3 className="text-2xl font-bold text-white">Invite friends</h3></div>
+          <p className="mt-3 text-sm leading-6 text-slate-400">Learn together and build your Lugaish community. {achievementSummary?.referralCount ?? 0} friend(s) joined with your link.</p>
+          {referralLink && (
+            <div className="mt-5 rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+              <p className="break-all text-xs text-slate-300">{referralLink}</p>
+              <button type="button" onClick={shareReferral} className="glow-button glow-button-blue mt-4 w-full justify-center">
+                {copied ? <Check size={18} /> : <Copy size={18} />} {copied ? 'Link copied' : 'Share invite link'}
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className="section-card border-amber-300/20 p-5 sm:p-8">
+          <div className="flex items-center gap-3"><Crown className="text-amber-300" /><h3 className="text-2xl font-bold text-white">Arabic Premium</h3></div>
+          <p className="mt-3 text-sm leading-6 text-slate-400">Premium video courses, structured playlists and exclusive practice are being prepared. Your account is already compatible with premium access when the programme launches.</p>
+          <span className="mt-5 inline-flex rounded-full border border-amber-300/20 bg-amber-500/10 px-4 py-2 text-xs font-black uppercase tracking-widest text-amber-200">{state.isPremium ? 'Premium active' : 'Coming soon'}</span>
         </div>
 
         {/* Quick Actions */}

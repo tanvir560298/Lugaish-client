@@ -231,6 +231,15 @@ export const api = {
       body: JSON.stringify(payload),
     });
   },
+  getAchievementSummary() {
+    return request('/achievements/summary');
+  },
+  claimCertificate(language, milestone) {
+    return request(`/achievements/certificates/${language}/${milestone}`, { method: 'POST' });
+  },
+  verifyCertificate(code) {
+    return request(`/achievements/certificates/verify/${encodeURIComponent(code)}`);
+  },
   getWeeklyInterview({ language, day } = {}) {
     const query = new URLSearchParams();
     if (language) query.set('language', language);

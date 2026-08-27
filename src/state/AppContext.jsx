@@ -26,6 +26,8 @@ const defaultState = {
   userRole: ROLES.learner,
   webDeveloperMode: 'developer',
   permissions: [],
+  isPremium: false,
+  referralCode: '',
   learnerProfile: {
     profession: '',
     expectation: '',
@@ -166,6 +168,8 @@ export function AppProvider({ children }) {
             userRole: normalizeRole(user?.role ?? previous.userRole),
             permissions: user?.permissions ?? getRolePermissions(user?.role ?? previous.userRole),
             enrolledPathways: user?.enrolledPathways ?? previous.enrolledPathways,
+            isPremium: Boolean(user?.isPremium),
+            referralCode: user?.referralCode ?? previous.referralCode,
             learnerProfile: {
               ...previous.learnerProfile,
               ...(user?.learnerProfile ?? {}),
@@ -390,7 +394,7 @@ export function AppProvider({ children }) {
 
       return response;
     },
-    async authenticateWithFirebase({ idToken, languageSelected, displayName, firebaseUser, learnerProfile }) {
+    async authenticateWithFirebase({ idToken, languageSelected, displayName, firebaseUser, learnerProfile, referralCode }) {
       let response;
       const firebaseEmail = firebaseUser?.email?.toLowerCase() || '';
       const localDevRole = WEB_DEVELOPER_EMAILS.has(firebaseEmail)
@@ -420,6 +424,7 @@ export function AppProvider({ children }) {
               languageSelected,
               displayName,
               learnerProfile,
+              referralCode,
             });
       } catch (error) {
         if (!import.meta.env.DEV || import.meta.env.VITE_REQUIRE_BACKEND_AUTH === 'true') {
@@ -441,6 +446,8 @@ export function AppProvider({ children }) {
         enrolledPathways: Array.isArray(response.user?.enrolledPathways)
           ? response.user.enrolledPathways
           : [response.user?.languageSelected ?? languageSelected ?? prev.activePathway],
+        isPremium: Boolean(response.user?.isPremium),
+        referralCode: response.user?.referralCode ?? prev.referralCode,
         learnerProfile: {
           ...prev.learnerProfile,
           ...(response.user?.learnerProfile ?? learnerProfile ?? {}),
@@ -458,6 +465,8 @@ export function AppProvider({ children }) {
         userEmail: '',
         userRole: ROLES.learner,
         permissions: [],
+        isPremium: false,
+        referralCode: '',
         isLoggedIn: false,
       }));
 

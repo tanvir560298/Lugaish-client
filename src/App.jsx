@@ -21,6 +21,7 @@ const ProfilePage = lazy(() => import('./pages/ProfilePage.jsx').then(module => 
 const ArchitectsPage = lazy(() => import('./pages/ArchitectsPage.jsx').then(module => ({ default: module.ArchitectsPage })));
 const InterviewPage = lazy(() => import('./pages/InterviewPage.jsx').then(module => ({ default: module.InterviewPage })));
 const SpeakingPracticePage = lazy(() => import('./pages/SpeakingPracticePage.jsx').then(module => ({ default: module.SpeakingPracticePage })));
+const CertificatePage = lazy(() => import('./pages/CertificatePage.jsx').then(module => ({ default: module.CertificatePage })));
 
 function PageFallback() {
   return (
@@ -157,6 +158,7 @@ export default function App() {
             <Route path='/quiz' element={<ProtectedCourseRoute><QuizPage /></ProtectedCourseRoute>} />
             <Route path='/dashboard' element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path='/profile' element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path='/certificate/:code' element={<CertificatePage />} />
             <Route path='/progress' element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
             <Route path='/pathways' element={<ProtectedRoute><PathwaysPage /></ProtectedRoute>} />
             <Route path='/daily-lessons' element={<ProtectedCourseRoute><DailyLessonsPage /></ProtectedCourseRoute>} />

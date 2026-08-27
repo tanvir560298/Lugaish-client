@@ -407,6 +407,7 @@ export function DailyLessonsPage() {
           const scheduledDate = formatScheduledDate(day.daySchedule?.scheduledFor);
           const isCurrentDay = !isWebDeveloper && day.day === dayModuleData.courseDay;
           const isPublished = Boolean(day.published);
+          const premiumLocked = Boolean(day.premiumLocked);
           const planPendingForLearner = !hasLoadedDayModules && !isWebDeveloper;
           const planUnavailableForLearner = Boolean(dayModuleError) && !isWebDeveloper;
           const planReadOnlyForLearner = planPendingForLearner || planUnavailableForLearner;
@@ -419,7 +420,7 @@ export function DailyLessonsPage() {
             && day.day <= dayModuleData.courseDay
           );
           const fallbackIsNext = index === 0 || Boolean(days[index - 1]?.staticLesson && state.completedLessons.includes(days[index - 1].staticLesson.id));
-          const isLocked = planReadOnlyForLearner || (!isWebDeveloper && (!isPublished || (hasRemoteDayPlan ? !availableFromServer : !fallbackIsNext && !completed)));
+          const isLocked = planReadOnlyForLearner || (!isWebDeveloper && (premiumLocked || !isPublished || (hasRemoteDayPlan ? !availableFromServer : !fallbackIsNext && !completed)));
           const Icon = presentation?.Icon ?? Clock3;
           const actionLabel = planPendingForLearner
             ? 'Loading plan'
@@ -428,7 +429,7 @@ export function DailyLessonsPage() {
             : !day.moduleType
             ? (isWebDeveloper ? 'Configure day' : 'Coming soon')
             : isLocked
-              ? (!isPublished ? 'Coming soon' : 'Complete previous day')
+              ? (premiumLocked ? 'Premium required' : !isPublished ? 'Coming soon' : 'Complete previous day')
               : completed
                 ? presentation.reviewLabel
                 : presentation.startLabel;
@@ -479,7 +480,7 @@ export function DailyLessonsPage() {
                   onClick={() => {
                     if (planReadOnlyForLearner) return;
                     if (isLocked && !isWebDeveloper) {
-                      setComingSoon(!isPublished ? `Day ${day.day}` : 'Complete the previous day');
+                      setComingSoon(premiumLocked ? 'Arabic Premium' : !isPublished ? `Day ${day.day}` : 'Complete the previous day');
                       return;
                     }
                     openDay(day);

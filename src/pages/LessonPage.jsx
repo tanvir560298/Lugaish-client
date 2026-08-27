@@ -90,6 +90,7 @@ function getModuleForm(lesson, staticLesson, day) {
   return {
     moduleType: lesson?.moduleType ?? 'video',
     published: lesson?.modulePublished !== false,
+    accessTier: lesson?.accessTier === 'premium' ? 'premium' : 'free',
     title: lesson?.title ?? staticLesson?.title ?? `Day ${day} learning session`,
     description: lesson?.description ?? staticLesson?.description ?? '',
     introTitle: lesson?.moduleIntroTitle ?? '',
@@ -488,6 +489,7 @@ export function LessonPage() {
         title: savedModule.title,
         description: savedModule.description,
         moduleType: savedModule.moduleType,
+        accessTier: savedModule.accessTier,
         modulePublished: savedModule.published,
         moduleIntroTitle: savedModule.introTitle,
         moduleIntroText: savedModule.introText,
@@ -571,6 +573,15 @@ export function LessonPage() {
             <label className="block">
               <span className="text-xs font-black uppercase tracking-widest text-slate-400">Day description</span>
               <textarea maxLength={2000} rows={3} value={moduleForm.description} onChange={event => setModuleForm(current => ({ ...current, description: event.target.value }))} placeholder="Explain what the learner will do today." className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-emerald-400/50" />
+            </label>
+
+            <label className="block rounded-2xl border border-amber-300/15 bg-amber-500/[0.05] p-4">
+              <span className="text-xs font-black uppercase tracking-widest text-amber-200">Access plan</span>
+              <select value={moduleForm.accessTier} onChange={event => setModuleForm(current => ({ ...current, accessTier: event.target.value }))} className="mt-2 min-h-12 w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 text-sm font-semibold text-white outline-none focus:border-amber-300/50">
+                <option value="free">Free course lesson</option>
+                <option value="premium">Arabic Premium lesson</option>
+              </select>
+              <p className="mt-2 text-xs leading-5 text-slate-400">Premium lessons remain visible to the course team but require an activated premium student account.</p>
             </label>
 
             {(moduleForm.moduleType === 'ai_practice' || moduleForm.moduleType === 'interview') && (
