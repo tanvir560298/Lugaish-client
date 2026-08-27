@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Award, LoaderCircle, Printer, Share2 } from 'lucide-react';
+import { LoaderCircle, Printer, Share2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 
@@ -39,7 +39,9 @@ export function CertificatePage() {
       <div className="certificate-print relative mx-auto flex min-h-[70rem] w-full max-w-[49.5rem] items-center overflow-hidden rounded-[2.5rem] border-4 border-amber-300/60 bg-slate-950 p-8 text-center shadow-2xl sm:p-14">
         <div className="absolute inset-3 rounded-[2rem] border border-amber-200/25" />
         <div className="relative w-full">
-          <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-gradient-to-br from-amber-300 to-amber-500 text-slate-950"><Award size={40} /></div>
+          <div className="mx-auto h-28 w-28 overflow-hidden rounded-full border-4 border-amber-300/70 bg-white p-2 shadow-xl shadow-amber-400/15 sm:h-32 sm:w-32">
+            <img src="/favicon.png" alt="Lugaish official logo" className="h-full w-full rounded-full object-contain" />
+          </div>
           <p className="mt-6 text-sm font-black uppercase tracking-[0.45em] text-amber-300">Lugaish</p>
           <h1 className="mt-4 text-4xl font-black text-white sm:text-6xl">Certificate of Achievement</h1>
           <p className="mt-7 text-slate-400">This certificate is proudly presented to</p>
