@@ -12,7 +12,9 @@ export function QuizPage() {
   const [searchParams] = useSearchParams();
   const isTesterMode = isStudentPreview(state);
   const isStaffPreview = searchParams.get('preview') === '1' && !isTesterMode;
-  const isPreview = isStaffPreview || isTesterMode;
+  // Tester Mode follows the real learner flow and saves this developer
+  // account's quiz history. Only an explicit staff content preview is read-only.
+  const isPreview = isStaffPreview;
   const previewDay = Math.max(Number(searchParams.get('day')) || 1, 1);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState(null);

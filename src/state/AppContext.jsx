@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { api, getAuthToken, setAuthToken } from '../api/client.js';
 import { COURSE_DATA } from '../data/courseData.js';
-import { ROLES, getRolePermissions, normalizeRole } from '../utils/roles.js';
+import { ROLES, getRolePermissions, isStudentPreview, normalizeRole } from '../utils/roles.js';
 import { COURSE_START_DATE_KEY, getEffectiveCourseStartKey, hasCourseStarted } from '../utils/courseLaunch.js';
 
 const LOCAL_STORAGE_KEY = 'lugaish_state_v1';
@@ -296,7 +296,7 @@ export function AppProvider({ children }) {
       return api.submitQuiz({
         ...payload,
         responses: responses.map(selectedAnswer => ({ selectedAnswer })),
-      });
+      }, { learnerPreview: isStudentPreview(state) });
     },
     recordServerQuizCompletion(lessonId, result) {
       setState(prev => {

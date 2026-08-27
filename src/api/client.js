@@ -225,9 +225,10 @@ export const api = {
       body: JSON.stringify(payload),
     });
   },
-  submitQuiz(payload) {
+  submitQuiz(payload, { learnerPreview = false } = {}) {
     return request('/quiz/submit', {
       method: 'POST',
+      headers: learnerPreview ? { 'X-Lugaish-Learner-Preview': '1' } : {},
       body: JSON.stringify(payload),
     });
   },
