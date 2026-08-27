@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Award, LoaderCircle, Printer, Share2, ShieldCheck } from 'lucide-react';
+import { Award, LoaderCircle, Printer, Share2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 
@@ -36,9 +36,9 @@ export function CertificatePage() {
 
   return (
     <section className="space-y-6 pb-16">
-      <div className="certificate-print relative overflow-hidden rounded-[2.5rem] border-4 border-amber-300/60 bg-slate-950 p-6 text-center shadow-2xl sm:p-12">
+      <div className="certificate-print relative mx-auto flex min-h-[70rem] w-full max-w-[49.5rem] items-center overflow-hidden rounded-[2.5rem] border-4 border-amber-300/60 bg-slate-950 p-8 text-center shadow-2xl sm:p-14">
         <div className="absolute inset-3 rounded-[2rem] border border-amber-200/25" />
-        <div className="relative">
+        <div className="relative w-full">
           <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-gradient-to-br from-amber-300 to-amber-500 text-slate-950"><Award size={40} /></div>
           <p className="mt-6 text-sm font-black uppercase tracking-[0.45em] text-amber-300">Lugaish</p>
           <h1 className="mt-4 text-4xl font-black text-white sm:text-6xl">Certificate of Achievement</h1>
@@ -50,7 +50,6 @@ export function CertificatePage() {
             <div><p className="text-slate-500">Milestone</p><p className="mt-1 font-bold text-white">Day {certificate.milestone}</p></div>
             <div><p className="text-slate-500">Verification ID</p><p className="mt-1 break-all font-mono text-xs font-bold text-amber-200">{certificate.certificateCode}</p></div>
           </div>
-          <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-500/10 px-4 py-2 text-xs font-bold text-emerald-200"><ShieldCheck size={16} /> Server verified</div>
         </div>
       </div>
       <div className="no-print flex flex-col justify-center gap-3 sm:flex-row">

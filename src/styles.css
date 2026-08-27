@@ -1202,8 +1202,23 @@ a {
   color: #0f172a !important;
 }
 @media print {
+  @page { size: A4 portrait; margin: 0; }
+  html, body { width: 210mm !important; height: 297mm !important; margin: 0 !important; background: #020617 !important; }
   body * { visibility: hidden !important; }
   .certificate-print, .certificate-print * { visibility: visible !important; }
-  .certificate-print { position: absolute; inset: 0; width: 100%; border-radius: 0 !important; box-shadow: none !important; }
+  .certificate-print {
+    position: absolute;
+    inset: 0;
+    width: 210mm !important;
+    max-width: none !important;
+    min-height: 297mm !important;
+    height: 297mm !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    box-sizing: border-box !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
   .no-print { display: none !important; }
 }
