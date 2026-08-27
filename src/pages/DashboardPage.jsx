@@ -99,6 +99,7 @@ function getInitials(name = '', email = '') {
 
 function LearnerRoleRow({ user, onRoleChange, onRemove, canManageRoles, isRemoving, isCurrentUser }) {
   const role = normalizeRole(user.role);
+  const progressEntries = Object.entries(user.learningProgress ?? {});
 
   return (
     <div className={`grid gap-4 border-t border-white/10 px-4 py-4 transition hover:bg-white/[0.03] ${canManageRoles ? 'lg:grid-cols-[1.35fr_0.65fr_280px]' : 'lg:grid-cols-[1.35fr_0.75fr]' } lg:items-center`}>
@@ -109,6 +110,25 @@ function LearnerRoleRow({ user, onRoleChange, onRemove, canManageRoles, isRemovi
         <div className="min-w-0">
           <p className="truncate text-sm font-black text-white">{user.name || 'Unnamed learner'}</p>
           <p className="truncate text-xs font-semibold text-slate-500">{user.email}</p>
+          {progressEntries.length > 0 && (
+            <div className="mt-3 space-y-2">
+              {progressEntries.map(([language, progress]) => (
+                <div key={language} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-black uppercase tracking-wider text-emerald-300">{language}</span>
+                    <span className="font-bold text-white">Current Day {progress.currentDay}</span>
+                    <span className="text-slate-400">{progress.completedDays?.length ?? 0} days completed</span>
+                  </div>
+                  {progress.completedDays?.length > 0 && <p className="mt-1 text-slate-400">Completed: {progress.completedDays.join(', ')}</p>}
+                  {progress.quizzes?.length > 0 && (
+                    <p className="mt-1 text-amber-200">
+                      Quizzes: {progress.quizzes.map(quiz => `Day ${quiz.day} (${quiz.score}%)`).join(' · ')}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
