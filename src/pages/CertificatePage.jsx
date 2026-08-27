@@ -36,7 +36,7 @@ export function CertificatePage() {
 
   return (
     <section className="space-y-6 pb-16">
-      <div className="certificate-print relative mx-auto flex min-h-[70rem] w-full max-w-[49.5rem] items-center overflow-hidden rounded-[2.5rem] border-4 border-amber-300/60 bg-slate-950 p-8 text-center shadow-2xl sm:p-14">
+      <div className="certificate-print relative mx-auto flex aspect-[1.414/1] w-full max-w-[70rem] items-center overflow-hidden rounded-[2.5rem] border-4 border-amber-300/60 bg-slate-950 p-8 text-center shadow-2xl sm:p-14">
         <div className="absolute inset-3 rounded-[2rem] border border-amber-200/25" />
         <div className="relative w-full">
           <div className="mx-auto h-28 w-28 overflow-hidden rounded-full border-4 border-amber-300/70 bg-white p-2 shadow-xl shadow-amber-400/15 sm:h-32 sm:w-32">
