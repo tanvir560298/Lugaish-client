@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { BookOpenCheck, ChevronDown, ClipboardList, FilePenLine, GraduationCap, Mail, RefreshCw, Send, ShieldCheck, Trash2, TrendingUp, UsersRound } from 'lucide-react';
+import { Award, BookOpenCheck, ChevronDown, ClipboardList, FilePenLine, GraduationCap, Mail, RefreshCw, Send, ShieldCheck, Trash2, TrendingUp, UsersRound } from 'lucide-react';
 import { api } from '../api/client.js';
 import { useAppContext } from '../state/AppContext.jsx';
 import { ROLE_LABELS, ROLE_VALUES, ROLES, getViewedRole, hasPermission, normalizeRole } from '../utils/roles.js';
@@ -529,7 +529,24 @@ export function DashboardPage() {
   const { state, actions, courseData } = useAppContext();
   const enrolledPathways = state.enrolledPathways?.length ? state.enrolledPathways : [state.activePathway];
   const [selectedCourse, setSelectedCourse] = useState(state.activePathway);
+  const [achievementSummary, setAchievementSummary] = useState(null);
+  const [claimingAchievement, setClaimingAchievement] = useState(false);
+  const [achievementError, setAchievementError] = useState('');
   const courseIsLive = hasCourseStarted();
+
+  const loadAchievements = async () => {
+    try {
+      const summary = await api.getAchievementSummary();
+      setAchievementSummary(summary);
+      setAchievementError('');
+    } catch (error) {
+      setAchievementError(error.message);
+    }
+  };
+
+  useEffect(() => {
+    if (state.isLoggedIn) loadAchievements();
+  }, [state.isLoggedIn]);
 
   useEffect(() => {
     if (!enrolledPathways.includes(selectedCourse)) {
@@ -582,6 +599,22 @@ export function DashboardPage() {
   const canPublish = hasPermission(role, 'publish_post');
   const canManageEmail = hasPermission(role, 'manage_email')
     && (role === ROLES.tester || state.userEmail?.toLowerCase() === EMAIL_MANAGER_EMAIL);
+  const selectedAchievement = achievementSummary?.courseProgress?.find(item => item.language === selectedCourse);
+  const sevenDayUnlocked = selectedAchievement?.eligibleMilestones?.includes(7);
+  const sevenDayCertificate = achievementSummary?.certificates?.find(item => item.language === selectedCourse && item.milestone === 7);
+
+  const claimSevenDayCertificate = async () => {
+    setClaimingAchievement(true);
+    setAchievementError('');
+    try {
+      await api.claimCertificate(selectedCourse, 7);
+      await loadAchievements();
+    } catch (error) {
+      setAchievementError(error.message);
+    } finally {
+      setClaimingAchievement(false);
+    }
+  };
 
   return (
     <section className="space-y-10">
@@ -662,6 +695,32 @@ export function DashboardPage() {
         </aside>
 
         <div className="space-y-6">
+          {!isStaff && sevenDayUnlocked && (
+            <div className="overflow-hidden rounded-[2rem] border border-amber-300/30 bg-gradient-to-br from-amber-500/20 via-blue-600/15 to-emerald-500/15 p-6 shadow-2xl shadow-amber-500/10 sm:p-8">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex items-start gap-4">
+                  <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-amber-300 text-slate-950 shadow-lg shadow-amber-400/20">
+                    <Award size={30} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-black uppercase tracking-[0.24em] text-amber-300">Course achievement unlocked</p>
+                    <h2 className="mt-2 text-2xl font-black text-white">You achieved the 7-Day {selectedCourse === 'arabic' ? 'Arabic' : 'English'} Course Milestone!</h2>
+                    <p className="mt-2 text-sm leading-6 text-slate-300">Congratulations! Your personalized Lugaish certificate is ready.</p>
+                  </div>
+                </div>
+                {sevenDayCertificate ? (
+                  <Link to={`/certificate/${sevenDayCertificate.certificateCode}`} className="glow-button glow-button-blue shrink-0 justify-center">
+                    View certificate
+                  </Link>
+                ) : (
+                  <button type="button" onClick={claimSevenDayCertificate} disabled={claimingAchievement} className="glow-button glow-button-blue shrink-0 justify-center disabled:cursor-wait disabled:opacity-60">
+                    {claimingAchievement ? 'Creating certificate...' : 'Claim certificate'}
+                  </button>
+                )}
+              </div>
+              {achievementError && <p className="mt-4 text-sm font-semibold text-red-200">{achievementError}</p>}
+            </div>
+          )}
           {isStaff && (
             <div className="section-card p-6 sm:p-8">
               <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">

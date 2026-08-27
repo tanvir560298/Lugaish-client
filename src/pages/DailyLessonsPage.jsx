@@ -219,11 +219,9 @@ export function DailyLessonsPage() {
     // published, and unlocked. Static courseData must never create a generic
     // practice/video CTA before the real course schedule says it is ready.
     return plannedDays.filter(day => {
-      // Learners can review completed PDF/quiz days alongside today's lesson.
-      // Incomplete backlog and future curriculum remain hidden.
-      if (['arabic', 'english'].includes(state.activePathway)
-        && day.day !== dayModuleData.courseDay
-        && !dayModuleData.completedDays.includes(day.day)) return false;
+      // Learners can review every released PDF/quiz day from Day 1 through
+      // today. Future curriculum remains hidden until Bangladesh midnight.
+      if (['arabic', 'english'].includes(state.activePathway) && day.day > dayModuleData.courseDay) return false;
       if (day.day > dayModuleData.courseDay) return false;
 
       // Arabic & English have a bundled PDF/quiz curriculum. Keep the calendar sequence
