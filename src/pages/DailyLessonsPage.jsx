@@ -193,6 +193,7 @@ export function DailyLessonsPage() {
     courseStarted: false,
     courseStartAt: '',
     courseStartDate: '',
+    nextUnlockAt: '',
   });
   const [hasLoadedDayModules, setHasLoadedDayModules] = useState(false);
   const [dayModuleError, setDayModuleError] = useState('');
@@ -257,6 +258,7 @@ export function DailyLessonsPage() {
           courseStarted: courseSchedule.courseStarted === true,
           courseStartAt: typeof courseSchedule.courseStartAt === 'string' ? courseSchedule.courseStartAt : '',
           courseStartDate: typeof courseSchedule.courseStartDate === 'string' ? courseSchedule.courseStartDate : '',
+          nextUnlockAt: typeof response.nextUnlockAt === 'string' ? response.nextUnlockAt : '',
         });
       })
       .catch(error => {
@@ -378,6 +380,12 @@ export function DailyLessonsPage() {
         <p className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm leading-6 text-slate-300">
           No published learning box is scheduled for you right now. Your course team&apos;s next server-configured date will appear here when it opens.
         </p>
+      )}
+
+      {hasRemoteDayPlan && !isWebDeveloper && dayModuleData.nextUnlockAt && dayModuleData.completedDays.includes(dayModuleData.currentDay) && (
+        <div className="rounded-2xl border border-cyan-300/25 bg-cyan-400/10 px-5 py-4 text-sm leading-6 text-cyan-50">
+          <strong>Day {dayModuleData.currentDay} complete.</strong> Your next learning day unlocks after 12:00 AM Bangladesh time. Your progress is safely stored in your account.
+        </div>
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

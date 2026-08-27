@@ -791,11 +791,11 @@ export function LessonPage() {
                   <button
                     type="button"
                     onClick={completePdfDay}
-                    disabled={isVideoCompleting || pdfReward?.awarded > 0}
+                    disabled={isVideoCompleting || Boolean(pdfReward)}
                     className="glow-button glow-button-blue shrink-0 py-4 disabled:opacity-60"
                   >
                     {isVideoCompleting ? <LoaderCircle size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
-                    {isVideoCompleting ? 'Completing day...' : pdfReward?.awarded > 0 ? 'Done · +500 XP' : 'Done'}
+                    {isVideoCompleting ? 'Completing day...' : pdfReward ? 'Completed' : 'Mark Day Complete'}
                   </button>
                 </div>
               )}
