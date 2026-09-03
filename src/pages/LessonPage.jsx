@@ -833,7 +833,7 @@ export function LessonPage() {
                   }}
                   className="glow-button glow-button-blue py-4 px-8"
                 >
-                  Start Quiz
+                  {staticLesson?.id && state.completedLessons?.includes(staticLesson.id) ? 'Review Quiz' : 'Start Quiz'}
                 </button>
               </div>
             </div>

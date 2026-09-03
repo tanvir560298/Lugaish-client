@@ -416,10 +416,10 @@ export function DailyLessonsPage() {
           const premiumLocked = Boolean(day.premiumLocked);
           const planPendingForLearner = !hasLoadedDayModules && !isWebDeveloper;
           const planUnavailableForLearner = Boolean(dayModuleError) && !isWebDeveloper;
-          const planReadOnlyForLearner = planPendingForLearner || planUnavailableForLearner;
-          const completed = hasRemoteDayPlan
-            ? dayModuleData.completedDays.includes(day.day)
-            : Boolean(day.staticLesson && state.completedLessons.includes(day.staticLesson.id));
+          const completed = Boolean(
+            (hasRemoteDayPlan && dayModuleData.completedDays?.includes(day.day))
+            || (day.staticLesson && state.completedLessons?.includes(day.staticLesson.id))
+          );
           const availableFromServer = day.available === true || (
             ['arabic', 'english'].includes(state.activePathway)
             && Boolean(day.staticLesson)
