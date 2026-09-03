@@ -8,7 +8,6 @@ import {
   Hammer, 
   LayoutDashboard, 
   Gauge,
-  Map, 
   Sparkles,
   CalendarDays,
   CreditCard,
@@ -23,7 +22,6 @@ import { ROLES } from '../utils/roles.js';
 const navLinks = [
   { href: '/', label: 'Overview', icon: <LayoutDashboard size={16} />, exact: true },
   { href: '/daily-lessons', label: 'Today', icon: <CalendarDays size={16} /> },
-  { href: '/pathways', label: 'Odyssey', icon: <Map size={16} /> },
   { href: '/pricing', label: 'Plans', icon: <CreditCard size={16} /> },
   { href: '/architects', label: 'Architects', icon: <Hammer size={16} /> },
 ];

@@ -29,7 +29,7 @@ const LinkedinIcon = () => (
 const TEAM_DATA = [
   { id: 1, name: "Hasibuddin Zidan", role: "English Instructor", category: "Instruction", bio: "Guiding learners through clear English practice, speaking confidence, and everyday communication.", icon: <GraduationCap size={24} />, color: "from-blue-500 to-cyan-400" },
   { id: 2, name: "Ishaat Alhumaidi", role: "Arabic Instructor", category: "Instruction", bio: "Guiding learners through Arabic foundations with clear explanations and practical confidence.", icon: <Globe size={24} />, color: "from-emerald-500 to-teal-400" },
-  { id: 3, name: "Tanvir Ahmad", role: "Web Developer", category: "Technology", bio: "Crafting the digital engine and the 'Odyssey' experience.", icon: <Code size={24} />, color: "from-purple-500 to-pink-400" },
+  { id: 3, name: "Tanvir Ahmad", role: "Web Developer", category: "Technology", bio: "Crafting the digital engine and interactive learning experience.", icon: <Code size={24} />, color: "from-purple-500 to-pink-400" },
   { id: 4, name: "Saiful Islam", role: "Editor", category: "Creative", bio: "Shaping lesson content and keeping every learning post clear, polished, and useful.", icon: <PenTool size={24} />, color: "from-yellow-400 to-orange-500" },
   { id: 5, name: "Shakib Alam", role: "Intern", category: "Interns", bio: "Supporting the Lugaish team with content updates, learning materials, and day-to-day platform improvements.", icon: <Zap size={24} />, color: "from-cyan-500 to-blue-500" },
   { id: 6, name: "Junaidul Hasan Rifat", role: "Intern", category: "Interns", bio: "Contributing to content publishing, course resources, and a smoother learning experience for every student.", icon: <User size={24} />, color: "from-rose-500 to-violet-500" }
