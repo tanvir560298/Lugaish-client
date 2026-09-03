@@ -32,3 +32,8 @@ legacy/
 # Local helper artifacts
 launch.sh
 IMPLEMENTATION_CHECKLIST.md
+
+# Python automation cache
+__pycache__/
+*.py[cod]
+automation/cache/
