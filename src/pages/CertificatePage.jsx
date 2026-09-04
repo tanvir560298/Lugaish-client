@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { LoaderCircle, Printer, Share2 } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../api/client.js';
-import { findLocalCertificate } from '../utils/certificateStorage.js';
+import { findLocalCertificate, markCertificateViewed } from '../utils/certificateStorage.js';
 
 export function CertificatePage() {
   const { code = '' } = useParams();
@@ -12,13 +12,20 @@ export function CertificatePage() {
 
   useEffect(() => {
     let ignore = false;
+    if (code) markCertificateViewed(code);
     api.verifyCertificate(code)
-      .then(result => { if (!ignore) setCertificate(result.certificate); })
+      .then(result => {
+        if (!ignore) {
+          setCertificate(result.certificate);
+          if (result.certificate?.certificateCode) markCertificateViewed(result.certificate.certificateCode);
+        }
+      })
       .catch(requestError => {
         if (ignore) return;
         const local = findLocalCertificate(code);
         if (local) {
           setCertificate(local);
+          if (local.certificateCode) markCertificateViewed(local.certificateCode);
         } else {
           setError(requestError.message || 'Certificate not found.');
         }

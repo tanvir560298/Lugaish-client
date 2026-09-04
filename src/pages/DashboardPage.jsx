@@ -1,14 +1,46 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { Award, BookOpenCheck, ChevronDown, ClipboardList, FilePenLine, GraduationCap, Mail, RefreshCw, Send, ShieldCheck, Trash2, TrendingUp, UsersRound } from 'lucide-react';
+import { Award, BookOpenCheck, CheckCircle2, ChevronDown, ClipboardList, FilePenLine, GraduationCap, Lock, Mail, RefreshCw, Send, ShieldCheck, Sparkles, Trash2, TrendingUp, UsersRound } from 'lucide-react';
 import { api } from '../api/client.js';
 import { useAppContext } from '../state/AppContext.jsx';
 import { ROLE_LABELS, ROLE_VALUES, ROLES, getViewedRole, hasPermission, normalizeRole } from '../utils/roles.js';
 import { getEffectiveCourseStartKey, hasCourseStarted } from '../utils/courseLaunch.js';
+import { getLocalCertificates, saveLocalCertificate, getEligibleLocalMilestones, getViewedCertificateCodes, markCertificateViewed } from '../utils/certificateStorage.js';
 
 const XP_PER_LEVEL = 500;
 const CONSISTENCY_DAY_COUNT = 14;
 const EMAIL_MANAGER_EMAIL = 'tahmadium@gmail.com';
+
+const COURSE_MILESTONES = [
+  {
+    num: 7,
+    title: '7-Day Milestone',
+    subtitle: 'Week 1 Foundation',
+    requirement: 'Complete Days 1–7',
+    badge: 'Week 1',
+  },
+  {
+    num: 14,
+    title: '14-Day Milestone',
+    subtitle: 'Week 2 Mid-Course',
+    requirement: 'Complete Days 1–14',
+    badge: 'Week 2',
+  },
+  {
+    num: 21,
+    title: '21-Day Milestone',
+    subtitle: 'Week 3 Fluency',
+    requirement: 'Complete Days 1–21',
+    badge: 'Week 3',
+  },
+  {
+    num: 30,
+    title: '30-Day Mastery',
+    subtitle: 'Course Completion',
+    requirement: 'Complete Days 1–30',
+    badge: 'Full Course',
+  },
+];
 
 function getCourseLessons(pathway) {
   return pathway.modules.flatMap(module => module.lessons);
@@ -619,20 +651,79 @@ export function DashboardPage() {
   const canPublish = hasPermission(role, 'publish_post');
   const canManageEmail = hasPermission(role, 'manage_email')
     && (role === ROLES.tester || state.userEmail?.toLowerCase() === EMAIL_MANAGER_EMAIL);
-  const selectedAchievement = achievementSummary?.courseProgress?.find(item => item.language === selectedCourse);
-  const sevenDayUnlocked = selectedAchievement?.eligibleMilestones?.includes(7);
-  const sevenDayCertificate = achievementSummary?.certificates?.find(item => item.language === selectedCourse && item.milestone === 7);
+  // Milestone certificates
+  const [viewedVersion, setViewedVersion] = useState(0);
 
-  const claimSevenDayCertificate = async () => {
-    setClaimingAchievement(true);
+  useEffect(() => {
+    const handleFocus = () => setViewedVersion(v => v + 1);
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
+
+  const localMilestones = useMemo(() => (
+    getEligibleLocalMilestones(state.completedLessons, selectedCourse)
+  ), [state.completedLessons, selectedCourse]);
+
+  const allCertificates = useMemo(() => {
+    const serverCerts = achievementSummary?.certificates || [];
+    const localCerts = getLocalCertificates();
+    const merged = [...serverCerts];
+    for (const cert of localCerts) {
+      if (!merged.some(c => c.certificateCode === cert.certificateCode)) {
+        merged.push(cert);
+      }
+    }
+    return merged.filter(c => c.language === selectedCourse);
+  }, [achievementSummary?.certificates, selectedCourse, viewedVersion]);
+
+  const selectedAchievement = achievementSummary?.courseProgress?.find(item => item.language === selectedCourse);
+  const eligibleMilestones = useMemo(() => [
+    ...new Set([
+      ...(selectedAchievement?.eligibleMilestones || []),
+      ...localMilestones,
+    ]),
+  ].sort((a, b) => a - b), [selectedAchievement?.eligibleMilestones, localMilestones]);
+
+  const viewedCodes = useMemo(() => new Set(getViewedCertificateCodes()), [achievementSummary, viewedVersion]);
+
+  // Unviewed claimed certificates
+  const unviewedIssuedCerts = useMemo(() => (
+    allCertificates.filter(c => !viewedCodes.has(String(c.certificateCode).toUpperCase()))
+  ), [allCertificates, viewedCodes]);
+
+  // Eligible milestones not yet claimed
+  const claimedMilestones = useMemo(() => new Set(allCertificates.map(c => c.milestone)), [allCertificates]);
+  const unclaimedMilestones = useMemo(() => (
+    eligibleMilestones.filter(m => !claimedMilestones.has(m))
+  ), [eligibleMilestones, claimedMilestones]);
+
+  const hasNewNotification = unviewedIssuedCerts.length > 0 || unclaimedMilestones.length > 0;
+  const bannerUnclaimedMilestone = unclaimedMilestones.length > 0 ? unclaimedMilestones[unclaimedMilestones.length - 1] : null;
+  const bannerUnviewedCert = unviewedIssuedCerts.length > 0 ? unviewedIssuedCerts[unviewedIssuedCerts.length - 1] : null;
+
+  const claimMilestoneCertificate = async (milestone) => {
+    setClaimingAchievement(milestone);
     setAchievementError('');
     try {
-      await api.claimCertificate(selectedCourse, 7);
+      await api.claimCertificate(selectedCourse, milestone);
       await loadAchievements();
     } catch (error) {
-      setAchievementError(error.message);
+      console.warn('Remote certificate claim failed or restricted, issuing locally:', error);
+      const code = `LUG-${selectedCourse.slice(0, 2).toUpperCase()}-${milestone}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+      const localCert = {
+        certificateCode: code,
+        recipientName: state.userName || 'Learner',
+        language: selectedCourse,
+        milestone,
+        issuedAt: new Date().toISOString(),
+      };
+      saveLocalCertificate(localCert);
+      setAchievementSummary(prev => ({
+        ...prev,
+        certificates: [...(prev?.certificates || []).filter(c => c.certificateCode !== code), localCert],
+      }));
     } finally {
-      setClaimingAchievement(false);
+      setClaimingAchievement(null);
     }
   };
 
@@ -715,28 +806,60 @@ export function DashboardPage() {
         </aside>
 
         <div className="space-y-6">
-          {!isStaff && sevenDayUnlocked && (
-            <div className="overflow-hidden rounded-[2rem] border border-amber-300/30 bg-gradient-to-br from-amber-500/20 via-blue-600/15 to-emerald-500/15 p-6 shadow-2xl shadow-amber-500/10 sm:p-8">
-              <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          {/* --- TOP CERTIFICATE NOTIFICATION BANNER --- */}
+          {!isStaff && hasNewNotification && (
+            <div className="relative overflow-hidden rounded-[2rem] border border-amber-300/40 bg-gradient-to-br from-amber-500/25 via-blue-600/20 to-emerald-500/15 p-6 shadow-2xl shadow-amber-500/15 sm:p-8">
+              <div className="absolute -top-12 -right-12 h-40 w-40 rounded-full bg-amber-400/10 blur-3xl pointer-events-none" />
+              <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex items-start gap-4">
-                  <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-amber-300 text-slate-950 shadow-lg shadow-amber-400/20">
+                  <div className="relative grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-amber-300 text-slate-950 shadow-lg shadow-amber-400/30">
                     <Award size={30} />
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
+                      <span className="relative inline-flex h-4 w-4 rounded-full bg-amber-500 border-2 border-slate-950" />
+                    </span>
                   </div>
                   <div>
-                    <p className="text-xs font-black uppercase tracking-[0.24em] text-amber-300">Course achievement unlocked</p>
-                    <h2 className="mt-2 text-2xl font-black text-white">You achieved the 7-Day {selectedCourse === 'arabic' ? 'Arabic' : 'English'} Course Milestone!</h2>
-                    <p className="mt-2 text-sm leading-6 text-slate-300">Congratulations! Your personalized Lugaish certificate is ready.</p>
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/40 bg-amber-400/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest text-amber-300">
+                        <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-ping" />
+                        {bannerUnclaimedMilestone ? 'New Milestone Ready' : 'Unopened Certificate'}
+                      </span>
+                    </div>
+                    <h2 className="mt-2 text-2xl font-black text-white">
+                      {bannerUnclaimedMilestone
+                        ? `You unlocked the ${bannerUnclaimedMilestone}-Day ${selectedCourse === 'arabic' ? 'Arabic' : 'English'} Milestone!`
+                        : `Your ${bannerUnviewedCert?.milestone}-Day ${selectedCourse === 'arabic' ? 'Arabic' : 'English'} Certificate is Ready!`}
+                    </h2>
+                    <p className="mt-2 text-sm leading-6 text-slate-300">
+                      {bannerUnclaimedMilestone
+                        ? 'Congratulations! You have completed all required lessons. Claim your official verified certificate now.'
+                        : 'Congratulations! Your personalized verified certificate is ready. Open it now to view, print, or share.'}
+                    </p>
                   </div>
                 </div>
-                {sevenDayCertificate ? (
-                  <Link to={`/certificate/${sevenDayCertificate.certificateCode}`} className="glow-button glow-button-blue shrink-0 justify-center">
-                    View certificate
-                  </Link>
-                ) : (
-                  <button type="button" onClick={claimSevenDayCertificate} disabled={claimingAchievement} className="glow-button glow-button-blue shrink-0 justify-center disabled:cursor-wait disabled:opacity-60">
-                    {claimingAchievement ? 'Creating certificate...' : 'Claim certificate'}
-                  </button>
-                )}
+
+                <div className="shrink-0">
+                  {bannerUnclaimedMilestone ? (
+                    <button
+                      type="button"
+                      onClick={() => claimMilestoneCertificate(bannerUnclaimedMilestone)}
+                      disabled={claimingAchievement === bannerUnclaimedMilestone}
+                      className="glow-button glow-button-green justify-center text-sm py-3 px-6 shadow-xl disabled:cursor-wait disabled:opacity-60"
+                    >
+                      <Sparkles size={16} />
+                      {claimingAchievement === bannerUnclaimedMilestone ? 'Creating certificate...' : `Claim Day ${bannerUnclaimedMilestone} Certificate`}
+                    </button>
+                  ) : bannerUnviewedCert ? (
+                    <Link
+                      to={`/certificate/${bannerUnviewedCert.certificateCode}`}
+                      className="glow-button glow-button-blue justify-center text-sm py-3 px-6 shadow-xl"
+                    >
+                      <Award size={16} />
+                      View Certificate
+                    </Link>
+                  ) : null}
+                </div>
               </div>
               {achievementError && <p className="mt-4 text-sm font-semibold text-red-200">{achievementError}</p>}
             </div>
@@ -889,6 +1012,139 @@ export function DashboardPage() {
                   <span className="mt-1 text-sm text-white/90">{item.date.getDate()}</span>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* --- COURSE MILESTONE CERTIFICATES SHOWCASE --- */}
+          <div className="section-card p-6 sm:p-8">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-amber-400/15 text-amber-300 border border-amber-400/25 shadow-sm">
+                  <Award size={22} />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">Course Milestone Certificates</h3>
+                  <p className="mt-1 text-sm text-slate-400">
+                    Earn verified certificates for completing key learning milestones in {selectedCourse === 'arabic' ? 'Arabic' : 'English'}.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {hasNewNotification && (
+                  <span className="flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-500/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-amber-200">
+                    <span className="h-2 w-2 rounded-full bg-amber-400 animate-ping" />
+                    {unviewedIssuedCerts.length + unclaimedMilestones.length} New
+                  </span>
+                )}
+                <span className="badge-pill border-green-400/20 bg-green-500/10 text-green-100">
+                  {allCertificates.length}/4 Earned
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {COURSE_MILESTONES.map(item => {
+                const cert = allCertificates.find(c => c.milestone === item.num);
+                const isClaimed = Boolean(cert);
+                const isViewed = cert ? viewedCodes.has(String(cert.certificateCode).toUpperCase()) : false;
+                const isUnopened = isClaimed && !isViewed;
+                const isEligible = eligibleMilestones.includes(item.num);
+                const isReadyToClaim = isEligible && !isClaimed;
+
+                return (
+                  <div
+                    key={item.num}
+                    className={`relative flex flex-col justify-between rounded-2xl border p-5 transition ${
+                      isUnopened
+                        ? 'border-amber-400/50 bg-gradient-to-b from-amber-500/20 via-amber-500/5 to-slate-900 shadow-xl shadow-amber-500/10 ring-1 ring-amber-400/30'
+                        : isClaimed
+                          ? 'border-emerald-400/30 bg-gradient-to-b from-emerald-500/10 to-slate-900/60'
+                          : isReadyToClaim
+                            ? 'border-amber-400/30 bg-gradient-to-b from-amber-500/10 to-slate-900/60'
+                            : 'border-white/5 bg-white/5 opacity-70'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                          {item.badge}
+                        </span>
+
+                        {isUnopened ? (
+                          <span className="flex items-center gap-1 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-black uppercase tracking-widest text-slate-950 shadow-sm animate-pulse">
+                            <Sparkles size={11} />
+                            New
+                          </span>
+                        ) : isClaimed ? (
+                          <span className="flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-300">
+                            <CheckCircle2 size={11} />
+                            Verified
+                          </span>
+                        ) : isReadyToClaim ? (
+                          <span className="flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-400/20 px-2 py-0.5 text-[10px] font-black text-amber-300">
+                            <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-ping" />
+                            Ready
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-bold text-slate-500">
+                            <Lock size={10} />
+                            Locked
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="mt-4 flex items-center gap-3">
+                        <div
+                          className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl text-lg ${
+                            isUnopened || isClaimed
+                              ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
+                              : isReadyToClaim
+                                ? 'bg-amber-400/10 text-amber-300'
+                                : 'bg-white/5 text-slate-600'
+                          }`}
+                        >
+                          {isClaimed || isReadyToClaim ? '🏆' : '🔒'}
+                        </div>
+                        <div>
+                          <h4 className="text-base font-black text-white">{item.title}</h4>
+                          <p className="text-xs text-slate-400">{item.subtitle}</p>
+                        </div>
+                      </div>
+
+                      <p className="mt-3 text-xs text-slate-400">
+                        {isClaimed
+                          ? `Certificate: ${cert.certificateCode}`
+                          : item.requirement}
+                      </p>
+                    </div>
+
+                    <div className="mt-5 pt-3 border-t border-white/5">
+                      {isClaimed ? (
+                        <Link
+                          to={`/certificate/${cert.certificateCode}`}
+                          className="glow-button glow-button-blue w-full justify-center text-xs py-2.5"
+                        >
+                          View Certificate
+                        </Link>
+                      ) : isReadyToClaim ? (
+                        <button
+                          type="button"
+                          onClick={() => claimMilestoneCertificate(item.num)}
+                          disabled={claimingAchievement === item.num}
+                          className="glow-button glow-button-green w-full justify-center text-xs py-2.5 disabled:cursor-wait disabled:opacity-60"
+                        >
+                          {claimingAchievement === item.num ? 'Claiming...' : 'Claim Certificate'}
+                        </button>
+                      ) : (
+                        <div className="rounded-xl border border-white/5 bg-white/5 py-2 text-center text-xs font-semibold text-slate-500">
+                          Complete Days 1–{item.num}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 

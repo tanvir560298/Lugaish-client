@@ -18,6 +18,7 @@ import {
   Eye,
 } from 'lucide-react';
 import { ROLES } from '../utils/roles.js';
+import { getUnviewedCertificateCount } from '../utils/certificateStorage.js';
 
 const navLinks = [
   { href: '/', label: 'Overview', icon: <LayoutDashboard size={16} />, exact: true },
@@ -41,6 +42,10 @@ export function Header() {
       ? location.pathname === link.href
       : location.pathname === link.href || location.pathname.startsWith(`${link.href}/`)
   );
+  const unviewedCertificateCount = React.useMemo(() => {
+    if (!state.isLoggedIn) return 0;
+    return getUnviewedCertificateCount(state.completedLessons, state.activePathway);
+  }, [state.isLoggedIn, state.completedLessons, state.activePathway, location.pathname]);
 
   return (
     <header className="site-header sticky top-0 z-[100] border-b border-white/5 bg-[#020617]/80 backdrop-blur-2xl">
@@ -88,6 +93,12 @@ export function Header() {
                   
                   <span className="relative z-10">{link.icon}</span>
                   <span className="relative z-10">{link.label}</span>
+                  {link.href === '/dashboard' && unviewedCertificateCount > 0 && (
+                    <span className="relative z-10 ml-0.5 flex h-2 w-2" title={`${unviewedCertificateCount} new certificate available`}>
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]"></span>
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -154,10 +165,16 @@ export function Header() {
 
           {/* Mobile Menu Toggle */}
           <button
-            className="header-menu header-icon-button xl:hidden p-2 text-white bg-white/5 rounded-xl border border-white/10"
+            className="header-menu header-icon-button relative xl:hidden p-2 text-white bg-white/5 rounded-xl border border-white/10"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Open navigation menu"
           >
+            {unviewedCertificateCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
+                <span className="relative inline-flex h-3 w-3 rounded-full bg-amber-500 border-2 border-slate-950"></span>
+              </span>
+            )}
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
@@ -205,10 +222,17 @@ export function Header() {
                   key={link.href}
                   to={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-4 rounded-2xl px-3 py-3 text-lg font-black text-white italic sm:text-xl"
+                  className="flex items-center justify-between rounded-2xl px-3 py-3 text-lg font-black text-white italic sm:text-xl"
                 >
-                  <span className="text-emerald-500">{link.icon}</span>
-                  {link.label}
+                  <div className="flex items-center gap-4">
+                    <span className="text-emerald-500">{link.icon}</span>
+                    {link.label}
+                  </div>
+                  {link.href === '/dashboard' && unviewedCertificateCount > 0 && (
+                    <span className="rounded-full bg-amber-400/20 border border-amber-400/40 px-2.5 py-0.5 text-xs font-black uppercase tracking-wider text-amber-300 not-italic">
+                      NEW
+                    </span>
+                  )}
                 </Link>
               ))}
             </div>
