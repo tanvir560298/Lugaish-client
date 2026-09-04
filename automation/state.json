@@ -45,7 +45,9 @@
     "2": {
       "post_id": "mock_post_id_123456789",
       "posted_at": "2026-09-04T08:27:57.105272",
-      "revealed": false
+      "revealed": true,
+      "comment_id": "mock_comment_id_987654321",
+      "answered_at": "2026-09-04T10:04:31.230528"
     }
   }
 }
