@@ -416,6 +416,7 @@ export function DailyLessonsPage() {
           const premiumLocked = Boolean(day.premiumLocked);
           const planPendingForLearner = !hasLoadedDayModules && !isWebDeveloper;
           const planUnavailableForLearner = Boolean(dayModuleError) && !isWebDeveloper;
+          const planReadOnlyForLearner = planPendingForLearner || planUnavailableForLearner;
           const isNextQuizCompleted = day.day % 2 !== 0 && Boolean(
             (hasRemoteDayPlan && dayModuleData.completedDays?.includes(day.day + 1))
             || (days[index + 1]?.staticLesson && state.completedLessons?.includes(days[index + 1].staticLesson.id))
