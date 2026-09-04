@@ -1,8 +1,51 @@
 {
   "subject": "arabic",
   "current_day": 1,
-  "last_run_timestamp": null,
-  "day_initialized_at": null,
-  "today_questions": {},
-  "pending_answers": {}
+  "last_run_timestamp": "2026-09-04T08:27:57.105277",
+  "day_initialized_at": "2026-09-04T08:27:57.104939",
+  "today_questions": {
+    "1": {
+      "question": "আরবি শব্দ “Qiyadah” (Leadership) এর সঠিক অর্থ বা ব্যবহার কোনটি?",
+      "options": [
+        "Qiyadah means guiding people toward a shared goal.",
+        "কঠিন পরিস্থিতি এড়িয়ে যাওয়া",
+        "শুধুমাত্র ব্যক্তিগত লাভ খোঁজা",
+        "দলীয় কাজে অংশ না নেওয়া"
+      ],
+      "answer_index": 0,
+      "correct_option_letter": "A",
+      "explanation": "সঠিক উত্তর A। Qiyadah (Leadership): Qiyadah means guiding people toward a shared goal. Use it when talking about leading a team or project."
+    },
+    "2": {
+      "question": "আরবি শব্দ “Nazahah” (Integrity) এর সঠিক অর্থ বা ব্যবহার কোনটি?",
+      "options": [
+        "Nazahah means honesty and strong moral character.",
+        "কঠিন পরিস্থিতি এড়িয়ে যাওয়া",
+        "শুধুমাত্র ব্যক্তিগত লাভ খোঁজা",
+        "দলীয় কাজে অংশ না নেওয়া"
+      ],
+      "answer_index": 0,
+      "correct_option_letter": "A",
+      "explanation": "সঠিক উত্তর A। Nazahah (Integrity): Nazahah means honesty and strong moral character. Use it when describing someone trustworthy."
+    },
+    "3": {
+      "question": "আরবি শব্দ “Taathir” (Influence) এর সঠিক অর্থ বা ব্যবহার কোনটি?",
+      "options": [
+        "Taathir means the ability to create a positive effect.",
+        "কঠিন পরিস্থিতি এড়িয়ে যাওয়া",
+        "শুধুমাত্র ব্যক্তিগত লাভ খোঁজা",
+        "দলীয় কাজে অংশ না নেওয়া"
+      ],
+      "answer_index": 0,
+      "correct_option_letter": "A",
+      "explanation": "সঠিক উত্তর A। Taathir (Influence): Taathir means the ability to create a positive effect. Use it when a leader inspires others to act."
+    }
+  },
+  "pending_answers": {
+    "2": {
+      "post_id": "mock_post_id_123456789",
+      "posted_at": "2026-09-04T08:27:57.105272",
+      "revealed": false
+    }
+  }
 }
