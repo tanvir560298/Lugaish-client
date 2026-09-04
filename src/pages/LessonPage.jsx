@@ -199,8 +199,12 @@ export function LessonPage() {
   const canDeleteExistingContent = state.userRole !== ROLES.intern;
   const staticLessons = useMemo(() => pathway.modules.flatMap(module => module.lessons), [pathway]);
   const staticLesson = staticLessons[day - 1] ?? null;
+  const nextQuizLesson = day % 2 !== 0 ? staticLessons[day] ?? null : null;
   const isDayAlreadyCompleted = Boolean(
-    staticLesson?.id && state.completedLessons?.includes(staticLesson.id)
+    staticLesson?.id && (
+      state.completedLessons?.includes(staticLesson.id)
+      || (nextQuizLesson?.id && state.completedLessons?.includes(nextQuizLesson.id))
+    )
   );
   const [lesson, setLesson] = useState({ videos: [], moduleType: 'video', modulePublished: true });
   const [selectedVideoId, setSelectedVideoId] = useState('');

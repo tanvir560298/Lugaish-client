@@ -107,15 +107,35 @@ function getFirstLessonId(pathway) {
   return COURSE_DATA[pathway]?.modules[0]?.lessons[0]?.id ?? defaultState.activeLessonId;
 }
 
+export function expandCompletedLessons(lessonIds) {
+  if (!Array.isArray(lessonIds)) return [];
+  const set = new Set(lessonIds);
+  for (const id of lessonIds) {
+    if (typeof id !== 'string') continue;
+    const match = id.match(/^([a-z]+-les-)(\d+)$/);
+    if (match) {
+      const prefix = match[1];
+      const dayNum = Number.parseInt(match[2], 10);
+      if (dayNum > 1 && dayNum % 2 === 0) {
+        // Completing an even-day quiz implies the preceding odd-day PDF was completed!
+        set.add(`${prefix}${dayNum - 1}`);
+      }
+    }
+  }
+  return [...set];
+}
+
 function normalizeState(state) {
   const activePathway = COURSE_DATA[state.activePathway] ? state.activePathway : defaultState.activePathway;
   const enrolledPathways = Array.isArray(state.enrolledPathways)
     ? state.enrolledPathways.filter(pathway => COURSE_DATA[pathway])
     : [activePathway];
   const normalizedEnrolledPathways = enrolledPathways.length ? enrolledPathways : [];
+  const completedLessons = expandCompletedLessons(state.completedLessons);
 
   return {
     ...state,
+    completedLessons,
     activePathway,
     enrolledPathways: [...new Set(normalizedEnrolledPathways)],
     courseActivity: state.courseActivity && typeof state.courseActivity === 'object' ? state.courseActivity : {},
@@ -263,9 +283,10 @@ export function AppProvider({ children }) {
     },
     completeLesson(lessonId) {
       setState(prev => {
-        const completed = prev.completedLessons.includes(lessonId)
+        const rawCompleted = prev.completedLessons.includes(lessonId)
           ? prev.completedLessons
           : [...prev.completedLessons, lessonId];
+        const completed = expandCompletedLessons(rawCompleted);
         const pathway = prev.activePathway;
         const todayKey = getDateKey();
         const courseActivity = hasCourseStarted()
@@ -300,9 +321,10 @@ export function AppProvider({ children }) {
     },
     recordServerQuizCompletion(lessonId, result) {
       setState(prev => {
-        const completedLessons = prev.completedLessons.includes(lessonId)
+        const rawCompleted = prev.completedLessons.includes(lessonId)
           ? prev.completedLessons
           : [...prev.completedLessons, lessonId];
+        const completedLessons = expandCompletedLessons(rawCompleted);
         const xp = Number.isFinite(Number(result?.totalXP))
           ? Number(result.totalXP)
           : prev.xp + (Number(result?.xpAwarded) || 0);
