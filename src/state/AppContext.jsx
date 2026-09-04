@@ -303,8 +303,12 @@ export function AppProvider({ children }) {
         const completedLessons = prev.completedLessons.includes(lessonId)
           ? prev.completedLessons
           : [...prev.completedLessons, lessonId];
-        const xp = Number.isFinite(Number(result?.totalXP)) ? Number(result.totalXP) : prev.xp;
-        const streak = Number.isFinite(Number(result?.streak)) ? Number(result.streak) : prev.streak;
+        const xp = Number.isFinite(Number(result?.totalXP))
+          ? Number(result.totalXP)
+          : prev.xp + (Number(result?.xpAwarded) || 0);
+        const streak = Number.isFinite(Number(result?.streak))
+          ? Number(result.streak)
+          : (Number(result?.xpAwarded) > 0 && prev.streak === 0 ? 1 : prev.streak);
         const badges = [...prev.badges];
         if (xp >= 500 && !badges.includes('visionary-voice')) badges.push('visionary-voice');
         if (computeLevel(xp) >= 4 && !badges.includes('rhetorical-elite')) badges.push('rhetorical-elite');

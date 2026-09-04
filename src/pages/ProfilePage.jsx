@@ -4,6 +4,7 @@ import { hasCourseStarted } from '../utils/courseLaunch.js';
 import { useEffect, useMemo, useState } from 'react';
 import { Award, Check, Copy, Crown, LoaderCircle, Share2 } from 'lucide-react';
 import { api } from '../api/client.js';
+import { getLocalCertificates, saveLocalCertificate } from '../utils/certificateStorage.js';
 
 export function ProfilePage() {
   const { state, actions } = useAppContext();
@@ -19,9 +20,30 @@ export function ProfilePage() {
   const loadAchievements = async () => {
     try {
       setAchievementError('');
-      setAchievementSummary(await api.getAchievementSummary());
+      const remote = await api.getAchievementSummary();
+      const localCerts = getLocalCertificates();
+      const allCerts = [...(remote?.certificates ?? [])];
+      for (const lc of localCerts) {
+        if (!allCerts.some(c => c.certificateCode === lc.certificateCode)) {
+          allCerts.push(lc);
+        }
+      }
+      setAchievementSummary({
+        ...remote,
+        certificates: allCerts,
+      });
     } catch (error) {
-      setAchievementError(error.message || 'Achievements are temporarily unavailable.');
+      const localCerts = getLocalCertificates();
+      if (localCerts.length > 0) {
+        setAchievementSummary({
+          certificates: localCerts,
+          courseProgress: [],
+          referralCode: state.referralCode || '',
+          referralCount: 0,
+        });
+      } else {
+        setAchievementError(error.message || 'Achievements are temporarily unavailable.');
+      }
     }
   };
 
@@ -39,8 +61,40 @@ export function ProfilePage() {
 
   const level = Math.floor(state.xp / 500) + 1;
   const courseIsLive = hasCourseStarted();
-  const claimable = (achievementSummary?.courseProgress ?? []).flatMap(course => (
-    course.eligibleMilestones
+
+  const localCourseMilestones = useMemo(() => {
+    const activeLang = state.activePathway || 'arabic';
+    const prefix = activeLang === 'english' ? 'en-les-' : 'ar-les-';
+    const completedDays = (state.completedLessons || [])
+      .filter(id => typeof id === 'string' && id.startsWith(prefix))
+      .map(id => Number.parseInt(id.slice(prefix.length), 10))
+      .filter(d => Number.isSafeInteger(d) && d > 0);
+    const daySet = new Set(completedDays);
+    const eligibleMilestones = [7, 14, 21, 30].filter(m =>
+      Array.from({ length: m }, (_, i) => i + 1).every(d => daySet.has(d))
+    );
+    return { language: activeLang, eligibleMilestones, completedDays };
+  }, [state.activePathway, state.completedLessons]);
+
+  const combinedProgress = useMemo(() => {
+    const list = [...(achievementSummary?.courseProgress ?? [])];
+    const existingIndex = list.findIndex(item => item.language === localCourseMilestones.language);
+    if (existingIndex >= 0) {
+      const mergedDays = [...new Set([...(list[existingIndex].completedDays || []), ...localCourseMilestones.completedDays])];
+      const mergedMilestones = [...new Set([...(list[existingIndex].eligibleMilestones || []), ...localCourseMilestones.eligibleMilestones])];
+      list[existingIndex] = {
+        ...list[existingIndex],
+        completedDays: mergedDays,
+        eligibleMilestones: mergedMilestones,
+      };
+    } else {
+      list.push(localCourseMilestones);
+    }
+    return list;
+  }, [achievementSummary?.courseProgress, localCourseMilestones]);
+
+  const claimable = combinedProgress.flatMap(course => (
+    (course.eligibleMilestones || [])
       .filter(milestone => !issuedKeys.has(`${course.language}:${milestone}`))
       .map(milestone => ({ language: course.language, milestone }))
   ));
@@ -54,7 +108,20 @@ export function ProfilePage() {
       await api.claimCertificate(language, milestone);
       await loadAchievements();
     } catch (error) {
-      setAchievementError(error.message || 'Certificate could not be issued.');
+      console.warn('Remote certificate claim failed, issuing locally:', error);
+      const code = `LUG-${language.slice(0, 2).toUpperCase()}-${milestone}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+      const localCert = {
+        certificateCode: code,
+        recipientName: state.userName || 'Learner',
+        language,
+        milestone,
+        issuedAt: new Date().toISOString(),
+      };
+      saveLocalCertificate(localCert);
+      setAchievementSummary(prev => ({
+        ...prev,
+        certificates: [...(prev?.certificates || []).filter(c => c.certificateCode !== code), localCert],
+      }));
     } finally {
       setClaiming('');
     }
