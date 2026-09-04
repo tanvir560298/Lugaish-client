@@ -4,7 +4,7 @@ import { hasCourseStarted } from '../utils/courseLaunch.js';
 import { useEffect, useMemo, useState } from 'react';
 import { Award, Check, Copy, Crown, LoaderCircle, Share2 } from 'lucide-react';
 import { api } from '../api/client.js';
-import { getLocalCertificates, saveLocalCertificate } from '../utils/certificateStorage.js';
+import { getLocalCertificates, saveLocalCertificate, getEligibleLocalMilestones, purgeInvalidLocalCertificates } from '../utils/certificateStorage.js';
 
 export function ProfilePage() {
   const { state, actions } = useAppContext();
@@ -17,12 +17,20 @@ export function ProfilePage() {
     (achievementSummary?.certificates ?? []).map(item => `${item.language}:${item.milestone}`),
   ), [achievementSummary?.certificates]);
 
+  const activeLang = state.activePathway || 'arabic';
+  const activeEligible = useMemo(() => (
+    getEligibleLocalMilestones(state.completedLessons, activeLang)
+  ), [state.completedLessons, activeLang]);
+
   const loadAchievements = async () => {
     try {
       setAchievementError('');
       const remote = await api.getAchievementSummary();
-      const localCerts = getLocalCertificates();
-      const allCerts = [...(remote?.certificates ?? [])];
+      const localCerts = purgeInvalidLocalCertificates(activeEligible, activeLang);
+      const allCerts = [...(remote?.certificates ?? [])].filter(c => {
+        if (c.language !== activeLang) return true;
+        return activeEligible.includes(c.milestone);
+      });
       for (const lc of localCerts) {
         if (!allCerts.some(c => c.certificateCode === lc.certificateCode)) {
           allCerts.push(lc);
@@ -33,7 +41,7 @@ export function ProfilePage() {
         certificates: allCerts,
       });
     } catch (error) {
-      const localCerts = getLocalCertificates();
+      const localCerts = purgeInvalidLocalCertificates(activeEligible, activeLang);
       if (localCerts.length > 0) {
         setAchievementSummary({
           certificates: localCerts,
@@ -63,35 +71,29 @@ export function ProfilePage() {
   const courseIsLive = hasCourseStarted();
 
   const localCourseMilestones = useMemo(() => {
-    const activeLang = state.activePathway || 'arabic';
     const prefix = activeLang === 'english' ? 'en-les-' : 'ar-les-';
     const completedDays = (state.completedLessons || [])
       .filter(id => typeof id === 'string' && id.startsWith(prefix))
       .map(id => Number.parseInt(id.slice(prefix.length), 10))
       .filter(d => Number.isSafeInteger(d) && d > 0);
-    const daySet = new Set(completedDays);
-    const eligibleMilestones = [7, 14, 21, 30].filter(m =>
-      Array.from({ length: m }, (_, i) => i + 1).every(d => daySet.has(d))
-    );
-    return { language: activeLang, eligibleMilestones, completedDays };
-  }, [state.activePathway, state.completedLessons]);
+    return { language: activeLang, eligibleMilestones: activeEligible, completedDays };
+  }, [activeLang, state.completedLessons, activeEligible]);
 
   const combinedProgress = useMemo(() => {
     const list = [...(achievementSummary?.courseProgress ?? [])];
     const existingIndex = list.findIndex(item => item.language === localCourseMilestones.language);
     if (existingIndex >= 0) {
       const mergedDays = [...new Set([...(list[existingIndex].completedDays || []), ...localCourseMilestones.completedDays])];
-      const mergedMilestones = [...new Set([...(list[existingIndex].eligibleMilestones || []), ...localCourseMilestones.eligibleMilestones])];
       list[existingIndex] = {
         ...list[existingIndex],
         completedDays: mergedDays,
-        eligibleMilestones: mergedMilestones,
+        eligibleMilestones: activeEligible,
       };
     } else {
       list.push(localCourseMilestones);
     }
     return list;
-  }, [achievementSummary?.courseProgress, localCourseMilestones]);
+  }, [achievementSummary?.courseProgress, localCourseMilestones, activeEligible]);
 
   const claimable = combinedProgress.flatMap(course => (
     (course.eligibleMilestones || [])
@@ -102,6 +104,10 @@ export function ProfilePage() {
   const referralLink = referralCode ? `${window.location.origin}/login?ref=${referralCode}` : '';
 
   const claimCertificate = async ({ language, milestone }) => {
+    if (language === activeLang && !activeEligible.includes(milestone)) {
+      setAchievementError(`Complete all lessons up to Day ${milestone} to unlock this certificate.`);
+      return;
+    }
     const key = `${language}:${milestone}`;
     setClaiming(key);
     try {

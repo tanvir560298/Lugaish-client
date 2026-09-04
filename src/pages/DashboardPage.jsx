@@ -5,7 +5,7 @@ import { api } from '../api/client.js';
 import { useAppContext } from '../state/AppContext.jsx';
 import { ROLE_LABELS, ROLE_VALUES, ROLES, getViewedRole, hasPermission, normalizeRole } from '../utils/roles.js';
 import { getEffectiveCourseStartKey, hasCourseStarted } from '../utils/courseLaunch.js';
-import { getLocalCertificates, saveLocalCertificate, getEligibleLocalMilestones, getViewedCertificateCodes, markCertificateViewed } from '../utils/certificateStorage.js';
+import { getLocalCertificates, saveLocalCertificate, getEligibleLocalMilestones, purgeInvalidLocalCertificates, getViewedCertificateCodes, markCertificateViewed } from '../utils/certificateStorage.js';
 
 const XP_PER_LEVEL = 500;
 const CONSISTENCY_DAY_COUNT = 14;
@@ -664,25 +664,28 @@ export function DashboardPage() {
     getEligibleLocalMilestones(state.completedLessons, selectedCourse)
   ), [state.completedLessons, selectedCourse]);
 
+  // A milestone is strictly eligible ONLY if the learner has completed all lessons up to that day (e.g. Day 16 unlocks Day 7 and Day 14, NEVER Day 21 or 30)
+  const eligibleMilestones = useMemo(() => (
+    [...localMilestones].sort((a, b) => a - b)
+  ), [localMilestones]);
+
+  // Auto-purge any mistakenly claimed premature certificates from localStorage (e.g. Day 21 or Day 30)
+  useEffect(() => {
+    purgeInvalidLocalCertificates(eligibleMilestones, selectedCourse);
+  }, [eligibleMilestones, selectedCourse]);
+
   const allCertificates = useMemo(() => {
     const serverCerts = achievementSummary?.certificates || [];
-    const localCerts = getLocalCertificates();
+    const localCerts = purgeInvalidLocalCertificates(eligibleMilestones, selectedCourse);
     const merged = [...serverCerts];
     for (const cert of localCerts) {
       if (!merged.some(c => c.certificateCode === cert.certificateCode)) {
         merged.push(cert);
       }
     }
-    return merged.filter(c => c.language === selectedCourse);
-  }, [achievementSummary?.certificates, selectedCourse, viewedVersion]);
-
-  const selectedAchievement = achievementSummary?.courseProgress?.find(item => item.language === selectedCourse);
-  const eligibleMilestones = useMemo(() => [
-    ...new Set([
-      ...(selectedAchievement?.eligibleMilestones || []),
-      ...localMilestones,
-    ]),
-  ].sort((a, b) => a - b), [selectedAchievement?.eligibleMilestones, localMilestones]);
+    // Strictly filter out any certificates that the learner has not reached or unlocked
+    return merged.filter(c => c.language === selectedCourse && eligibleMilestones.includes(c.milestone));
+  }, [achievementSummary?.certificates, selectedCourse, viewedVersion, eligibleMilestones]);
 
   const viewedCodes = useMemo(() => new Set(getViewedCertificateCodes()), [achievementSummary, viewedVersion]);
 
@@ -698,10 +701,15 @@ export function DashboardPage() {
   ), [eligibleMilestones, claimedMilestones]);
 
   const hasNewNotification = unviewedIssuedCerts.length > 0 || unclaimedMilestones.length > 0;
-  const bannerUnclaimedMilestone = unclaimedMilestones.length > 0 ? unclaimedMilestones[unclaimedMilestones.length - 1] : null;
-  const bannerUnviewedCert = unviewedIssuedCerts.length > 0 ? unviewedIssuedCerts[unviewedIssuedCerts.length - 1] : null;
+  // Banner offers the lowest unclaimed milestone first (e.g. Day 14)
+  const bannerUnclaimedMilestone = unclaimedMilestones.length > 0 ? unclaimedMilestones[0] : null;
+  const bannerUnviewedCert = unviewedIssuedCerts.length > 0 ? unviewedIssuedCerts[0] : null;
 
   const claimMilestoneCertificate = async (milestone) => {
+    if (!eligibleMilestones.includes(milestone)) {
+      setAchievementError(`Complete all lessons up to Day ${milestone} to unlock this certificate.`);
+      return;
+    }
     setClaimingAchievement(milestone);
     setAchievementError('');
     try {
