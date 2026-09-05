@@ -1,8 +1,51 @@
 {
   "subject": "arabic",
   "current_day": 2,
-  "last_run_timestamp": "2026-09-05T13:03:57.870137",
-  "day_initialized_at": "2026-09-04T08:27:57.104939",
-  "today_questions": {},
-  "pending_answers": {}
+  "last_run_timestamp": "2026-09-05T16:30:52.371675",
+  "day_initialized_at": "2026-09-05T16:30:52.371369",
+  "today_questions": {
+    "1": {
+      "question": "“একটি বাড়ি” এর সঠিক আরবি প্রতিশব্দ কোনটি?",
+      "options": [
+        "مَسْجِدٌ (Masjidun)",
+        "بَابٌ (Baabun)",
+        "كِتَابٌ (Kitaabun)",
+        "بَيْتٌ (Baytun)"
+      ],
+      "answer_index": 3,
+      "correct_option_letter": "D",
+      "explanation": "সঠিক উত্তর D) بَيْتٌ (Baytun)। “بَيْتٌ” (Baytun) অর্থ হলো একটি বাড়ি।"
+    },
+    "2": {
+      "question": "“এটি একটি মসজিদ” এর সঠিক আরবি অনুবাদ কী হবে?",
+      "options": [
+        "هٰذَا بَيْتٌ (Hadha baytun)",
+        "هٰذَا مَسْجِدٌ (Hadha masjidun)",
+        "هٰذَا بَابٌ (Hadha baabun)",
+        "مَا هٰذَا؟ (Ma hadha?)"
+      ],
+      "answer_index": 1,
+      "correct_option_letter": "B",
+      "explanation": "সঠিক উত্তর B) هٰذَا مَسْجِدٌ (Hadha masjidun)। “هٰذَا َمْسِجٌد” (Hadha masjidun) অর্থ হলো “এটি একটি মসজিদ।”"
+    },
+    "3": {
+      "question": "“هٰذَا” (Hadha) শব্দের সঠিক বাংলা অর্থ কোনটি?",
+      "options": [
+        "সে / তিনি",
+        "এটি / এই",
+        "তারা",
+        "তুমি"
+      ],
+      "answer_index": 1,
+      "correct_option_letter": "B",
+      "explanation": "সঠিক উত্তর B) এটি / এই। “هٰذَا” (Hadha) শব্দের অর্থ হলো “এটি” বা “এই”।"
+    }
+  },
+  "pending_answers": {
+    "1": {
+      "post_id": "mock_post_id_123456789",
+      "posted_at": "2026-09-05T16:30:52.371671",
+      "revealed": false
+    }
+  }
 }
