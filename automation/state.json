@@ -1,8 +1,51 @@
 {
   "subject": "arabic",
   "current_day": 3,
-  "last_run_timestamp": "2026-09-06T13:12:21.736675",
-  "day_initialized_at": "2026-09-05T16:30:52.371369",
-  "today_questions": {},
-  "pending_answers": {}
+  "last_run_timestamp": "2026-09-06T16:41:24.200085",
+  "day_initialized_at": "2026-09-06T16:41:24.199780",
+  "today_questions": {
+    "1": {
+      "question": "আরবি রিডিং প্র্যাকটিস — Day 3 (প্রশ্ন ১): “كِتَابٌ” (Kitaabun) শব্দের অর্থ কী?",
+      "options": [
+        "একটি কলম",
+        "একটি বই",
+        "একটি টেবিল",
+        "একটি বাড়ি"
+      ],
+      "answer_index": 1,
+      "correct_option_letter": "B",
+      "explanation": "সঠিক উত্তর B) একটি বই। আরবিতে كِتَابٌ মানে বই।"
+    },
+    "2": {
+      "question": "আরবি রিডিং প্র্যাকটিস — Day 3 (প্রশ্ন ২): “هٰذَا” (Hadha) শব্দটি ব্যাকরণগতভাবে কী নির্দেশ করে?",
+      "options": [
+        "দূরের কিছু নির্দেশ করতে (That)",
+        "কাছের পুরুষবাচক কিছু নির্দেশ করতে (This)",
+        "বহুবচন নির্দেশ করতে (These)",
+        "প্রশ্ন করতে (What)"
+      ],
+      "answer_index": 1,
+      "correct_option_letter": "B",
+      "explanation": "সঠিক উত্তর B। “هٰذَا” হলো ইসমুল ইশারা (ইসমে ইশারা লিল-ক্বারীব), যা কাছের কোনো পুরুষবাচক বস্তু বা ব্যক্তিকে নির্দেশ করতে ব্যবহৃত হয়।"
+    },
+    "3": {
+      "question": "আরবি রিডিং প্র্যাকটিস — Day 3 (প্রশ্ন ৩): “একটি দরজা” এর সঠিক আরবি কী?",
+      "options": [
+        "بَابٌ (Baabun)",
+        "بَيْتٌ (Baytun)",
+        "مَسْجِدٌ (Masjidun)",
+        "قَلَمٌ (Qalamun)"
+      ],
+      "answer_index": 0,
+      "correct_option_letter": "A",
+      "explanation": "সঠিক উত্তর A) بَابٌ (Baabun) অর্থ দরজা।"
+    }
+  },
+  "pending_answers": {
+    "1": {
+      "post_id": "mock_post_id_123456789",
+      "posted_at": "2026-09-06T16:41:24.200081",
+      "revealed": false
+    }
+  }
 }
