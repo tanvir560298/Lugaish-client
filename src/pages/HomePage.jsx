@@ -15,8 +15,11 @@ import {
   Target,
   ChevronDown,
   CalendarDays,
-  BellRing
+  BellRing,
+  Volume2
 } from 'lucide-react';
+import { InteractiveTrialWidget } from '../components/InteractiveTrialWidget.jsx';
+import { SocialProofSection } from '../components/SocialProofSection.jsx';
 
 const HeroScene = lazy(() => import('../components/HeroScene.jsx'));
 
@@ -232,21 +235,62 @@ export function HomePage() {
                   </div>
                   
                   {/* Visual Ladder Preview */}
-                  <div className="space-y-4">
-                    {[1, 2, 3].map((step) => (
-                      <div key={step} className={`h-12 w-full rounded-2xl border flex items-center px-4 gap-4 ${step === 1 ? 'bg-blue-500/10 border-blue-500/30' : 'bg-white/5 border-white/5'}`}>
-                        <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold ${step === 1 ? 'bg-blue-500' : 'bg-slate-800'}`}>
-                          {step === 1 ? <CheckCircle2 size={12} /> : step}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500 text-slate-950 font-bold">
+                          <CheckCircle2 size={15} />
                         </div>
-                        <div className={`h-2 rounded-full bg-current opacity-20 ${step === 1 ? 'w-24' : 'w-16'}`} />
+                        <div>
+                          <p className="text-xs font-bold text-white">5 Core Greetings</p>
+                          <p className="text-[10px] text-emerald-300 font-medium">Completed • Audio verified</p>
+                        </div>
                       </div>
-                    ))}
+                      <span className="rounded-full bg-emerald-400/20 px-2.5 py-0.5 text-[10px] font-black text-emerald-300">
+                        100%
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-2xl border border-blue-500/40 bg-blue-500/15 px-4 py-3 shadow-lg shadow-blue-500/10">
+                      <div className="flex items-center gap-3">
+                        <div className="relative flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600 text-white font-bold">
+                          <Sparkles size={14} className="animate-pulse" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-white">AI Pronunciation Match</p>
+                          <p className="text-[10px] text-blue-300 font-medium">Speaking challenge active</p>
+                        </div>
+                      </div>
+                      <span className="flex items-center gap-1 rounded-full bg-blue-400/20 px-2.5 py-0.5 text-[10px] font-black text-blue-200">
+                        <span className="h-1.5 w-1.5 animate-ping rounded-full bg-blue-400" />
+                        96% Score
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/[0.03] px-4 py-3 opacity-80">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-800 text-slate-400 text-xs font-bold">
+                          <Flame size={14} className="text-orange-400" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-slate-300">Habit Streak Milestone</p>
+                          <p className="text-[10px] text-slate-400">Unlock Milestone Certificate</p>
+                        </div>
+                      </div>
+                      <span className="rounded-full bg-orange-400/10 px-2.5 py-0.5 text-[10px] font-black text-orange-300">
+                        +50 XP
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="pt-4">
-                    <div className="hero-preview-action w-full h-14 bg-gradient-to-r from-blue-600 to-emerald-500 rounded-2xl flex items-center justify-center font-black gap-2">
-                      Continue Ascent <ArrowRight size={18} />
-                    </div>
+                  <div className="pt-3">
+                    <button
+                      type="button"
+                      onClick={() => handleStart('english')}
+                      className="hero-preview-action group flex w-full h-14 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-emerald-500 font-black text-white gap-2 shadow-lg shadow-blue-500/20 transition-all hover:opacity-95 active:scale-95 cursor-pointer"
+                    >
+                      Continue Ascent <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+                    </button>
                   </div>
                 </div>
              </div>
@@ -289,6 +333,13 @@ export function HomePage() {
         </div>
       </section>
 
+      {/* --- LIVE INTERACTIVE TRIAL: ZERO-LOGIN PLAYGROUND --- */}
+      <section className="home-trial py-12 sm:py-16 lg:py-24 border-t border-white/5 bg-slate-900/20">
+        <div className="app-shell">
+          <InteractiveTrialWidget onStartPathway={handleStart} />
+        </div>
+      </section>
+
       {/* --- PATHWAY SELECTION --- */}
       <section className="home-pathways overflow-hidden py-16 sm:py-24 lg:py-32">
         <div className="app-shell">
@@ -306,6 +357,8 @@ export function HomePage() {
               desc="AI-supported English practice for business, travel, interviews, and confident daily communication."
               color="blue"
               features={["AI Practice Support", "Business Meetings", "Interview Readiness"]}
+              audioText="Welcome to Lugaish. Accelerate your career with natural, fluent spoken English."
+              audioLang="en-US"
               onStart={() => handleStart('english')}
             />
             <PathCard 
@@ -316,11 +369,16 @@ export function HomePage() {
               desc="AI-assisted Arabic practice with cultural context, everyday phrases, and guided confidence-building."
               color="emerald"
               features={["AI Practice Support", "Cultural Context", "Daily Conversation"]}
+              audioText="مرحباً بكم في لغيش. انضم إلينا لتتقن اللغة العربية بكل ثقة وسهولة."
+              audioLang="ar-SA"
               onStart={() => handleStart('arabic')}
             />
           </div>
         </div>
       </section>
+
+      {/* --- SOCIAL PROOF & MILESTONE CERTIFICATION --- */}
+      <SocialProofSection />
 
       {/* --- THE "ESCAPE" PRICING TEASER --- */}
       <section className="home-offer relative overflow-hidden bg-gradient-to-b from-transparent to-blue-900/10 py-16 sm:py-24 lg:py-32">
@@ -405,8 +463,44 @@ const pathCardColors = {
   },
 };
 
-function PathCard({ icon, badge, title, desc, color, features, onStart }) {
+function PathCard({ icon, badge, title, desc, color, features, onStart, audioText, audioLang }) {
   const colorClasses = pathCardColors[color] ?? pathCardColors.blue;
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
+  const handleToggleAudio = (e) => {
+    e.stopPropagation();
+    if (typeof window === 'undefined' || !('speechSynthesis' in window) || !audioText) return;
+
+    if (isPlayingAudio) {
+      window.speechSynthesis.cancel();
+      setIsPlayingAudio(false);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(audioText);
+    utterance.lang = audioLang || 'en-US';
+    utterance.rate = 0.92;
+    utterance.pitch = 1.0;
+
+    const voices = window.speechSynthesis.getVoices();
+    const voice = voices.find(v => v.lang.toLowerCase().startsWith((audioLang || 'en').toLowerCase().slice(0, 2)));
+    if (voice) utterance.voice = voice;
+
+    utterance.onstart = () => setIsPlayingAudio(true);
+    utterance.onend = () => setIsPlayingAudio(false);
+    utterance.onerror = () => setIsPlayingAudio(false);
+
+    window.speechSynthesis.speak(utterance);
+  };
 
   return (
     <motion.div 
@@ -425,8 +519,33 @@ function PathCard({ icon, badge, title, desc, color, features, onStart }) {
         </div>
         <p className="mb-3 text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">{badge}</p>
         <h3 className="mb-4 text-3xl font-black sm:text-4xl">{title}</h3>
-        <p className="mb-8 max-w-xs text-base text-slate-400 sm:text-lg">{desc}</p>
+        <p className="mb-6 max-w-xs text-base text-slate-400 sm:text-lg">{desc}</p>
         
+        {audioText && (
+          <div className="mb-6 flex items-center">
+            <button
+              type="button"
+              onClick={handleToggleAudio}
+              className={`inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all ${
+                isPlayingAudio
+                  ? 'border-emerald-400 bg-emerald-500/20 text-emerald-300'
+                  : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
+              }`}
+              title="Listen to native sample audio"
+            >
+              <Volume2 size={15} />
+              <span>{isPlayingAudio ? 'Playing Sample...' : 'Sample Native Audio'}</span>
+              {isPlayingAudio && (
+                <span className="flex items-center gap-0.5 ml-1">
+                  <span className="h-2 w-0.5 animate-bounce bg-emerald-400" />
+                  <span className="h-3 w-0.5 animate-bounce bg-emerald-400 delay-100" />
+                  <span className="h-2 w-0.5 animate-bounce bg-emerald-400 delay-200" />
+                </span>
+              )}
+            </button>
+          </div>
+        )}
+
         <ul className="mb-8 space-y-4 sm:mb-12">
           {features.map((f, i) => (
             <li key={i} className="flex items-center gap-3 font-bold text-sm text-slate-300">
