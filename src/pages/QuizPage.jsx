@@ -74,9 +74,13 @@ export function QuizPage() {
       return;
     }
 
-    const finalResponses = responses.length === questions.length
-      ? responses
-      : [...responses.slice(0, questionIndex), selectedIndex];
+    const baseResponses = [...responses];
+    if (selectedIndex !== null) {
+      baseResponses[questionIndex] = selectedIndex;
+    }
+    const finalResponses = Array.from({ length: questions.length }, (_, i) => (
+      Number.isSafeInteger(baseResponses[i]) ? baseResponses[i] : (i === questionIndex ? selectedIndex : null)
+    ));
     if (finalResponses.length !== questions.length || finalResponses.some(answer => !Number.isSafeInteger(answer))) {
       setSubmitError('Please answer every question before finishing the quiz.');
       return;
@@ -87,13 +91,18 @@ export function QuizPage() {
 
     let result = null;
     try {
-      result = await actions.submitQuiz(activeLesson.id, finalResponses);
+      const submitPromise = actions.submitQuiz(activeLesson.id, finalResponses);
+      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 4000));
+      result = await Promise.race([submitPromise, timeoutPromise]);
     } catch (error) {
-      console.warn('Remote quiz submission failed or had answer key mismatch, saving locally:', error);
+      console.warn('Remote quiz submission failed or timed out, saving locally:', error);
     }
 
     try {
-      const correctAnswers = Number.isFinite(Number(result?.correctAnswers)) ? Number(result.correctAnswers) : score;
+      const localScore = finalResponses.reduce((total, response, index) => (
+        total + (response === questions[index]?.answer ? 1 : 0)
+      ), 0);
+      const correctAnswers = Number.isFinite(Number(result?.correctAnswers)) ? Number(result.correctAnswers) : localScore;
       const percentage = Number.isFinite(Number(result?.score))
         ? Number(result.score)
         : Math.round((correctAnswers / questions.length) * 100);
@@ -108,7 +117,11 @@ export function QuizPage() {
         alreadyCompleted: false,
       };
 
-      actions.recordServerQuizCompletion(activeLesson.id, completionResult);
+      try {
+        actions.recordServerQuizCompletion(activeLesson.id, completionResult);
+      } catch (recordError) {
+        console.warn('Failed recording quiz completion in state:', recordError);
+      }
       setXpEarned(xpAwarded);
       setServerScore(correctAnswers);
       if (xpAwarded > 0 || percentage >= 60) {
@@ -254,11 +267,23 @@ export function QuizPage() {
 
             <div className="flex justify-end">
               {!answerChecked ? (
-                <button type="button" className="glow-button glow-button-green disabled:cursor-not-allowed disabled:opacity-50" onClick={checkAnswer} disabled={selectedIndex === null}>Check answer</button>
+                <button
+                  type="button"
+                  className="glow-button glow-button-green disabled:cursor-not-allowed disabled:opacity-50"
+                  onClick={checkAnswer}
+                  disabled={selectedIndex === null}
+                >
+                  {questionIndex + 1 === questions.length ? 'Check answer & finish' : 'Check answer'}
+                </button>
               ) : (
-                <button type="button" className="glow-button glow-button-blue disabled:cursor-not-allowed disabled:opacity-50" onClick={continueQuiz} disabled={isSubmitting}>
+                <button
+                  type="button"
+                  className="glow-button glow-button-blue disabled:cursor-not-allowed disabled:opacity-50"
+                  onClick={continueQuiz}
+                  disabled={isSubmitting}
+                >
                   {isSubmitting && <LoaderCircle size={18} className="animate-spin" />}
-                  {questionIndex + 1 === questions.length ? (submitError ? 'Try saving again' : 'Finish quiz') : 'Next question'}
+                  {questionIndex + 1 === questions.length ? (submitError ? 'Try submitting again' : 'Submit Quiz') : 'Next question'}
                 </button>
               )}
             </div>

@@ -153,12 +153,17 @@ function normalizeState(state) {
 }
 
 function getLessonApiPayload(lessonId, pathway) {
-  const path = COURSE_DATA[pathway];
+  let lang = pathway;
+  if (typeof lessonId === 'string') {
+    if (lessonId.startsWith('ar-')) lang = 'arabic';
+    else if (lessonId.startsWith('en-')) lang = 'english';
+  }
+  const path = COURSE_DATA[lang];
   const lessons = path?.modules.flatMap(module => module.lessons) ?? [];
   const day = lessons.findIndex(lesson => lesson.id === lessonId) + 1;
 
   if (!day) return null;
-  return { day, language: pathway };
+  return { day, language: lang };
 }
 
 export function AppProvider({ children }) {
