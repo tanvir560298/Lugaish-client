@@ -1,7 +1,7 @@
 {
   "subject": "arabic",
   "current_day": 4,
-  "last_run_timestamp": "2026-09-09T17:31:00.842753",
+  "last_run_timestamp": "2026-09-10T08:38:41.476154",
   "day_initialized_at": "2026-09-07T15:20:15.879227",
   "today_questions": {
     "1": {
@@ -49,10 +49,8 @@
     },
     "2": {
       "post_id": "mock_post_id_123456789",
-      "posted_at": "2026-09-09T08:36:11.932461",
-      "revealed": true,
-      "comment_id": "mock_comment_id_987654321",
-      "answered_at": "2026-09-09T10:15:49.373354"
+      "posted_at": "2026-09-10T08:38:41.476149",
+      "revealed": false
     },
     "3": {
       "post_id": "mock_post_id_123456789",
