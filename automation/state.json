@@ -50,7 +50,9 @@
     "2": {
       "post_id": "mock_post_id_123456789",
       "posted_at": "2026-09-10T08:38:41.476149",
-      "revealed": false
+      "revealed": true,
+      "comment_id": "mock_comment_id_987654321",
+      "answered_at": "2026-09-10T10:09:56.083003"
     },
     "3": {
       "post_id": "mock_post_id_123456789",
