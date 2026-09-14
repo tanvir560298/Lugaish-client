@@ -1,3 +1,13 @@
+import { IELTS_BAND_7_48_CLASSES, IELTS_BAND_7_MONTH_THEMES } from './tanvirIeltsBand7Data.js';
+
+export { IELTS_BAND_7_48_CLASSES, IELTS_BAND_7_MONTH_THEMES };
+
+export const SPOKEN_ENGLISH_MONTH_THEMES = {
+  1: 'Breaking Hesitation & Daily Scenarios',
+  2: 'Situational Fluency & Practical Conversations',
+  3: 'Spontaneous Flow, Debates & Professional Edge',
+};
+
 // Complete 30-Class Curriculum for Course 1: Spoken English for Daily Fluency
 export const SPOKEN_ENGLISH_30_CLASSES = [
   // --- MONTH 1: Breaking Hesitation & Daily Scenarios (Classes 01–10) ---
@@ -550,38 +560,7 @@ export const SPOKEN_ENGLISH_30_CLASSES = [
 // Starter curriculum plan templates for Tanvir Ahmad's 3 official courses
 export const DEFAULT_COURSE_PLANS = {
   'tanvir-spoken-english-fluency': SPOKEN_ENGLISH_30_CLASSES,
-  'tanvir-ielts-comprehensive-band-7': [
-    {
-      day: 1,
-      month: 1,
-      title: 'IELTS Band 7+ Rubric & Speaking Part 1 Mastery',
-      coreStructure: 'Deconstructing the 4 IELTS speaking descriptors: Fluency, Lexis, Grammar, Pronunciation.',
-      liveActivity: 'Diagnostic mock test with instant scoring.',
-      actionItem: 'Diagnostic recording of 6 Speaking Part 1 topics with lexical variety.',
-      studyTopic: 'Band 7 Speaking criteria, fluency thresholds, and avoiding short responses.',
-      studentOutput: 'Diagnostic recording of 6 Speaking Part 1 topics with lexical variety.',
-      classNotes: 'Focus on natural idioms and compound sentences.',
-      actionType: 'ai_speaking',
-      actionLabel: 'Start Band 7 Speaking Diagnostic',
-      actionTarget: '/speaking-practice?language=english&day=1',
-      status: 'published',
-    },
-    {
-      day: 2,
-      month: 1,
-      title: 'Writing Task 2: Band 7+ Essay Formulas',
-      coreStructure: 'Agree/Disagree & Discussion essay architecture: Clear thesis statements and PEEL paragraphs.',
-      liveActivity: 'Live essay outline breakdown.',
-      actionItem: 'Full 250-word Task 2 essay outline and topic sentence formulation.',
-      studyTopic: 'Essay coherence, thesis positioning, and paragraph flow.',
-      studentOutput: 'Full 250-word Task 2 essay outline and topic sentence formulation.',
-      classNotes: 'Never write a generic thesis. Take a clear, qualified stance.',
-      actionType: 'pdf_resource',
-      actionLabel: 'Download Task 2 Formula PDF',
-      actionTarget: '/lesson/2',
-      status: 'published',
-    },
-  ],
+  'tanvir-ielts-comprehensive-band-7': IELTS_BAND_7_48_CLASSES,
   'tanvir-ielts-foundation-band-6': [
     {
       day: 1,
@@ -640,20 +619,20 @@ export const DEFAULT_TANVIR_COURSES = [
   {
     id: 'tanvir-ielts-comprehensive-band-7',
     title: 'IELTS Comprehensive Mastery: Target Band 7',
-    subtitle: '4-Month Intensive Academic & General Training for Band 7+',
-    duration: '4 Months',
+    subtitle: '4-Month Intensive Academic & General Training for Band 7',
+    duration: '4 Months • 48 Strategy Classes + 8 Full Mocks',
     instructor: 'Tanvir Ahmad',
     category: 'IELTS Preparation',
-    format: 'Live Drills & 1-on-1 Mock Evaluation',
+    format: '48 Strategy Classes + 8 Weekend Mocks (Outside Hours)',
     status: 'enrolling',
-    totalDays: 120,
+    totalDays: 48,
     seatLimit: 12,
     enrolledCount: 0,
-    schedule: '3 Days / Week • 7:30 PM - 9:30 PM (Dhaka Time)',
-    venue: 'Lugaish Interactive Studio & Evaluation Labs',
+    schedule: '3 Days / Week • 7:30 PM - 9:30 PM + Weekend Mocks',
+    venue: 'Lugaish Interactive Studio & Cambridge Simulation Labs',
     price: 'Paid Cohort (Announced Soon)',
-    description: 'A 4-month structured IELTS masterclass instructed by Tanvir Ahmad targeting Band 7+. Delivers rigorous, strategy-driven preparation across all four modules: high-scoring Speaking interview drills, formulaic Writing Task 1 & 2 essay feedback, rapid Reading scanning techniques, and audio Listening simulations.',
-    tags: ['4 Months', 'Target Band 7', 'IELTS Mastery', 'Mock Interviews', 'Task 1 & 2'],
+    description: 'A 4-month intensive IELTS masterclass instructed by Tanvir Ahmad targeting Band 7. Features 48 strategy and drill classes (12 classes/month) with zero wasted class time, plus 8 full-length weekend mock tests (LRW + live speaking interview) outside class hours, followed by detailed performance autopsy reports.',
+    tags: ['4 Months', '48 Live Classes', '8 Weekend Mocks', 'Target Band 7', 'Zero Class Time Wasted'],
     createdAt: '2026-09-05T00:00:00.000Z',
   },
   {
@@ -677,7 +656,7 @@ export const DEFAULT_TANVIR_COURSES = [
   },
 ];
 
-const STORAGE_KEY = 'lugaish_tanvir_courses_v4';
+const STORAGE_KEY = 'lugaish_tanvir_courses_v5';
 
 export function loadTanvirCourses() {
   if (typeof window === 'undefined') return DEFAULT_TANVIR_COURSES;
@@ -688,7 +667,16 @@ export function loadTanvirCourses() {
       return DEFAULT_TANVIR_COURSES;
     }
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : DEFAULT_TANVIR_COURSES;
+    if (!Array.isArray(parsed) || parsed.length === 0) return DEFAULT_TANVIR_COURSES;
+
+    // Check if IELTS course metadata needs updating (e.g., totalDays !== 48 or still references 7+)
+    const ieltsCourse = parsed.find(c => c.id === 'tanvir-ielts-comprehensive-band-7');
+    if (!ieltsCourse || ieltsCourse.totalDays !== 48 || ieltsCourse.subtitle?.includes('7+')) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_TANVIR_COURSES));
+      return DEFAULT_TANVIR_COURSES;
+    }
+
+    return parsed;
   } catch {
     return DEFAULT_TANVIR_COURSES;
   }
@@ -706,13 +694,21 @@ export function saveTanvirCourses(courses) {
 export function loadCoursePlan(courseId) {
   if (typeof window === 'undefined') return DEFAULT_COURSE_PLANS[courseId] || [];
   try {
-    const raw = localStorage.getItem(`lugaish_plan_${courseId}_v4`);
+    const raw = localStorage.getItem(`lugaish_plan_${courseId}_v5`);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        // Guarantee IELTS course has full 48 classes
+        if (courseId === 'tanvir-ielts-comprehensive-band-7' && parsed.length < 48) {
+          const fullPlan = DEFAULT_COURSE_PLANS[courseId];
+          localStorage.setItem(`lugaish_plan_${courseId}_v5`, JSON.stringify(fullPlan));
+          return fullPlan;
+        }
+        return parsed;
+      }
     }
     const initial = DEFAULT_COURSE_PLANS[courseId] || [];
-    localStorage.setItem(`lugaish_plan_${courseId}_v4`, JSON.stringify(initial));
+    localStorage.setItem(`lugaish_plan_${courseId}_v5`, JSON.stringify(initial));
     return initial;
   } catch {
     return DEFAULT_COURSE_PLANS[courseId] || [];
@@ -722,7 +718,7 @@ export function loadCoursePlan(courseId) {
 export function saveCoursePlan(courseId, plan) {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem(`lugaish_plan_${courseId}_v4`, JSON.stringify(plan));
+    localStorage.setItem(`lugaish_plan_${courseId}_v5`, JSON.stringify(plan));
   } catch (err) {
     console.error('Failed to save course plan to localStorage', err);
   }

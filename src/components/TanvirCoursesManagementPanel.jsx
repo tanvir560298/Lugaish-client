@@ -41,7 +41,9 @@ import {
   saveTanvirCourses,
   loadCoursePlan,
   saveCoursePlan,
-  DEFAULT_COURSE_PLANS
+  DEFAULT_COURSE_PLANS,
+  IELTS_BAND_7_MONTH_THEMES,
+  SPOKEN_ENGLISH_MONTH_THEMES
 } from '../data/tanvirCoursesData.js';
 import { useNavigate } from 'react-router-dom';
 
@@ -984,23 +986,25 @@ export function CoursePlanModal({ course, onClose, navigate }) {
   // Extract available months
   const availableMonths = useMemo(() => {
     const months = new Set();
+    const isIelts = course.id === 'tanvir-ielts-comprehensive-band-7';
     plan.forEach(d => {
-      if (d.month) months.add(d.month);
-      else if (d.day <= 10) months.add(1);
-      else if (d.day <= 20) months.add(2);
-      else if (d.day <= 30) months.add(3);
+      if (d.month) {
+        months.add(d.month);
+      } else {
+        const perMonth = isIelts ? 12 : 10;
+        months.add(Math.min(isIelts ? 4 : 3, Math.ceil(d.day / perMonth)));
+      }
     });
     return Array.from(months).sort((a, b) => a - b);
-  }, [plan]);
+  }, [plan, course.id]);
 
-  const monthThemes = {
-    1: 'Breaking Hesitation & Daily Scenarios',
-    2: 'Situational Fluency & Practical Conversations',
-    3: 'Spontaneous Flow, Debates & Professional Edge',
-  };
+  const monthThemes = course.id === 'tanvir-ielts-comprehensive-band-7'
+    ? IELTS_BAND_7_MONTH_THEMES
+    : SPOKEN_ENGLISH_MONTH_THEMES;
 
   // Filtered day roadmap
   const filteredDays = useMemo(() => {
+    const isIelts = course.id === 'tanvir-ielts-comprehensive-band-7';
     return plan.filter(d => {
       // Month match
       let matchesMonth = true;
@@ -1009,9 +1013,8 @@ export function CoursePlanModal({ course, onClose, navigate }) {
         if (d.month) {
           matchesMonth = d.month === targetM;
         } else {
-          if (targetM === 1) matchesMonth = d.day <= 10;
-          else if (targetM === 2) matchesMonth = d.day > 10 && d.day <= 20;
-          else if (targetM === 3) matchesMonth = d.day > 20;
+          const perMonth = isIelts ? 12 : 10;
+          matchesMonth = Math.ceil(d.day / perMonth) === targetM;
         }
       }
 
@@ -1262,20 +1265,26 @@ export function CoursePlanModal({ course, onClose, navigate }) {
                 All Classes ({plan.length})
               </button>
 
-              {availableMonths.map(m => (
-                <button
-                  key={m}
-                  type="button"
-                  onClick={() => setSelectedMonth(String(m))}
-                  className={`rounded-xl px-3.5 py-1.5 text-xs font-black uppercase tracking-wider transition ${
-                    selectedMonth === String(m)
-                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  Month {m} {m === 1 ? '(1–10)' : m === 2 ? '(11–20)' : '(21–30)'}
-                </button>
-              ))}
+              {availableMonths.map(m => {
+                const isIelts = course.id === 'tanvir-ielts-comprehensive-band-7';
+                const labelRange = isIelts
+                  ? m === 1 ? '(1–12)' : m === 2 ? '(13–24)' : m === 3 ? '(25–36)' : '(37–48)'
+                  : m === 1 ? '(1–10)' : m === 2 ? '(11–20)' : '(21–30)';
+                return (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => setSelectedMonth(String(m))}
+                    className={`rounded-xl px-3.5 py-1.5 text-xs font-black uppercase tracking-wider transition ${
+                      selectedMonth === String(m)
+                        ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Month {m} {labelRange}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Search and Action Filter */}
@@ -1319,159 +1328,215 @@ export function CoursePlanModal({ course, onClose, navigate }) {
         <div className="relative z-10 mt-3 flex-1 overflow-y-auto pr-1.5 space-y-4">
           {filteredDays.map(item => {
             const actionConfig = PLAN_ACTION_TYPES[item.actionType] || PLAN_ACTION_TYPES.ai_speaking;
-            const itemMonth = item.month || (item.day <= 10 ? 1 : item.day <= 20 ? 2 : 3);
+            const isIelts = course.id === 'tanvir-ielts-comprehensive-band-7';
+            const itemMonth = item.month || (isIelts 
+              ? (item.day <= 12 ? 1 : item.day <= 24 ? 2 : item.day <= 36 ? 3 : 4)
+              : (item.day <= 10 ? 1 : item.day <= 20 ? 2 : 3)
+            );
 
             return (
-              <div
-                key={item.day}
-                className="rounded-2xl border border-white/10 bg-gradient-to-b from-slate-900/90 to-slate-950/95 p-4 sm:p-5 md:p-6 transition hover:border-emerald-500/40 hover:shadow-xl hover:shadow-emerald-950/20"
-              >
-                {/* Card Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-white/10">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-lg bg-emerald-500/20 border border-emerald-400/40 px-2.5 py-1 text-xs font-black text-emerald-300 uppercase tracking-wider">
-                      Class {String(item.day).padStart(2, '0')}
-                    </span>
-                    <span className="rounded-lg bg-blue-500/15 border border-blue-400/30 px-2 py-0.5 text-[10px] font-bold text-blue-300 uppercase tracking-wider">
-                      Month {itemMonth}
-                    </span>
-                    <h4 className="text-base sm:text-lg font-black text-white">
-                      {item.title}
-                    </h4>
+              <React.Fragment key={item.day}>
+                <div
+                  className="rounded-2xl border border-white/10 bg-gradient-to-b from-slate-900/90 to-slate-950/95 p-4 sm:p-5 md:p-6 transition hover:border-emerald-500/40 hover:shadow-xl hover:shadow-emerald-950/20"
+                >
+                  {/* Card Header */}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-white/10">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-lg bg-emerald-500/20 border border-emerald-400/40 px-2.5 py-1 text-xs font-black text-emerald-300 uppercase tracking-wider">
+                        Class {String(item.day).padStart(2, '0')}
+                      </span>
+                      <span className="rounded-lg bg-blue-500/15 border border-blue-400/30 px-2 py-0.5 text-[10px] font-bold text-blue-300 uppercase tracking-wider">
+                        Month {itemMonth}
+                      </span>
+                      <h4 className="text-base sm:text-lg font-black text-white">
+                        {item.title}
+                      </h4>
+                    </div>
+
+                    {/* Resource Badges */}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {item.classNotes && (
+                        <span className="inline-flex items-center gap-1 rounded-md border border-amber-400/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-300">
+                          <BookOpen size={11} /> Notes
+                        </span>
+                      )}
+                      {item.pdfUrl && (
+                        <span className="inline-flex items-center gap-1 rounded-md border border-blue-400/30 bg-blue-500/10 px-2 py-0.5 text-[10px] font-bold text-blue-300">
+                          <FileText size={11} /> PDF
+                        </span>
+                      )}
+                      {item.audioUrl && (
+                        <span className="inline-flex items-center gap-1 rounded-md border border-cyan-400/30 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-bold text-cyan-300">
+                          <Headphones size={11} /> Audio
+                        </span>
+                      )}
+                      {item.videoUrl && (
+                        <span className="inline-flex items-center gap-1 rounded-md border border-purple-400/30 bg-purple-500/10 px-2 py-0.5 text-[10px] font-bold text-purple-300">
+                          <Video size={11} /> Video
+                        </span>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Resource Badges */}
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    {item.classNotes && (
-                      <span className="inline-flex items-center gap-1 rounded-md border border-amber-400/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-300">
-                        <BookOpen size={11} /> Notes
-                      </span>
-                    )}
-                    {item.pdfUrl && (
-                      <span className="inline-flex items-center gap-1 rounded-md border border-blue-400/30 bg-blue-500/10 px-2 py-0.5 text-[10px] font-bold text-blue-300">
-                        <FileText size={11} /> PDF
-                      </span>
-                    )}
-                    {item.audioUrl && (
-                      <span className="inline-flex items-center gap-1 rounded-md border border-cyan-400/30 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-bold text-cyan-300">
-                        <Headphones size={11} /> Audio
-                      </span>
-                    )}
-                    {item.videoUrl && (
-                      <span className="inline-flex items-center gap-1 rounded-md border border-purple-400/30 bg-purple-500/10 px-2 py-0.5 text-[10px] font-bold text-purple-300">
-                        <Video size={11} /> Video
-                      </span>
-                    )}
+                  {/* 3 Core Curriculum Blocks (High-Impact Structured Content) */}
+                  <div className="mt-4 grid gap-3 lg:grid-cols-3">
+                    {/* 1. Core Structure (মূল বাক্য ও গ্রামার টেকনিক) */}
+                    <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.04] p-3.5 text-xs flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center gap-1.5 font-bold text-amber-300 text-[11px] uppercase tracking-wider mb-1.5">
+                          <Lightbulb size={13} className="text-amber-400 shrink-0" />
+                          <span>Core Structure (মূল বাক্য ও টেকনিক)</span>
+                        </div>
+                        <p className="text-amber-100 font-medium leading-relaxed">
+                          {item.coreStructure || item.studyTopic || 'Grammar blueprints and sentence formulas.'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 2. Live Activity (লাইভ ড্রিল ও সলভিং) */}
+                    <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] p-3.5 text-xs flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center gap-1.5 font-bold text-emerald-300 text-[11px] uppercase tracking-wider mb-1.5">
+                          <Mic size={13} className="text-emerald-400 shrink-0" />
+                          <span>Live Activity (লাইভ ড্রিল ও সমাধান)</span>
+                        </div>
+                        <p className="text-emerald-100 font-medium leading-relaxed">
+                          {item.liveActivity || 'Interactive live drills and problem solving with mentor.'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* 3. Action Item & Submission (হোমওয়ার্ক ও আউটপুট) */}
+                    <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/[0.04] p-3.5 text-xs flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center gap-1.5 font-bold text-cyan-300 text-[11px] uppercase tracking-wider mb-1.5">
+                          <Zap size={13} className="text-cyan-400 shrink-0" />
+                          <span>Action Item (হোমওয়ার্ক ও আউটপুট)</span>
+                        </div>
+                        <p className="text-cyan-100 font-medium leading-relaxed">
+                          {item.actionItem || item.studentOutput || 'Submit voice recording or practice task.'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Footer Action Bar for this Class */}
+                  <div className="mt-4 pt-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    {/* Left: View Notes & Resources Button */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedResourceDay(item)}
+                        className="inline-flex items-center gap-2 rounded-xl border border-amber-400/30 bg-amber-500/10 hover:bg-amber-500/20 px-3.5 py-2 text-xs font-bold text-amber-200 transition active:scale-95"
+                      >
+                        <BookOpen size={14} className="text-amber-400" />
+                        <span>View Class Notes & Resources</span>
+                      </button>
+
+                      {item.actionTarget && (
+                        <span className="hidden md:inline-block text-[10px] text-slate-500 font-mono">
+                          Target: {item.actionTarget}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Right: Primary Action / Editor Controls */}
+                    <div className="flex flex-wrap items-center gap-2 justify-end">
+                      {/* Primary Practice / Action Launch Button */}
+                      <button
+                        type="button"
+                        onClick={() => setSimulatedAction({
+                          day: item.day,
+                          title: item.title,
+                          actionType: item.actionType,
+                          actionLabel: item.actionLabel || 'Launch Action Drill',
+                          actionTarget: item.actionTarget,
+                          studyTopic: item.coreStructure || item.studyTopic,
+                          studentOutput: item.actionItem || item.studentOutput,
+                        })}
+                        className={`inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black uppercase tracking-wider shadow transition active:scale-95 ${actionConfig.btnClass}`}
+                      >
+                        {actionConfig.icon}
+                        <span>{item.actionLabel || 'Launch Practice Task'}</span>
+                        <ArrowRight size={13} className="shrink-0" />
+                      </button>
+
+                      {/* Instructor Edit / Delete Controls (Shown in Editor Mode) */}
+                      {planMode === 'editor' && (
+                        <div className="flex items-center gap-1.5 pl-2 border-l border-white/10">
+                          <button
+                            type="button"
+                            onClick={() => setEditingDay(item)}
+                            className="inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/5 px-2.5 py-1.5 text-xs font-bold text-slate-300 hover:bg-white/10 hover:text-white transition"
+                            title="Edit Day Curriculum & Notes"
+                          >
+                            <Edit3 size={13} /> Edit
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteDay(item.day)}
+                            className="inline-flex items-center gap-1 rounded-lg border border-red-500/30 bg-red-500/10 px-2.5 py-1.5 text-xs font-bold text-red-400 hover:bg-red-500/20 transition"
+                            title="Delete Day"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* 3 Core Curriculum Blocks (High-Impact Structured Content) */}
-                <div className="mt-4 grid gap-3 lg:grid-cols-3">
-                  {/* 1. Core Structure (মূল বাক্য ও গ্রামার টেকনিক) */}
-                  <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.04] p-3.5 text-xs flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center gap-1.5 font-bold text-amber-300 text-[11px] uppercase tracking-wider mb-1.5">
-                        <Lightbulb size={13} className="text-amber-400 shrink-0" />
-                        <span>Core Structure (মূল বাক্য ও টেকনিক)</span>
+                {/* Weekend Mock Test Milestone (Outside Class Hours) */}
+                {item.weekendMock && (
+                  <div className="relative overflow-hidden rounded-2xl border-2 border-rose-500/50 bg-gradient-to-r from-rose-950/80 via-slate-900/95 to-red-950/70 p-4 sm:p-5 shadow-2xl shadow-rose-950/40">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex items-start gap-3.5">
+                        <div className="rounded-2xl bg-gradient-to-br from-red-500/30 to-rose-600/30 border border-red-400/40 p-3 text-red-300 shrink-0 shadow-inner">
+                          <Award size={24} className="animate-pulse text-red-400" />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="rounded-lg bg-red-500/30 border border-red-400/50 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest text-red-300">
+                              🔴 Weekend Mock Test {String(item.weekendMock.mockNum).padStart(2, '0')} (Outside Class Hours)
+                            </span>
+                            <span className="rounded-lg bg-white/10 px-2 py-0.5 text-[10px] font-bold text-slate-300">
+                              Official Cambridge Simulation
+                            </span>
+                          </div>
+                          <h5 className="text-base sm:text-lg font-black text-white tracking-wide">
+                            {item.weekendMock.title}
+                          </h5>
+                          <p className="text-xs text-rose-200/90 font-medium">
+                            <span className="text-white font-bold">Coverage:</span> {item.weekendMock.coverage}
+                          </p>
+                          <p className="text-xs text-slate-300">
+                            <span className="text-amber-300 font-bold">Objective:</span> {item.weekendMock.objective}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-amber-100 font-medium leading-relaxed">
-                        {item.coreStructure || item.studyTopic || 'Grammar blueprints and sentence formulas.'}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* 2. Live Activity (লাইভ স্পিকিং ড্রিল) */}
-                  <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] p-3.5 text-xs flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center gap-1.5 font-bold text-emerald-300 text-[11px] uppercase tracking-wider mb-1.5">
-                        <Mic size={13} className="text-emerald-400 shrink-0" />
-                        <span>Live Activity (লাইভ স্পিকিং ড্রিল)</span>
-                      </div>
-                      <p className="text-emerald-100 font-medium leading-relaxed">
-                        {item.liveActivity || 'Interactive live speaking drills with batchmates and mentor.'}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* 3. Action Item & Submission (হোমওয়ার্ক ও আউটপুট) */}
-                  <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/[0.04] p-3.5 text-xs flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center gap-1.5 font-bold text-cyan-300 text-[11px] uppercase tracking-wider mb-1.5">
-                        <Zap size={13} className="text-cyan-400 shrink-0" />
-                        <span>Action Item (হোমওয়ার্ক ও আউটপুট)</span>
-                      </div>
-                      <p className="text-cyan-100 font-medium leading-relaxed">
-                        {item.actionItem || item.studentOutput || 'Submit voice recording or practice task.'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer Action Bar for this Class */}
-                <div className="mt-4 pt-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  {/* Left: View Notes & Resources Button */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedResourceDay(item)}
-                      className="inline-flex items-center gap-2 rounded-xl border border-amber-400/30 bg-amber-500/10 hover:bg-amber-500/20 px-3.5 py-2 text-xs font-bold text-amber-200 transition active:scale-95"
-                    >
-                      <BookOpen size={14} className="text-amber-400" />
-                      <span>View Class Notes & Resources</span>
-                    </button>
-
-                    {item.actionTarget && (
-                      <span className="hidden md:inline-block text-[10px] text-slate-500 font-mono">
-                        Target: {item.actionTarget}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Right: Primary Action / Editor Controls */}
-                  <div className="flex flex-wrap items-center gap-2 justify-end">
-                    {/* Primary Practice / Action Launch Button */}
-                    <button
-                      type="button"
-                      onClick={() => setSimulatedAction({
-                        day: item.day,
-                        title: item.title,
-                        actionType: item.actionType,
-                        actionLabel: item.actionLabel || 'Launch Action Drill',
-                        actionTarget: item.actionTarget,
-                        studyTopic: item.coreStructure || item.studyTopic,
-                        studentOutput: item.actionItem || item.studentOutput,
-                      })}
-                      className={`inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black uppercase tracking-wider shadow transition active:scale-95 ${actionConfig.btnClass}`}
-                    >
-                      {actionConfig.icon}
-                      <span>{item.actionLabel || 'Launch Practice Task'}</span>
-                      <ArrowRight size={13} className="shrink-0" />
-                    </button>
-
-                    {/* Instructor Edit / Delete Controls (Shown in Editor Mode) */}
-                    {planMode === 'editor' && (
-                      <div className="flex items-center gap-1.5 pl-2 border-l border-white/10">
+                      <div className="shrink-0 flex items-center gap-2 self-end sm:self-center">
                         <button
                           type="button"
-                          onClick={() => setEditingDay(item)}
-                          className="inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/5 px-2.5 py-1.5 text-xs font-bold text-slate-300 hover:bg-white/10 hover:text-white transition"
-                          title="Edit Day Curriculum & Notes"
+                          onClick={() => setSimulatedAction({
+                            day: item.day,
+                            title: item.weekendMock.title,
+                            actionType: 'mock_interview',
+                            actionLabel: `Mock ${item.weekendMock.mockNum} Protocol & Rubric`,
+                            actionTarget: '/progress',
+                            studyTopic: item.weekendMock.coverage,
+                            studentOutput: item.weekendMock.objective,
+                          })}
+                          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-pink-600 hover:from-red-500 hover:to-pink-500 text-white px-4 py-2.5 text-xs font-black uppercase tracking-wider shadow-lg shadow-red-950/50 transition active:scale-95"
                         >
-                          <Edit3 size={13} /> Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteDay(item.day)}
-                          className="inline-flex items-center gap-1 rounded-lg border border-red-500/30 bg-red-500/10 px-2.5 py-1.5 text-xs font-bold text-red-400 hover:bg-red-500/20 transition"
-                          title="Delete Day"
-                        >
-                          <Trash2 size={13} />
+                          <Award size={14} />
+                          <span>Mock Details & Rubric</span>
+                          <ArrowRight size={13} />
                         </button>
                       </div>
-                    )}
+                    </div>
                   </div>
-                </div>
-              </div>
+                )}
+              </React.Fragment>
             );
           })}
 
