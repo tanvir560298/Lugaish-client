@@ -5,7 +5,7 @@ import { api } from '../api/client.js';
 import { useAppContext } from '../state/AppContext.jsx';
 import { InPersonBatchCard } from '../components/InPersonBatchCard.jsx';
 import { TanvirCoursesManagementPanel } from '../components/TanvirCoursesManagementPanel.jsx';
-import { ROLE_LABELS, ROLE_VALUES, ROLES, getViewedRole, hasPermission, normalizeRole } from '../utils/roles.js';
+import { ROLE_LABELS, ROLE_VALUES, ROLES, getViewedRole, hasPermission, isStudentPreview, normalizeRole } from '../utils/roles.js';
 import { getEffectiveCourseStartKey, hasCourseStarted } from '../utils/courseLaunch.js';
 import { getLocalCertificates, saveLocalCertificate, getEligibleLocalMilestones, purgeInvalidLocalCertificates, getViewedCertificateCodes, markCertificateViewed } from '../utils/certificateStorage.js';
 
