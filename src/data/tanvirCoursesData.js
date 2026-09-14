@@ -1,3 +1,163 @@
+// Starter curriculum plan templates for Tanvir Ahmad's 3 official courses
+export const DEFAULT_COURSE_PLANS = {
+  'tanvir-spoken-english-fluency': [
+    {
+      day: 1,
+      title: 'Phonetic Foundations & Hesitation Breakdown',
+      studyTopic: 'Vowel length, rhythm patterns, and eliminating vocal fillers (uh, um) during conversation.',
+      studentOutput: 'Record a 60-second spontaneous self-introduction audio without hesitation.',
+      actionType: 'ai_speaking',
+      actionLabel: 'Launch AI Pronunciation Drill',
+      actionTarget: '/speaking-practice?language=english&day=1',
+      status: 'published',
+    },
+    {
+      day: 2,
+      title: 'Everyday Functional Phrases & Active Listening',
+      studyTopic: '15 conversational connectors to naturally ask follow-up questions in business and daily life.',
+      studentOutput: 'Shadow and repeat 10 real-world dialogue situations with native intonation.',
+      actionType: 'pdf_resource',
+      actionLabel: 'Open Functional Phrases PDF',
+      actionTarget: '/lesson/2',
+      status: 'published',
+    },
+    {
+      day: 3,
+      title: 'Spontaneous Speech: 2-Minute JAM Sessions',
+      studyTopic: 'Just-A-Minute (JAM) technique for formulating instant thoughts without translation lag.',
+      studentOutput: 'Continuous 2-minute speech on a surprise topic evaluated by AI speech recognition.',
+      actionType: 'ai_speaking',
+      actionLabel: 'Start 2-Min Speech Drill',
+      actionTarget: '/speaking-practice?language=english&day=3',
+      status: 'published',
+    },
+    {
+      day: 4,
+      title: 'Grammar in Action: Past Tense Storytelling',
+      studyTopic: 'Using narrative tenses (Past Simple vs Continuous) to tell compelling life stories.',
+      studentOutput: 'Complete story completion exercise and correct past tense verb pitfalls.',
+      actionType: 'quiz',
+      actionLabel: 'Take Storytelling Check Quiz',
+      actionTarget: '/quiz?language=english&day=4',
+      status: 'published',
+    },
+    {
+      day: 5,
+      title: 'Live Dialogue Simulation: Disagreeing Politely',
+      studyTopic: 'Expressing contrary opinions with diplomacy and professional vocabulary in meetings.',
+      studentOutput: '1-on-1 interactive mock dialogue with live mentor and peers.',
+      actionType: 'mock_interview',
+      actionLabel: 'Join Speaking Room Simulation',
+      actionTarget: '/interview?language=english&day=5',
+      status: 'published',
+    },
+  ],
+  'tanvir-ielts-comprehensive-band-7': [
+    {
+      day: 1,
+      title: 'IELTS Band 7+ Rubric & Speaking Part 1 Mastery',
+      studyTopic: 'Deconstructing the 4 IELTS speaking descriptors: Fluency, Lexis, Grammar, Pronunciation.',
+      studentOutput: 'Diagnostic recording of 6 Speaking Part 1 topics with lexical variety.',
+      actionType: 'ai_speaking',
+      actionLabel: 'Start Band 7 Speaking Diagnostic',
+      actionTarget: '/speaking-practice?language=english&day=1',
+      status: 'published',
+    },
+    {
+      day: 2,
+      title: 'Writing Task 2: Band 7+ Essay Formulas',
+      studyTopic: 'Agree/Disagree & Discussion essay architecture: Clear thesis statements and PEEL paragraphs.',
+      studentOutput: 'Full 250-word Task 2 essay outline and topic sentence formulation.',
+      actionType: 'pdf_resource',
+      actionLabel: 'Download Task 2 Formula PDF',
+      actionTarget: '/lesson/2',
+      status: 'published',
+    },
+    {
+      day: 3,
+      title: 'Reading: Skimming & Scanning Under Time Pressure',
+      studyTopic: 'Targeting True/False/Not Given and Headings match in under 18 minutes per passage.',
+      studentOutput: 'Complete timed 13-question academic reading section with detailed rationale.',
+      actionType: 'quiz',
+      actionLabel: 'Start Timed Reading Drill',
+      actionTarget: '/quiz?language=english&day=3',
+      status: 'published',
+    },
+    {
+      day: 4,
+      title: 'Listening: Section 3 & 4 Accent & Distractor Traps',
+      studyTopic: 'Overcoming multiple speakers, Australian/British phonetic shifts, and self-correction traps.',
+      studentOutput: 'Section 4 lecture note-taking with zero spelling errors.',
+      actionType: 'video_lecture',
+      actionLabel: 'Play Section 4 Audio Drill',
+      actionTarget: '/lesson/4',
+      status: 'published',
+    },
+    {
+      day: 5,
+      title: 'Speaking Part 2: 2-Minute Cue Card Strategy',
+      studyTopic: 'The 1-minute prep method: Brainstorming PPF (Past, Present, Future) to never run out of ideas.',
+      studentOutput: 'Complete 2-minute unscripted cue card monologue with complex connective clauses.',
+      actionType: 'mock_interview',
+      actionLabel: 'Simulate Full Cue Card Test',
+      actionTarget: '/interview?language=english&day=5',
+      status: 'published',
+    },
+  ],
+  'tanvir-ielts-foundation-band-6': [
+    {
+      day: 1,
+      title: 'Sentence Structures: Simple, Compound & Complex',
+      studyTopic: 'Mastering coordinating (FANBOYS) and subordinating conjunctions to eliminate run-on sentences.',
+      studentOutput: '15 sentence transformation drills creating error-free complex clauses.',
+      actionType: 'pdf_resource',
+      actionLabel: 'Open Grammar Foundation PDF',
+      actionTarget: '/lesson/1',
+      status: 'published',
+    },
+    {
+      day: 2,
+      title: 'Essential 500 Academic Word List (AWL) Part 1',
+      studyTopic: 'Top 25 AWL sublist words with correct collocations and prepositions.',
+      studentOutput: 'Vocabulary retention test with sentence creation drills.',
+      actionType: 'quiz',
+      actionLabel: 'Start Academic Word Quiz',
+      actionTarget: '/quiz?language=english&day=2',
+      status: 'published',
+    },
+    {
+      day: 3,
+      title: 'Basic Listening: Number, Name & Spelling Traps',
+      studyTopic: 'Double consonants, vowels (A/E/I), postcode formats, and telephone numbering rules.',
+      studentOutput: '100% accuracy on Section 1 registration form filling audio simulation.',
+      actionType: 'video_lecture',
+      actionLabel: 'Play Listening Form-Fill Drill',
+      actionTarget: '/lesson/3',
+      status: 'published',
+    },
+    {
+      day: 4,
+      title: 'Speaking with Confidence: Everyday Q&A Drills',
+      studyTopic: 'Expanding 1-word responses into 3-sentence answers using Reason + Example formula.',
+      studentOutput: 'Record answers to 8 general questions demonstrating sentence expansion.',
+      actionType: 'ai_speaking',
+      actionLabel: 'Practice Everyday Q&A With AI',
+      actionTarget: '/speaking-practice?language=english&day=4',
+      status: 'published',
+    },
+    {
+      day: 5,
+      title: 'Writing Task 1 Basics: Bar Charts & Trends',
+      studyTopic: 'Writing an effective Overview paragraph and vocabulary for increase/decrease/fluctuation.',
+      studentOutput: 'Draft a 150-word Task 1 report with trend verbs and prepositions.',
+      actionType: 'pdf_resource',
+      actionLabel: 'Open Task 1 Guide & Templates',
+      actionTarget: '/lesson/5',
+      status: 'published',
+    },
+  ],
+};
+
 // Official courses offered and instructed by Tanvir Ahmad
 export const DEFAULT_TANVIR_COURSES = [
   {
@@ -82,5 +242,30 @@ export function saveTanvirCourses(courses) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(courses));
   } catch (err) {
     console.error('Failed to save Tanvir courses to localStorage', err);
+  }
+}
+
+export function loadCoursePlan(courseId) {
+  if (typeof window === 'undefined') return DEFAULT_COURSE_PLANS[courseId] || [];
+  try {
+    const raw = localStorage.getItem(`lugaish_plan_${courseId}_v1`);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+    const initial = DEFAULT_COURSE_PLANS[courseId] || [];
+    localStorage.setItem(`lugaish_plan_${courseId}_v1`, JSON.stringify(initial));
+    return initial;
+  } catch {
+    return DEFAULT_COURSE_PLANS[courseId] || [];
+  }
+}
+
+export function saveCoursePlan(courseId, plan) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(`lugaish_plan_${courseId}_v1`, JSON.stringify(plan));
+  } catch (err) {
+    console.error('Failed to save course plan to localStorage', err);
   }
 }
