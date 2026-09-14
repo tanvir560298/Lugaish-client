@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, 
@@ -523,8 +524,10 @@ function CourseFormModal({ title, initialData, onClose, onSubmit }) {
     });
   };
 
-  return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -749,7 +752,8 @@ function CourseFormModal({ title, initialData, onClose, onSubmit }) {
           </div>
         </form>
       </motion.div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -766,8 +770,10 @@ function CourseWorkspaceModal({ course, onClose, onUpdateCourse, navigate }) {
     onUpdateCourse({ status: newStatus });
   };
 
-  return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/85 backdrop-blur-lg overflow-y-auto">
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/85 backdrop-blur-lg overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -907,7 +913,8 @@ function CourseWorkspaceModal({ course, onClose, onUpdateCourse, navigate }) {
           </button>
         </div>
       </motion.div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -1072,46 +1079,73 @@ export function CoursePlanModal({ course, onClose, navigate }) {
     showToast('Reset plan to official 30-class starter template.');
   };
 
-  return (
-    <div className="fixed inset-0 z-[130] flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-xl overflow-y-auto">
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-2 sm:p-4 md:p-6 overflow-hidden">
+      {/* Clickable dark backdrop */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.96, y: 20 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="fixed inset-0 bg-slate-950/85 backdrop-blur-md"
+      />
+
+      {/* Main Dialog Window */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96, y: 20 }}
-        className="relative w-full max-w-6xl rounded-3xl border border-emerald-500/30 bg-slate-950 p-4 sm:p-6 md:p-8 shadow-2xl my-4 sm:my-6 flex flex-col max-h-[94vh] overflow-hidden"
+        exit={{ opacity: 0, scale: 0.96, y: 15 }}
+        onClick={e => e.stopPropagation()}
+        className="relative z-10 w-full max-w-6xl rounded-3xl border border-emerald-500/30 bg-slate-950 p-4 sm:p-6 md:p-7 shadow-[0_25px_80px_rgba(0,0,0,0.95)] flex flex-col h-[92vh] max-h-[92vh] overflow-hidden"
       >
         {/* Decorative glows */}
         <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-emerald-600/15 blur-[90px] pointer-events-none" />
         <div className="absolute -left-24 -bottom-24 h-72 w-72 rounded-full bg-teal-600/10 blur-[90px] pointer-events-none" />
 
         {/* Header Strip */}
-        <div className="relative z-10 flex flex-col gap-4 pb-5 border-b border-white/10 shrink-0">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="relative z-10 flex flex-col gap-3 pb-4 border-b border-white/10 shrink-0">
+          {/* Row 1: Badges on left, Dedicated Close Button on right */}
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-300">
+                <Compass size={13} /> Course Plan & Curriculum Hub
+              </span>
+              {course.duration && (
+                <span className="rounded-full border border-amber-400/30 bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-black text-amber-300 uppercase">
+                  ⏳ {course.duration}
+                </span>
+              )}
+              <span className="rounded-full border border-purple-400/30 bg-purple-500/10 px-2.5 py-0.5 text-[10px] font-black text-purple-300 uppercase">
+                👨‍🏫 Instructor: {course.instructor || 'Tanvir Ahmad'}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-2xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/15 hover:text-white transition shadow-sm"
+              title="Close Modal"
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          {/* Row 2: Title & Mode Switcher */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 pt-0.5">
             <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-300">
-                  <Compass size={13} /> Course Plan & Curriculum Hub
-                </span>
-                {course.duration && (
-                  <span className="rounded-full border border-amber-400/30 bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-black text-amber-300 uppercase">
-                    ⏳ {course.duration}
-                  </span>
-                )}
-                <span className="rounded-full border border-purple-400/30 bg-purple-500/10 px-2.5 py-0.5 text-[10px] font-black text-purple-300 uppercase">
-                  👨‍🏫 Instructor: {course.instructor || 'Tanvir Ahmad'}
-                </span>
-              </div>
-              <h3 className="mt-2 text-xl sm:text-2xl md:text-3xl font-black text-white">
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight">
                 {course.title}
               </h3>
-              <p className="mt-1 text-xs sm:text-sm text-slate-400">
+              <p className="mt-1 text-xs sm:text-sm text-slate-300">
                 Full 30-Day Live Syllabus • 60–70% Student Talking Time (STT) • Daily Speaking Drills & Action Outputs
               </p>
             </div>
 
-            {/* Top Action Controls & Close */}
-            <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
-              {/* Dual Mode Switcher: Student View (Viewer) vs Instructor View (Editor) */}
+            {/* Mode Controls & Editor Actions */}
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Dual Mode Switcher */}
               <div className="flex items-center rounded-2xl border border-white/15 bg-white/5 p-1 shadow-inner">
                 <button
                   type="button"
@@ -1145,14 +1179,14 @@ export function CoursePlanModal({ course, onClose, navigate }) {
                   <button
                     type="button"
                     onClick={() => setIsAddingDay(true)}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-3 py-2 text-xs font-black uppercase tracking-wider text-white shadow-md transition active:scale-95"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-3 py-1.5 text-xs font-black uppercase tracking-wider text-white shadow-md transition active:scale-95"
                   >
                     <Plus size={14} /> Add Day
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsUploadOpen(true)}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 px-3 py-2 text-xs font-bold text-slate-200 transition"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 px-3 py-1.5 text-xs font-bold text-slate-200 transition"
                     title="Upload / Paste Syllabus Plan"
                   >
                     <Upload size={13} /> Upload
@@ -1160,7 +1194,7 @@ export function CoursePlanModal({ course, onClose, navigate }) {
                   <button
                     type="button"
                     onClick={handleExportPlan}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 px-3 py-2 text-xs font-bold text-slate-200 transition"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 px-3 py-1.5 text-xs font-bold text-slate-200 transition"
                     title="Copy Plan JSON"
                   >
                     {copied ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
@@ -1168,17 +1202,9 @@ export function CoursePlanModal({ course, onClose, navigate }) {
                   </button>
                 </>
               )}
-
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition ml-1"
-                title="Close Modal"
-              >
-                <X size={20} />
-              </button>
             </div>
           </div>
+        </div>
 
           {/* Mode Indicator Banner */}
           <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-2.5">
@@ -1203,7 +1229,6 @@ export function CoursePlanModal({ course, onClose, navigate }) {
               <span>Month Filter: <strong className="text-cyan-300">{selectedMonth === 'all' ? 'All Months' : `Month ${selectedMonth}`}</strong></span>
             </div>
           </div>
-        </div>
 
         {/* Plan Toast */}
         <AnimatePresence>
@@ -1587,21 +1612,32 @@ export function CoursePlanModal({ course, onClose, navigate }) {
           />
         )}
       </AnimatePresence>
-    </div>
+    </div>,
+    document.body
   );
 }
 
 /* ---------------- SUB-MODAL 1: CLASS RESOURCE & STUDY NOTES READER ---------------- */
 function ClassResourceModal({ dayItem, courseTitle, onClose, onLaunchPractice }) {
   const itemMonth = dayItem.month || (dayItem.day <= 10 ? 1 : dayItem.day <= 20 ? 2 : 3);
+  if (typeof document === 'undefined') return null;
 
-  return (
-    <div className="fixed inset-0 z-[140] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md overflow-y-auto">
+  return createPortal(
+    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+      {/* Clickable dark backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="fixed inset-0 bg-slate-950/85 backdrop-blur-md"
+      />
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-3xl rounded-3xl border border-amber-500/30 bg-slate-900 p-5 sm:p-8 shadow-2xl my-6 flex flex-col max-h-[90vh] overflow-hidden"
+        onClick={e => e.stopPropagation()}
+        className="relative z-10 w-full max-w-3xl rounded-3xl border border-amber-500/30 bg-slate-900 p-5 sm:p-8 shadow-2xl my-6 flex flex-col max-h-[90vh] overflow-hidden"
       >
         {/* Glow */}
         <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-amber-600/10 blur-[80px] pointer-events-none" />
@@ -1623,16 +1659,17 @@ function ClassResourceModal({ dayItem, courseTitle, onClose, onLaunchPractice })
             <h4 className="mt-2 text-xl sm:text-2xl font-black text-white">
               {dayItem.title}
             </h4>
-            <p className="mt-0.5 text-xs text-slate-400">
-              Instructor: <strong className="text-slate-200">Tanvir Ahmad</strong> • Guided Lecture & Output Blueprint
+            <p className="mt-0.5 text-xs text-slate-300">
+              Instructor: <strong className="text-white">Tanvir Ahmad</strong> • Guided Lecture & Output Blueprint
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition shrink-0"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-2xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/15 hover:text-white transition shadow-sm"
+            title="Close Notes"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
@@ -1762,7 +1799,8 @@ function ClassResourceModal({ dayItem, courseTitle, onClose, onLaunchPractice })
           </button>
         </div>
       </motion.div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -1779,13 +1817,24 @@ function PlanDayEditorModal({ initialData, isEdit, onClose, onSubmit }) {
     });
   };
 
-  return (
-    <div className="fixed inset-0 z-[140] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md overflow-y-auto">
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+      {/* Clickable dark backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="fixed inset-0 bg-slate-950/85 backdrop-blur-md"
+      />
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-2xl rounded-3xl border border-white/15 bg-slate-900 p-5 sm:p-7 shadow-2xl my-6 flex flex-col max-h-[92vh] overflow-hidden"
+        onClick={e => e.stopPropagation()}
+        className="relative z-10 w-full max-w-2xl rounded-3xl border border-white/15 bg-slate-900 p-5 sm:p-7 shadow-2xl my-6 flex flex-col max-h-[92vh] overflow-hidden"
       >
         <div className="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
           <div>
@@ -1796,7 +1845,12 @@ function PlanDayEditorModal({ initialData, isEdit, onClose, onSubmit }) {
               {isEdit ? `Edit Class ${formData.day}` : `Add Class to Course Plan`}
             </h4>
           </div>
-          <button type="button" onClick={onClose} className="text-slate-400 hover:text-white">
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid h-9 w-9 place-items-center rounded-2xl border border-white/10 bg-white/5 text-slate-400 hover:bg-white/15 hover:text-white transition"
+            title="Close editor"
+          >
             <X size={18} />
           </button>
         </div>
@@ -1994,7 +2048,8 @@ function PlanDayEditorModal({ initialData, isEdit, onClose, onSubmit }) {
           </div>
         </form>
       </motion.div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -2060,13 +2115,24 @@ function PlanUploadModal({ course, onClose, onImport }) {
     setError('');
   };
 
-  return (
-    <div className="fixed inset-0 z-[140] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md overflow-y-auto">
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+      {/* Clickable dark backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="fixed inset-0 bg-slate-950/85 backdrop-blur-md"
+      />
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-2xl rounded-3xl border border-white/10 bg-slate-900 p-5 sm:p-7 shadow-2xl my-6 flex flex-col max-h-[90vh] overflow-hidden"
+        onClick={e => e.stopPropagation()}
+        className="relative z-10 w-full max-w-2xl rounded-3xl border border-white/10 bg-slate-900 p-5 sm:p-7 shadow-2xl my-6 flex flex-col max-h-[90vh] overflow-hidden"
       >
         <div className="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
           <div>
@@ -2075,7 +2141,12 @@ function PlanUploadModal({ course, onClose, onImport }) {
             </span>
             <h4 className="text-lg sm:text-xl font-black text-white">Upload Course Plan</h4>
           </div>
-          <button type="button" onClick={onClose} className="text-slate-400 hover:text-white">
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid h-9 w-9 place-items-center rounded-2xl border border-white/10 bg-white/5 text-slate-400 hover:bg-white/15 hover:text-white transition"
+            title="Close uploader"
+          >
             <X size={18} />
           </button>
         </div>
@@ -2129,7 +2200,8 @@ function PlanUploadModal({ course, onClose, onImport }) {
           </button>
         </div>
       </motion.div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -2144,13 +2216,24 @@ function PlanSimulationModal({ action, onClose, navigate }) {
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-[140] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md overflow-y-auto">
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
+      {/* Clickable dark backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="fixed inset-0 bg-slate-950/85 backdrop-blur-md"
+      />
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-md rounded-3xl border border-emerald-500/40 bg-slate-900 p-6 shadow-2xl"
+        onClick={e => e.stopPropagation()}
+        className="relative z-10 w-full max-w-md rounded-3xl border border-emerald-500/40 bg-slate-900 p-6 shadow-2xl"
       >
         <div className="flex items-center justify-between pb-3 border-b border-white/10">
           <div className="flex items-center gap-2">
@@ -2162,8 +2245,13 @@ function PlanSimulationModal({ action, onClose, navigate }) {
               <h4 className="text-base font-black text-white">Class {action.day} Action Trigger</h4>
             </div>
           </div>
-          <button type="button" onClick={onClose} className="text-slate-400 hover:text-white">
-            <X size={18} />
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid h-8 w-8 place-items-center rounded-2xl border border-white/10 bg-white/5 text-slate-400 hover:bg-white/15 hover:text-white transition"
+            title="Close preview"
+          >
+            <X size={16} />
           </button>
         </div>
 
@@ -2212,7 +2300,8 @@ function PlanSimulationModal({ action, onClose, navigate }) {
           )}
         </div>
       </motion.div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
