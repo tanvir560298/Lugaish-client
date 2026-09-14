@@ -262,9 +262,16 @@ export function TanvirCoursesManagementPanel() {
               <div>
                 {/* Card Top Pill Row */}
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-purple-300 border border-purple-400/20 bg-purple-500/10 px-2.5 py-0.5 rounded-full">
-                    {course.category}
-                  </span>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-purple-300 border border-purple-400/20 bg-purple-500/10 px-2.5 py-0.5 rounded-full">
+                      {course.category}
+                    </span>
+                    {course.duration && (
+                      <span className="text-[10px] font-black uppercase tracking-widest text-amber-300 border border-amber-400/25 bg-amber-500/10 px-2.5 py-0.5 rounded-full">
+                        ⏳ {course.duration}
+                      </span>
+                    )}
+                  </div>
 
                   <div className="flex items-center gap-2">
                     <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${status.badgeClass}`}>
@@ -530,7 +537,20 @@ function CourseFormModal({ title, initialData, onClose, onSubmit }) {
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-4">
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
+                Duration
+              </label>
+              <input
+                type="text"
+                value={formData.duration || ''}
+                onChange={e => setFormData({ ...formData, duration: e.target.value })}
+                placeholder="e.g. 3 Months"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-purple-400"
+              />
+            </div>
+
             <div>
               <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
                 Category
@@ -539,7 +559,7 @@ function CourseFormModal({ title, initialData, onClose, onSubmit }) {
                 type="text"
                 value={formData.category}
                 onChange={e => setFormData({ ...formData, category: e.target.value })}
-                placeholder="e.g. Language Immersion"
+                placeholder="e.g. Spoken English"
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-purple-400"
               />
             </div>
@@ -568,7 +588,7 @@ function CourseFormModal({ title, initialData, onClose, onSubmit }) {
                 type="text"
                 value={formData.price}
                 onChange={e => setFormData({ ...formData, price: e.target.value })}
-                placeholder="e.g. 4,500 BDT or Free"
+                placeholder="e.g. Upcoming or 3,500 BDT"
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-purple-400"
               />
             </div>
