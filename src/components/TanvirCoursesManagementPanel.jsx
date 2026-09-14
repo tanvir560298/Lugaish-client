@@ -43,6 +43,7 @@ import {
   saveCoursePlan,
   DEFAULT_COURSE_PLANS,
   IELTS_BAND_7_MONTH_THEMES,
+  IELTS_FOUNDATION_BAND_6_MONTH_THEMES,
   SPOKEN_ENGLISH_MONTH_THEMES
 } from '../data/tanvirCoursesData.js';
 import { useNavigate } from 'react-router-dom';
@@ -986,25 +987,29 @@ export function CoursePlanModal({ course, onClose, navigate }) {
   // Extract available months
   const availableMonths = useMemo(() => {
     const months = new Set();
-    const isIelts = course.id === 'tanvir-ielts-comprehensive-band-7';
+    const isIelts7 = course.id === 'tanvir-ielts-comprehensive-band-7';
+    const isIelts6 = course.id === 'tanvir-ielts-foundation-band-6';
     plan.forEach(d => {
       if (d.month) {
         months.add(d.month);
       } else {
-        const perMonth = isIelts ? 12 : 10;
-        months.add(Math.min(isIelts ? 4 : 3, Math.ceil(d.day / perMonth)));
+        const perMonth = isIelts7 ? 12 : 10;
+        const maxMonths = isIelts6 ? 6 : isIelts7 ? 4 : 3;
+        months.add(Math.min(maxMonths, Math.ceil(d.day / perMonth)));
       }
     });
     return Array.from(months).sort((a, b) => a - b);
   }, [plan, course.id]);
 
-  const monthThemes = course.id === 'tanvir-ielts-comprehensive-band-7'
+  const monthThemes = course.id === 'tanvir-ielts-foundation-band-6'
+    ? IELTS_FOUNDATION_BAND_6_MONTH_THEMES
+    : course.id === 'tanvir-ielts-comprehensive-band-7'
     ? IELTS_BAND_7_MONTH_THEMES
     : SPOKEN_ENGLISH_MONTH_THEMES;
 
   // Filtered day roadmap
   const filteredDays = useMemo(() => {
-    const isIelts = course.id === 'tanvir-ielts-comprehensive-band-7';
+    const isIelts7 = course.id === 'tanvir-ielts-comprehensive-band-7';
     return plan.filter(d => {
       // Month match
       let matchesMonth = true;
@@ -1013,7 +1018,7 @@ export function CoursePlanModal({ course, onClose, navigate }) {
         if (d.month) {
           matchesMonth = d.month === targetM;
         } else {
-          const perMonth = isIelts ? 12 : 10;
+          const perMonth = isIelts7 ? 12 : 10;
           matchesMonth = Math.ceil(d.day / perMonth) === targetM;
         }
       }
@@ -1266,10 +1271,16 @@ export function CoursePlanModal({ course, onClose, navigate }) {
               </button>
 
               {availableMonths.map(m => {
-                const isIelts = course.id === 'tanvir-ielts-comprehensive-band-7';
-                const labelRange = isIelts
-                  ? m === 1 ? '(1–12)' : m === 2 ? '(13–24)' : m === 3 ? '(25–36)' : '(37–48)'
-                  : m === 1 ? '(1–10)' : m === 2 ? '(11–20)' : '(21–30)';
+                const isIelts7 = course.id === 'tanvir-ielts-comprehensive-band-7';
+                const isIelts6 = course.id === 'tanvir-ielts-foundation-band-6';
+                let labelRange = '';
+                if (isIelts7) {
+                  labelRange = m === 1 ? '(1–12)' : m === 2 ? '(13–24)' : m === 3 ? '(25–36)' : '(37–48)';
+                } else if (isIelts6) {
+                  labelRange = `(${((m - 1) * 10) + 1}–${m * 10})`;
+                } else {
+                  labelRange = m === 1 ? '(1–10)' : m === 2 ? '(11–20)' : '(21–30)';
+                }
                 return (
                   <button
                     key={m}
@@ -1328,10 +1339,10 @@ export function CoursePlanModal({ course, onClose, navigate }) {
         <div className="relative z-10 mt-3 flex-1 overflow-y-auto pr-1.5 space-y-4">
           {filteredDays.map(item => {
             const actionConfig = PLAN_ACTION_TYPES[item.actionType] || PLAN_ACTION_TYPES.ai_speaking;
-            const isIelts = course.id === 'tanvir-ielts-comprehensive-band-7';
-            const itemMonth = item.month || (isIelts 
+            const isIelts7 = course.id === 'tanvir-ielts-comprehensive-band-7';
+            const itemMonth = item.month || (isIelts7 
               ? (item.day <= 12 ? 1 : item.day <= 24 ? 2 : item.day <= 36 ? 3 : 4)
-              : (item.day <= 10 ? 1 : item.day <= 20 ? 2 : 3)
+              : Math.ceil(item.day / 10)
             );
 
             return (

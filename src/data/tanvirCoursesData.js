@@ -1,6 +1,12 @@
 import { IELTS_BAND_7_48_CLASSES, IELTS_BAND_7_MONTH_THEMES } from './tanvirIeltsBand7Data.js';
+import { IELTS_FOUNDATION_BAND_6_60_CLASSES, IELTS_FOUNDATION_BAND_6_MONTH_THEMES } from './tanvirIeltsFoundationBand6Data.js';
 
-export { IELTS_BAND_7_48_CLASSES, IELTS_BAND_7_MONTH_THEMES };
+export { 
+  IELTS_BAND_7_48_CLASSES, 
+  IELTS_BAND_7_MONTH_THEMES,
+  IELTS_FOUNDATION_BAND_6_60_CLASSES,
+  IELTS_FOUNDATION_BAND_6_MONTH_THEMES
+};
 
 export const SPOKEN_ENGLISH_MONTH_THEMES = {
   1: 'Breaking Hesitation & Daily Scenarios',
@@ -561,38 +567,7 @@ export const SPOKEN_ENGLISH_30_CLASSES = [
 export const DEFAULT_COURSE_PLANS = {
   'tanvir-spoken-english-fluency': SPOKEN_ENGLISH_30_CLASSES,
   'tanvir-ielts-comprehensive-band-7': IELTS_BAND_7_48_CLASSES,
-  'tanvir-ielts-foundation-band-6': [
-    {
-      day: 1,
-      month: 1,
-      title: 'Sentence Structures: Simple, Compound & Complex',
-      coreStructure: 'Mastering coordinating (FANBOYS) and subordinating conjunctions to eliminate run-on sentences.',
-      liveActivity: 'Live sentence correction drills.',
-      actionItem: '15 sentence transformation drills creating error-free complex clauses.',
-      studyTopic: 'Conjunction rules and punctuation accuracy.',
-      studentOutput: '15 sentence transformation drills creating error-free complex clauses.',
-      classNotes: 'Practice comma placement with subordinating conjunctions.',
-      actionType: 'pdf_resource',
-      actionLabel: 'Open Grammar Foundation PDF',
-      actionTarget: '/lesson/1',
-      status: 'published',
-    },
-    {
-      day: 2,
-      month: 1,
-      title: 'Essential 500 Academic Word List (AWL) Part 1',
-      coreStructure: 'Top 25 AWL sublist words with correct collocations and prepositions.',
-      liveActivity: 'Vocabulary speed challenge.',
-      actionItem: 'Vocabulary retention test with sentence creation drills.',
-      studyTopic: 'Academic collocations and word formation.',
-      studentOutput: 'Vocabulary retention test with sentence creation drills.',
-      classNotes: 'Learn collocations rather than isolated words.',
-      actionType: 'quiz',
-      actionLabel: 'Start Academic Word Quiz',
-      actionTarget: '/quiz?language=english&day=2',
-      status: 'published',
-    },
-  ],
+  'tanvir-ielts-foundation-band-6': IELTS_FOUNDATION_BAND_6_60_CLASSES,
 };
 
 // Official courses offered and instructed by Tanvir Ahmad
@@ -637,26 +612,26 @@ export const DEFAULT_TANVIR_COURSES = [
   },
   {
     id: 'tanvir-ielts-foundation-band-6',
-    title: 'IELTS Foundation to Band 6: Step-by-Step Bridge',
-    subtitle: '6-Month Complete Beginner-to-Intermediate IELTS Bridge Program',
-    duration: '6 Months',
+    title: 'Complete IELTS Bridge: Foundation to Band 6',
+    subtitle: '6-Month Complete English Repair & Guided IELTS Prep for Band 6',
+    duration: '6 Months • 60 Masterclasses + 12 Full Mocks',
     instructor: 'Tanvir Ahmad',
     category: 'IELTS Foundation',
-    format: 'Foundation Modules & Live Practice',
-    status: 'upcoming',
-    totalDays: 180,
+    format: '60 Masterclasses + 12 Weekend Mocks (Outside Hours)',
+    status: 'enrolling',
+    totalDays: 60,
     seatLimit: 20,
     enrolledCount: 0,
-    schedule: '3 Days / Week • 6:30 PM - 8:00 PM (Dhaka Time)',
-    venue: 'Lugaish Interactive Studio & Evaluation Labs',
+    schedule: '3 Days / Week • 6:30 PM - 8:00 PM + Weekend Mocks',
+    venue: 'Lugaish Interactive Studio & Cambridge Simulation Labs',
     price: 'Paid Cohort (Announced Soon)',
-    description: 'A 6-month foundational stepping-stone course instructed by Tanvir Ahmad for learners starting with English gaps and wanting a clear, reliable pathway to Band 6+. Systematically strengthens grammar foundations, everyday vocabulary bank, sentence structures, and phonetics before bridging into official IELTS examination formats.',
-    tags: ['6 Months', 'Foundation to Band 6', 'Step-by-Step', 'Grammar Core', 'Vocabulary Bank'],
+    description: 'A 6-month comprehensive foundation & IELTS bridge masterclass instructed by Tanvir Ahmad targeting Band 6.0. Specially designed for foundational learners, divided into Phase 1 (Months 1–3: Core Grammar, SVO, Vocabulary & Hesitation Removal) and Phase 2 (Months 4–6: Guided Cambridge IELTS Practice, Module Strategies & 12 Full Weekend Mock Tests).',
+    tags: ['6 Months', '60 Live Classes', '12 Weekend Mocks', 'Target Band 6', 'Phase 1 & Phase 2'],
     createdAt: '2026-09-10T00:00:00.000Z',
   },
 ];
 
-const STORAGE_KEY = 'lugaish_tanvir_courses_v5';
+const STORAGE_KEY = 'lugaish_tanvir_courses_v6';
 
 export function loadTanvirCourses() {
   if (typeof window === 'undefined') return DEFAULT_TANVIR_COURSES;
@@ -669,9 +644,10 @@ export function loadTanvirCourses() {
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed) || parsed.length === 0) return DEFAULT_TANVIR_COURSES;
 
-    // Check if IELTS course metadata needs updating (e.g., totalDays !== 48 or still references 7+)
-    const ieltsCourse = parsed.find(c => c.id === 'tanvir-ielts-comprehensive-band-7');
-    if (!ieltsCourse || ieltsCourse.totalDays !== 48 || ieltsCourse.subtitle?.includes('7+')) {
+    // Check if courses metadata needs updating (e.g. Band 7 has 48 days, Band 6 has 60 days)
+    const ielts7Course = parsed.find(c => c.id === 'tanvir-ielts-comprehensive-band-7');
+    const ielts6Course = parsed.find(c => c.id === 'tanvir-ielts-foundation-band-6');
+    if (!ielts7Course || ielts7Course.totalDays !== 48 || !ielts6Course || ielts6Course.totalDays !== 60) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_TANVIR_COURSES));
       return DEFAULT_TANVIR_COURSES;
     }
@@ -694,21 +670,27 @@ export function saveTanvirCourses(courses) {
 export function loadCoursePlan(courseId) {
   if (typeof window === 'undefined') return DEFAULT_COURSE_PLANS[courseId] || [];
   try {
-    const raw = localStorage.getItem(`lugaish_plan_${courseId}_v5`);
+    const raw = localStorage.getItem(`lugaish_plan_${courseId}_v6`);
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        // Guarantee IELTS course has full 48 classes
+        // Guarantee IELTS Band 7 has full 48 classes
         if (courseId === 'tanvir-ielts-comprehensive-band-7' && parsed.length < 48) {
           const fullPlan = DEFAULT_COURSE_PLANS[courseId];
-          localStorage.setItem(`lugaish_plan_${courseId}_v5`, JSON.stringify(fullPlan));
+          localStorage.setItem(`lugaish_plan_${courseId}_v6`, JSON.stringify(fullPlan));
+          return fullPlan;
+        }
+        // Guarantee IELTS Band 6 has full 60 classes
+        if (courseId === 'tanvir-ielts-foundation-band-6' && parsed.length < 60) {
+          const fullPlan = DEFAULT_COURSE_PLANS[courseId];
+          localStorage.setItem(`lugaish_plan_${courseId}_v6`, JSON.stringify(fullPlan));
           return fullPlan;
         }
         return parsed;
       }
     }
     const initial = DEFAULT_COURSE_PLANS[courseId] || [];
-    localStorage.setItem(`lugaish_plan_${courseId}_v5`, JSON.stringify(initial));
+    localStorage.setItem(`lugaish_plan_${courseId}_v6`, JSON.stringify(initial));
     return initial;
   } catch {
     return DEFAULT_COURSE_PLANS[courseId] || [];
@@ -718,7 +700,7 @@ export function loadCoursePlan(courseId) {
 export function saveCoursePlan(courseId, plan) {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem(`lugaish_plan_${courseId}_v5`, JSON.stringify(plan));
+    localStorage.setItem(`lugaish_plan_${courseId}_v6`, JSON.stringify(plan));
   } catch (err) {
     console.error('Failed to save course plan to localStorage', err);
   }
