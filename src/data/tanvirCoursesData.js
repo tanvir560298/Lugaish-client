@@ -11,7 +11,7 @@ export const DEFAULT_TANVIR_COURSES = [
     status: 'enrolling', // 'active' | 'enrolling' | 'upcoming' | 'draft'
     totalDays: 90,
     seatLimit: 15,
-    enrolledCount: 6,
+    enrolledCount: 0,
     schedule: '3 Days / Week • 8:00 PM - 9:30 PM (Dhaka Time)',
     venue: 'Lugaish Digital Portal / Live Studio',
     price: 'Paid Cohort (Announced Soon)',
@@ -30,7 +30,7 @@ export const DEFAULT_TANVIR_COURSES = [
     status: 'enrolling',
     totalDays: 120,
     seatLimit: 12,
-    enrolledCount: 4,
+    enrolledCount: 0,
     schedule: '3 Days / Week • 7:30 PM - 9:30 PM (Dhaka Time)',
     venue: 'Lugaish Interactive Studio & Evaluation Labs',
     price: 'Paid Cohort (Announced Soon)',
@@ -49,7 +49,7 @@ export const DEFAULT_TANVIR_COURSES = [
     status: 'upcoming',
     totalDays: 180,
     seatLimit: 20,
-    enrolledCount: 3,
+    enrolledCount: 0,
     schedule: '3 Days / Week • 6:30 PM - 8:00 PM (Dhaka Time)',
     venue: 'Lugaish Interactive Studio & Evaluation Labs',
     price: 'Paid Cohort (Announced Soon)',
@@ -59,7 +59,7 @@ export const DEFAULT_TANVIR_COURSES = [
   },
 ];
 
-const STORAGE_KEY = 'lugaish_tanvir_courses_v2';
+const STORAGE_KEY = 'lugaish_tanvir_courses_v3';
 
 export function loadTanvirCourses() {
   if (typeof window === 'undefined') return DEFAULT_TANVIR_COURSES;
