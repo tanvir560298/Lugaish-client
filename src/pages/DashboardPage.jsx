@@ -3,7 +3,6 @@ import { Link, Navigate } from 'react-router-dom';
 import { Award, BookOpenCheck, CheckCircle2, ChevronDown, ClipboardList, FilePenLine, GraduationCap, Lock, Mail, RefreshCw, Send, ShieldCheck, Sparkles, Trash2, TrendingUp, UsersRound } from 'lucide-react';
 import { api } from '../api/client.js';
 import { useAppContext } from '../state/AppContext.jsx';
-import { InPersonBatchCard } from '../components/InPersonBatchCard.jsx';
 import { TanvirCoursesManagementPanel } from '../components/TanvirCoursesManagementPanel.jsx';
 import { ROLE_LABELS, ROLE_VALUES, ROLES, getViewedRole, hasPermission, isStudentPreview, normalizeRole } from '../utils/roles.js';
 import { getEffectiveCourseStartKey, hasCourseStarted } from '../utils/courseLaunch.js';
@@ -303,185 +302,6 @@ function SeatCapacityPanel({ users, seatLimits }) {
           ))
         ) : (
           <div className="px-4 py-5 text-sm font-semibold text-slate-400">No pending applications yet.</div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function InPersonBatchManagementPanel({ isWebDeveloper }) {
-  const [applications, setApplications] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [updatingId, setUpdatingId] = useState('');
-  const [filter, setFilter] = useState('all');
-
-  const loadApplications = async () => {
-    try {
-      setLoading(true);
-      const res = await api.listInPersonBatchApplications();
-      setApplications(res.applications || []);
-    } catch (err) {
-      console.warn('Failed to load in-person applications', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (isWebDeveloper) loadApplications();
-  }, [isWebDeveloper]);
-
-  const handleUpdate = async (id, status, paymentStatus) => {
-    try {
-      setUpdatingId(id);
-      await api.updateInPersonBatchApplication(id, { status, paymentStatus });
-      setApplications(prev => prev.map(app => (app._id === id ? { ...app, status, paymentStatus } : app)));
-    } catch (err) {
-      alert(err.message || 'Failed to update application');
-    } finally {
-      setUpdatingId('');
-    }
-  };
-
-  if (!isWebDeveloper) return null;
-
-  const filtered = filter === 'all' ? applications : applications.filter(a => a.status === filter);
-  const pendingCount = applications.filter(a => a.status === 'pending').length;
-  const enrolledCount = applications.filter(a => a.status === 'enrolled').length;
-  const paidCount = applications.filter(a => a.paymentStatus === 'paid').length;
-
-  return (
-    <div id="in-person-batch-management" className="section-card p-6 sm:p-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-black uppercase tracking-[0.24em] text-purple-400">Private Paid Batch</span>
-            <span className="rounded-full border border-purple-400/30 bg-purple-500/10 px-2.5 py-0.5 text-[10px] font-black text-purple-300 uppercase">
-              Physical Cohort
-            </span>
-          </div>
-          <h3 className="mt-2 text-xl font-black text-white">In-Person Batch Applications</h3>
-          <p className="mt-2 text-sm leading-6 text-slate-400">
-            Review prospective learners who filled out the private batch interest form, assign seats, and track payment.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={loadApplications}
-          disabled={loading}
-          className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-white/10 transition"
-        >
-          <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-          Refresh List
-        </button>
-      </div>
-
-      {/* Metrics Counter */}
-      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-          <p className="text-[10px] font-black uppercase tracking-wider text-slate-500">Total Inquiries</p>
-          <p className="mt-1 text-2xl font-black text-white">{applications.length}</p>
-        </div>
-        <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4">
-          <p className="text-[10px] font-black uppercase tracking-wider text-amber-300">Pending Review</p>
-          <p className="mt-1 text-2xl font-black text-amber-200">{pendingCount}</p>
-        </div>
-        <div className="rounded-2xl border border-blue-400/20 bg-blue-500/10 p-4">
-          <p className="text-[10px] font-black uppercase tracking-wider text-blue-300">Enrolled Students</p>
-          <p className="mt-1 text-2xl font-black text-blue-200">{enrolledCount}/12</p>
-        </div>
-        <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-4">
-          <p className="text-[10px] font-black uppercase tracking-wider text-emerald-300">Paid Fees</p>
-          <p className="mt-1 text-2xl font-black text-emerald-200">{paidCount} Paid</p>
-        </div>
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="mt-6 flex flex-wrap gap-2">
-        {['all', 'pending', 'contacted', 'approved', 'enrolled', 'declined'].map(f => (
-          <button
-            key={f}
-            type="button"
-            onClick={() => setFilter(f)}
-            className={`rounded-xl px-3 py-1.5 text-xs font-bold uppercase tracking-wider transition ${
-              filter === f ? 'bg-purple-600 text-white shadow-md' : 'bg-white/5 text-slate-400 hover:bg-white/10'
-            }`}
-          >
-            {f}
-          </button>
-        ))}
-      </div>
-
-      {/* Applications List */}
-      <div className="mt-5 space-y-3">
-        {loading ? (
-          <div className="py-8 text-center text-sm text-slate-400">Loading applications...</div>
-        ) : filtered.length ? (
-          filtered.map(app => (
-            <div key={app._id} className="rounded-2xl border border-white/10 bg-slate-950/40 p-4 sm:p-5">
-              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-base font-bold text-white">{app.fullName}</h4>
-                    <span className="text-xs text-slate-500">•</span>
-                    <span className="text-xs font-semibold text-purple-300 capitalize">{app.preferredTrack} Track</span>
-                    <span className="text-xs text-slate-500">•</span>
-                    <span className="text-xs font-semibold text-slate-400 capitalize">{app.city} {app.area ? `(${app.area})` : ''}</span>
-                  </div>
-                  <div className="mt-1.5 flex flex-wrap items-center gap-3 text-xs text-slate-400">
-                    <span className="text-white font-mono font-bold">{app.phone}</span>
-                    <span>{app.email}</span>
-                    <span>Schedule: <strong className="text-slate-300">{app.preferredSchedule?.replace('_', ' ')}</strong></span>
-                  </div>
-                  {app.learningGoal && (
-                    <p className="mt-2 text-xs leading-relaxed text-slate-300 italic bg-white/5 p-2.5 rounded-xl border border-white/5">
-                      "{app.learningGoal}"
-                    </p>
-                  )}
-                </div>
-
-                {/* Status Controls */}
-                <div className="flex flex-wrap items-center gap-2">
-                  <select
-                    value={app.status || 'pending'}
-                    disabled={updatingId === app._id}
-                    onChange={(e) => handleUpdate(app._id, e.target.value, app.paymentStatus || 'unpaid')}
-                    className="rounded-xl border border-white/10 bg-slate-800 px-3 py-2 text-xs font-bold text-white focus:outline-none"
-                  >
-                    <option value="pending">Status: Pending</option>
-                    <option value="contacted">Status: Contacted</option>
-                    <option value="approved">Status: Approved</option>
-                    <option value="enrolled">Status: Enrolled</option>
-                    <option value="declined">Status: Declined</option>
-                  </select>
-
-                  <select
-                    value={app.paymentStatus || 'unpaid'}
-                    disabled={updatingId === app._id}
-                    onChange={(e) => handleUpdate(app._id, app.status || 'pending', e.target.value)}
-                    className="rounded-xl border border-white/10 bg-slate-800 px-3 py-2 text-xs font-bold text-white focus:outline-none"
-                  >
-                    <option value="unpaid">Payment: Unpaid</option>
-                    <option value="partial">Payment: Partial</option>
-                    <option value="paid">Payment: Paid (Full)</option>
-                  </select>
-
-                  <a
-                    href={`https://wa.me/${String(app.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hello ${app.fullName}, regarding your application for the Lugaish Private In-Person Batch...`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs font-bold text-emerald-300 hover:bg-emerald-500/20 transition"
-                  >
-                    WhatsApp
-                  </a>
-                </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="py-8 text-center text-sm text-slate-500">
-            No in-person batch applications found matching the current filter.
-          </div>
         )}
       </div>
     </div>
@@ -1135,8 +955,6 @@ export function DashboardPage() {
 
           {isWebDeveloper && <TanvirCoursesManagementPanel />}
 
-          {isWebDeveloper && <InPersonBatchManagementPanel isWebDeveloper={isWebDeveloper} />}
-
           <RoleManagementPanel canManageRoles={canManageRoles} canViewRoles={canViewRoles} />
 
           {canManageEmail && <EmailManagementPanel defaultTestEmail={state.userEmail} />}
@@ -1231,9 +1049,6 @@ export function DashboardPage() {
               ))}
             </div>
           </div>
-
-          {/* --- PRIVATE IN-PERSON BATCH (DEVELOPER ONLY PREVIEW) --- */}
-          {isWebDeveloper && <InPersonBatchCard />}
 
           {/* --- COURSE MILESTONE CERTIFICATES SHOWCASE --- */}
           <div className="section-card p-6 sm:p-8">

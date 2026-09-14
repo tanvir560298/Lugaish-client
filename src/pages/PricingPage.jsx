@@ -10,9 +10,6 @@ import {
   ArrowRight,
   TrendingDown
 } from 'lucide-react';
-import { InPersonBatchCard } from '../components/InPersonBatchCard.jsx';
-import { useAppContext } from '../state/AppContext.jsx';
-import { ROLES, isStudentPreview } from '../utils/roles.js';
 
 // --- THE ESCAPING MASCOT ---
 const EscapingMascot = () => {
@@ -61,9 +58,6 @@ const EscapingMascot = () => {
 };
 
 export function PricingPage() {
-  const { state } = useAppContext();
-  const isWebDeveloper = (!isStudentPreview(state) && state.userRole === ROLES.webDeveloper) || state.userEmail?.toLowerCase() === 'tahmadium@gmail.com';
-
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-950 pb-16 text-slate-50 sm:pb-24 lg:pb-32">
       
@@ -214,26 +208,8 @@ export function PricingPage() {
               </p>
             </div>
           </motion.div>
+
         </div>
-
-        {/* PRIVATE IN-PERSON BATCH SECTION (DEVELOPER ONLY PREVIEW) */}
-        {isWebDeveloper && (
-          <div className="mx-auto mt-16 sm:mt-24 max-w-5xl">
-            <div className="text-center mb-8">
-              <span className="inline-flex items-center gap-2 rounded-full border border-purple-500/30 bg-purple-500/10 px-3 py-1 text-[11px] font-black uppercase tracking-widest text-purple-300">
-                Exclusive In-Person Immersion (Developer Preview)
-              </span>
-              <h2 className="mt-3 text-3xl sm:text-5xl font-black text-white tracking-tight">
-                Looking for <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300">Face-to-Face Coaching</span>?
-              </h2>
-              <p className="mt-3 text-sm sm:text-base text-slate-400 max-w-xl mx-auto">
-                Our private in-person cohort at the Islamic University of Madinah offers intensive, physical classroom practice with strictly 12 seats. Fill out the form to unlock full schedule, venue, and fee details.
-              </p>
-            </div>
-
-            <InPersonBatchCard />
-          </div>
-        )}
 
         {/* URGENCY SECTION */}
         <motion.div 

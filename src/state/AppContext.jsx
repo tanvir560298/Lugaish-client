@@ -34,7 +34,6 @@ const defaultState = {
     courseDuration: '',
     referralSource: '',
   },
-  inPersonBatch: null,
   isLoggedIn: false,
   theme: 'dark',
 };
@@ -85,21 +84,14 @@ function normalizeFreshProgress(state) {
 
 function loadState() {
   const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-  const isUnlockedLocal = localStorage.getItem('lugaish_in_person_unlocked') === 'true';
-  const fallbackInPerson = isUnlockedLocal ? { hasApplied: true, status: 'pending', paymentStatus: 'unpaid' } : null;
-
-  if (!raw) return { ...defaultState, inPersonBatch: fallbackInPerson, activityData: generateActivityData() };
+  if (!raw) return { ...defaultState, activityData: generateActivityData() };
 
   try {
     const parsed = JSON.parse(raw);
-    const loaded = normalizeFreshProgress({ ...defaultState, ...parsed });
-    if (!loaded.inPersonBatch && isUnlockedLocal) {
-      loaded.inPersonBatch = fallbackInPerson;
-    }
-    return loaded;
+    return normalizeFreshProgress({ ...defaultState, ...parsed });
   } catch (error) {
     localStorage.removeItem(LOCAL_STORAGE_KEY);
-    return { ...defaultState, inPersonBatch: fallbackInPerson, activityData: generateActivityData() };
+    return { ...defaultState, activityData: generateActivityData() };
   }
 }
 
@@ -207,7 +199,6 @@ export function AppProvider({ children }) {
               ...previous.learnerProfile,
               ...(user?.learnerProfile ?? {}),
             },
-            inPersonBatch: user?.inPersonBatch ?? previous.inPersonBatch ?? null,
           }));
         }
       } catch (error) {
@@ -429,7 +420,6 @@ export function AppProvider({ children }) {
           ...prev.learnerProfile,
           ...(learnerProfile ?? {}),
         },
-        inPersonBatch: response.user?.inPersonBatch ?? prev.inPersonBatch ?? null,
         isLoggedIn: true,
       }));
 
@@ -493,7 +483,6 @@ export function AppProvider({ children }) {
           ...prev.learnerProfile,
           ...(response.user?.learnerProfile ?? learnerProfile ?? {}),
         },
-        inPersonBatch: response.user?.inPersonBatch ?? prev.inPersonBatch ?? null,
         isLoggedIn: true,
       }));
 
@@ -558,38 +547,6 @@ export function AppProvider({ children }) {
 
         return { ...prev, xp, badges, activityData };
       });
-    },
-    async applyInPersonBatch(formData) {
-      const response = await api.applyInPersonBatch(formData);
-      setState(prev => ({
-        ...prev,
-        inPersonBatch: response.application || {
-          hasApplied: true,
-          status: 'pending',
-          paymentStatus: 'unpaid',
-          ...formData,
-        },
-      }));
-      try {
-        localStorage.setItem('lugaish_in_person_unlocked', 'true');
-        if (formData.email) {
-          localStorage.setItem('lugaish_in_person_email', formData.email);
-        }
-      } catch {}
-      return response;
-    },
-    setInPersonBatchUnlocked(unlocked = true, data = null) {
-      if (unlocked) {
-        setState(prev => ({
-          ...prev,
-          inPersonBatch: {
-            hasApplied: true,
-            status: data?.status || 'pending',
-            paymentStatus: data?.paymentStatus || 'unpaid',
-            ...(data || {}),
-          },
-        }));
-      }
     },
   }), [state.activePathway, state.isLoggedIn]);
 

@@ -159,25 +159,6 @@ export const api = {
       body: JSON.stringify(payload),
     });
   },
-  applyInPersonBatch(payload) {
-    return request('/auth/in-person-batch/apply', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
-  },
-  getInPersonBatchStatus(email = '') {
-    const query = email ? `?email=${encodeURIComponent(email)}` : '';
-    return request(`/auth/in-person-batch/status${query}`);
-  },
-  listInPersonBatchApplications() {
-    return request('/auth/in-person-batch/applications');
-  },
-  updateInPersonBatchApplication(id, payload) {
-    return request(`/auth/in-person-batch/applications/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(payload),
-    });
-  },
   listUsers() {
     return request('/auth/users');
   },

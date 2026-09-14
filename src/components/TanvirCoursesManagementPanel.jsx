@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, 
@@ -151,26 +150,26 @@ export function TanvirCoursesManagementPanel() {
   };
 
   return (
-    <div id="tanvir-courses-hub" className="section-card relative overflow-hidden p-6 sm:p-8 md:p-10 border border-purple-500/30 bg-gradient-to-b from-slate-900/90 via-slate-900/80 to-slate-950/90 shadow-2xl backdrop-blur-xl">
+    <div id="tanvir-courses-hub" className="section-card relative overflow-hidden p-6 sm:p-8 md:p-10 border border-purple-500/20 bg-slate-900/60 shadow-2xl backdrop-blur-xl">
       {/* Decorative ambient gradients */}
-      <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-purple-600/15 blur-[90px] pointer-events-none" />
+      <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-purple-600/10 blur-[90px] pointer-events-none" />
       <div className="absolute -left-24 -bottom-24 h-72 w-72 rounded-full bg-blue-600/10 blur-[90px] pointer-events-none" />
 
       {/* Header Banner */}
       <div className="relative z-10 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between pb-6 border-b border-white/10">
         <div>
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-purple-400/40 bg-purple-500/15 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-purple-300 shadow-sm">
+          <div className="flex items-center gap-2.5">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-purple-400/40 bg-purple-500/15 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-purple-300">
               <ShieldCheck size={13} /> Developer View Only
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-400/30 bg-blue-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue-300 shadow-sm">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-400/30 bg-blue-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue-300">
               Instructor: Tanvir Ahmad
             </span>
           </div>
           <h2 className="mt-3 text-2xl sm:text-3xl font-black tracking-tight text-white">
             Courses Offered by Tanvir Ahmad
           </h2>
-          <p className="mt-1.5 text-sm text-slate-300 max-w-2xl leading-relaxed">
+          <p className="mt-1 text-sm text-slate-400 max-w-2xl">
             View, launch, and manage all courses conducted and offered by Tanvir Ahmad. Work with cohorts, tune curriculum days, inspect student capacity, and launch new offerings.
           </p>
         </div>
@@ -203,53 +202,53 @@ export function TanvirCoursesManagementPanel() {
 
       {/* Metrics Row */}
       <div className="relative z-10 mt-6 grid gap-4 grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4 shadow-sm backdrop-blur-md">
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Courses</p>
           <div className="mt-1 flex items-baseline gap-2">
             <span className="text-2xl sm:text-3xl font-black text-white">{stats.total}</span>
-            <span className="text-xs font-bold text-purple-300">Curated</span>
+            <span className="text-xs font-semibold text-purple-300">Curated</span>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4 shadow-sm backdrop-blur-md">
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Active Cohorts</p>
           <div className="mt-1 flex items-baseline gap-2">
             <span className="text-2xl sm:text-3xl font-black text-emerald-400">{stats.activeOrEnrolling}</span>
-            <span className="text-xs font-bold text-emerald-300/90">Open / Live</span>
+            <span className="text-xs font-semibold text-emerald-300/80">Open / Live</span>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4 shadow-sm backdrop-blur-md">
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Enrolled Learners</p>
           <div className="mt-1 flex items-baseline gap-2">
             <span className="text-2xl sm:text-3xl font-black text-blue-300">{stats.totalEnrolled}</span>
-            <span className="text-xs font-semibold text-slate-400">/ {stats.totalSeats} seats</span>
+            <span className="text-xs text-slate-400">/ {stats.totalSeats} seats</span>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-slate-900/60 p-4 shadow-sm backdrop-blur-md">
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
           <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Cohort Occupancy</p>
           <div className="mt-1 flex items-baseline gap-2">
             <span className="text-2xl sm:text-3xl font-black text-amber-300">
               {stats.totalSeats > 0 ? Math.round((stats.totalEnrolled / stats.totalSeats) * 100) : 0}%
             </span>
-            <span className="text-xs font-bold text-slate-400">Filled</span>
+            <span className="text-xs font-semibold text-slate-400">Filled</span>
           </div>
         </div>
       </div>
 
       {/* Filter and Search Controls */}
       <div className="relative z-10 mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-white/10 bg-slate-950/60 p-1.5">
+        <div className="flex flex-wrap items-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.03] p-1">
           {['all', 'active', 'enrolling', 'upcoming', 'draft'].map(statusKey => (
             <button
               key={statusKey}
               type="button"
               onClick={() => setStatusFilter(statusKey)}
-              className={`rounded-xl px-3.5 py-1.5 text-[11px] font-black uppercase tracking-wider transition ${
+              className={`rounded-lg px-3 py-1.5 text-[11px] font-black uppercase tracking-wider transition ${
                 statusFilter === statusKey
-                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
-                  : 'text-slate-300 hover:text-white hover:bg-white/5'
+                  ? 'bg-purple-600 text-white shadow'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               {statusKey === 'all' ? 'All Courses' : statusKey}
@@ -264,7 +263,7 @@ export function TanvirCoursesManagementPanel() {
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             placeholder="Search offered courses..."
-            className="w-full rounded-xl border border-white/10 bg-slate-950/60 py-2 pl-9 pr-3 text-xs text-white placeholder-slate-400 outline-none transition focus:border-purple-400/60"
+            className="w-full rounded-xl border border-white/10 bg-white/5 py-2 pl-9 pr-3 text-xs text-white placeholder-slate-500 outline-none transition focus:border-purple-400/50"
           />
         </div>
       </div>
@@ -443,7 +442,7 @@ export function TanvirCoursesManagementPanel() {
 
       {/* --- MODAL 1: CREATE NEW COURSE --- */}
       <AnimatePresence>
-        {createModalOpen && createPortal(
+        {createModalOpen && (
           <CourseFormModal
             title="Create Course Offered by Tanvir Ahmad"
             initialData={{
@@ -463,14 +462,13 @@ export function TanvirCoursesManagementPanel() {
             }}
             onClose={() => setCreateModalOpen(false)}
             onSubmit={handleCreateCourse}
-          />,
-          document.body
+          />
         )}
       </AnimatePresence>
 
       {/* --- MODAL 2: EDIT COURSE DETAILS --- */}
       <AnimatePresence>
-        {editingCourse && createPortal(
+        {editingCourse && (
           <CourseFormModal
             title={`Edit Course: ${editingCourse.title}`}
             initialData={{
@@ -479,33 +477,30 @@ export function TanvirCoursesManagementPanel() {
             }}
             onClose={() => setEditingCourse(null)}
             onSubmit={(updates) => handleUpdateCourse(editingCourse.id, updates)}
-          />,
-          document.body
+          />
         )}
       </AnimatePresence>
 
       {/* --- MODAL 3: WORK ON COURSE / WORKSPACE HUB --- */}
       <AnimatePresence>
-        {workingCourse && createPortal(
+        {workingCourse && (
           <CourseWorkspaceModal
             course={workingCourse}
             onClose={() => setWorkingCourse(null)}
             onUpdateCourse={(updates) => handleUpdateCourse(workingCourse.id, updates)}
             navigate={navigate}
-          />,
-          document.body
+          />
         )}
       </AnimatePresence>
 
       {/* --- MODAL 4: OPEN PLAN (CURRICULUM & OUTPUT MANAGER) --- */}
       <AnimatePresence>
-        {planningCourse && createPortal(
+        {planningCourse && (
           <CoursePlanModal
             course={planningCourse}
             onClose={() => setPlanningCourse(null)}
             navigate={navigate}
-          />,
-          document.body
+          />
         )}
       </AnimatePresence>
     </div>
@@ -529,22 +524,12 @@ function CourseFormModal({ title, initialData, onClose, onSubmit }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overflow-y-auto">
-      {/* Clickable dark backdrop */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="fixed inset-0 bg-slate-950/80 backdrop-blur-md"
-      />
-
+    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        onClick={e => e.stopPropagation()}
-        className="relative z-10 w-full max-w-2xl rounded-3xl border border-white/10 bg-slate-900 p-6 sm:p-8 shadow-2xl my-8"
+        className="relative w-full max-w-2xl rounded-3xl border border-white/10 bg-slate-900 p-6 sm:p-8 shadow-2xl my-8"
       >
         <div className="flex items-center justify-between pb-4 border-b border-white/10">
           <div>
@@ -556,8 +541,7 @@ function CourseFormModal({ title, initialData, onClose, onSubmit }) {
           <button
             type="button"
             onClick={onClose}
-            className="grid h-9 w-9 place-items-center rounded-2xl border border-white/10 bg-white/5 text-slate-400 hover:bg-white/15 hover:text-white transition"
-            title="Close modal"
+            className="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition"
           >
             <X size={18} />
           </button>
@@ -783,22 +767,12 @@ function CourseWorkspaceModal({ course, onClose, onUpdateCourse, navigate }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 overflow-y-auto">
-      {/* Clickable dark backdrop */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="fixed inset-0 bg-slate-950/80 backdrop-blur-md"
-      />
-
+    <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/85 backdrop-blur-lg overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-        onClick={e => e.stopPropagation()}
-        className="relative z-10 w-full max-w-3xl rounded-3xl border border-purple-500/30 bg-slate-900 p-6 sm:p-8 shadow-2xl my-8"
+        className="relative w-full max-w-3xl rounded-3xl border border-purple-500/30 bg-slate-900 p-6 sm:p-8 shadow-2xl my-8"
       >
         <div className="flex items-start justify-between pb-4 border-b border-white/10">
           <div>
@@ -818,8 +792,7 @@ function CourseWorkspaceModal({ course, onClose, onUpdateCourse, navigate }) {
           <button
             type="button"
             onClick={onClose}
-            className="grid h-9 w-9 place-items-center rounded-2xl border border-white/10 bg-white/5 text-slate-400 hover:bg-white/15 hover:text-white transition"
-            title="Close workspace"
+            className="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition"
           >
             <X size={18} />
           </button>
@@ -1100,138 +1073,125 @@ export function CoursePlanModal({ course, onClose, navigate }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-5 md:p-7 overflow-hidden">
-      {/* Clickable dark backdrop covering the entire screen */}
+    <div className="fixed inset-0 z-[130] flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-xl overflow-y-auto">
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="fixed inset-0 bg-slate-950/85 backdrop-blur-md"
-      />
-
-      {/* Modal Dialog Window */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.96, y: 15 }}
+        initial={{ opacity: 0, scale: 0.96, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96, y: 15 }}
-        onClick={e => e.stopPropagation()}
-        className="relative z-10 w-full max-w-6xl rounded-3xl border border-emerald-500/30 bg-slate-950 p-4 sm:p-6 md:p-7 shadow-[0_25px_80px_rgba(0,0,0,0.95)] flex flex-col h-[92vh] max-h-[92vh] overflow-hidden"
+        exit={{ opacity: 0, scale: 0.96, y: 20 }}
+        className="relative w-full max-w-6xl rounded-3xl border border-emerald-500/30 bg-slate-950 p-4 sm:p-6 md:p-8 shadow-2xl my-4 sm:my-6 flex flex-col max-h-[94vh] overflow-hidden"
       >
         {/* Decorative glows */}
         <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-emerald-600/15 blur-[90px] pointer-events-none" />
         <div className="absolute -left-24 -bottom-24 h-72 w-72 rounded-full bg-teal-600/10 blur-[90px] pointer-events-none" />
 
         {/* Header Strip */}
-        <div className="relative z-10 flex flex-col gap-3.5 pb-4 border-b border-white/10 shrink-0">
-          {/* Row 1: Badges, Title & Dedicated Close Button */}
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
+        <div className="relative z-10 flex flex-col gap-4 pb-5 border-b border-white/10 shrink-0">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-300 shadow-sm">
-                  <Compass size={13} /> Course Curriculum Hub
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-300">
+                  <Compass size={13} /> Course Plan & Curriculum Hub
                 </span>
                 {course.duration && (
-                  <span className="rounded-full border border-amber-400/30 bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-black text-amber-300 uppercase shadow-sm">
+                  <span className="rounded-full border border-amber-400/30 bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-black text-amber-300 uppercase">
                     ⏳ {course.duration}
                   </span>
                 )}
-                <span className="rounded-full border border-purple-400/30 bg-purple-500/10 px-2.5 py-0.5 text-[10px] font-black text-purple-300 uppercase shadow-sm">
+                <span className="rounded-full border border-purple-400/30 bg-purple-500/10 px-2.5 py-0.5 text-[10px] font-black text-purple-300 uppercase">
                   👨‍🏫 Instructor: {course.instructor || 'Tanvir Ahmad'}
                 </span>
               </div>
-              <h3 className="mt-2 text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight">
+              <h3 className="mt-2 text-xl sm:text-2xl md:text-3xl font-black text-white">
                 {course.title}
               </h3>
-              <p className="mt-1 text-xs sm:text-sm text-slate-300 font-medium">
+              <p className="mt-1 text-xs sm:text-sm text-slate-400">
                 Full 30-Day Live Syllabus • 60–70% Student Talking Time (STT) • Daily Speaking Drills & Action Outputs
               </p>
             </div>
 
-            {/* Pinned top-right close button */}
-            <button
-              type="button"
-              onClick={onClose}
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-white/15 bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white transition shadow-md active:scale-95"
-              title="Close Curriculum Hub"
-            >
-              <X size={18} />
-            </button>
-          </div>
-
-          {/* Row 2: Mode Switcher & Editor Action Controls */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-            {/* Dual Mode Switcher: Student View (Viewer) vs Instructor View (Editor) */}
-            <div className="flex items-center rounded-2xl border border-white/15 bg-slate-900/80 p-1 shadow-inner">
-              <button
-                type="button"
-                onClick={() => setPlanMode('viewer')}
-                className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-black uppercase tracking-wider transition ${
-                  planMode === 'viewer'
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-                title="Switch to Student Viewer Mode"
-              >
-                <Eye size={13} /> Student View
-              </button>
-              <button
-                type="button"
-                onClick={() => setPlanMode('editor')}
-                className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-black uppercase tracking-wider transition ${
-                  planMode === 'editor'
-                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-                title="Switch to Instructor Editor Mode"
-              >
-                <Edit3 size={13} /> Editor Mode
-              </button>
-            </div>
-
-            {/* In Editor Mode: Add Day, Upload, Export */}
-            {planMode === 'editor' && (
-              <div className="flex flex-wrap items-center gap-2">
+            {/* Top Action Controls & Close */}
+            <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+              {/* Dual Mode Switcher: Student View (Viewer) vs Instructor View (Editor) */}
+              <div className="flex items-center rounded-2xl border border-white/15 bg-white/5 p-1 shadow-inner">
                 <button
                   type="button"
-                  onClick={() => setIsAddingDay(true)}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-3.5 py-2 text-xs font-black uppercase tracking-wider text-white shadow-md transition active:scale-95"
+                  onClick={() => setPlanMode('viewer')}
+                  className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-black uppercase tracking-wider transition ${
+                    planMode === 'viewer'
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Switch to Student Viewer Mode"
                 >
-                  <Plus size={14} /> Add Day
+                  <Eye size={14} /> Student View
                 </button>
                 <button
                   type="button"
-                  onClick={() => setIsUploadOpen(true)}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 px-3 py-2 text-xs font-bold text-slate-200 transition"
-                  title="Upload / Paste Syllabus Plan"
+                  onClick={() => setPlanMode('editor')}
+                  className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-black uppercase tracking-wider transition ${
+                    planMode === 'editor'
+                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Switch to Instructor Editor Mode"
                 >
-                  <Upload size={13} /> Upload
-                </button>
-                <button
-                  type="button"
-                  onClick={handleExportPlan}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 px-3 py-2 text-xs font-bold text-slate-200 transition"
-                  title="Copy Plan JSON"
-                >
-                  {copied ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
-                  <span className="hidden sm:inline">Export</span>
+                  <Edit3 size={14} /> Editor Mode
                 </button>
               </div>
-            )}
+
+              {/* In Editor Mode: Add Day, Upload, Export */}
+              {planMode === 'editor' && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingDay(true)}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-3 py-2 text-xs font-black uppercase tracking-wider text-white shadow-md transition active:scale-95"
+                  >
+                    <Plus size={14} /> Add Day
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsUploadOpen(true)}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 px-3 py-2 text-xs font-bold text-slate-200 transition"
+                    title="Upload / Paste Syllabus Plan"
+                  >
+                    <Upload size={13} /> Upload
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleExportPlan}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 px-3 py-2 text-xs font-bold text-slate-200 transition"
+                    title="Copy Plan JSON"
+                  >
+                    {copied ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
+                    <span className="hidden sm:inline">Export</span>
+                  </button>
+                </>
+              )}
+
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition ml-1"
+                title="Close Modal"
+              >
+                <X size={20} />
+              </button>
+            </div>
           </div>
 
-          {/* Row 3: Mode Explanation Pill */}
-          <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.02] px-3.5 py-2">
+          {/* Mode Indicator Banner */}
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-2.5">
             <div className="flex items-center gap-2">
               <span className={`inline-block h-2 w-2 rounded-full ${planMode === 'viewer' ? 'bg-emerald-400 animate-pulse' : 'bg-purple-400 animate-pulse'}`} />
               <p className="text-xs text-slate-300 font-medium">
                 {planMode === 'viewer' ? (
                   <>
-                    <strong className="text-emerald-300">Student View Mode:</strong> View full 30-day curriculum with core speaking structures, live speaking drills, homework tasks, and class notes.
+                    <strong className="text-emerald-300">Viewer Mode (Student Syllabus Explorer)</strong>: View full 30-day curriculum with core speaking structures, live speaking drills, homework tasks, and class notes.
                   </>
                 ) : (
                   <>
-                    <strong className="text-purple-300">Editor Mode (Instructor View):</strong> Customize class days, attach lecture notes, PDF study links, audio drills, video classes, and action triggers.
+                    <strong className="text-purple-300">Editor Mode (Instructor Management)</strong>: Customize class days, attach lecture notes, PDF study links, audio drills, video classes, and action triggers.
                   </>
                 )}
               </p>
@@ -1240,7 +1200,7 @@ export function CoursePlanModal({ course, onClose, navigate }) {
             <div className="flex items-center gap-2 text-[11px] font-bold text-slate-400">
               <span>Total Classes: <strong className="text-white">{plan.length}</strong></span>
               <span>•</span>
-              <span>Filter: <strong className="text-cyan-300">{selectedMonth === 'all' ? 'All Months' : `Month ${selectedMonth}`}</strong></span>
+              <span>Month Filter: <strong className="text-cyan-300">{selectedMonth === 'all' ? 'All Months' : `Month ${selectedMonth}`}</strong></span>
             </div>
           </div>
         </div>
@@ -1252,7 +1212,7 @@ export function CoursePlanModal({ course, onClose, navigate }) {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="relative z-10 mt-2 flex items-center gap-2 rounded-xl border border-emerald-400/30 bg-emerald-500/15 p-2.5 text-xs font-bold text-emerald-200 shrink-0"
+              className="relative z-10 mt-3 flex items-center gap-2 rounded-xl border border-emerald-400/30 bg-emerald-500/15 p-2.5 text-xs font-bold text-emerald-200 shrink-0"
             >
               <CheckCircle2 size={15} className="text-emerald-400 shrink-0" />
               {planNotification}
@@ -1261,17 +1221,17 @@ export function CoursePlanModal({ course, onClose, navigate }) {
         </AnimatePresence>
 
         {/* Navigation Tabs: Months & Filter Bar */}
-        <div className="relative z-10 mt-3 flex flex-col gap-2 shrink-0 pb-2 border-b border-white/10">
-          <div className="flex flex-wrap items-center justify-between gap-2.5">
+        <div className="relative z-10 mt-3 flex flex-col gap-3 shrink-0">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             {/* Month Tabs */}
-            <div className="flex flex-wrap items-center gap-1 rounded-2xl border border-white/10 bg-slate-950/60 p-1">
+            <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-white/10 bg-white/[0.03] p-1.5">
               <button
                 type="button"
                 onClick={() => setSelectedMonth('all')}
                 className={`rounded-xl px-3.5 py-1.5 text-xs font-black uppercase tracking-wider transition ${
                   selectedMonth === 'all'
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    ? 'bg-emerald-600 text-white shadow'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
                 All Classes ({plan.length})
@@ -1284,8 +1244,8 @@ export function CoursePlanModal({ course, onClose, navigate }) {
                   onClick={() => setSelectedMonth(String(m))}
                   className={`rounded-xl px-3.5 py-1.5 text-xs font-black uppercase tracking-wider transition ${
                     selectedMonth === String(m)
-                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
-                      : 'text-slate-300 hover:text-white hover:bg-white/5'
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow'
+                      : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   Month {m} {m === 1 ? '(1–10)' : m === 2 ? '(11–20)' : '(21–30)'}
@@ -1294,24 +1254,24 @@ export function CoursePlanModal({ course, onClose, navigate }) {
             </div>
 
             {/* Search and Action Filter */}
-            <div className="flex items-center gap-2 flex-1 sm:flex-initial justify-end">
-              <div className="relative min-w-[160px] sm:min-w-[220px]">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="relative min-w-[200px] sm:min-w-[240px]">
                 <Search size={13} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  placeholder="Search class, topic..."
-                  className="w-full rounded-xl border border-white/15 bg-slate-900/80 py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-400 outline-none focus:border-emerald-400 transition"
+                  placeholder="Search class, topic, or formula..."
+                  className="w-full rounded-xl border border-white/10 bg-white/5 py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-500 outline-none focus:border-emerald-400"
                 />
               </div>
 
               <select
                 value={filterAction}
                 onChange={e => setFilterAction(e.target.value)}
-                className="rounded-xl border border-white/15 bg-slate-900 px-2.5 py-1.5 text-xs font-bold text-slate-200 outline-none focus:border-emerald-400 transition"
+                className="rounded-xl border border-white/10 bg-slate-900 px-3 py-1.5 text-xs font-bold text-white outline-none focus:border-emerald-400"
               >
-                <option value="all">All Actions</option>
+                <option value="all">All Action Types</option>
                 <option value="ai_speaking">AI Speaking</option>
                 <option value="pdf_resource">PDF Material</option>
                 <option value="quiz">Daily Quiz</option>
@@ -1323,7 +1283,7 @@ export function CoursePlanModal({ course, onClose, navigate }) {
 
           {/* Month Subtitle info if month is active */}
           {selectedMonth !== 'all' && monthThemes[Number(selectedMonth)] && (
-            <div className="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-slate-300">
+            <div className="flex items-center gap-2 px-1 text-xs text-slate-400">
               <span className="font-bold uppercase tracking-wider text-emerald-400">Month {selectedMonth} Focus:</span>
               <span className="text-slate-200 font-medium">{monthThemes[Number(selectedMonth)]}</span>
             </div>
@@ -1331,7 +1291,7 @@ export function CoursePlanModal({ course, onClose, navigate }) {
         </div>
 
         {/* Scrollable Curriculum Class Cards */}
-        <div className="relative z-10 mt-3 flex-1 min-h-0 overflow-y-auto pr-2 space-y-4">
+        <div className="relative z-10 mt-3 flex-1 overflow-y-auto pr-1.5 space-y-4">
           {filteredDays.map(item => {
             const actionConfig = PLAN_ACTION_TYPES[item.actionType] || PLAN_ACTION_TYPES.ai_speaking;
             const itemMonth = item.month || (item.day <= 10 ? 1 : item.day <= 20 ? 2 : 3);
@@ -1339,7 +1299,7 @@ export function CoursePlanModal({ course, onClose, navigate }) {
             return (
               <div
                 key={item.day}
-                className="rounded-3xl border border-white/10 bg-gradient-to-b from-slate-900/90 to-slate-950/95 p-4 sm:p-5 md:p-6 transition hover:border-emerald-500/40 hover:shadow-xl hover:shadow-emerald-950/20"
+                className="rounded-2xl border border-white/10 bg-gradient-to-b from-slate-900/90 to-slate-950/95 p-4 sm:p-5 md:p-6 transition hover:border-emerald-500/40 hover:shadow-xl hover:shadow-emerald-950/20"
               >
                 {/* Card Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-white/10">
@@ -1381,41 +1341,41 @@ export function CoursePlanModal({ course, onClose, navigate }) {
                 </div>
 
                 {/* 3 Core Curriculum Blocks (High-Impact Structured Content) */}
-                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <div className="mt-4 grid gap-3 lg:grid-cols-3">
                   {/* 1. Core Structure (মূল বাক্য ও গ্রামার টেকনিক) */}
-                  <div className="rounded-2xl border border-amber-500/25 bg-amber-500/[0.04] p-4 text-xs flex flex-col justify-between">
+                  <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.04] p-3.5 text-xs flex flex-col justify-between">
                     <div>
-                      <div className="flex items-center gap-1.5 font-bold text-amber-300 text-[11px] uppercase tracking-wider mb-2">
-                        <Lightbulb size={14} className="text-amber-400 shrink-0" />
+                      <div className="flex items-center gap-1.5 font-bold text-amber-300 text-[11px] uppercase tracking-wider mb-1.5">
+                        <Lightbulb size={13} className="text-amber-400 shrink-0" />
                         <span>Core Structure (মূল বাক্য ও টেকনিক)</span>
                       </div>
-                      <p className="text-white text-xs sm:text-[13px] font-medium leading-relaxed">
+                      <p className="text-amber-100 font-medium leading-relaxed">
                         {item.coreStructure || item.studyTopic || 'Grammar blueprints and sentence formulas.'}
                       </p>
                     </div>
                   </div>
 
                   {/* 2. Live Activity (লাইভ স্পিকিং ড্রিল) */}
-                  <div className="rounded-2xl border border-emerald-500/25 bg-emerald-500/[0.04] p-4 text-xs flex flex-col justify-between">
+                  <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] p-3.5 text-xs flex flex-col justify-between">
                     <div>
-                      <div className="flex items-center gap-1.5 font-bold text-emerald-300 text-[11px] uppercase tracking-wider mb-2">
-                        <Mic size={14} className="text-emerald-400 shrink-0" />
+                      <div className="flex items-center gap-1.5 font-bold text-emerald-300 text-[11px] uppercase tracking-wider mb-1.5">
+                        <Mic size={13} className="text-emerald-400 shrink-0" />
                         <span>Live Activity (লাইভ স্পিকিং ড্রিল)</span>
                       </div>
-                      <p className="text-slate-200 text-xs sm:text-[13px] font-medium leading-relaxed">
+                      <p className="text-emerald-100 font-medium leading-relaxed">
                         {item.liveActivity || 'Interactive live speaking drills with batchmates and mentor.'}
                       </p>
                     </div>
                   </div>
 
                   {/* 3. Action Item & Submission (হোমওয়ার্ক ও আউটপুট) */}
-                  <div className="rounded-2xl border border-cyan-500/25 bg-cyan-500/[0.04] p-4 text-xs flex flex-col justify-between">
+                  <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/[0.04] p-3.5 text-xs flex flex-col justify-between">
                     <div>
-                      <div className="flex items-center gap-1.5 font-bold text-cyan-300 text-[11px] uppercase tracking-wider mb-2">
-                        <Zap size={14} className="text-cyan-400 shrink-0" />
+                      <div className="flex items-center gap-1.5 font-bold text-cyan-300 text-[11px] uppercase tracking-wider mb-1.5">
+                        <Zap size={13} className="text-cyan-400 shrink-0" />
                         <span>Action Item (হোমওয়ার্ক ও আউটপুট)</span>
                       </div>
-                      <p className="text-cyan-100 text-xs sm:text-[13px] font-medium leading-relaxed">
+                      <p className="text-cyan-100 font-medium leading-relaxed">
                         {item.actionItem || item.studentOutput || 'Submit voice recording or practice task.'}
                       </p>
                     </div>
@@ -1423,13 +1383,13 @@ export function CoursePlanModal({ course, onClose, navigate }) {
                 </div>
 
                 {/* Footer Action Bar for this Class */}
-                <div className="mt-4 pt-3.5 border-t border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="mt-4 pt-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   {/* Left: View Notes & Resources Button */}
                   <div className="flex flex-wrap items-center gap-2">
                     <button
                       type="button"
                       onClick={() => setSelectedResourceDay(item)}
-                      className="inline-flex items-center gap-2 rounded-xl border border-amber-400/30 bg-amber-500/10 hover:bg-amber-500/20 px-3.5 py-2 text-xs font-bold text-amber-200 transition active:scale-95 shadow-sm"
+                      className="inline-flex items-center gap-2 rounded-xl border border-amber-400/30 bg-amber-500/10 hover:bg-amber-500/20 px-3.5 py-2 text-xs font-bold text-amber-200 transition active:scale-95"
                     >
                       <BookOpen size={14} className="text-amber-400" />
                       <span>View Class Notes & Resources</span>
@@ -1520,7 +1480,7 @@ export function CoursePlanModal({ course, onClose, navigate }) {
         </div>
 
         {/* Footer info & close */}
-        <div className="relative z-10 mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-3 shrink-0">
+        <div className="relative z-10 mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-3 shrink-0">
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -1547,7 +1507,7 @@ export function CoursePlanModal({ course, onClose, navigate }) {
 
       {/* --- SUB-MODAL 1: CLASS RESOURCE & STUDY NOTES READER (STUDENT VIEW) --- */}
       <AnimatePresence>
-        {selectedResourceDay && createPortal(
+        {selectedResourceDay && (
           <ClassResourceModal
             dayItem={selectedResourceDay}
             courseTitle={course.title}
@@ -1564,14 +1524,13 @@ export function CoursePlanModal({ course, onClose, navigate }) {
                 studentOutput: dayData.actionItem || dayData.studentOutput,
               });
             }}
-          />,
-          document.body
+          />
         )}
       </AnimatePresence>
 
       {/* --- SUB-MODAL 2: ADD OR EDIT DAY MODAL --- */}
       <AnimatePresence>
-        {(isAddingDay || editingDay) && createPortal(
+        {(isAddingDay || editingDay) && (
           <PlanDayEditorModal
             initialData={editingDay || {
               day: plan.length > 0 ? Math.max(...plan.map(d => d.day || 0)) + 1 : 1,
@@ -1603,32 +1562,29 @@ export function CoursePlanModal({ course, onClose, navigate }) {
                 handleAddDay(dayData);
               }
             }}
-          />,
-          document.body
+          />
         )}
       </AnimatePresence>
 
       {/* --- SUB-MODAL 3: UPLOAD / PASTE PLAN --- */}
       <AnimatePresence>
-        {isUploadOpen && createPortal(
+        {isUploadOpen && (
           <PlanUploadModal
             course={course}
             onClose={() => setIsUploadOpen(false)}
             onImport={handleImportPlan}
-          />,
-          document.body
+          />
         )}
       </AnimatePresence>
 
       {/* --- SUB-MODAL 4: ACTION SIMULATION PREVIEW ("CLICK KORLE KI HOBE") --- */}
       <AnimatePresence>
-        {simulatedAction && createPortal(
+        {simulatedAction && (
           <PlanSimulationModal
             action={simulatedAction}
             onClose={() => setSimulatedAction(null)}
             navigate={navigate}
-          />,
-          document.body
+          />
         )}
       </AnimatePresence>
     </div>
@@ -1640,22 +1596,12 @@ function ClassResourceModal({ dayItem, courseTitle, onClose, onLaunchPractice })
   const itemMonth = dayItem.month || (dayItem.day <= 10 ? 1 : dayItem.day <= 20 ? 2 : 3);
 
   return (
-    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-      {/* Clickable dark backdrop */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="fixed inset-0 bg-slate-950/85 backdrop-blur-md"
-      />
-
+    <div className="fixed inset-0 z-[140] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        onClick={e => e.stopPropagation()}
-        className="relative z-10 w-full max-w-3xl rounded-3xl border border-amber-500/30 bg-slate-900 p-5 sm:p-8 shadow-2xl my-6 flex flex-col max-h-[90vh] overflow-hidden"
+        className="relative w-full max-w-3xl rounded-3xl border border-amber-500/30 bg-slate-900 p-5 sm:p-8 shadow-2xl my-6 flex flex-col max-h-[90vh] overflow-hidden"
       >
         {/* Glow */}
         <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-amber-600/10 blur-[80px] pointer-events-none" />
@@ -1677,17 +1623,16 @@ function ClassResourceModal({ dayItem, courseTitle, onClose, onLaunchPractice })
             <h4 className="mt-2 text-xl sm:text-2xl font-black text-white">
               {dayItem.title}
             </h4>
-            <p className="mt-0.5 text-xs text-slate-300">
-              Instructor: <strong className="text-white">Tanvir Ahmad</strong> • Guided Lecture & Output Blueprint
+            <p className="mt-0.5 text-xs text-slate-400">
+              Instructor: <strong className="text-slate-200">Tanvir Ahmad</strong> • Guided Lecture & Output Blueprint
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-white/10 bg-white/5 text-slate-300 hover:bg-white/15 hover:text-white transition shadow-sm"
-            title="Close Notes"
+            className="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition shrink-0"
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
 
@@ -1835,22 +1780,12 @@ function PlanDayEditorModal({ initialData, isEdit, onClose, onSubmit }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-      {/* Clickable dark backdrop */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="fixed inset-0 bg-slate-950/85 backdrop-blur-md"
-      />
-
+    <div className="fixed inset-0 z-[140] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        onClick={e => e.stopPropagation()}
-        className="relative z-10 w-full max-w-2xl rounded-3xl border border-white/15 bg-slate-900 p-5 sm:p-7 shadow-2xl my-6 flex flex-col max-h-[92vh] overflow-hidden"
+        className="relative w-full max-w-2xl rounded-3xl border border-white/15 bg-slate-900 p-5 sm:p-7 shadow-2xl my-6 flex flex-col max-h-[92vh] overflow-hidden"
       >
         <div className="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
           <div>
@@ -1861,12 +1796,7 @@ function PlanDayEditorModal({ initialData, isEdit, onClose, onSubmit }) {
               {isEdit ? `Edit Class ${formData.day}` : `Add Class to Course Plan`}
             </h4>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="grid h-9 w-9 place-items-center rounded-2xl border border-white/10 bg-white/5 text-slate-400 hover:bg-white/15 hover:text-white transition"
-            title="Close editor"
-          >
+          <button type="button" onClick={onClose} className="text-slate-400 hover:text-white">
             <X size={18} />
           </button>
         </div>
@@ -2131,22 +2061,12 @@ function PlanUploadModal({ course, onClose, onImport }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-      {/* Clickable dark backdrop */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="fixed inset-0 bg-slate-950/85 backdrop-blur-md"
-      />
-
+    <div className="fixed inset-0 z-[140] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        onClick={e => e.stopPropagation()}
-        className="relative z-10 w-full max-w-2xl rounded-3xl border border-white/10 bg-slate-900 p-5 sm:p-7 shadow-2xl my-6 flex flex-col max-h-[90vh] overflow-hidden"
+        className="relative w-full max-w-2xl rounded-3xl border border-white/10 bg-slate-900 p-5 sm:p-7 shadow-2xl my-6 flex flex-col max-h-[90vh] overflow-hidden"
       >
         <div className="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
           <div>
@@ -2155,12 +2075,7 @@ function PlanUploadModal({ course, onClose, onImport }) {
             </span>
             <h4 className="text-lg sm:text-xl font-black text-white">Upload Course Plan</h4>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="grid h-9 w-9 place-items-center rounded-2xl border border-white/10 bg-white/5 text-slate-400 hover:bg-white/15 hover:text-white transition"
-            title="Close uploader"
-          >
+          <button type="button" onClick={onClose} className="text-slate-400 hover:text-white">
             <X size={18} />
           </button>
         </div>
@@ -2230,22 +2145,12 @@ function PlanSimulationModal({ action, onClose, navigate }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-      {/* Clickable dark backdrop */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-        className="fixed inset-0 bg-slate-950/85 backdrop-blur-md"
-      />
-
+    <div className="fixed inset-0 z-[140] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        onClick={e => e.stopPropagation()}
-        className="relative z-10 w-full max-w-md rounded-3xl border border-emerald-500/40 bg-slate-900 p-6 shadow-2xl"
+        className="relative w-full max-w-md rounded-3xl border border-emerald-500/40 bg-slate-900 p-6 shadow-2xl"
       >
         <div className="flex items-center justify-between pb-3 border-b border-white/10">
           <div className="flex items-center gap-2">
@@ -2257,13 +2162,8 @@ function PlanSimulationModal({ action, onClose, navigate }) {
               <h4 className="text-base font-black text-white">Class {action.day} Action Trigger</h4>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="grid h-8 w-8 place-items-center rounded-2xl border border-white/10 bg-white/5 text-slate-400 hover:bg-white/15 hover:text-white transition"
-            title="Close preview"
-          >
-            <X size={16} />
+          <button type="button" onClick={onClose} className="text-slate-400 hover:text-white">
+            <X size={18} />
           </button>
         </div>
 
