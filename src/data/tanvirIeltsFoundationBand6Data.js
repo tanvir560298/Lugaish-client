@@ -22,7 +22,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 1,
     month: 1,
-    title: 'The Grammar Foundation — Parts of Speech in Real Sentences',
+    title: 'Topic 1',
+    dayType: 'Grammar Day',
     coreStructure: 'Noun, Verb, Adjective ও Adverb-এর সঠিক স্থান নির্ণয় (সাধারণ বাংলা-টু-ইংলিশ ভুল দূরীকরণ)।',
     liveActivity: 'ভুল পার্টস অফ স্পিচ দিয়ে তৈরি বাক্য শোধরানোর লাইভ ড্রিল।',
     actionItem: '২০টি বাক্যে আন্ডারলাইন করা শব্দের পার্টস অফ স্পিচ চিহ্নিত করা ও সঠিক বাক্য লেখা।',
@@ -37,7 +38,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 2,
     month: 1,
-    title: 'Sentence Architecture — Subject-Verb-Object (SVO) & Agreement',
+    title: 'Topic 2',
+    dayType: 'Grammar Day',
     coreStructure: 'সিঙ্গুলার/প্লুরাল সাবজেক্ট ও ভার্ব এগ্রিমেন্ট (He goes vs They go কনফিউশন দূরীকরণ)।',
     liveActivity: 'সাবজেক্ট-ভার্ব ম্যাচিং স্পিড কুইজ।',
     actionItem: '১৫টি ত্রুটিযুক্ত বাক্যের সাবজেক্ট-ভার্ব এরর সংশোধন করা।',
@@ -52,7 +54,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 3,
     month: 1,
-    title: 'Tense Mastery 1 — Present Simple vs Present Continuous',
+    title: 'Topic 3',
+    dayType: 'Speaking Day',
     coreStructure: 'দৈনন্দিন অভ্যাস ও চলমান কাজের পার্থক্য; সঠিক অক্সিলিয়ারি ভার্ব (am/is/are/do/does) ব্যবহার।',
     liveActivity: '"Describe your day and what is happening right now" স্পিকিং ড্রিল।',
     actionItem: 'নিজের দৈনন্দিন রুটিন নিয়ে ১০টি নির্ভুল বাক্যের প্যারাগ্রাফ লেখা।',
@@ -67,7 +70,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 4,
     month: 1,
-    title: 'Tense Mastery 2 — Past Simple (Regular & Irregular Verbs)',
+    title: 'Topic 4',
+    dayType: 'Speaking Day',
     coreStructure: 'অতীতের ঘটনা বর্ণনা; কমন ইরেগুলার ভার্ব লিস্ট (went, saw, bought) ও সঠিক উচ্চারণ।',
     liveActivity: '"What did you do last weekend?" পার্টনার স্পিকিং ড্রিল।',
     actionItem: 'অতীতের একটি ভ্রমণের গল্প নিয়ে ৮-১০ লাইনের নোট ও অডিও সাবমিশন।',
@@ -82,7 +86,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 5,
     month: 1,
-    title: 'Foundation Listening — Numbers, Letters, Dates & Spellings',
+    title: 'Topic 5',
+    dayType: 'Listening Day',
     coreStructure: 'অডিও শুনে নাম, ফোন নম্বর, পোস্টকোড ও তারিখ নির্ভুলভাবে লেখার রিফ্লেক্স।',
     liveActivity: 'অডিও শুনে লাইভ ফর্ম ফিল-আপ স্প্রিন্ট (১০০% নির্ভুলতার টার্গেট)।',
     actionItem: '২টি বেসিক লিসেনিং স্পেলিং ড্রিল সম্পন্ন করা।',
@@ -103,7 +108,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 6,
     month: 1,
-    title: 'Clear Pronunciation & Breaking the Hesitation Barrier',
+    title: 'Topic 6',
+    dayType: 'Speaking Day',
     coreStructure: 'Vowel sounds, consonant clusters, এবং শব্দের শেষ অক্ষর (s/es/ed) স্পষ্টভাবে উচ্চারণ।',
     liveActivity: 'আয়নার সামনে ও ক্লাসে লাউড রিডিং প্র্যাকটিস।',
     actionItem: 'একটি ছোট প্যাসেজ রিডিং পড়ে ২ মিনিটের অডিও ফাইল জমা দেওয়া।',
@@ -118,7 +124,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 7,
     month: 1,
-    title: 'Foundation Reading — Sentence Breakdown & Finding the Main Idea',
+    title: 'Topic 7',
+    dayType: 'Reading Day',
     coreStructure: 'বড় বাক্যকে ভেঙে সহজ অর্থ বের করা এবং প্যারাগ্রাফের টপিক সেন্টেন্স চেনা।',
     liveActivity: 'সহজ আর্টিকেল পড়ে সেন্ট্রাল আইডিয়া চিহ্নিত করা।',
     actionItem: '২টি ছোট আর্টিকেলের মেইন থিম ৩ বাক্যে সামারাইজ করা।',
@@ -133,7 +140,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 8,
     month: 1,
-    title: 'Core Academic Vocabulary — 50 Essential Action Verbs',
+    title: 'Topic 8',
+    dayType: 'Vocabulary Day',
     coreStructure: 'Analyze, indicate, occur, establish, contribute ইত্যাদি শব্দের অর্থ ও ব্যবহার।',
     liveActivity: 'নতুন শব্দ দিয়ে তৎক্ষণাৎ অর্থপূর্ণ বাক্য তৈরির ড্রিল।',
     actionItem: '১০টি নতুন শব্দ দিয়ে বাস্তব জীবনের বাক্য লিখে জমা দেওয়া।',
@@ -148,7 +156,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 9,
     month: 1,
-    title: 'Speaking Confidence — 1-Minute Talk on Familiar Topics',
+    title: 'Topic 9',
+    dayType: 'Speaking Day',
     coreStructure: 'দ্বিধা ছাড়া টানা ১ মিনিট কথা বলা (টপিক: Family, Hometown, Favorite Food)।',
     liveActivity: '"The 60-Second Non-Stop Challenge" — কোনো বাংলা শব্দ ছাড়া কথা বলা।',
     actionItem: '৩টি ভিন্ন টপিকে ১ মিনিটের ভয়েস নোট সাবমিট করা।',
@@ -163,7 +172,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 10,
     month: 1,
-    title: 'Mock 01 Review & Month 1 Grammar Polish',
+    title: 'Topic 10',
+    dayType: 'Review Day',
     coreStructure: 'মক ০১-এর ভুলের খাতা বিশ্লেষণ ও বেসিক গ্রামার সামারি কুইজ।',
     liveActivity: 'ক্লাসের সবার কমন ভুলগুলোর লাইভ কারেকশন।',
     actionItem: 'ব্যক্তিগত দুর্বলতার তালিকা তৈরি করা।',
@@ -188,7 +198,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 11,
     month: 2,
-    title: 'Future Forms & Modal Verbs (Will, Going to, Can, Should, Must)',
+    title: 'Topic 11',
+    dayType: 'Grammar Day',
     coreStructure: 'ভবিষ্যৎ পরিকল্পনা ও পরামর্শ দেওয়ার ব্যাকরণগত নিয়ম (Will vs Going to vs Modals)।',
     liveActivity: '"My plans for next year" — পার্টনার ডিসকাশন ও সাজেশন ওয়ার্কশপ।',
     actionItem: 'মোডাল ভার্ব ব্যবহার করে একটি উপদেশমূলক অনুচ্ছেদ লেখা।',
@@ -203,7 +214,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 12,
     month: 2,
-    title: 'Compound Sentences — Joining Ideas with FANBOYS',
+    title: 'Topic 12',
+    dayType: 'Writing Day',
     coreStructure: 'ছোট ছোট বাক্য জোড়া লাগিয়ে For, And, Nor, But, Or, Yet, So দিয়ে মানসম্মত বাক্য তৈরি।',
     liveActivity: 'দুটি সরল বাক্যকে একটি যৌক্তিক কম্পাউন্ড বাক্যে রূপান্তর।',
     actionItem: '১০ জোড়া বাক্যকে সঠিকভাবে যুক্ত করে জমা দেওয়া।',
@@ -218,7 +230,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 13,
     month: 2,
-    title: 'Complex Sentences — Subordinating Conjunctions',
+    title: 'Topic 13',
+    dayType: 'Writing Day',
     coreStructure: 'Because, although, even though, since, while দিয়ে কার্যকারণ ও বৈপরীত্য প্রকাশ।',
     liveActivity: 'কমপ্লেক্স সেন্টেন্স তৈরির লাইভ ক্লাসরুম প্রতিযোগিতা।',
     actionItem: 'কমপ্লেক্স সেন্টেন্স ব্যবহার করে ৮ লাইনের একটি অনুচ্ছেদ লেখা।',
@@ -233,7 +246,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 14,
     month: 2,
-    title: 'Prepositions of Time & Place (In, On, At) without Confusion',
+    title: 'Topic 14',
+    dayType: 'Grammar Day',
     coreStructure: 'সময়, তারিখ, বছর এবং ভৌগোলিক স্থানের প্রিপজিশনাল নির্ভুলতা।',
     liveActivity: 'ফিল-ইন-দ্য-ব্ল্যাঙ্কস স্পিড ড্রিল।',
     actionItem: 'প্রিপজিশনাল এরর কারেকশন শিট পূরণ করা।',
@@ -248,7 +262,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 15,
     month: 2,
-    title: 'Listening Comprehension — Accents & Connected Speech',
+    title: 'Topic 15',
+    dayType: 'Listening Day',
     coreStructure: 'ব্রিটিশ ও অস্ট্রেলিয়ান উচ্চারণের সাথে পরিচিতি এবং লিংকিং সাউন্ড ধরা।',
     liveActivity: 'শর্ট পডকাস্ট ক্লিপস শুনে মিসিং ওয়ার্ডস নোট করা।',
     actionItem: '১টি অডিও ট্র্যাক শুনে তার সামারি লেখা।',
@@ -269,7 +284,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 16,
     month: 2,
-    title: 'Reading Comprehension — Context Clues & Guessing Meanings',
+    title: 'Topic 16',
+    dayType: 'Reading Day',
     coreStructure: 'ডিকশনারি ছাড়াই বাক্যের প্রেক্ষাপট দেখে অজানা শব্দের অর্থ অনুমানের কৌশল।',
     liveActivity: 'আননোন প্যাসেজ থেকে কনটেক্সট ক্লু বের করার ড্রিল।',
     actionItem: '১টি প্যাসেজের ১০টি কঠিন শব্দের অর্থ অনুমান করে মিলিয়ে দেখা।',
@@ -284,7 +300,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 17,
     month: 2,
-    title: 'Passive Voice Essentials for Academic English',
+    title: 'Topic 17',
+    dayType: 'Writing Day',
     coreStructure: 'কেন এবং কীভাবে প্যাসিভ ভয়েস (Object + be + V3) ব্যবহার করতে হয়।',
     liveActivity: 'অ্যাক্টিভ বাক্যকে প্যাসিভে রূপান্তরের লাইভ এক্সারসাইজ।',
     actionItem: 'কোনো পণ্য তৈরির ৫টি ধাপ প্যাসিভ ভয়েসে লেখা।',
@@ -299,7 +316,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 18,
     month: 2,
-    title: 'Speaking — Answering "Why" with Logic (Connector Drill)',
+    title: 'Topic 18',
+    dayType: 'Speaking Day',
     coreStructure: 'Because of this, as a result, for instance ব্যবহার করে কথার বিস্তার।',
     liveActivity: '"The Why Game" — প্রতি প্রশ্নের উত্তরে কারণ ও উদাহরণ দেওয়া।',
     actionItem: '৫টি "Why" প্রশ্নের ৩ বাক্যের অডিও উত্তর পাঠানো।',
@@ -314,7 +332,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 19,
     month: 2,
-    title: 'Paragraph Writing Fundamentals (The 1-Idea Paragraph)',
+    title: 'Topic 19',
+    dayType: 'Writing Day',
     coreStructure: 'Topic sentence, Supporting detail, এবং Concluding sentence সাজানো।',
     liveActivity: 'ক্লাসে বসে ১০০ শব্দের একটি সুসংগঠিত প্যারাগ্রাফ লেখা।',
     actionItem: '"Advantages of public transport" নিয়ে একটি প্যারাগ্রাফ লিখে সাবমিট করা।',
@@ -329,7 +348,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 20,
     month: 2,
-    title: 'Mock 02 & 03 Review — Sentence Quality Calibration',
+    title: 'Topic 20',
+    dayType: 'Writing Day',
     coreStructure: 'লেখার ভুলগুলো সামনাসামনি সংশোধন এবং বাক্য গঠনের ফ্লো বাড়ানো।',
     liveActivity: 'দুর্বল প্যারাগ্রাফ রি-রাইটিং ওয়ার্কশপ।',
     actionItem: 'পূর্বের ভুল প্যারাগ্রাফটি পুনরায় নির্ভুলভাবে লেখা।',
@@ -354,7 +374,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 21,
     month: 3,
-    title: 'IELTS Architecture & Band 6 Criteria Breakdown',
+    title: 'Topic 21',
+    dayType: 'IELTS Orientation',
     coreStructure: '৪টি মডিউলের নম্বর বণ্টন এবং ব্যান্ড ৬ পাওয়ার সহজ সমীকরণ (Listening: 23-25, Reading: 23-26)।',
     liveActivity: 'ব্যান্ড ৫.৫ বনাম ব্যান্ড ৬.০-এর স্যাম্পল তুলনা।',
     actionItem: 'ব্যক্তিগত ব্যান্ড ৬ স্ট্র্যাটেজি ও স্টাডি রুটিন তৈরি।',
@@ -369,7 +390,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 22,
     month: 3,
-    title: 'Paraphrasing Fundamentals — The Core IELTS Skill',
+    title: 'Topic 22',
+    dayType: 'Vocabulary Day',
     coreStructure: 'সিনোনিমস এবং পার্টস অব স্পিচ পরিবর্তনের মাধ্যমে বাক্যের রূপান্তর।',
     liveActivity: 'আইইএলটিএস কোয়েশ্চেন স্টেটমেন্ট প্যারাফ্রেজিং ড্রিল।',
     actionItem: '১০টি আইইএলটিএস বাক্যের সফল প্যারাফ্রেজ তৈরি করা।',
@@ -384,7 +406,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 23,
     month: 3,
-    title: 'Listening Part 1 Intro — Note & Form Completion Basics',
+    title: 'Topic 23',
+    dayType: 'Listening Day',
     coreStructure: 'ফর্ম ফিল-আপের নিয়ম, শব্দসীমা (NO MORE THAN TWO WORDS) এবং প্রেডিকশন।',
     liveActivity: '২টি ফুল সেকশন ১ অডিও লাইভ সলভিং।',
     actionItem: '২টি ক্যামব্রিজ সেকশন ১ টেস্ট কমপ্লিট করা।',
@@ -399,7 +422,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 24,
     month: 3,
-    title: 'Reading Intro — The Scanning Engine for Names, Dates & Numbers',
+    title: 'Topic 24',
+    dayType: 'Reading Day',
     coreStructure: 'পুরো টেক্সট না পড়ে চোখের পলকে সুনির্দিষ্ট তথ্য খুঁজে বের করার ড্রিল।',
     liveActivity: '৬০ সেকেন্ডের ইনফরমেশন হান্ট চ্যালেঞ্জ।',
     actionItem: '২টি ছোট প্যাসেজ থেকে স্ক্যানিং এক্সারসাইজ সম্পন্ন করা।',
@@ -414,7 +438,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 25,
     month: 3,
-    title: 'Speaking Part 1 Intro — The 3-Sentence Formula',
+    title: 'Topic 25',
+    dayType: 'Speaking Day',
     coreStructure: 'Direct Answer + Detail/Explanation + Closing hook (Yes/No-তে না থামা)।',
     liveActivity: 'সাধারণ টপিকে (Hometown, Work/Study, Weather) লাইভ স্পিকিং।',
     actionItem: '৫টি পার্ট ১ প্রশ্নের অডিও উত্তর জমা দেওয়া।',
@@ -435,7 +460,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 26,
     month: 3,
-    title: 'Academic Collocations for Common Topics (Education & Technology)',
+    title: 'Topic 26',
+    dayType: 'Vocabulary Day',
     coreStructure: 'একা একা শব্দ না শিখে জোড়ায় শব্দ শেখা (gain knowledge, modern technology, major drawback)।',
     liveActivity: 'কোলোকেশন ম্যাচিং ও বাক্য গঠন ড্রিল।',
     actionItem: '১৫টি কোলোকেশন দিয়ে ৫টি বাক্য তৈরি করা।',
@@ -450,7 +476,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 27,
     month: 3,
-    title: 'Writing Task 1 Intro — Reading Visual Charts & Axes',
+    title: 'Topic 27',
+    dayType: 'Writing Day',
     coreStructure: 'চার্টের টাইটেল, এক্স-অ্যাক্সিস, ওয়াই-অ্যাক্সিস ও ইউনিট (%, million) রিড করার কৌশল।',
     liveActivity: 'গ্রাফ দেখে ৩টি প্রধান তথ্য পয়েন্ট বের করা।',
     actionItem: '১টি বার চার্টের মূল তথ্যগুলো বুলেট পয়েন্টে লেখা।',
@@ -465,7 +492,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 28,
     month: 3,
-    title: 'Writing Task 2 Intro — Idea Generation & The 4-Paragraph Layout',
+    title: 'Topic 28',
+    dayType: 'Writing Day',
     coreStructure: 'এসে টপিক পড়ে আইডিয়া বের করা এবং ইন্ট্রোডাকশন লেখার সহজ ফর্মুলা।',
     liveActivity: '২টি টপিকের থিসিস স্টেটমেন্ট তৈরি করা।',
     actionItem: '১টি আইইএলটিএস এসে-র ইন্ট্রোডাকশন ও প্ল্যানিং লিখে জমা দেওয়া।',
@@ -480,7 +508,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 29,
     month: 3,
-    title: 'Exam Psychology & Overcoming Test Panic',
+    title: 'Topic 29',
+    dayType: 'Speaking Day',
     coreStructure: 'নার্ভাসনেস কন্ট্রোল, লিসেনিংয়ে ট্র্যাক হারালে রিকভার করার উপায়।',
     liveActivity: 'টাইমড স্ট্রেস স্পিকিং ড্রিল।',
     actionItem: 'সেলফ-অ্যাসেসমেন্ট রিফ্লেকশন নোট তৈরি।',
@@ -495,7 +524,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 30,
     month: 3,
-    title: 'Phase 1 Grand Diagnostic Review & Mock 05 Post-Mortem',
+    title: 'Topic 30',
+    dayType: 'Review Day',
     coreStructure: 'প্রথম ৩ মাসের অগ্রগতির বিস্তারিত অডিট ও ফেজ ২-এর প্রস্তুতি নিশ্চিতকরণ।',
     liveActivity: 'দুর্বল জায়গাগুলোর লাইভ রিভিশন।',
     actionItem: 'ফেজ ২-এর স্টাডি গোল সেট করা।',
@@ -524,7 +554,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 31,
     month: 4,
-    title: 'Listening Section 1 Mastery — Eliminating 100% of Careless Errors',
+    title: 'Topic 31',
+    dayType: 'Listening Day',
     coreStructure: 'প্লুরাল "-s" মিস হওয়া এবং ক্যাপিটালাইজেশনের ভুল চিরতরে বন্ধ করা।',
     liveActivity: '৩ সেট ক্যামব্রিজ সেকশন ১ লাইভ সলভিং (১০/১০ টার্গেট)।',
     actionItem: '৩টি সেকশন ১ লিসেনিং সম্পন্ন করে ভুল তালিকা সাবমিট করা।',
@@ -539,7 +570,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 32,
     month: 4,
-    title: 'Listening Section 2 — Maps & Labelling Step-by-Step',
+    title: 'Topic 32',
+    dayType: 'Listening Day',
     coreStructure: 'দিকনির্দেশক শব্দ ট্র্যাক করা এবং স্টার্ট পয়েন্ট থেকে ম্যাপ অনুসরণ।',
     liveActivity: 'লাইভ ম্যাপ লিসেনিং প্র্যাকটিস।',
     actionItem: '২টি ম্যাপ ও প্ল্যান লিসেনিং টেস্ট সমাধান।',
@@ -554,7 +586,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 33,
     month: 4,
-    title: 'Reading — True / False / Not Given (Foundational Rules)',
+    title: 'Topic 33',
+    dayType: 'Reading Day',
     coreStructure: 'False (বিপরীত তথ্য) বনাম Not Given (তথ্য নেই)-এর সহজ ও নিখুঁত পার্থক্য।',
     liveActivity: 'টেক্সটের তথ্য মিলিয়ে T/F/NG ড্রিল।',
     actionItem: '২টি প্যাসেজের T/F/NG প্রশ্ন সলভ করা।',
@@ -569,7 +602,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 34,
     month: 4,
-    title: 'Reading — Sentence Completion & Short Answer Questions',
+    title: 'Topic 34',
+    dayType: 'Reading Day',
     coreStructure: 'ব্যাকরণ মিলিয়ে ফাঁকা জায়গায় উপযুক্ত শব্দ বসানো (সরাসরি প্যাসেজের শব্দ)।',
     liveActivity: 'প্যাসেজ থেকে সরাসরি শব্দ বেছে নেওয়ার টেকনিক।',
     actionItem: '১টি সম্পূর্ণ প্যাসেজ ১ সলভ করা।',
@@ -584,7 +618,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 35,
     month: 4,
-    title: 'Speaking Part 1 — Fluency Hacks & Natural Fillers',
+    title: 'Topic 35',
+    dayType: 'Speaking Day',
     coreStructure: 'থমকে না দাঁড়িয়ে Well, to be honest, as far as I remember ব্যবহার করে সময় নেওয়া।',
     liveActivity: 'ফিলার ব্যবহার করে তাৎক্ষণিক উত্তর দেওয়ার ড্রিল।',
     actionItem: '৭টি পার্ট ১ প্রশ্নের ভয়েস নোট রেকর্ড করা।',
@@ -605,7 +640,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 36,
     month: 4,
-    title: 'Speaking Part 2 Intro — The "Past-Present-Future" Framework',
+    title: 'Topic 36',
+    dayType: 'Speaking Day',
     coreStructure: 'কিউ-কার্ডের সময় পূরণ করতে না পারলে কীভাবে কথা টেনে ২ মিনিট করতে হয়।',
     liveActivity: '১ মিনিটের নোট-টেকিং ও টানা ৯০ সেকেন্ড কথা বলা।',
     actionItem: '২টি কিউ-কার্ডের ২ মিনিটের অডিও রেকর্ড সাবমিট করা।',
@@ -620,7 +656,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 37,
     month: 4,
-    title: 'Writing Task 1 — The Band 6 Overview Formula',
+    title: 'Topic 37',
+    dayType: 'Writing Day',
     coreStructure: '"Overall, it is clear that..." দিয়ে ২ লাইনের স্পষ্ট ওভারভিউ লেখার টেকনিক।',
     liveActivity: '৩টি ভিন্ন চার্টের ওভারভিউ তাৎক্ষণিক লেখা।',
     actionItem: '২টি চার্টের ইন্ট্রো ও ওভারভিউ লিখে জমা দেওয়া।',
@@ -635,7 +672,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 38,
     month: 4,
-    title: 'Writing Task 1 — Body Paragraph Structure for Line & Bar Graphs',
+    title: 'Topic 38',
+    dayType: 'Writing Day',
     coreStructure: 'সর্বোচ্চ ও সর্বনিম্ন ডেটা আলাদা প্যারাগ্রাফে সাজানোর নিয়ম।',
     liveActivity: 'ডেটা সাজিয়ে বডি প্যারাগ্রাফ ১ ড্রাফটিং।',
     actionItem: '১টি পূর্ণাঙ্গ লাইন গ্রাফ রিপোর্ট (১৫০ শব্দ) জমা দেওয়া।',
@@ -650,7 +688,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 39,
     month: 4,
-    title: 'Writing Task 2 — The 4-Paragraph Band 6 Essay Template',
+    title: 'Topic 39',
+    dayType: 'Writing Day',
     coreStructure: 'ইন্ট্রোডাকশন, বডি ১, বডি ২ এবং কনক্লুশনের সহজ অথচ কার্যকর কাঠামো।',
     liveActivity: 'ক্লাসে বসে পূর্ণাঙ্গ এসে প্ল্যান ও ইন্ট্রো তৈরি।',
     actionItem: '১টি পূর্ণাঙ্গ এসে ড্রাফট লিখে সাবমিট করা।',
@@ -665,7 +704,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 40,
     month: 4,
-    title: 'Writing Task 2 — Agree/Disagree Essays with Clear Opinions',
+    title: 'Topic 40',
+    dayType: 'Writing Day',
     coreStructure: 'দ্বিধাহীনভাবে এক পক্ষ সমর্থন করে সহজ ভাষায় যুক্তি তুলে ধরা।',
     liveActivity: 'লাইভ বডি প্যারাগ্রাফ ড্রাফটিং সেশন।',
     actionItem: '১টি পূর্ণাঙ্গ Agree/Disagree এসে লেখা।',
@@ -690,7 +730,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 41,
     month: 5,
-    title: 'Listening Section 3 — Academic Discussions & Multiple Choice',
+    title: 'Topic 41',
+    dayType: 'Listening Day',
     coreStructure: 'একাধিক বক্তার তর্কাতর্কি থেকে সঠিক উত্তর বের করার উপায় ও ডিস্ট্র্যাক্টর ফিল্টারিং।',
     liveActivity: 'সেকশন ৩-এর অডিও ট্র্যাক ও অপশন অ্যানালাইসিস।',
     actionItem: '২টি সেকশন ৩ টেস্ট সম্পন্ন করা।',
@@ -705,7 +746,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 42,
     month: 5,
-    title: 'Listening Section 4 — Monologue & Lecture Note-Taking',
+    title: 'Topic 42',
+    dayType: 'Listening Day',
     coreStructure: 'দ্রুতগতির একমুখী লেকচার থেকে মূল শব্দ লিখে নেওয়া এবং সাইনপোস্ট ওয়ার্ড চেনা।',
     liveActivity: 'লেকচার শুনে ফিল-ইন-দ্য-ব্ল্যাঙ্কস সলভিং।',
     actionItem: '২টি সেকশন ৪ টেস্ট সম্পন্ন করা।',
@@ -720,7 +762,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 43,
     month: 5,
-    title: 'Reading — Matching Headings (The Core Theme Method)',
+    title: 'Topic 43',
+    dayType: 'Reading Day',
     coreStructure: 'প্যারাগ্রাফের সামগ্রিক অর্থ বুঝে সঠিক শিরোনাম বাছাইয়ের ট্রিকস (শব্দ মিলের ফাঁদ এড়িয়ে চলা)।',
     liveActivity: 'হেডলাইন ম্যাচিং লাইভ প্র্যাকটিস।',
     actionItem: '২টি প্যাসেজের হেডলাইন ম্যাচিং সলভ করা।',
@@ -735,7 +778,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 44,
     month: 5,
-    title: 'Reading — Summary Completion (With & Without Box)',
+    title: 'Topic 44',
+    dayType: 'Reading Day',
     coreStructure: 'প্যারাফ্রেজিং এবং পার্টস অব স্পিচ মিলিয়ে শূন্যস্থান পূরণ।',
     liveActivity: 'সামারি কমপ্লিশন স্পিড সলভিং।',
     actionItem: '১টি পূর্ণাঙ্গ রিডিং প্যাসেজ ২ সমাধান করা।',
@@ -750,7 +794,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 45,
     month: 5,
-    title: 'Speaking Part 2 — Mastering 2 Full Minutes with Storytelling',
+    title: 'Topic 45',
+    dayType: 'Speaking Day',
     coreStructure: 'থামাথামি ছাড়া আত্মবিশ্বাসের সাথে পুরো ২ মিনিট শেষ করার অভ্যাস ও পেসিং।',
     liveActivity: 'টাইমার চালু রেখে লাইভ কিউ-কার্ড স্পিকিং ড্রিল।',
     actionItem: '২টি কিউ-কার্ডের আনকাট ২ মিনিটের ভিডিও/অডিও পাঠানো।',
@@ -771,7 +816,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 46,
     month: 5,
-    title: 'Speaking Part 3 Intro — Expanding on Abstract Social Topics',
+    title: 'Topic 46',
+    dayType: 'Speaking Day',
     coreStructure: 'সাধারণ সামাজিক প্রশ্নের ক্ষেত্রে মতামত ও কারণ ব্যক্ত করার সহজ ফ্রেম।',
     liveActivity: 'পার্ট ৩ র্যাপিড ফায়ার প্রশ্নোত্তর পর্ব।',
     actionItem: '৪টি পার্ট ৩ প্রশ্নের অডিও উত্তর জমা দেওয়া।',
@@ -786,7 +832,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 47,
     month: 5,
-    title: 'Writing Task 1 — Pie Charts & Static Tables',
+    title: 'Topic 47',
+    dayType: 'Writing Day',
     coreStructure: 'শতকরা অনুপাত তুলনা করার ভাষা (accounted for, made up, followed by)।',
     liveActivity: 'পাই চার্ট ডেটা গ্রুピング ও প্যারাগ্রাফিং।',
     actionItem: '১টি পূর্ণাঙ্গ পাই চার্ট রিপোর্ট জমা দেওয়া।',
@@ -801,7 +848,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 48,
     month: 5,
-    title: 'Writing Task 1 — Process & Life-Cycle Diagrams',
+    title: 'Topic 48',
+    dayType: 'Writing Day',
     coreStructure: 'ধাপগুলো ক্রমানুসারে সাজানো এবং প্যাসিভ ভয়েসের সঠিক ব্যবহার (is heated, are separated)।',
     liveActivity: 'সিম্পল প্রসেস ডায়াগ্রাম লাইভ ড্রাফটিং।',
     actionItem: '১টি প্রসেস ডায়াগ্রাম রিপোর্ট লেখা।',
@@ -816,7 +864,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 49,
     month: 5,
-    title: 'Writing Task 2 — Discuss Both Views Essays',
+    title: 'Topic 49',
+    dayType: 'Writing Day',
     coreStructure: 'দুই পক্ষের মতামত সুন্দরভাবে সাজিয়ে নিজের অবস্থান বজায় রাখা।',
     liveActivity: 'উভয় পক্ষের বডি প্যারাগ্রাফ লেখার ড্রিল।',
     actionItem: '১টি পূর্ণাঙ্গ Discuss Both Views এসে লিখে জমা দেওয়া।',
@@ -831,7 +880,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 50,
     month: 5,
-    title: 'Writing Task 2 — Problem and Solution Essays',
+    title: 'Topic 50',
+    dayType: 'Writing Day',
     coreStructure: 'কারণ এবং বাস্তবসম্মত সমাধান সাজিয়ে লেখার সহজ উপায়।',
     liveActivity: 'ইন্ট্রো ও সলিউশন প্যারাগ্রাফ ড্রাফটিং।',
     actionItem: '১টি Problem-Solution এসে সাবমিট করা।',
@@ -856,7 +906,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 51,
     month: 6,
-    title: 'Listening — 4-Section Guided Sprint with Audio Script Analysis',
+    title: 'Topic 51',
+    dayType: 'Listening Day',
     coreStructure: 'সম্পূর্ণ লিসেনিং টেস্ট দিয়ে সাথে সাথে অডিও স্ক্রিপ্ট পড়ে ট্র্যাপগুলো বোঝা।',
     liveActivity: 'স্ক্রিপ্ট ট্র্যাকিং এক্সারসাইজ।',
     actionItem: '১টি ফুল লিসেনিং টেস্ট সমাধান ও ভুল অ্যানালাইসিস।',
@@ -871,7 +922,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 52,
     month: 6,
-    title: 'Reading — Time Management Drill (The 20-Minute Passage Strategy)',
+    title: 'Topic 52',
+    dayType: 'Reading Day',
     coreStructure: 'সহজ প্রশ্নে আগে মার্কস নিশ্চিত করা এবং কঠিন প্রশ্নে আটকে না থাকার সাইকোলজি।',
     liveActivity: '২০ মিনিটের টাইমড প্যাসেজ স্প্রিন্ট।',
     actionItem: '১টি সম্পূর্ণ রিডিং টেস্ট ঘড়ি ধরে ৬০ মিনিটে সলভ করা।',
@@ -886,7 +938,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 53,
     month: 6,
-    title: 'Speaking — Full Mock Interview Clinic (Parts 1, 2, and 3)',
+    title: 'Topic 53',
+    dayType: 'Speaking Day',
     coreStructure: 'সম্পূর্ণ টেস্টের লাইভ অভিজ্ঞতা এবং নার্ভাসনেস কাটানোর মহড়া।',
     liveActivity: 'শিক্ষার্থীদের সরাসরি ইন্টারভিউ সিমুলেশন ও তাৎক্ষণিক ফিডব্যাক।',
     actionItem: 'নিজের স্পিকিং রেকর্ডিং শুনে ভুলের তালিকা তৈরি।',
@@ -901,7 +954,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 54,
     month: 6,
-    title: 'Writing Task 1 — 20-Minute Timed Sprint',
+    title: 'Topic 54',
+    dayType: 'Writing Day',
     coreStructure: '২০ মিনিটের টাইমার চালিয়ে আনসিন চার্টের রিপোর্ট লেখার লাইভ ড্রিল।',
     liveActivity: 'স্ক্রিনের সামনে তাৎক্ষণিক রিপোর্ট ড্রাফটিং।',
     actionItem: '১টি টাস্ক ১ ফাইনাল এডিট করে জমা দেওয়া।',
@@ -916,7 +970,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 55,
     month: 6,
-    title: 'Writing Task 2 — 40-Minute Timed Sprint',
+    title: 'Topic 55',
+    dayType: 'Writing Day',
     coreStructure: '৪০ মিনিটের মধ্যে প্ল্যানিং থেকে শুরু করে পূর্ণাঙ্গ এসে লেখার লাইভ স্প্রিন্ট।',
     liveActivity: 'ক্লাসরুম লাইভ এসে রাইটিং।',
     actionItem: 'নিজের এসে নিজে প্রুフリーড করে ভুল মার্ক করা।',
@@ -937,7 +992,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 56,
     month: 6,
-    title: 'Liquidating Common Mistakes (Spelling, Capitalization & Punctuation)',
+    title: 'Topic 56',
+    dayType: 'Language Polish',
     coreStructure: 'যেসব ছোটখাটো ভুলে ব্যান্ড ৬ থেকে ৫.৫-এ নেমে যায়, সেগুলো স্থায়ীভাবে বন্ধ করা।',
     liveActivity: 'এরর ডিটেকশন ও কারেকশন ওয়ার্কশপ।',
     actionItem: '৫০টি বহুল ব্যবহৃত একাডেমিক স্পেলিং টেস্ট।',
@@ -952,7 +1008,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 57,
     month: 6,
-    title: 'Reading & Listening Troubleshooting Clinic',
+    title: 'Topic 57',
+    dayType: 'Reading & Listening',
     coreStructure: 'ক্লাসের সবার দুর্বল প্রশ্ন-টাইপগুলো আলাদা করে ধরে সমাধান করা।',
     liveActivity: 'টার্গেটেড কোয়েশ্চেন সলভিং।',
     actionItem: 'ব্যক্তিগত উইক-পয়েন্ট প্র্যাকটিস শিট।',
@@ -967,7 +1024,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 58,
     month: 6,
-    title: 'Writing & Speaking Fine Polish',
+    title: 'Topic 58',
+    dayType: 'Writing & Speaking',
     coreStructure: 'ব্যান্ড ৬-এর জন্য প্রয়োজনীয় কোহেশন ও বডি ল্যাঙ্গুয়েজের শেষ মুহূর্তের টিপস।',
     liveActivity: 'স্পিকিং ওয়ার্ম-আপ ও কুইক রাইটিং ফিডব্যাক।',
     actionItem: 'ফাইনাল রিভিশন নোট তৈরি।',
@@ -988,7 +1046,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 59,
     month: 6,
-    title: 'Mock 11 & 12 Post-Mortem & Individual Score Cards',
+    title: 'Topic 59',
+    dayType: 'Review Day',
     coreStructure: 'শেষ দুটি মকের চূড়ান্ত ফলাফল বিশ্লেষণ এবং কনফিডেন্স বুস্টিং।',
     liveActivity: 'ফাইনাল প্রবলেম সলভিং ও ওয়ান-অন-ওয়ান কাউন্সেলিং।',
     actionItem: 'এক্সাম চেকলিস্ট প্রস্তুত করা।',
@@ -1003,7 +1062,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 60,
     month: 6,
-    title: 'The Exam Day Blueprint & Psychological Readiness',
+    title: 'Topic 60',
+    dayType: 'Exam Blueprint',
     coreStructure: 'পরীক্ষার আগের রাতের প্রস্তুতি, পরীক্ষার হলের সময় ব্যবস্থাপনা এবং বিদায়ী দিকনির্দেশনা।',
     liveActivity: 'শেষ মুহূর্তের প্রশ্ন-উত্তর ও শুভকামনা পর্ব।',
     actionItem: 'অফিসিয়াল আইইএলটিএস পরীক্ষার জন্য চূড়ান্ত প্রস্তুতি গ্রহণ।',

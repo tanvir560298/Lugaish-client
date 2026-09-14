@@ -1029,6 +1029,7 @@ export function CoursePlanModal({ course, onClose, navigate }) {
       // Search query match
       const matchesSearch = search.trim() === '' ? true : (
         (d.title && d.title.toLowerCase().includes(search.toLowerCase())) ||
+        (d.dayType && d.dayType.toLowerCase().includes(search.toLowerCase())) ||
         (d.coreStructure && d.coreStructure.toLowerCase().includes(search.toLowerCase())) ||
         (d.liveActivity && d.liveActivity.toLowerCase().includes(search.toLowerCase())) ||
         (d.actionItem && d.actionItem.toLowerCase().includes(search.toLowerCase())) ||
@@ -1147,7 +1148,7 @@ export function CoursePlanModal({ course, onClose, navigate }) {
                 {course.title}
               </h3>
               <p className="mt-1 text-xs sm:text-sm text-slate-300">
-                Full 30-Day Live Syllabus • 60–70% Student Talking Time (STT) • Daily Speaking Drills & Action Outputs
+                {course.subtitle || `Full ${plan.length}-Class Live Syllabus • Strategy Drills & Action Outputs`}
               </p>
             </div>
 
@@ -1221,7 +1222,7 @@ export function CoursePlanModal({ course, onClose, navigate }) {
               <p className="text-xs text-slate-300 font-medium">
                 {planMode === 'viewer' ? (
                   <>
-                    <strong className="text-emerald-300">Viewer Mode (Student Syllabus Explorer)</strong>: View full 30-day curriculum with core speaking structures, live speaking drills, homework tasks, and class notes.
+                    <strong className="text-emerald-300">Viewer Mode (Student Syllabus Explorer)</strong>: View full {plan.length}-class curriculum with core strategies, live drills, homework tasks, and class notes.
                   </>
                 ) : (
                   <>
@@ -1359,6 +1360,11 @@ export function CoursePlanModal({ course, onClose, navigate }) {
                       <span className="rounded-lg bg-blue-500/15 border border-blue-400/30 px-2 py-0.5 text-[10px] font-bold text-blue-300 uppercase tracking-wider">
                         Month {itemMonth}
                       </span>
+                      {item.dayType && (
+                        <span className="rounded-lg bg-cyan-500/15 border border-cyan-400/30 px-2.5 py-0.5 text-[10px] font-black text-cyan-300 uppercase tracking-wider">
+                          {item.dayType}
+                        </span>
+                      )}
                       <h4 className="text-base sm:text-lg font-black text-white">
                         {item.title}
                       </h4>
@@ -1932,7 +1938,7 @@ function PlanDayEditorModal({ initialData, isEdit, onClose, onSubmit }) {
         </div>
 
         <form onSubmit={handleSubmit} className="mt-4 flex-1 overflow-y-auto pr-1 space-y-4">
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
             <div>
               <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
                 Class / Day # *
@@ -1964,7 +1970,27 @@ function PlanDayEditorModal({ initialData, isEdit, onClose, onSubmit }) {
                 <option value={6}>Month 6</option>
               </select>
             </div>
-            <div className="col-span-2">
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-widest text-cyan-300 mb-1">
+                Day Type / Skill *
+              </label>
+              <select
+                value={formData.dayType || 'Speaking Day'}
+                onChange={e => setFormData({ ...formData, dayType: e.target.value })}
+                className="w-full rounded-xl border border-cyan-500/30 bg-slate-950 px-3 py-2 text-sm font-bold text-cyan-200 outline-none focus:border-cyan-400"
+              >
+                <option value="Speaking Day">Speaking Day</option>
+                <option value="Listening Day">Listening Day</option>
+                <option value="Reading Day">Reading Day</option>
+                <option value="Writing Day">Writing Day</option>
+                <option value="Grammar Day">Grammar Day</option>
+                <option value="Vocabulary Day">Vocabulary Day</option>
+                <option value="Review Day">Review & Assessment Day</option>
+                <option value="IELTS Orientation">IELTS Orientation</option>
+                <option value="Exam Blueprint">Exam Blueprint / Mock</option>
+              </select>
+            </div>
+            <div>
               <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
                 Class / Lesson Title *
               </label>
@@ -1973,7 +1999,7 @@ function PlanDayEditorModal({ initialData, isEdit, onClose, onSubmit }) {
                 type="text"
                 value={formData.title}
                 onChange={e => setFormData({ ...formData, title: e.target.value })}
-                placeholder="e.g. Breaking the Ice — High-Impact Self-Introduction"
+                placeholder="e.g. Topic 1"
                 className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-purple-400"
               />
             </div>
