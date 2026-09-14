@@ -428,6 +428,26 @@ export function LoginPage({ mode = 'login' }) {
                 {error}
               </p>
             )}
+
+            {import.meta.env.DEV && (
+              <div className="mt-4 pt-4 border-t border-white/10 text-center">
+                <button
+                  type="button"
+                  id="dev-bypass-login"
+                  onClick={() => {
+                    actions.login({
+                      userName: 'Tanvir Ahmad',
+                      userEmail: 'tahmadium@gmail.com',
+                      userRole: 'web_developer',
+                    });
+                    navigate(redirectTo, { replace: true });
+                  }}
+                  className="w-full rounded-2xl border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 px-4 py-3 text-xs font-black uppercase tracking-wider text-purple-300 transition"
+                >
+                  ⚡ Developer Quick Sign-In (Tanvir Ahmad)
+                </button>
+              </div>
+            )}
           </div>
         </motion.div>
       </div>

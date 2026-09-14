@@ -30,7 +30,10 @@ import {
   HelpCircle,
   Video,
   Copy,
-  Check
+  Check,
+  Eye,
+  Headphones,
+  Lightbulb
 } from 'lucide-react';
 import { 
   loadTanvirCourses, 
@@ -947,6 +950,8 @@ const PLAN_ACTION_TYPES = {
 
 export function CoursePlanModal({ course, onClose, navigate }) {
   const [plan, setPlan] = useState(() => loadCoursePlan(course.id));
+  const [planMode, setPlanMode] = useState('viewer'); // 'viewer' (Student View) | 'editor' (Instructor View)
+  const [selectedMonth, setSelectedMonth] = useState('all'); // 'all' | '1' | '2' | '3'
   const [search, setSearch] = useState('');
   const [filterAction, setFilterAction] = useState('all');
   
@@ -955,6 +960,7 @@ export function CoursePlanModal({ course, onClose, navigate }) {
   const [isAddingDay, setIsAddingDay] = useState(false);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [simulatedAction, setSimulatedAction] = useState(null);
+  const [selectedResourceDay, setSelectedResourceDay] = useState(null);
   const [planNotification, setPlanNotification] = useState('');
   const [copied, setCopied] = useState(false);
 
@@ -968,19 +974,57 @@ export function CoursePlanModal({ course, onClose, navigate }) {
     saveCoursePlan(course.id, updatedPlan);
   };
 
+  // Extract available months
+  const availableMonths = useMemo(() => {
+    const months = new Set();
+    plan.forEach(d => {
+      if (d.month) months.add(d.month);
+      else if (d.day <= 10) months.add(1);
+      else if (d.day <= 20) months.add(2);
+      else if (d.day <= 30) months.add(3);
+    });
+    return Array.from(months).sort((a, b) => a - b);
+  }, [plan]);
+
+  const monthThemes = {
+    1: 'Breaking Hesitation & Daily Scenarios',
+    2: 'Situational Fluency & Practical Conversations',
+    3: 'Spontaneous Flow, Debates & Professional Edge',
+  };
+
   // Filtered day roadmap
   const filteredDays = useMemo(() => {
     return plan.filter(d => {
+      // Month match
+      let matchesMonth = true;
+      if (selectedMonth !== 'all') {
+        const targetM = Number(selectedMonth);
+        if (d.month) {
+          matchesMonth = d.month === targetM;
+        } else {
+          if (targetM === 1) matchesMonth = d.day <= 10;
+          else if (targetM === 2) matchesMonth = d.day > 10 && d.day <= 20;
+          else if (targetM === 3) matchesMonth = d.day > 20;
+        }
+      }
+
+      // Action type match
       const matchesAction = filterAction === 'all' ? true : d.actionType === filterAction;
+
+      // Search query match
       const matchesSearch = search.trim() === '' ? true : (
-        d.title.toLowerCase().includes(search.toLowerCase()) ||
-        d.studyTopic?.toLowerCase().includes(search.toLowerCase()) ||
-        d.studentOutput?.toLowerCase().includes(search.toLowerCase()) ||
+        (d.title && d.title.toLowerCase().includes(search.toLowerCase())) ||
+        (d.coreStructure && d.coreStructure.toLowerCase().includes(search.toLowerCase())) ||
+        (d.liveActivity && d.liveActivity.toLowerCase().includes(search.toLowerCase())) ||
+        (d.actionItem && d.actionItem.toLowerCase().includes(search.toLowerCase())) ||
+        (d.studyTopic && d.studyTopic.toLowerCase().includes(search.toLowerCase())) ||
+        (d.studentOutput && d.studentOutput.toLowerCase().includes(search.toLowerCase())) ||
         String(d.day).includes(search)
       );
-      return matchesAction && matchesSearch;
+
+      return matchesMonth && matchesAction && matchesSearch;
     }).sort((a, b) => (a.day || 0) - (b.day || 0));
-  }, [plan, filterAction, search]);
+  }, [plan, selectedMonth, filterAction, search]);
 
   const handleAddDay = (newDay) => {
     const updated = [...plan, newDay].sort((a, b) => (a.day || 0) - (b.day || 0));
@@ -1009,7 +1053,7 @@ export function CoursePlanModal({ course, onClose, navigate }) {
       const jsonStr = JSON.stringify(plan, null, 2);
       navigator.clipboard.writeText(jsonStr);
       setCopied(true);
-      showToast('Plan JSON copied to clipboard!');
+      showToast('Course Plan JSON copied to clipboard!');
       setTimeout(() => setCopied(false), 3000);
     } catch {
       showToast('Could not copy to clipboard.');
@@ -1025,74 +1069,139 @@ export function CoursePlanModal({ course, onClose, navigate }) {
   const handleResetToDefault = () => {
     const defaultTemplate = DEFAULT_COURSE_PLANS[course.id] || [];
     persistPlan(defaultTemplate);
-    showToast('Reset plan to official starter template.');
+    showToast('Reset plan to official 30-class starter template.');
   };
 
   return (
-    <div className="fixed inset-0 z-[130] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-xl overflow-y-auto">
+    <div className="fixed inset-0 z-[130] flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-xl overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 20 }}
-        className="relative w-full max-w-5xl rounded-3xl border border-emerald-500/30 bg-slate-950 p-5 sm:p-8 shadow-2xl my-6 flex flex-col max-h-[92vh] overflow-hidden"
+        className="relative w-full max-w-6xl rounded-3xl border border-emerald-500/30 bg-slate-950 p-4 sm:p-6 md:p-8 shadow-2xl my-4 sm:my-6 flex flex-col max-h-[94vh] overflow-hidden"
       >
         {/* Decorative glows */}
-        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-emerald-600/15 blur-[80px] pointer-events-none" />
-        <div className="absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-teal-600/10 blur-[80px] pointer-events-none" />
+        <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-emerald-600/15 blur-[90px] pointer-events-none" />
+        <div className="absolute -left-24 -bottom-24 h-72 w-72 rounded-full bg-teal-600/10 blur-[90px] pointer-events-none" />
 
         {/* Header Strip */}
-        <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-5 border-b border-white/10 shrink-0">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-300">
-                <Compass size={13} /> Course Plan & Curriculum Manager
-              </span>
-              {course.duration && (
-                <span className="rounded-full border border-amber-400/30 bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-black text-amber-300 uppercase">
-                  ⏳ {course.duration}
+        <div className="relative z-10 flex flex-col gap-4 pb-5 border-b border-white/10 shrink-0">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/15 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-emerald-300">
+                  <Compass size={13} /> Course Plan & Curriculum Hub
                 </span>
-              )}
+                {course.duration && (
+                  <span className="rounded-full border border-amber-400/30 bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-black text-amber-300 uppercase">
+                    ⏳ {course.duration}
+                  </span>
+                )}
+                <span className="rounded-full border border-purple-400/30 bg-purple-500/10 px-2.5 py-0.5 text-[10px] font-black text-purple-300 uppercase">
+                  👨‍🏫 Instructor: {course.instructor || 'Tanvir Ahmad'}
+                </span>
+              </div>
+              <h3 className="mt-2 text-xl sm:text-2xl md:text-3xl font-black text-white">
+                {course.title}
+              </h3>
+              <p className="mt-1 text-xs sm:text-sm text-slate-400">
+                Full 30-Day Live Syllabus • 60–70% Student Talking Time (STT) • Daily Speaking Drills & Action Outputs
+              </p>
             </div>
-            <h3 className="mt-2 text-2xl sm:text-3xl font-black text-white">
-              {course.title}
-            </h3>
-            <p className="mt-1 text-xs sm:text-sm text-slate-400">
-              Instructor: <span className="text-white font-bold">{course.instructor}</span> • Schedule: <span className="text-slate-300">{course.schedule || 'Regular'}</span>
-            </p>
+
+            {/* Top Action Controls & Close */}
+            <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+              {/* Dual Mode Switcher: Student View (Viewer) vs Instructor View (Editor) */}
+              <div className="flex items-center rounded-2xl border border-white/15 bg-white/5 p-1 shadow-inner">
+                <button
+                  type="button"
+                  onClick={() => setPlanMode('viewer')}
+                  className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-black uppercase tracking-wider transition ${
+                    planMode === 'viewer'
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Switch to Student Viewer Mode"
+                >
+                  <Eye size={14} /> Student View
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPlanMode('editor')}
+                  className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-black uppercase tracking-wider transition ${
+                    planMode === 'editor'
+                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                  title="Switch to Instructor Editor Mode"
+                >
+                  <Edit3 size={14} /> Editor Mode
+                </button>
+              </div>
+
+              {/* In Editor Mode: Add Day, Upload, Export */}
+              {planMode === 'editor' && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingDay(true)}
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-3 py-2 text-xs font-black uppercase tracking-wider text-white shadow-md transition active:scale-95"
+                  >
+                    <Plus size={14} /> Add Day
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsUploadOpen(true)}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 px-3 py-2 text-xs font-bold text-slate-200 transition"
+                    title="Upload / Paste Syllabus Plan"
+                  >
+                    <Upload size={13} /> Upload
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleExportPlan}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 px-3 py-2 text-xs font-bold text-slate-200 transition"
+                    title="Copy Plan JSON"
+                  >
+                    {copied ? <Check size={13} className="text-emerald-400" /> : <Copy size={13} />}
+                    <span className="hidden sm:inline">Export</span>
+                  </button>
+                </>
+              )}
+
+              <button
+                type="button"
+                onClick={onClose}
+                className="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition ml-1"
+                title="Close Modal"
+              >
+                <X size={20} />
+              </button>
+            </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setIsAddingDay(true)}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-3.5 py-2 text-xs font-black uppercase tracking-wider text-white shadow-md transition active:scale-95"
-            >
-              <Plus size={15} /> Add Day
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsUploadOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 px-3.5 py-2 text-xs font-bold text-slate-200 transition"
-              title="Upload / Paste Syllabus Plan"
-            >
-              <Upload size={14} /> Upload Plan
-            </button>
-            <button
-              type="button"
-              onClick={handleExportPlan}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 px-3 py-2 text-xs font-bold text-slate-200 transition"
-              title="Copy Plan JSON"
-            >
-              {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
-              <span className="hidden sm:inline">Export</span>
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition ml-1"
-            >
-              <X size={20} />
-            </button>
+          {/* Mode Indicator Banner */}
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-2.5">
+            <div className="flex items-center gap-2">
+              <span className={`inline-block h-2 w-2 rounded-full ${planMode === 'viewer' ? 'bg-emerald-400 animate-pulse' : 'bg-purple-400 animate-pulse'}`} />
+              <p className="text-xs text-slate-300 font-medium">
+                {planMode === 'viewer' ? (
+                  <>
+                    <strong className="text-emerald-300">Viewer Mode (Student Syllabus Explorer)</strong>: View full 30-day curriculum with core speaking structures, live speaking drills, homework tasks, and class notes.
+                  </>
+                ) : (
+                  <>
+                    <strong className="text-purple-300">Editor Mode (Instructor Management)</strong>: Customize class days, attach lecture notes, PDF study links, audio drills, video classes, and action triggers.
+                  </>
+                )}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 text-[11px] font-bold text-slate-400">
+              <span>Total Classes: <strong className="text-white">{plan.length}</strong></span>
+              <span>•</span>
+              <span>Month Filter: <strong className="text-cyan-300">{selectedMonth === 'all' ? 'All Months' : `Month ${selectedMonth}`}</strong></span>
+            </div>
           </div>
         </div>
 
@@ -1111,145 +1220,230 @@ export function CoursePlanModal({ course, onClose, navigate }) {
           )}
         </AnimatePresence>
 
-        {/* Metrics & Filter Controls */}
-        <div className="relative z-10 mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between shrink-0">
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="font-bold text-slate-400">
-              Configured Days: <span className="text-emerald-300 font-extrabold">{plan.length}</span> / {course.totalDays || 90} Target Days
-            </span>
-            <span className="text-slate-600">•</span>
-            <span className="text-slate-400">
-              Outputs Configured: <span className="text-cyan-300 font-bold">{plan.filter(d => d.studentOutput).length}</span>
-            </span>
-          </div>
+        {/* Navigation Tabs: Months & Filter Bar */}
+        <div className="relative z-10 mt-3 flex flex-col gap-3 shrink-0">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            {/* Month Tabs */}
+            <div className="flex flex-wrap items-center gap-1.5 rounded-2xl border border-white/10 bg-white/[0.03] p-1.5">
+              <button
+                type="button"
+                onClick={() => setSelectedMonth('all')}
+                className={`rounded-xl px-3.5 py-1.5 text-xs font-black uppercase tracking-wider transition ${
+                  selectedMonth === 'all'
+                    ? 'bg-emerald-600 text-white shadow'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                All Classes ({plan.length})
+              </button>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="relative min-w-[200px]">
-              <Search size={13} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="Search day or topic..."
-                className="w-full rounded-xl border border-white/10 bg-white/5 py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-500 outline-none focus:border-emerald-400"
-              />
+              {availableMonths.map(m => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setSelectedMonth(String(m))}
+                  className={`rounded-xl px-3.5 py-1.5 text-xs font-black uppercase tracking-wider transition ${
+                    selectedMonth === String(m)
+                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Month {m} {m === 1 ? '(1–10)' : m === 2 ? '(11–20)' : '(21–30)'}
+                </button>
+              ))}
             </div>
 
-            <select
-              value={filterAction}
-              onChange={e => setFilterAction(e.target.value)}
-              className="rounded-xl border border-white/10 bg-slate-900 px-3 py-1.5 text-xs font-bold text-white outline-none focus:border-emerald-400"
-            >
-              <option value="all">All Action Types</option>
-              <option value="ai_speaking">AI Speaking</option>
-              <option value="pdf_resource">PDF Material</option>
-              <option value="quiz">Daily Quiz</option>
-              <option value="mock_interview">Mock Interview</option>
-              <option value="video_lecture">Audio/Video</option>
-            </select>
+            {/* Search and Action Filter */}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="relative min-w-[200px] sm:min-w-[240px]">
+                <Search size={13} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Search class, topic, or formula..."
+                  className="w-full rounded-xl border border-white/10 bg-white/5 py-1.5 pl-8 pr-3 text-xs text-white placeholder-slate-500 outline-none focus:border-emerald-400"
+                />
+              </div>
+
+              <select
+                value={filterAction}
+                onChange={e => setFilterAction(e.target.value)}
+                className="rounded-xl border border-white/10 bg-slate-900 px-3 py-1.5 text-xs font-bold text-white outline-none focus:border-emerald-400"
+              >
+                <option value="all">All Action Types</option>
+                <option value="ai_speaking">AI Speaking</option>
+                <option value="pdf_resource">PDF Material</option>
+                <option value="quiz">Daily Quiz</option>
+                <option value="mock_interview">Mock Interview</option>
+                <option value="video_lecture">Audio/Video</option>
+              </select>
+            </div>
           </div>
+
+          {/* Month Subtitle info if month is active */}
+          {selectedMonth !== 'all' && monthThemes[Number(selectedMonth)] && (
+            <div className="flex items-center gap-2 px-1 text-xs text-slate-400">
+              <span className="font-bold uppercase tracking-wider text-emerald-400">Month {selectedMonth} Focus:</span>
+              <span className="text-slate-200 font-medium">{monthThemes[Number(selectedMonth)]}</span>
+            </div>
+          )}
         </div>
 
-        {/* Scrollable Day Roadmap List */}
-        <div className="relative z-10 mt-4 flex-1 overflow-y-auto pr-1 space-y-3.5">
+        {/* Scrollable Curriculum Class Cards */}
+        <div className="relative z-10 mt-3 flex-1 overflow-y-auto pr-1.5 space-y-4">
           {filteredDays.map(item => {
             const actionConfig = PLAN_ACTION_TYPES[item.actionType] || PLAN_ACTION_TYPES.ai_speaking;
+            const itemMonth = item.month || (item.day <= 10 ? 1 : item.day <= 20 ? 2 : 3);
 
             return (
               <div
                 key={item.day}
-                className="rounded-2xl border border-white/10 bg-gradient-to-b from-slate-900/90 to-slate-950/90 p-4 sm:p-5 transition hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-950/20"
+                className="rounded-2xl border border-white/10 bg-gradient-to-b from-slate-900/90 to-slate-950/95 p-4 sm:p-5 md:p-6 transition hover:border-emerald-500/40 hover:shadow-xl hover:shadow-emerald-950/20"
               >
-                <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                  {/* Left Column: Day # & Content */}
-                  <div className="space-y-2 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-lg bg-emerald-500/20 border border-emerald-400/30 px-2.5 py-0.5 text-xs font-black text-emerald-300 uppercase tracking-widest">
-                        Day {item.day}
+                {/* Card Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-white/10">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-lg bg-emerald-500/20 border border-emerald-400/40 px-2.5 py-1 text-xs font-black text-emerald-300 uppercase tracking-wider">
+                      Class {String(item.day).padStart(2, '0')}
+                    </span>
+                    <span className="rounded-lg bg-blue-500/15 border border-blue-400/30 px-2 py-0.5 text-[10px] font-bold text-blue-300 uppercase tracking-wider">
+                      Month {itemMonth}
+                    </span>
+                    <h4 className="text-base sm:text-lg font-black text-white">
+                      {item.title}
+                    </h4>
+                  </div>
+
+                  {/* Resource Badges */}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {item.classNotes && (
+                      <span className="inline-flex items-center gap-1 rounded-md border border-amber-400/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-300">
+                        <BookOpen size={11} /> Notes
                       </span>
-                      <h4 className="text-base font-black text-white">
-                        {item.title}
-                      </h4>
-                    </div>
+                    )}
+                    {item.pdfUrl && (
+                      <span className="inline-flex items-center gap-1 rounded-md border border-blue-400/30 bg-blue-500/10 px-2 py-0.5 text-[10px] font-bold text-blue-300">
+                        <FileText size={11} /> PDF
+                      </span>
+                    )}
+                    {item.audioUrl && (
+                      <span className="inline-flex items-center gap-1 rounded-md border border-cyan-400/30 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-bold text-cyan-300">
+                        <Headphones size={11} /> Audio
+                      </span>
+                    )}
+                    {item.videoUrl && (
+                      <span className="inline-flex items-center gap-1 rounded-md border border-purple-400/30 bg-purple-500/10 px-2 py-0.5 text-[10px] font-bold text-purple-300">
+                        <Video size={11} /> Video
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-                    {/* কোনদিন কী পড়ব (Study Topic) */}
-                    <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs">
-                      <p className="font-bold text-slate-400 text-[10px] uppercase tracking-wider mb-0.5">
-                        📖 কোনদিন কী পড়ব (Lesson Concept & Study Scope):
-                      </p>
-                      <p className="text-slate-200 leading-relaxed font-medium">
-                        {item.studyTopic || 'Standard daily lecture and guided concept review.'}
-                      </p>
-                    </div>
-
-                    {/* কী আউটপুট ব্যবহার করব (Student Output) */}
-                    <div className="rounded-xl border border-cyan-500/15 bg-cyan-500/[0.03] p-3 text-xs">
-                      <p className="font-bold text-cyan-300 text-[10px] uppercase tracking-wider mb-0.5">
-                        🎯 কী আউটপুট তৈরি/ব্যবহার করবে (Expected Student Output):
-                      </p>
-                      <p className="text-cyan-100 leading-relaxed font-medium">
-                        {item.studentOutput || 'Submit voice recording or complete test exercise.'}
+                {/* 3 Core Curriculum Blocks (High-Impact Structured Content) */}
+                <div className="mt-4 grid gap-3 lg:grid-cols-3">
+                  {/* 1. Core Structure (মূল বাক্য ও গ্রামার টেকনিক) */}
+                  <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.04] p-3.5 text-xs flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-1.5 font-bold text-amber-300 text-[11px] uppercase tracking-wider mb-1.5">
+                        <Lightbulb size={13} className="text-amber-400 shrink-0" />
+                        <span>Core Structure (মূল বাক্য ও টেকনিক)</span>
+                      </div>
+                      <p className="text-amber-100 font-medium leading-relaxed">
+                        {item.coreStructure || item.studyTopic || 'Grammar blueprints and sentence formulas.'}
                       </p>
                     </div>
                   </div>
 
-                  {/* Right Column: ক্লিক করলে কী হবে (Click Action) & Controls */}
-                  <div className="lg:w-72 shrink-0 space-y-3 pt-2 lg:pt-0 lg:pl-4 lg:border-l lg:border-white/10">
+                  {/* 2. Live Activity (লাইভ স্পিকিং ড্রিল) */}
+                  <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] p-3.5 text-xs flex flex-col justify-between">
                     <div>
-                      <span className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1.5">
-                        ⚡ ক্লিক করলে কী হবে (Action Trigger):
-                      </span>
-
-                      <div className="flex items-center gap-1.5 mb-2">
-                        <span className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-bold ${actionConfig.badgeClass}`}>
-                          {actionConfig.icon} {actionConfig.label}
-                        </span>
+                      <div className="flex items-center gap-1.5 font-bold text-emerald-300 text-[11px] uppercase tracking-wider mb-1.5">
+                        <Mic size={13} className="text-emerald-400 shrink-0" />
+                        <span>Live Activity (লাইভ স্পিকিং ড্রিল)</span>
                       </div>
-
-                      {/* Click Action Button (Interactive Tester) */}
-                      <button
-                        type="button"
-                        onClick={() => setSimulatedAction({
-                          day: item.day,
-                          title: item.title,
-                          actionType: item.actionType,
-                          actionLabel: item.actionLabel,
-                          actionTarget: item.actionTarget,
-                          studyTopic: item.studyTopic,
-                          studentOutput: item.studentOutput,
-                        })}
-                        className={`w-full inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black uppercase tracking-wider shadow transition active:scale-95 ${actionConfig.btnClass}`}
-                        title="Click to simulate / test what learners experience"
-                      >
-                        {actionConfig.icon}
-                        <span className="truncate">{item.actionLabel || 'Start Day Action'}</span>
-                        <ArrowRight size={13} className="shrink-0" />
-                      </button>
-
-                      {item.actionTarget && (
-                        <p className="mt-1 text-[9px] text-slate-500 truncate text-center font-mono">
-                          Target: {item.actionTarget}
-                        </p>
-                      )}
+                      <p className="text-emerald-100 font-medium leading-relaxed">
+                        {item.liveActivity || 'Interactive live speaking drills with batchmates and mentor.'}
+                      </p>
                     </div>
+                  </div>
 
-                    {/* Day Edit / Delete Buttons */}
-                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/5">
-                      <button
-                        type="button"
-                        onClick={() => setEditingDay(item)}
-                        className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-bold text-slate-300 hover:bg-white/10 transition"
-                      >
-                        <Edit3 size={12} /> Edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteDay(item.day)}
-                        className="inline-flex items-center gap-1 rounded-lg border border-red-500/20 bg-red-500/10 px-2 py-1 text-[11px] font-bold text-red-400 hover:bg-red-500/20 transition"
-                      >
-                        <Trash2 size={12} />
-                      </button>
+                  {/* 3. Action Item & Submission (হোমওয়ার্ক ও আউটপুট) */}
+                  <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/[0.04] p-3.5 text-xs flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-1.5 font-bold text-cyan-300 text-[11px] uppercase tracking-wider mb-1.5">
+                        <Zap size={13} className="text-cyan-400 shrink-0" />
+                        <span>Action Item (হোমওয়ার্ক ও আউটপুট)</span>
+                      </div>
+                      <p className="text-cyan-100 font-medium leading-relaxed">
+                        {item.actionItem || item.studentOutput || 'Submit voice recording or practice task.'}
+                      </p>
                     </div>
+                  </div>
+                </div>
+
+                {/* Footer Action Bar for this Class */}
+                <div className="mt-4 pt-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  {/* Left: View Notes & Resources Button */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedResourceDay(item)}
+                      className="inline-flex items-center gap-2 rounded-xl border border-amber-400/30 bg-amber-500/10 hover:bg-amber-500/20 px-3.5 py-2 text-xs font-bold text-amber-200 transition active:scale-95"
+                    >
+                      <BookOpen size={14} className="text-amber-400" />
+                      <span>View Class Notes & Resources</span>
+                    </button>
+
+                    {item.actionTarget && (
+                      <span className="hidden md:inline-block text-[10px] text-slate-500 font-mono">
+                        Target: {item.actionTarget}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Right: Primary Action / Editor Controls */}
+                  <div className="flex flex-wrap items-center gap-2 justify-end">
+                    {/* Primary Practice / Action Launch Button */}
+                    <button
+                      type="button"
+                      onClick={() => setSimulatedAction({
+                        day: item.day,
+                        title: item.title,
+                        actionType: item.actionType,
+                        actionLabel: item.actionLabel || 'Launch Action Drill',
+                        actionTarget: item.actionTarget,
+                        studyTopic: item.coreStructure || item.studyTopic,
+                        studentOutput: item.actionItem || item.studentOutput,
+                      })}
+                      className={`inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black uppercase tracking-wider shadow transition active:scale-95 ${actionConfig.btnClass}`}
+                    >
+                      {actionConfig.icon}
+                      <span>{item.actionLabel || 'Launch Practice Task'}</span>
+                      <ArrowRight size={13} className="shrink-0" />
+                    </button>
+
+                    {/* Instructor Edit / Delete Controls (Shown in Editor Mode) */}
+                    {planMode === 'editor' && (
+                      <div className="flex items-center gap-1.5 pl-2 border-l border-white/10">
+                        <button
+                          type="button"
+                          onClick={() => setEditingDay(item)}
+                          className="inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/5 px-2.5 py-1.5 text-xs font-bold text-slate-300 hover:bg-white/10 hover:text-white transition"
+                          title="Edit Day Curriculum & Notes"
+                        >
+                          <Edit3 size={13} /> Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteDay(item.day)}
+                          className="inline-flex items-center gap-1 rounded-lg border border-red-500/30 bg-red-500/10 px-2.5 py-1.5 text-xs font-bold text-red-400 hover:bg-red-500/20 transition"
+                          title="Delete Day"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1258,22 +1452,27 @@ export function CoursePlanModal({ course, onClose, navigate }) {
 
           {filteredDays.length === 0 && (
             <div className="py-14 text-center rounded-3xl border border-dashed border-white/10 bg-white/[0.01]">
-              <Compass size={36} className="mx-auto text-slate-600 mb-3" />
-              <p className="text-sm font-bold text-slate-400">No days match your search or filter.</p>
-              <div className="mt-3 flex items-center justify-center gap-3">
+              <Compass size={40} className="mx-auto text-slate-600 mb-3" />
+              <p className="text-sm font-bold text-slate-300">No classes match your current search or month filter.</p>
+              <p className="text-xs text-slate-500 mt-1">Try clearing the search input or selecting "All Classes".</p>
+              <div className="mt-4 flex items-center justify-center gap-3">
                 <button
                   type="button"
-                  onClick={() => setIsAddingDay(true)}
-                  className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-black uppercase tracking-wider text-white"
+                  onClick={() => {
+                    setSearch('');
+                    setSelectedMonth('all');
+                    setFilterAction('all');
+                  }}
+                  className="rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold text-slate-300 hover:bg-white/10"
                 >
-                  + Add First Day
+                  Clear Filters
                 </button>
                 <button
                   type="button"
                   onClick={handleResetToDefault}
-                  className="rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-xs font-bold text-slate-300 hover:bg-white/10"
+                  className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-black uppercase tracking-wider text-white hover:bg-emerald-500 shadow"
                 >
-                  Load Official Starter Plan
+                  Load Official 30-Day Syllabus
                 </button>
               </div>
             </div>
@@ -1281,36 +1480,74 @@ export function CoursePlanModal({ course, onClose, navigate }) {
         </div>
 
         {/* Footer info & close */}
-        <div className="relative z-10 mt-4 flex items-center justify-between border-t border-white/10 pt-3 shrink-0">
-          <button
-            type="button"
-            onClick={handleResetToDefault}
-            className="text-[11px] font-bold text-slate-500 hover:text-slate-300 transition"
-          >
-            Reset to Official Starter Plan
-          </button>
+        <div className="relative z-10 mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-3 shrink-0">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleResetToDefault}
+              className="text-[11px] font-bold text-slate-500 hover:text-slate-300 transition underline underline-offset-4"
+            >
+              Reset to Official 30-Day Template
+            </button>
+            <span className="text-slate-600">•</span>
+            <span className="text-[11px] text-slate-400">
+              Tanvir Ahmad Curriculum System
+            </span>
+          </div>
+
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl bg-white/10 hover:bg-white/20 px-6 py-2 text-xs font-black uppercase tracking-wider text-white"
+            className="rounded-xl bg-white/10 hover:bg-white/20 px-6 py-2 text-xs font-black uppercase tracking-wider text-white transition"
           >
             Close Plan
           </button>
         </div>
       </motion.div>
 
-      {/* --- SUB-MODAL A: ADD OR EDIT DAY --- */}
+      {/* --- SUB-MODAL 1: CLASS RESOURCE & STUDY NOTES READER (STUDENT VIEW) --- */}
+      <AnimatePresence>
+        {selectedResourceDay && (
+          <ClassResourceModal
+            dayItem={selectedResourceDay}
+            courseTitle={course.title}
+            onClose={() => setSelectedResourceDay(null)}
+            onLaunchPractice={(dayData) => {
+              setSelectedResourceDay(null);
+              setSimulatedAction({
+                day: dayData.day,
+                title: dayData.title,
+                actionType: dayData.actionType,
+                actionLabel: dayData.actionLabel || 'Launch Practice Drill',
+                actionTarget: dayData.actionTarget,
+                studyTopic: dayData.coreStructure || dayData.studyTopic,
+                studentOutput: dayData.actionItem || dayData.studentOutput,
+              });
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* --- SUB-MODAL 2: ADD OR EDIT DAY MODAL --- */}
       <AnimatePresence>
         {(isAddingDay || editingDay) && (
           <PlanDayEditorModal
             initialData={editingDay || {
               day: plan.length > 0 ? Math.max(...plan.map(d => d.day || 0)) + 1 : 1,
+              month: selectedMonth !== 'all' ? Number(selectedMonth) : 1,
               title: '',
+              coreStructure: '',
+              liveActivity: '',
+              actionItem: '',
               studyTopic: '',
               studentOutput: '',
+              classNotes: '',
+              pdfUrl: '',
+              audioUrl: '',
+              videoUrl: '',
               actionType: 'ai_speaking',
-              actionLabel: 'Launch Day Drill',
-              actionTarget: '/speaking-practice',
+              actionLabel: 'Launch Speaking Practice Drill',
+              actionTarget: '/speaking-practice?language=english',
               status: 'published',
             }}
             isEdit={Boolean(editingDay)}
@@ -1329,7 +1566,7 @@ export function CoursePlanModal({ course, onClose, navigate }) {
         )}
       </AnimatePresence>
 
-      {/* --- SUB-MODAL B: UPLOAD / PASTE PLAN --- */}
+      {/* --- SUB-MODAL 3: UPLOAD / PASTE PLAN --- */}
       <AnimatePresence>
         {isUploadOpen && (
           <PlanUploadModal
@@ -1340,7 +1577,7 @@ export function CoursePlanModal({ course, onClose, navigate }) {
         )}
       </AnimatePresence>
 
-      {/* --- SUB-MODAL C: ACTION SIMULATION PREVIEW ("CLICK KORLE KI HOBE") --- */}
+      {/* --- SUB-MODAL 4: ACTION SIMULATION PREVIEW ("CLICK KORLE KI HOBE") --- */}
       <AnimatePresence>
         {simulatedAction && (
           <PlanSimulationModal
@@ -1354,7 +1591,182 @@ export function CoursePlanModal({ course, onClose, navigate }) {
   );
 }
 
-/* ---------------- SUB-MODAL A: DAY EDITOR MODAL ---------------- */
+/* ---------------- SUB-MODAL 1: CLASS RESOURCE & STUDY NOTES READER ---------------- */
+function ClassResourceModal({ dayItem, courseTitle, onClose, onLaunchPractice }) {
+  const itemMonth = dayItem.month || (dayItem.day <= 10 ? 1 : dayItem.day <= 20 ? 2 : 3);
+
+  return (
+    <div className="fixed inset-0 z-[140] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md overflow-y-auto">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="relative w-full max-w-3xl rounded-3xl border border-amber-500/30 bg-slate-900 p-5 sm:p-8 shadow-2xl my-6 flex flex-col max-h-[90vh] overflow-hidden"
+      >
+        {/* Glow */}
+        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-amber-600/10 blur-[80px] pointer-events-none" />
+
+        {/* Header */}
+        <div className="flex items-start justify-between pb-4 border-b border-white/10 shrink-0">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-lg bg-amber-500/20 border border-amber-400/30 px-2.5 py-0.5 text-xs font-black text-amber-300 uppercase tracking-wider">
+                Class {String(dayItem.day).padStart(2, '0')}
+              </span>
+              <span className="rounded-lg bg-blue-500/15 border border-blue-400/30 px-2 py-0.5 text-[10px] font-bold text-blue-300 uppercase tracking-wider">
+                Month {itemMonth}
+              </span>
+              <span className="text-xs text-slate-400 font-medium">
+                {courseTitle}
+              </span>
+            </div>
+            <h4 className="mt-2 text-xl sm:text-2xl font-black text-white">
+              {dayItem.title}
+            </h4>
+            <p className="mt-0.5 text-xs text-slate-400">
+              Instructor: <strong className="text-slate-200">Tanvir Ahmad</strong> • Guided Lecture & Output Blueprint
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition shrink-0"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Scrollable Resource Content */}
+        <div className="mt-4 flex-1 overflow-y-auto space-y-4 pr-1">
+          {/* 1. Core Structure Blueprint */}
+          <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4 sm:p-5">
+            <div className="flex items-center gap-2 mb-2 font-black text-amber-300 text-xs sm:text-sm uppercase tracking-wider">
+              <Lightbulb size={16} className="text-amber-400" />
+              <span>Core Structure (মূল বাক্য ও গ্রামার টেকনিক)</span>
+            </div>
+            <p className="text-white text-sm sm:text-base font-semibold leading-relaxed">
+              {dayItem.coreStructure || dayItem.studyTopic || 'Natural sentence formulas and conversation frameworks.'}
+            </p>
+          </div>
+
+          {/* 2. In-Class Live Speaking Activity */}
+          <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4 sm:p-5">
+            <div className="flex items-center gap-2 mb-2 font-black text-emerald-300 text-xs sm:text-sm uppercase tracking-wider">
+              <Mic size={16} className="text-emerald-400" />
+              <span>Live In-Class Activity (লাইভ স্পিকিং ড্রিল)</span>
+            </div>
+            <p className="text-slate-200 text-xs sm:text-sm font-medium leading-relaxed">
+              {dayItem.liveActivity || 'Live interaction and spontaneous speaking drills.'}
+            </p>
+          </div>
+
+          {/* 3. Action Item & Submission Requirement */}
+          <div className="rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-4 sm:p-5">
+            <div className="flex items-center gap-2 mb-2 font-black text-cyan-300 text-xs sm:text-sm uppercase tracking-wider">
+              <Zap size={16} className="text-cyan-400" />
+              <span>Action Item & Homework (হোমওয়ার্ক ও আউটপুট সাবমিশন)</span>
+            </div>
+            <p className="text-cyan-100 text-xs sm:text-sm font-medium leading-relaxed">
+              {dayItem.actionItem || dayItem.studentOutput || 'Submit voice recording or required assignment.'}
+            </p>
+          </div>
+
+          {/* 4. Instructor Class Notes & Guidance */}
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5">
+            <div className="flex items-center gap-2 mb-2 font-black text-slate-200 text-xs sm:text-sm uppercase tracking-wider">
+              <BookOpen size={16} className="text-purple-400" />
+              <span>Class Notes & Instructor Guidance from Tanvir Ahmad</span>
+            </div>
+            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed whitespace-pre-line">
+              {dayItem.classNotes || 'Focus on confident, natural delivery without memorizing exact sentences. Speak with natural pausing, intonation, and stress.'}
+            </p>
+          </div>
+
+          {/* 5. Attached Materials & Media Links */}
+          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-5 space-y-3">
+            <h5 className="text-xs font-black uppercase tracking-wider text-slate-300">
+              Attached Study Materials & Media
+            </h5>
+
+            <div className="grid gap-2 sm:grid-cols-2">
+              {dayItem.pdfUrl ? (
+                <a
+                  href={dayItem.pdfUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-between rounded-xl border border-blue-500/30 bg-blue-500/10 p-3 hover:bg-blue-500/20 transition text-xs font-bold text-blue-200"
+                >
+                  <span className="flex items-center gap-2">
+                    <FileText size={16} className="text-blue-400" />
+                    <span>Download Lecture PDF Sheet</span>
+                  </span>
+                  <ExternalLink size={13} />
+                </a>
+              ) : (
+                <div className="flex items-center gap-2 rounded-xl border border-white/5 bg-white/[0.01] p-3 text-xs text-slate-500">
+                  <FileText size={16} />
+                  <span>PDF Lecture Sheet (Shared in Class)</span>
+                </div>
+              )}
+
+              {dayItem.videoUrl ? (
+                <a
+                  href={dayItem.videoUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-between rounded-xl border border-purple-500/30 bg-purple-500/10 p-3 hover:bg-purple-500/20 transition text-xs font-bold text-purple-200"
+                >
+                  <span className="flex items-center gap-2">
+                    <Video size={16} className="text-purple-400" />
+                    <span>Watch Class Recording / Lecture</span>
+                  </span>
+                  <ExternalLink size={13} />
+                </a>
+              ) : (
+                <div className="flex items-center gap-2 rounded-xl border border-white/5 bg-white/[0.01] p-3 text-xs text-slate-500">
+                  <Video size={16} />
+                  <span>Live Video Class via Portal</span>
+                </div>
+              )}
+            </div>
+
+            {dayItem.audioUrl && (
+              <div className="mt-3 rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-3">
+                <p className="text-[11px] font-bold text-cyan-300 mb-1 flex items-center gap-1.5">
+                  <Headphones size={13} /> Listening Drill Audio Sample:
+                </p>
+                <audio controls className="w-full h-8 mt-1" src={dayItem.audioUrl} />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between gap-3 shrink-0">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl border border-white/10 px-4 py-2 text-xs font-bold text-slate-400 hover:text-white"
+          >
+            Close Notes
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onLaunchPractice(dayItem)}
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 px-5 py-2 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-emerald-900/40 active:scale-95 transition"
+          >
+            <Zap size={14} />
+            <span>Launch Action / Practice Task</span>
+            <ArrowRight size={13} />
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+/* ---------------- SUB-MODAL 2: DAY EDITOR MODAL (INSTRUCTOR) ---------------- */
 function PlanDayEditorModal({ initialData, isEdit, onClose, onSubmit }) {
   const [formData, setFormData] = useState(initialData);
 
@@ -1363,31 +1775,37 @@ function PlanDayEditorModal({ initialData, isEdit, onClose, onSubmit }) {
     onSubmit({
       ...formData,
       day: Number(formData.day) || 1,
+      month: Number(formData.month) || 1,
     });
   };
 
   return (
-    <div className="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+    <div className="fixed inset-0 z-[140] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-xl rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-2xl my-8"
+        className="relative w-full max-w-2xl rounded-3xl border border-white/15 bg-slate-900 p-5 sm:p-7 shadow-2xl my-6 flex flex-col max-h-[92vh] overflow-hidden"
       >
-        <div className="flex items-center justify-between pb-3 border-b border-white/10">
-          <h4 className="text-lg font-black text-white">
-            {isEdit ? `Edit Day ${formData.day}` : `Add Day to Plan`}
-          </h4>
+        <div className="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
+          <div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-purple-400">
+              Instructor Curriculum Editor
+            </span>
+            <h4 className="text-lg sm:text-xl font-black text-white">
+              {isEdit ? `Edit Class ${formData.day}` : `Add Class to Course Plan`}
+            </h4>
+          </div>
           <button type="button" onClick={onClose} className="text-slate-400 hover:text-white">
             <X size={18} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-          <div className="grid grid-cols-3 gap-3">
+        <form onSubmit={handleSubmit} className="mt-4 flex-1 overflow-y-auto pr-1 space-y-4">
+          <div className="grid grid-cols-4 gap-3">
             <div>
               <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
-                Day Number *
+                Class / Day # *
               </label>
               <input
                 required
@@ -1396,61 +1814,132 @@ function PlanDayEditorModal({ initialData, isEdit, onClose, onSubmit }) {
                 max="365"
                 value={formData.day}
                 onChange={e => setFormData({ ...formData, day: e.target.value })}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-emerald-400"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-purple-400"
               />
+            </div>
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
+                Month # *
+              </label>
+              <select
+                value={formData.month || 1}
+                onChange={e => setFormData({ ...formData, month: Number(e.target.value) })}
+                className="w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-sm font-bold text-white outline-none focus:border-purple-400"
+              >
+                <option value={1}>Month 1</option>
+                <option value={2}>Month 2</option>
+                <option value={3}>Month 3</option>
+                <option value={4}>Month 4</option>
+                <option value={5}>Month 5</option>
+                <option value={6}>Month 6</option>
+              </select>
             </div>
             <div className="col-span-2">
               <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
-                Lesson Title *
+                Class / Lesson Title *
               </label>
               <input
                 required
                 type="text"
                 value={formData.title}
                 onChange={e => setFormData({ ...formData, title: e.target.value })}
-                placeholder="e.g. Hesitation Breakdown"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-emerald-400"
+                placeholder="e.g. Breaking the Ice — High-Impact Self-Introduction"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-purple-400"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
-              কোনদিন কী পড়ব (Study Scope & Concepts) *
+            <label className="block text-[10px] font-black uppercase tracking-widest text-amber-300 mb-1">
+              Core Structure (মূল বাক্য ও গ্রামার টেকনিক) *
             </label>
             <textarea
               required
               rows={2}
-              value={formData.studyTopic}
-              onChange={e => setFormData({ ...formData, studyTopic: e.target.value })}
-              placeholder="What core concepts, grammar points, or speaking strategies will be taught on this day?"
-              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-white outline-none focus:border-emerald-400"
+              value={formData.coreStructure}
+              onChange={e => setFormData({ ...formData, coreStructure: e.target.value, studyTopic: e.target.value })}
+              placeholder="e.g. Name + Background + Current Focus + 1 Unique Passion (মুখস্থ ছাড়া ন্যাচারাল ডেলিভারি)।"
+              className="w-full rounded-xl border border-amber-500/20 bg-white/5 p-3 text-xs text-white outline-none focus:border-amber-400"
             />
           </div>
 
           <div>
-            <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
-              কী আউটপুট তৈরি/ব্যবহার করবে (Expected Student Output) *
+            <label className="block text-[10px] font-black uppercase tracking-widest text-emerald-300 mb-1">
+              Live Activity (লাইভ স্পিকিং ড্রিল) *
             </label>
             <textarea
               required
               rows={2}
-              value={formData.studentOutput}
-              onChange={e => setFormData({ ...formData, studentOutput: e.target.value })}
-              placeholder="e.g. Record 60-second self-introduction audio / Complete Task 2 essay outline"
-              className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-xs text-white outline-none focus:border-emerald-400"
+              value={formData.liveActivity}
+              onChange={e => setFormData({ ...formData, liveActivity: e.target.value })}
+              placeholder="e.g. 'Elevator Pitch' — প্রত্যেকে ৯০ সেকেন্ডে নিজের পরিচয় দেবে কোনো বাংলা শব্দ ব্যবহার না করে।"
+              className="w-full rounded-xl border border-emerald-500/20 bg-white/5 p-3 text-xs text-white outline-none focus:border-emerald-400"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-black uppercase tracking-widest text-cyan-300 mb-1">
+              Action Item & Submission (হোমওয়ার্ক ও আউটপুট) *
+            </label>
+            <textarea
+              required
+              rows={2}
+              value={formData.actionItem}
+              onChange={e => setFormData({ ...formData, actionItem: e.target.value, studentOutput: e.target.value })}
+              placeholder="e.g. নিজের ১ মিনিটের সেলফ-ইন্ট্রো অডিও রেকর্ড করে সাবমিট করা।"
+              className="w-full rounded-xl border border-cyan-500/20 bg-white/5 p-3 text-xs text-white outline-none focus:border-cyan-400"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[10px] font-black uppercase tracking-widest text-purple-300 mb-1">
+              Class Notes & Guidance from Tanvir Ahmad
+            </label>
+            <textarea
+              rows={2}
+              value={formData.classNotes || ''}
+              onChange={e => setFormData({ ...formData, classNotes: e.target.value })}
+              placeholder="Tips, common pronunciation mistakes, or delivery pointers for this class..."
+              className="w-full rounded-xl border border-purple-500/20 bg-white/5 p-3 text-xs text-white outline-none focus:border-purple-400"
             />
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
-                ক্লিক করলে কী হবে (Action Type)
+                PDF Resource URL (লেকচার শিট)
+              </label>
+              <input
+                type="text"
+                value={formData.pdfUrl || ''}
+                onChange={e => setFormData({ ...formData, pdfUrl: e.target.value })}
+                placeholder="https://.../notes.pdf"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-mono text-white outline-none focus:border-purple-400"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
+                Video Lecture URL (ভিডিও রেকর্ডিং)
+              </label>
+              <input
+                type="text"
+                value={formData.videoUrl || ''}
+                onChange={e => setFormData({ ...formData, videoUrl: e.target.value })}
+                placeholder="https://.../lecture-video"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-mono text-white outline-none focus:border-purple-400"
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
+                Action Type (ক্লিক করলে কী হবে)
               </label>
               <select
                 value={formData.actionType}
                 onChange={e => setFormData({ ...formData, actionType: e.target.value })}
-                className="w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-xs font-bold text-white outline-none focus:border-emerald-400"
+                className="w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-2 text-xs font-bold text-white outline-none focus:border-purple-400"
               >
                 <option value="ai_speaking">AI Speaking Practice</option>
                 <option value="pdf_resource">PDF Lesson Material</option>
@@ -1462,33 +1951,33 @@ function PlanDayEditorModal({ initialData, isEdit, onClose, onSubmit }) {
 
             <div>
               <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
-                বাটন লেবেল (Action Button Label)
+                Button Label (বাটন নাম)
               </label>
               <input
                 required
                 type="text"
                 value={formData.actionLabel}
                 onChange={e => setFormData({ ...formData, actionLabel: e.target.value })}
-                placeholder="e.g. Launch AI Pronunciation Drill"
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white outline-none focus:border-emerald-400"
+                placeholder="e.g. Record 1-Min Self-Intro Audio"
+                className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white outline-none focus:border-purple-400"
               />
             </div>
           </div>
 
           <div>
             <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
-              টার্গেট লিংক বা রাউট (Action Target URL / Route)
+              Target Link / Route
             </label>
             <input
               type="text"
               value={formData.actionTarget}
               onChange={e => setFormData({ ...formData, actionTarget: e.target.value })}
               placeholder="e.g. /speaking-practice?language=english&day=1"
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-mono text-white outline-none focus:border-emerald-400"
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs font-mono text-white outline-none focus:border-purple-400"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10 shrink-0">
             <button
               type="button"
               onClick={onClose}
@@ -1498,9 +1987,9 @@ function PlanDayEditorModal({ initialData, isEdit, onClose, onSubmit }) {
             </button>
             <button
               type="submit"
-              className="rounded-xl bg-emerald-600 hover:bg-emerald-500 px-6 py-2 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-emerald-600/30"
+              className="rounded-xl bg-purple-600 hover:bg-purple-500 px-6 py-2 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-purple-600/30"
             >
-              Save Day
+              Save Class Day
             </button>
           </div>
         </form>
@@ -1509,7 +1998,7 @@ function PlanDayEditorModal({ initialData, isEdit, onClose, onSubmit }) {
   );
 }
 
-/* ---------------- SUB-MODAL B: UPLOAD / PASTE PLAN ---------------- */
+/* ---------------- SUB-MODAL 3: UPLOAD / PASTE PLAN ---------------- */
 function PlanUploadModal({ course, onClose, onImport }) {
   const [pasteText, setPasteText] = useState('');
   const [error, setError] = useState('');
@@ -1517,7 +2006,7 @@ function PlanUploadModal({ course, onClose, onImport }) {
   const handleParseAndImport = () => {
     setError('');
     if (!pasteText.trim()) {
-      setError('Please paste your curriculum JSON or text.');
+      setError('Please paste your curriculum JSON or formatted lines.');
       return;
     }
 
@@ -1530,20 +2019,25 @@ function PlanUploadModal({ course, onClose, onImport }) {
       }
       throw new Error('JSON is not an array of days.');
     } catch {
-      // Try simple line-by-line format:
-      // Day 1: Title | Study Topic | Student Output | ActionLabel
+      // Line-by-line fallback format:
+      // Day 1: Title | CoreStructure | LiveActivity | ActionItem
       try {
         const lines = pasteText.split('\n').map(l => l.trim()).filter(Boolean);
         const imported = lines.map((line, idx) => {
           const parts = line.split('|').map(p => p.trim());
           const dayNum = idx + 1;
+          const monthNum = dayNum <= 10 ? 1 : dayNum <= 20 ? 2 : 3;
           return {
             day: dayNum,
+            month: monthNum,
             title: parts[0] || `Lesson Day ${dayNum}`,
-            studyTopic: parts[1] || 'Core lesson topics and guided drills.',
-            studentOutput: parts[2] || 'Practice exercise submission.',
+            coreStructure: parts[1] || 'Core sentence patterns and grammar structures.',
+            liveActivity: parts[2] || 'In-class speaking drill.',
+            actionItem: parts[3] || 'Submit voice recording homework.',
+            studyTopic: parts[1] || 'Core lesson topics.',
+            studentOutput: parts[3] || 'Practice output submission.',
             actionType: 'ai_speaking',
-            actionLabel: parts[3] || 'Launch Practice Drill',
+            actionLabel: 'Launch Practice Drill',
             actionTarget: `/speaking-practice?day=${dayNum}`,
             status: 'published',
           };
@@ -1556,7 +2050,7 @@ function PlanUploadModal({ course, onClose, onImport }) {
       } catch (err) {
         setError(`Failed to parse: ${err.message}. Please use valid JSON.`);
       }
-      setError('Could not parse plan. Please paste a valid JSON array of days.');
+      setError('Could not parse plan. Please paste a valid JSON array of class days.');
     }
   };
 
@@ -1567,37 +2061,37 @@ function PlanUploadModal({ course, onClose, onImport }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+    <div className="fixed inset-0 z-[140] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="relative w-full max-w-2xl rounded-3xl border border-white/10 bg-slate-900 p-6 sm:p-8 shadow-2xl my-8"
+        className="relative w-full max-w-2xl rounded-3xl border border-white/10 bg-slate-900 p-5 sm:p-7 shadow-2xl my-6 flex flex-col max-h-[90vh] overflow-hidden"
       >
-        <div className="flex items-center justify-between pb-3 border-b border-white/10">
+        <div className="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
           <div>
             <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
               Bulk Curriculum Uploader
             </span>
-            <h4 className="text-xl font-black text-white">Upload Course Plan</h4>
+            <h4 className="text-lg sm:text-xl font-black text-white">Upload Course Plan</h4>
           </div>
           <button type="button" onClick={onClose} className="text-slate-400 hover:text-white">
             <X size={18} />
           </button>
         </div>
 
-        <p className="mt-3 text-xs text-slate-300 leading-relaxed">
-          Paste your day-by-day course plan in JSON format. You can also click <strong>"Load Official Starter Plan Template"</strong> below to populate the starter plan template for this track.
+        <p className="mt-3 text-xs text-slate-300 leading-relaxed shrink-0">
+          Paste your day-by-day curriculum in JSON format or click <strong>"Load Official 30-Day Starter Template"</strong> to populate the ready-to-use curriculum for this course.
         </p>
 
         {error && (
-          <div className="mt-3 rounded-xl border border-red-400/30 bg-red-500/10 p-3 text-xs text-red-300">
+          <div className="mt-3 rounded-xl border border-red-400/30 bg-red-500/10 p-3 text-xs text-red-300 shrink-0">
             {error}
           </div>
         )}
 
-        <div className="mt-4">
-          <div className="flex items-center justify-between mb-1.5">
+        <div className="mt-4 flex-1 flex flex-col min-h-0">
+          <div className="flex items-center justify-between mb-1.5 shrink-0">
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
               Paste Plan JSON
             </span>
@@ -1606,19 +2100,19 @@ function PlanUploadModal({ course, onClose, onImport }) {
               onClick={handleLoadSample}
               className="text-[10px] font-black uppercase tracking-wider text-emerald-400 hover:underline"
             >
-              Load Official Starter Plan Template
+              Load Official 30-Day Starter Template
             </button>
           </div>
           <textarea
             rows={10}
             value={pasteText}
             onChange={e => setPasteText(e.target.value)}
-            placeholder={`[\n  {\n    "day": 1,\n    "title": "Pronunciation Foundations",\n    "studyTopic": "Vowel length and intonation rules",\n    "studentOutput": "Record 60-second speech",\n    "actionType": "ai_speaking",\n    "actionLabel": "Launch AI Pronunciation Drill",\n    "actionTarget": "/speaking-practice?day=1"\n  }\n]`}
-            className="w-full rounded-2xl border border-white/10 bg-slate-950 p-3 font-mono text-xs text-emerald-300 outline-none focus:border-emerald-400/60"
+            placeholder={`[\n  {\n    "day": 1,\n    "month": 1,\n    "title": "Breaking the Ice — High-Impact Self-Introduction",\n    "coreStructure": "Name + Background + Current Focus + 1 Unique Passion",\n    "liveActivity": "Elevator Pitch (90 seconds)",\n    "actionItem": "Submit 1-min self-intro audio",\n    "actionType": "ai_speaking",\n    "actionLabel": "Record Audio",\n    "actionTarget": "/speaking-practice?day=1"\n  }\n]`}
+            className="w-full flex-1 min-h-[220px] rounded-2xl border border-white/10 bg-slate-950 p-3 font-mono text-xs text-emerald-300 outline-none focus:border-emerald-400/60"
           />
         </div>
 
-        <div className="flex items-center justify-end gap-3 pt-5 border-t border-white/10 mt-4">
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10 mt-4 shrink-0">
           <button
             type="button"
             onClick={onClose}
@@ -1639,7 +2133,7 @@ function PlanUploadModal({ course, onClose, onImport }) {
   );
 }
 
-/* ---------------- SUB-MODAL C: ACTION SIMULATION PREVIEW ---------------- */
+/* ---------------- SUB-MODAL 4: ACTION SIMULATION PREVIEW ---------------- */
 function PlanSimulationModal({ action, onClose, navigate }) {
   const actionConfig = PLAN_ACTION_TYPES[action.actionType] || PLAN_ACTION_TYPES.ai_speaking;
 
@@ -1651,7 +2145,7 @@ function PlanSimulationModal({ action, onClose, navigate }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[140] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+    <div className="fixed inset-0 z-[140] flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -1664,8 +2158,8 @@ function PlanSimulationModal({ action, onClose, navigate }) {
               <Zap size={16} />
             </span>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Click Simulation</p>
-              <h4 className="text-base font-black text-white">Day {action.day} Action Trigger</h4>
+              <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Action Simulation</p>
+              <h4 className="text-base font-black text-white">Class {action.day} Action Trigger</h4>
             </div>
           </div>
           <button type="button" onClick={onClose} className="text-slate-400 hover:text-white">
@@ -1680,7 +2174,7 @@ function PlanSimulationModal({ action, onClose, navigate }) {
           </div>
 
           <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Action Button Clicked</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Action Button Triggered</p>
             <div className="mt-2">
               <span className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-black uppercase tracking-wider ${actionConfig.btnClass}`}>
                 {actionConfig.icon} {action.actionLabel}
@@ -1694,7 +2188,7 @@ function PlanSimulationModal({ action, onClose, navigate }) {
           </div>
 
           <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Destination Route / Target</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Target Route / URL</p>
             <p className="text-xs text-slate-300 font-mono mt-1">{action.actionTarget || 'None specified'}</p>
           </div>
         </div>
@@ -1713,7 +2207,7 @@ function PlanSimulationModal({ action, onClose, navigate }) {
               onClick={handleOpenPage}
               className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 px-5 py-2 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-emerald-900/40"
             >
-              Open Live Page <ExternalLink size={13} />
+              Open Live Route <ExternalLink size={13} />
             </button>
           )}
         </div>
