@@ -1,3 +1,5 @@
+import { IELTS_FOUNDATION_BAND_6_60_CLASSES } from './tanvirIeltsFoundationBand6Data.js';
+
 export const COURSE_DATA = {
   english: {
     title: 'English Spelling Masterclass Pathway',
@@ -1646,6 +1648,42 @@ export const COURSE_DATA = {
             ],
           },
         ],
+      },
+    ],
+  },
+  paid_batch: {
+    title: 'Paid Batch Pathway',
+    displayTitle: 'Paid Batch',
+    flag: '💎',
+    isPrivate: true,
+    accent: 'purple',
+    description: 'Exclusive Level 6 Private Batch: Complete IELTS Bridge — English Foundation to Band 6. 60 masterclasses + 12 full weekend mocks.',
+    modules: [
+      {
+        id: 'pb-mod-1',
+        title: 'Paid Batch — Level 6 Foundation to Band 6',
+        description: '60 comprehensive classes structured into Core Language Repair and Guided Band 6 Practice.',
+        lessons: IELTS_FOUNDATION_BAND_6_60_CLASSES.map((cls, index) => {
+          const day = cls.day || index + 1;
+          return {
+            id: `pb-les-${day}`,
+            day,
+            title: `Lesson ${day}: ${cls.title || `Topic ${day}`}`,
+            topicTitle: cls.title || `Topic ${day}`,
+            dayType: cls.dayType || 'Study Day',
+            description: cls.studyTopic || cls.coreStructure || `Comprehensive study session for Day ${day}.`,
+            coreStructure: cls.coreStructure || '',
+            liveActivity: cls.liveActivity || '',
+            actionItem: cls.actionItem || '',
+            studentOutput: cls.studentOutput || '',
+            classNotes: cls.classNotes || '',
+            weekendMock: cls.weekendMock || null,
+            langCode: 'en-US',
+            cards: [],
+            phrases: [],
+            quiz: [],
+          };
+        }),
       },
     ],
   },

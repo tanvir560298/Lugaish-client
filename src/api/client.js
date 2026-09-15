@@ -168,6 +168,12 @@ export const api = {
       body: JSON.stringify(payload),
     });
   },
+  updateUserPrivateBatch(userId, payload) {
+    return request(`/auth/users/${userId}/private-batch`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  },
   removeUser(userId) {
     return request(`/auth/users/${userId}`, {
       method: 'DELETE',

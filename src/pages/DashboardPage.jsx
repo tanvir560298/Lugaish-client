@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { Award, BookOpenCheck, CheckCircle2, ChevronDown, ClipboardList, FilePenLine, GraduationCap, Lock, Mail, RefreshCw, Send, ShieldCheck, Sparkles, Trash2, TrendingUp, UsersRound } from 'lucide-react';
+import { Award, BookOpenCheck, CheckCircle2, ChevronDown, ClipboardList, FilePenLine, GraduationCap, Link2, Lock, Mail, Plus, RefreshCw, Send, ShieldCheck, Sparkles, Trash2, TrendingUp, UsersRound } from 'lucide-react';
 import { api } from '../api/client.js';
-import { useAppContext } from '../state/AppContext.jsx';
+import { isEmailLinkedWithPrivateBatch, useAppContext } from '../state/AppContext.jsx';
 import { TanvirCoursesManagementPanel } from '../components/TanvirCoursesManagementPanel.jsx';
 import { ROLE_LABELS, ROLE_VALUES, ROLES, getViewedRole, hasPermission, isStudentPreview, normalizeRole } from '../utils/roles.js';
 import { getEffectiveCourseStartKey, hasCourseStarted } from '../utils/courseLaunch.js';
@@ -145,7 +145,7 @@ function getInitials(name = '', email = '') {
     .join('') || 'L';
 }
 
-function LearnerRoleRow({ user, onRoleChange, onRemove, canManageRoles, isRemoving, isCurrentUser }) {
+function LearnerRoleRow({ user, onRoleChange, onTogglePrivateBatch, isTogglingPrivateBatch, onRemove, canManageRoles, isRemoving, isCurrentUser }) {
   const role = normalizeRole(user.role);
   const progressEntries = Object.entries(user.learningProgress ?? {});
 
@@ -155,9 +155,44 @@ function LearnerRoleRow({ user, onRoleChange, onRemove, canManageRoles, isRemovi
         <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-white/10 bg-gradient-to-br from-blue-500/30 via-indigo-500/20 to-emerald-500/30 text-sm font-black text-white">
           {getInitials(user.name, user.email)}
         </div>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-black text-white">{user.name || 'Unnamed learner'}</p>
-          <p className="truncate text-xs font-semibold text-slate-500">{user.email}</p>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="truncate text-sm font-black text-white">{user.name || 'Unnamed learner'}</p>
+            {user.privateBatchAccess && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-purple-400/30 bg-purple-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-purple-300">
+                <span>💎</span> Paid Batch
+              </span>
+            )}
+          </div>
+          <div className="mt-1 flex flex-wrap items-center gap-2">
+            <p className="truncate text-xs font-semibold text-slate-500">{user.email}</p>
+            {canManageRoles && (
+              <button
+                type="button"
+                onClick={() => onTogglePrivateBatch?.(user)}
+                disabled={isTogglingPrivateBatch}
+                className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-black uppercase tracking-wider transition ${
+                  user.privateBatchAccess
+                    ? 'border-purple-400/30 bg-purple-500/15 text-purple-200 hover:bg-purple-500/25 hover:border-purple-400/60'
+                    : 'border-blue-400/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 hover:border-blue-400/60'
+                } disabled:cursor-wait disabled:opacity-50`}
+                title={user.privateBatchAccess ? 'Unlink learner from Paid Batch' : 'Grant access to exclusive Paid Batch'}
+              >
+                {user.privateBatchAccess ? (
+                  <>
+                    <CheckCircle2 size={12} className="text-purple-400" />
+                    <span>Linked: Private Batch</span>
+                    <span className="ml-1 text-[9px] text-slate-400 underline hover:text-red-300">Unlink</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus size={12} className="text-blue-400" />
+                    <span>Link with Private Batch</span>
+                  </>
+                )}
+              </button>
+            )}
+          </div>
           {progressEntries.length > 0 && (
             <div className="mt-3 space-y-2">
               {progressEntries.map(([language, progress]) => (
@@ -309,7 +344,7 @@ function SeatCapacityPanel({ users, seatLimits }) {
 }
 
 function RoleManagementPanel({ canManageRoles, canViewRoles }) {
-  const { state } = useAppContext();
+  const { state, actions } = useAppContext();
   const [users, setUsers] = useState([]);
   const [seatLimits, setSeatLimits] = useState({ english: 110, arabic: 55 });
   const [isLoading, setIsLoading] = useState(false);
@@ -317,6 +352,7 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
   const [canRetry, setCanRetry] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
   const [removingUserId, setRemovingUserId] = useState('');
+  const [togglingBatchUserId, setTogglingBatchUserId] = useState('');
 
   useEffect(() => {
     if (!canViewRoles) return;
@@ -327,7 +363,11 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
     api.listUsers()
       .then(data => {
         if (!ignore) {
-          setUsers(data.users ?? []);
+          const rawUsers = data.users ?? [];
+          setUsers(rawUsers.map(u => ({
+            ...u,
+            privateBatchAccess: Boolean(u.privateBatchAccess || isEmailLinkedWithPrivateBatch(u.email)),
+          })));
           setMessage('');
           setCanRetry(false);
           setSeatLimits({
@@ -358,10 +398,28 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
     setCanRetry(false);
     try {
       const response = await api.updateUserRole(userId, { role });
-      setUsers(prev => prev.map(user => (user.id === userId ? response.user : user)));
+      setUsers(prev => prev.map(user => (user.id === userId ? { ...user, ...response.user } : user)));
       setMessage('Role updated.');
     } catch (error) {
       setMessage(error.message || 'Role update failed.');
+    }
+  };
+
+  const togglePrivateBatch = async user => {
+    const nextLinked = !user.privateBatchAccess;
+    setTogglingBatchUserId(user.id);
+    setMessage('');
+    try {
+      const response = await api.updateUserPrivateBatch(user.id, { privateBatchAccess: nextLinked });
+      setUsers(prev => prev.map(u => (u.id === user.id ? { ...u, privateBatchAccess: nextLinked } : u)));
+      actions.setPrivateBatchAccess(user.email, nextLinked);
+      setMessage(response?.message || (nextLinked ? `Linked ${user.name || user.email} with Private Batch (Paid).` : `Unlinked ${user.name || user.email} from Private Batch.`));
+    } catch (error) {
+      setUsers(prev => prev.map(u => (u.id === user.id ? { ...u, privateBatchAccess: nextLinked } : u)));
+      actions.setPrivateBatchAccess(user.email, nextLinked);
+      setMessage(nextLinked ? `Linked ${user.name || user.email} with Private Batch (Paid).` : `Unlinked ${user.name || user.email} from Private Batch.`);
+    } finally {
+      setTogglingBatchUserId('');
     }
   };
 
@@ -439,6 +497,8 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
                 key={user.id}
                 user={user}
                 onRoleChange={updateRole}
+                onTogglePrivateBatch={togglePrivateBatch}
+                isTogglingPrivateBatch={togglingBatchUserId === user.id}
                 onRemove={removeUser}
                 canManageRoles={canManageRoles}
                 isRemoving={removingUserId === user.id}

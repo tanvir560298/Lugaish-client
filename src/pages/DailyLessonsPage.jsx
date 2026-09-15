@@ -19,7 +19,7 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client.js';
-import { useAppContext } from '../state/AppContext.jsx';
+import { isEmailLinkedWithPrivateBatch, useAppContext } from '../state/AppContext.jsx';
 import { ROLES, isStudentPreview } from '../utils/roles.js';
 
 const LEARNER_PREVIEW_DAYS = 8;
@@ -126,6 +126,21 @@ function ModuleStats({ day, language }) {
   const lesson = day.staticLesson;
   const baseClass = 'rounded-2xl border border-white/10 bg-white/5 p-3';
 
+  if (language === 'paid_batch' || day.staticLesson?.dayType) {
+    return (
+      <div className="mt-6 flex flex-wrap items-center gap-2">
+        <span className="rounded-xl border border-purple-400/25 bg-purple-500/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-purple-300">
+          {day.staticLesson?.dayType || 'Class Masterclass'}
+        </span>
+        {day.staticLesson?.weekendMock && (
+          <span className="rounded-xl border border-amber-400/25 bg-amber-500/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-amber-300">
+            Full Mock Included
+          </span>
+        )}
+      </div>
+    );
+  }
+
   if (['arabic', 'english'].includes(language)) {
     if (day.day % 2 !== 0) {
       return (
@@ -198,8 +213,17 @@ export function DailyLessonsPage() {
   const [hasLoadedDayModules, setHasLoadedDayModules] = useState(false);
   const [dayModuleError, setDayModuleError] = useState('');
   const isWebDeveloper = !isStudentPreview(state) && [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
-  const enrolledPathways = state.enrolledPathways?.length ? state.enrolledPathways : [state.activePathway];
-  const availableToEnroll = Object.keys(courseData).filter(pathway => !enrolledPathways.includes(pathway));
+  const canAccessPrivateBatch = isWebDeveloper || state.privateBatchAccess || isEmailLinkedWithPrivateBatch(state.userEmail);
+  const rawEnrolled = state.enrolledPathways?.length ? state.enrolledPathways : [state.activePathway];
+  const enrolledPathways = rawEnrolled.filter(pathwayKey => {
+    if (pathwayKey === 'paid_batch') return canAccessPrivateBatch;
+    return true;
+  });
+  const availableToEnroll = Object.keys(courseData).filter(pathway => {
+    if (enrolledPathways.includes(pathway)) return false;
+    if (courseData[pathway]?.isPrivate) return false;
+    return true;
+  });
   const pathway = courseData[state.activePathway] ?? courseData.english;
   const staticLessons = useMemo(() => getStaticLessons(pathway), [pathway]);
   const plannedDays = useMemo(
@@ -214,6 +238,9 @@ export function DailyLessonsPage() {
   const courseStartedForLearner = dayModuleData.courseStarted === true;
   const days = useMemo(() => {
     if (isWebDeveloper) return plannedDays;
+    if (state.activePathway === 'paid_batch') {
+      return plannedDays;
+    }
     if (!hasRemoteDayPlan || !courseStartedForLearner) return [];
 
     // Learners only see dates that the server has explicitly configured,
@@ -320,19 +347,32 @@ export function DailyLessonsPage() {
           {enrolledPathways.map(pathwayKey => {
             const isActive = state.activePathway === pathwayKey;
             const course = courseData[pathwayKey];
+            if (!course) return null;
+            const isPaidBatch = pathwayKey === 'paid_batch';
 
             return (
               <button
                 key={pathwayKey}
                 type="button"
                 onClick={() => actions.switchPathway(pathwayKey)}
-                className={`rounded-2xl border px-5 py-3 text-sm font-black uppercase tracking-widest transition ${
+                className={`flex items-center gap-2 rounded-2xl border px-5 py-3 text-sm font-black uppercase tracking-widest transition ${
                   isActive
-                    ? 'border-blue-400/30 bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                    : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
+                    ? (isPaidBatch
+                        ? 'border-purple-400/40 bg-purple-600 text-white shadow-lg shadow-purple-500/25'
+                        : 'border-blue-400/30 bg-blue-600 text-white shadow-lg shadow-blue-500/20')
+                    : (isPaidBatch
+                        ? 'border-purple-400/20 bg-purple-500/10 text-purple-200 hover:bg-purple-500/20'
+                        : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10')
                 }`}
               >
-                {course.title.replace(' Pathway', '')} Lessons
+                {isPaidBatch ? (
+                  <>
+                    <span>💎</span>
+                    <span>Paid Batch</span>
+                  </>
+                ) : (
+                  <span>{course.title.replace(' Pathway', '')} Lessons</span>
+                )}
               </button>
             );
           })}
@@ -348,7 +388,7 @@ export function DailyLessonsPage() {
                 className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-5 py-3 text-sm font-black uppercase tracking-widest text-emerald-300 transition hover:bg-emerald-500 hover:text-white"
               >
                 <Plus size={16} />
-                Add {courseData[pathwayKey].title.replace(' Pathway', '')}
+                Add {courseData[pathwayKey]?.title?.replace(' Pathway', '') || pathwayKey}
               </button>
             ))}
           </div>
@@ -466,9 +506,11 @@ export function DailyLessonsPage() {
                   <p className={`text-[10px] font-black uppercase tracking-[0.28em] ${presentation?.accent ?? 'text-slate-500'}`}>Day {day.day}{presentation ? ` · ${presentation.label}` : ''}</p>
                   {scheduledDate && <p className="mt-1 text-xs font-bold text-slate-500">{scheduledDate}</p>}
                   <h2 className="mt-2 text-xl font-black leading-tight text-white">
-                    {['arabic', 'english'].includes(state.activePathway)
-                      ? (day.day % 2 !== 0 ? `Day ${day.day} PDF` : `Day ${day.day} Quiz`)
-                      : day.title}
+                    {state.activePathway === 'paid_batch'
+                      ? (day.staticLesson?.topicTitle || day.title || `Topic ${day.day}`)
+                      : ['arabic', 'english'].includes(state.activePathway)
+                        ? (day.day % 2 !== 0 ? `Day ${day.day} PDF` : `Day ${day.day} Quiz`)
+                        : day.title}
                   </h2>
                 </div>
                 <div className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl ${
@@ -479,9 +521,11 @@ export function DailyLessonsPage() {
               </div>
 
               <p className="min-h-12 text-sm leading-6 text-slate-400">
-                {['arabic', 'english'].includes(state.activePathway)
-                  ? (day.day % 2 !== 0 ? "Read the day's PDF learning resource." : "Complete the day's review quiz.")
-                  : day.description}
+                {state.activePathway === 'paid_batch'
+                  ? (day.staticLesson?.description || `Study session for Topic ${day.day}`)
+                  : ['arabic', 'english'].includes(state.activePathway)
+                    ? (day.day % 2 !== 0 ? "Read the day's PDF learning resource." : "Complete the day's review quiz.")
+                    : day.description}
               </p>
               <ModuleStats day={day} language={state.activePathway} />
 
