@@ -1677,6 +1677,8 @@ export const COURSE_DATA = {
             actionItem: cls.actionItem || '',
             studentOutput: cls.studentOutput || '',
             classNotes: cls.classNotes || '',
+            slideUrl: cls.slideUrl || '',
+            slideEmbedUrl: cls.slideEmbedUrl || '',
             weekendMock: cls.weekendMock || null,
             langCode: 'en-US',
             cards: [],

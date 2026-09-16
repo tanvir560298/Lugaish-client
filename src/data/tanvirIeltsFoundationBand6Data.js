@@ -33,6 +33,8 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
     actionType: 'pdf_resource',
     actionLabel: 'Open Part 1 Listening Guide',
     actionTarget: '/lesson/1',
+    slideUrl: 'https://drive.google.com/file/d/1xvDT_G_oAXLwRy4Os1XjkypZvvPjsR_x/view?usp=sharing',
+    slideEmbedUrl: 'https://drive.google.com/file/d/1xvDT_G_oAXLwRy4Os1XjkypZvvPjsR_x/preview',
     status: 'published',
   },
   {
