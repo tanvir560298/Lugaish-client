@@ -273,6 +273,21 @@ export function DailyLessonsPage() {
     setHasLoadedDayModules(false);
     setDayModuleError('');
 
+    if (state.activePathway === 'paid_batch') {
+      setDayModuleData({
+        modules: [],
+        completedDays: [],
+        currentDay: 1,
+        courseDay: 60,
+        courseStarted: true,
+        courseStartAt: '',
+        courseStartDate: '',
+        nextUnlockAt: '',
+      });
+      setHasLoadedDayModules(true);
+      return undefined;
+    }
+
     api.getDayModules(state.activePathway, { learnerPreview: isStudentPreview(state) })
       .then(response => {
         if (ignore) return;

@@ -73,7 +73,7 @@ function CourseLaunchGuard({ children }) {
     && [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
 
   useEffect(() => {
-    if (isWebDeveloper) {
+    if (isWebDeveloper || state.activePathway === 'paid_batch') {
       setLaunchState({ loading: false, started: true, startAt: '', startDate: '', error: '' });
       return undefined;
     }
