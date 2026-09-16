@@ -238,13 +238,19 @@ export function LessonPage() {
   const [configurationOpen, setConfigurationOpen] = useState(searchParams.get('configure') === '1');
   const isConfigurationView = isWebDeveloper && configurationOpen;
 
-  // Day 1 Paid Batch Audio Drill Player
+  // Day 1 Paid Batch Audio Drill Player 1
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [audioCurrentTime, setAudioCurrentTime] = useState(0);
   const [audioDuration, setAudioDuration] = useState(0);
   const audioRef = useRef(null);
   const [showQuestionImage, setShowQuestionImage] = useState(true);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+
+  // Day 1 Paid Batch Audio Drill Player 2 (After Question Picture)
+  const [isPlayingAudio2, setIsPlayingAudio2] = useState(false);
+  const [audio2CurrentTime, setAudio2CurrentTime] = useState(0);
+  const [audio2Duration, setAudio2Duration] = useState(0);
+  const audio2Ref = useRef(null);
 
   const formatAudioTime = (seconds) => {
     if (!Number.isFinite(seconds) || seconds <= 0) return '0:00';
@@ -259,6 +265,10 @@ export function LessonPage() {
       audioRef.current.pause();
       setIsPlayingAudio(false);
     } else {
+      if (audio2Ref.current && isPlayingAudio2) {
+        audio2Ref.current.pause();
+        setIsPlayingAudio2(false);
+      }
       audioRef.current.play().then(() => {
         setIsPlayingAudio(true);
       }).catch(err => {
@@ -280,6 +290,39 @@ export function LessonPage() {
     const target = Math.min(Math.max(0, audioRef.current.currentTime + offset), audioDuration || 300);
     audioRef.current.currentTime = target;
     setAudioCurrentTime(target);
+  };
+
+  const togglePlayAudio2 = () => {
+    if (!audio2Ref.current) return;
+    if (isPlayingAudio2) {
+      audio2Ref.current.pause();
+      setIsPlayingAudio2(false);
+    } else {
+      if (audioRef.current && isPlayingAudio) {
+        audioRef.current.pause();
+        setIsPlayingAudio(false);
+      }
+      audio2Ref.current.play().then(() => {
+        setIsPlayingAudio2(true);
+      }).catch(err => {
+        console.warn('Audio 2 playback error:', err);
+      });
+    }
+  };
+
+  const handleAudio2Seek = (e) => {
+    const newTime = Number(e.target.value);
+    setAudio2CurrentTime(newTime);
+    if (audio2Ref.current) {
+      audio2Ref.current.currentTime = newTime;
+    }
+  };
+
+  const handleSkipAudio2 = (offset) => {
+    if (!audio2Ref.current) return;
+    const target = Math.min(Math.max(0, audio2Ref.current.currentTime + offset), audio2Duration || 300);
+    audio2Ref.current.currentTime = target;
+    setAudio2CurrentTime(target);
   };
 
   useEffect(() => {
@@ -999,7 +1042,7 @@ export function LessonPage() {
                           Class 01 Curriculum
                         </span>
                         <span className="text-[10px] font-bold text-slate-400">
-                          4 Course Resources (2 Books + Audio + Question Sheet)
+                          5 Course Resources (2 Books + Audio 1 + Question Sheet + Audio 2)
                         </span>
                       </div>
                       <h3 className="mt-1 text-2xl font-black text-white">
@@ -1344,6 +1387,145 @@ export function LessonPage() {
                       </div>
                     </div>
                   )}
+                </div>
+
+                {/* Audio Track 2 Section - Directly After Question Picture */}
+                <div className="relative overflow-hidden rounded-2xl border border-teal-400/30 bg-gradient-to-br from-teal-950/40 via-slate-900/90 to-slate-950 p-6 shadow-xl shadow-teal-950/30">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/10 pb-4">
+                    <div className="flex items-start sm:items-center gap-3">
+                      <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl border transition ${
+                        isPlayingAudio2 
+                          ? 'border-teal-400/50 bg-teal-500/20 text-teal-300 shadow-lg shadow-teal-500/30 animate-pulse' 
+                          : 'border-white/10 bg-white/5 text-teal-400'
+                      }`}>
+                        <Headphones size={24} />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center gap-1 rounded-full border border-teal-400/30 bg-teal-500/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-teal-200">
+                            🎧 Audio Drill Track 2 · Section Follow-Up
+                          </span>
+                          <span className="text-[10px] font-semibold text-slate-400">
+                            Google Drive Audio 2
+                          </span>
+                        </div>
+                        <h4 className="mt-1 text-lg font-black text-white">
+                          Class 1: Official IELTS Listening Audio Drill (Part 2)
+                        </h4>
+                        <p className="text-xs text-slate-300">
+                          Follow-up practice audio track for Question Sheet drills, speed handling, and self-correction traps.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Live Equalizer Status */}
+                    <div className="flex items-center gap-2 shrink-0 bg-white/5 rounded-xl px-3 py-1.5 border border-white/10 self-start sm:self-auto">
+                      <div className="flex items-end gap-1 h-4">
+                        <span className={`inline-block w-1 rounded-full bg-teal-400 ${isPlayingAudio2 ? 'animate-[soundwave-bar-1_1s_ease-in-out_infinite]' : 'h-2'}`} />
+                        <span className={`inline-block w-1 rounded-full bg-cyan-400 ${isPlayingAudio2 ? 'animate-[soundwave-bar-2_0.8s_ease-in-out_infinite]' : 'h-3'}`} />
+                        <span className={`inline-block w-1 rounded-full bg-emerald-400 ${isPlayingAudio2 ? 'animate-[soundwave-bar-3_1.1s_ease-in-out_infinite]' : 'h-1.5'}`} />
+                        <span className={`inline-block w-1 rounded-full bg-teal-300 ${isPlayingAudio2 ? 'animate-[soundwave-bar-4_0.9s_ease-in-out_infinite]' : 'h-3.5'}`} />
+                      </div>
+                      <span className="text-[11px] font-bold text-teal-300">
+                        {isPlayingAudio2 ? 'Audio 2 Playing' : 'Ready to Play'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Player Controls & Scrubber */}
+                  <div className="mt-5 space-y-4">
+                    <div className="flex flex-wrap items-center gap-3">
+                      {/* Play / Pause Button */}
+                      <button
+                        type="button"
+                        onClick={togglePlayAudio2}
+                        className={`glow-button flex items-center justify-center gap-2.5 py-3 px-6 text-xs font-black uppercase tracking-wider transition ${
+                          isPlayingAudio2
+                            ? 'glow-button-green bg-teal-400 text-slate-950 font-black shadow-lg shadow-teal-400/40 hover:bg-teal-300 hover:scale-[1.02]'
+                            : 'glow-button-blue bg-gradient-to-r from-teal-600 via-cyan-600 to-emerald-600 text-white shadow-lg shadow-teal-600/30 hover:scale-[1.02]'
+                        }`}
+                      >
+                        {isPlayingAudio2 ? (
+                          <>
+                            <Pause size={18} className="fill-current" />
+                            <span>Pause Audio 2</span>
+                          </>
+                        ) : (
+                          <>
+                            <Play size={18} className="fill-current" />
+                            <span>Play Audio 2</span>
+                          </>
+                        )}
+                      </button>
+
+                      {/* Rewind 10s */}
+                      <button
+                        type="button"
+                        onClick={() => handleSkipAudio2(-10)}
+                        title="Rewind 10 seconds"
+                        className="glow-button glow-button-muted py-2.5 px-3 text-xs font-bold flex items-center gap-1.5"
+                      >
+                        <RotateCcw size={14} />
+                        <span>-10s</span>
+                      </button>
+
+                      {/* Forward 10s */}
+                      <button
+                        type="button"
+                        onClick={() => handleSkipAudio2(10)}
+                        title="Forward 10 seconds"
+                        className="glow-button glow-button-muted py-2.5 px-3 text-xs font-bold flex items-center gap-1.5"
+                      >
+                        <span>+10s</span>
+                        <RotateCw size={14} />
+                      </button>
+
+                      {/* Google Drive Link */}
+                      <a
+                        href="https://drive.google.com/file/d/11Q8pZegls5VJjaUu8OiN97Mdf6ldlGUv/view?usp=sharing"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-auto glow-button glow-button-muted py-2.5 px-3.5 text-xs font-bold flex items-center gap-1.5 text-slate-300 hover:text-white"
+                      >
+                        <span>Open Audio 2 in Drive</span>
+                        <ExternalLink size={13} />
+                      </a>
+                    </div>
+
+                    {/* Timeline & Progress Bar */}
+                    <div className="rounded-xl border border-white/10 bg-slate-950/60 p-3 space-y-1.5">
+                      <input
+                        type="range"
+                        min="0"
+                        max={audio2Duration || 100}
+                        step="0.1"
+                        value={audio2CurrentTime}
+                        onChange={handleAudio2Seek}
+                        className="w-full accent-teal-400 cursor-pointer h-1.5 bg-white/10 rounded-lg"
+                      />
+                      <div className="flex items-center justify-between text-[11px] font-mono font-bold text-slate-400">
+                        <span className="text-teal-300">{formatAudioTime(audio2CurrentTime)}</span>
+                        <span>{formatAudioTime(audio2Duration)}</span>
+                      </div>
+                    </div>
+
+                    {/* HTML5 Audio 2 Element */}
+                    <audio
+                      ref={audio2Ref}
+                      preload="metadata"
+                      onTimeUpdate={(e) => setAudio2CurrentTime(e.currentTarget.currentTime)}
+                      onLoadedMetadata={(e) => setAudio2Duration(e.currentTarget.duration)}
+                      onEnded={() => {
+                        setIsPlayingAudio2(false);
+                        setAudio2CurrentTime(0);
+                      }}
+                      onPause={() => setIsPlayingAudio2(false)}
+                      onPlay={() => setIsPlayingAudio2(true)}
+                    >
+                      <source src="/audio/day1-ielts-listening-audio-2.mp3" type="audio/mpeg" />
+                      <source src="https://drive.usercontent.google.com/download?id=11Q8pZegls5VJjaUu8OiN97Mdf6ldlGUv&export=download" type="audio/mpeg" />
+                    </audio>
+                  </div>
                 </div>
               </div>
 

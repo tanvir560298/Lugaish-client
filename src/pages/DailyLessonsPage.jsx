@@ -225,10 +225,35 @@ export function DailyLessonsPage() {
       day1AudioRef.current.pause();
       setIsDay1AudioPlaying(false);
     } else {
+      if (day1Audio2Ref.current && isDay1Audio2Playing) {
+        day1Audio2Ref.current.pause();
+        setIsDay1Audio2Playing(false);
+      }
       day1AudioRef.current.play().then(() => {
         setIsDay1AudioPlaying(true);
       }).catch(err => {
         console.warn('Audio playback error:', err);
+      });
+    }
+  };
+
+  const [isDay1Audio2Playing, setIsDay1Audio2Playing] = useState(false);
+  const day1Audio2Ref = useRef(null);
+
+  const toggleDay1Audio2 = () => {
+    if (!day1Audio2Ref.current) return;
+    if (isDay1Audio2Playing) {
+      day1Audio2Ref.current.pause();
+      setIsDay1Audio2Playing(false);
+    } else {
+      if (day1AudioRef.current && isDay1AudioPlaying) {
+        day1AudioRef.current.pause();
+        setIsDay1AudioPlaying(false);
+      }
+      day1Audio2Ref.current.play().then(() => {
+        setIsDay1Audio2Playing(true);
+      }).catch(err => {
+        console.warn('Audio 2 playback error:', err);
       });
     }
   };
@@ -642,7 +667,7 @@ export function DailyLessonsPage() {
                   <div className="flex items-center justify-between">
                     <p className="text-[11px] font-black uppercase tracking-widest text-purple-300 flex items-center gap-1.5">
                       <span>📚 Course Materials</span>
-                      <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-[9px] font-bold text-emerald-300">2 Books + Audio + Question Sheet</span>
+                      <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-[9px] font-bold text-emerald-300">2 Books + 2 Audios + Question Sheet</span>
                     </p>
                     <span className="text-[10px] font-bold text-slate-400">Click to open &amp; play</span>
                   </div>
@@ -799,6 +824,67 @@ export function DailyLessonsPage() {
                         <ExternalLink size={14} />
                       </a>
                     </div>
+                  </div>
+
+                  {/* Audio Drill 2 Row - After Question Picture */}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-xl border border-teal-400/30 bg-teal-950/40 p-3 transition hover:border-teal-400/50">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${
+                        isDay1Audio2Playing ? 'bg-teal-400 text-slate-950 animate-pulse' : 'bg-teal-500/20 text-teal-300'
+                      }`}>
+                        <Headphones size={18} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-black text-white flex items-center gap-1.5">
+                          <span>Listening Drill Audio 2</span>
+                          <span className="rounded bg-teal-500/30 px-1 py-0.2 text-[9px] font-bold text-teal-200">Part 2</span>
+                        </p>
+                        <p className="truncate text-[10px] font-medium text-slate-300">
+                          Follow-up Cambridge Practice Audio Drill
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleDay1Audio2();
+                        }}
+                        className={`flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-black transition shadow-md ${
+                          isDay1Audio2Playing
+                            ? 'bg-teal-400 text-slate-950 shadow-teal-400/30'
+                            : 'bg-teal-600 text-white hover:bg-teal-500 shadow-teal-600/30'
+                        }`}
+                      >
+                        {isDay1Audio2Playing ? <Pause size={13} className="fill-current" /> : <Play size={13} className="fill-current" />}
+                        <span>{isDay1Audio2Playing ? 'Pause Audio 2' : 'Play Audio 2'}</span>
+                      </button>
+
+                      <a
+                        href="https://drive.google.com/file/d/11Q8pZegls5VJjaUu8OiN97Mdf6ldlGUv/view?usp=sharing"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="rounded-lg border border-white/10 bg-white/5 p-2 text-slate-400 hover:text-white transition"
+                        title="Open in Google Drive"
+                      >
+                        <ExternalLink size={14} />
+                      </a>
+                    </div>
+
+                    {/* Hidden Audio 2 Element */}
+                    <audio
+                      ref={day1Audio2Ref}
+                      preload="none"
+                      onEnded={() => setIsDay1Audio2Playing(false)}
+                      onPause={() => setIsDay1Audio2Playing(false)}
+                      onPlay={() => setIsDay1Audio2Playing(true)}
+                    >
+                      <source src="/audio/day1-ielts-listening-audio-2.mp3" type="audio/mpeg" />
+                      <source src="https://drive.usercontent.google.com/download?id=11Q8pZegls5VJjaUu8OiN97Mdf6ldlGUv&export=download" type="audio/mpeg" />
+                    </audio>
                   </div>
                 </div>
 

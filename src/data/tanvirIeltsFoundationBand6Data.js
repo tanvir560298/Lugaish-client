@@ -46,6 +46,10 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
     questionImageUrl: 'https://drive.google.com/file/d/12tb8zkiP2Y7tab9n6NE7KJodfemPJuYY/view?usp=sharing',
     questionImageFileUrl: '/images/day1-listening-question-sheet.jpg',
     questionImageTitle: 'Class 1: Listening Form Completion Question Sheet',
+    audio2Url: 'https://drive.google.com/file/d/11Q8pZegls5VJjaUu8OiN97Mdf6ldlGUv/view?usp=sharing',
+    audio2EmbedUrl: 'https://drive.google.com/file/d/11Q8pZegls5VJjaUu8OiN97Mdf6ldlGUv/preview',
+    audio2FileUrl: '/audio/day1-ielts-listening-audio-2.mp3',
+    audio2Title: 'Official IELTS Listening Audio Drill (Part 2)',
     status: 'published',
   },
   {
