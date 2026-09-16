@@ -152,8 +152,10 @@ export function expandCompletedLessons(lessonIds) {
 }
 
 function normalizeState(state) {
-  const isDev = normalizeRole(state.userRole) === ROLES.webDeveloper || WEB_DEVELOPER_EMAILS.has(state.userEmail?.toLowerCase());
-  const hasPrivateAccess = Boolean(state.privateBatchAccess || isDev || isEmailLinkedWithPrivateBatch(state.userEmail));
+  const isTesterMode = state.webDeveloperMode === 'tester';
+  const isDev = !isTesterMode && (normalizeRole(state.userRole) === ROLES.webDeveloper || WEB_DEVELOPER_EMAILS.has(state.userEmail?.toLowerCase()));
+  const isLinked = Boolean(state.privateBatchAccess || isEmailLinkedWithPrivateBatch(state.userEmail));
+  const hasPrivateAccess = Boolean(isDev || isLinked);
 
   const activePathway = COURSE_DATA[state.activePathway] && (state.activePathway !== 'paid_batch' || hasPrivateAccess)
     ? state.activePathway
@@ -558,10 +560,11 @@ export function AppProvider({ children }) {
     toggleWebDeveloperMode() {
       setState(prev => {
         if (normalizeRole(prev.userRole) !== ROLES.webDeveloper) return prev;
-        return {
+        const nextMode = prev.webDeveloperMode === 'tester' ? 'developer' : 'tester';
+        return normalizeState({
           ...prev,
-          webDeveloperMode: prev.webDeveloperMode === 'tester' ? 'developer' : 'tester',
-        };
+          webDeveloperMode: nextMode,
+        });
       });
     },
     addXP(amount) {
@@ -597,16 +600,10 @@ export function AppProvider({ children }) {
       setState(prev => {
         const isCurrent = prev.userEmail?.toLowerCase() === email?.toLowerCase();
         if (!isCurrent) return prev;
-        const nextAccess = Boolean(isLinked);
-        const pathways = new Set(prev.enrolledPathways);
-        if (nextAccess) pathways.add('paid_batch');
-        else pathways.delete('paid_batch');
-        return {
+        return normalizeState({
           ...prev,
-          privateBatchAccess: nextAccess,
-          enrolledPathways: [...pathways],
-          activePathway: (!nextAccess && prev.activePathway === 'paid_batch') ? 'english' : prev.activePathway,
-        };
+          privateBatchAccess: Boolean(isLinked),
+        });
       });
     },
   }), [state.activePathway, state.isLoggedIn]);
