@@ -10,6 +10,8 @@ import {
   ListChecks,
   Lock,
   Mic,
+  Pause,
+  Play,
   Plus,
   Settings2,
   Sparkles,
@@ -17,7 +19,7 @@ import {
   UsersRound,
   Video,
 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { isEmailLinkedWithPrivateBatch, useAppContext } from '../state/AppContext.jsx';
@@ -213,6 +215,22 @@ export function DailyLessonsPage() {
   });
   const [hasLoadedDayModules, setHasLoadedDayModules] = useState(false);
   const [dayModuleError, setDayModuleError] = useState('');
+  const [isDay1AudioPlaying, setIsDay1AudioPlaying] = useState(false);
+  const day1AudioRef = useRef(null);
+
+  const toggleDay1Audio = () => {
+    if (!day1AudioRef.current) return;
+    if (isDay1AudioPlaying) {
+      day1AudioRef.current.pause();
+      setIsDay1AudioPlaying(false);
+    } else {
+      day1AudioRef.current.play().then(() => {
+        setIsDay1AudioPlaying(true);
+      }).catch(err => {
+        console.warn('Audio playback error:', err);
+      });
+    }
+  };
   const isWebDeveloper = !isStudentPreview(state) && [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
   const canAccessPrivateBatch = isWebDeveloper || state.privateBatchAccess || isEmailLinkedWithPrivateBatch(state.userEmail) || (isStudentPreview(state) && isEmailLinkedWithPrivateBatch('tahmadium@gmail.com'));
   const baseEnrolled = [...new Set([
@@ -618,14 +636,14 @@ export function DailyLessonsPage() {
                   </div>
                 </div>
 
-                {/* Direct Course PDF Materials Inside Card */}
+                {/* Direct Course PDF & Audio Materials Inside Card */}
                 <div className="relative z-10 mt-6 space-y-2.5 rounded-2xl border border-purple-400/30 bg-purple-950/40 p-4 backdrop-blur-md">
                   <div className="flex items-center justify-between">
                     <p className="text-[11px] font-black uppercase tracking-widest text-purple-300 flex items-center gap-1.5">
-                      <span>📚 Course PDF Materials</span>
-                      <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-[9px] font-bold text-emerald-300">2 Ready</span>
+                      <span>📚 Course Materials</span>
+                      <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-[9px] font-bold text-emerald-300">2 Books + 1 Audio</span>
                     </p>
-                    <span className="text-[10px] font-bold text-slate-400">Click to open & download</span>
+                    <span className="text-[10px] font-bold text-slate-400">Click to open &amp; play</span>
                   </div>
 
                   <div className="grid gap-2.5 sm:grid-cols-2">
@@ -676,6 +694,67 @@ export function DailyLessonsPage() {
                       </div>
                       <ExternalLink size={14} className="shrink-0 text-slate-400 group-hover:text-indigo-300" />
                     </a>
+                  </div>
+
+                  {/* Audio File Player - Directly Under The Books */}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-xl border border-emerald-400/30 bg-emerald-950/40 p-3 transition hover:border-emerald-400/50">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${
+                        isDay1AudioPlaying ? 'bg-emerald-500 text-slate-950 animate-pulse' : 'bg-emerald-500/20 text-emerald-300'
+                      }`}>
+                        <Headphones size={18} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-black text-white flex items-center gap-1.5">
+                          <span>Listening Drill Audio</span>
+                          <span className="rounded bg-emerald-500/30 px-1 py-0.2 text-[9px] font-bold text-emerald-200">MP3</span>
+                        </p>
+                        <p className="truncate text-[10px] font-medium text-slate-300">
+                          Official Part 1 Form Completion Audio Drill
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleDay1Audio();
+                        }}
+                        className={`flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-black transition shadow-md ${
+                          isDay1AudioPlaying
+                            ? 'bg-emerald-400 text-slate-950 shadow-emerald-400/30'
+                            : 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-emerald-600/30'
+                        }`}
+                      >
+                        {isDay1AudioPlaying ? <Pause size={13} className="fill-current" /> : <Play size={13} className="fill-current" />}
+                        <span>{isDay1AudioPlaying ? 'Pause Audio' : 'Play Audio'}</span>
+                      </button>
+
+                      <a
+                        href="https://drive.google.com/file/d/1ODDAamucZshhbOanDN_UC36khUdPZcPT/view?usp=sharing"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="rounded-lg border border-white/10 bg-white/5 p-2 text-slate-400 hover:text-white transition"
+                        title="Open in Google Drive"
+                      >
+                        <ExternalLink size={14} />
+                      </a>
+                    </div>
+
+                    {/* Hidden Audio Element for Day 1 */}
+                    <audio
+                      ref={day1AudioRef}
+                      preload="none"
+                      onEnded={() => setIsDay1AudioPlaying(false)}
+                      onPause={() => setIsDay1AudioPlaying(false)}
+                      onPlay={() => setIsDay1AudioPlaying(true)}
+                    >
+                      <source src="/audio/day1-ielts-listening-audio.mp3" type="audio/mpeg" />
+                      <source src="https://drive.usercontent.google.com/download?id=1ODDAamucZshhbOanDN_UC36khUdPZcPT&export=download" type="audio/mpeg" />
+                    </audio>
                   </div>
                 </div>
 

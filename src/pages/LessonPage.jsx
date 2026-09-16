@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import confetti from 'canvas-confetti';
 import {
   ArrowLeft,
@@ -14,9 +14,12 @@ import {
   Lock,
   LoaderCircle,
   Mic,
+  Pause,
   Play,
   Plus,
   RefreshCw,
+  RotateCcw,
+  RotateCw,
   Save,
   Settings2,
   Sparkles,
@@ -24,6 +27,7 @@ import {
   Trash2,
   UsersRound,
   Video,
+  Volume2,
 } from 'lucide-react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client.js';
@@ -232,6 +236,48 @@ export function LessonPage() {
   const [moduleMessage, setModuleMessage] = useState('');
   const [configurationOpen, setConfigurationOpen] = useState(searchParams.get('configure') === '1');
   const isConfigurationView = isWebDeveloper && configurationOpen;
+
+  // Day 1 Paid Batch Audio Drill Player
+  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
+  const [audioCurrentTime, setAudioCurrentTime] = useState(0);
+  const [audioDuration, setAudioDuration] = useState(0);
+  const audioRef = useRef(null);
+
+  const formatAudioTime = (seconds) => {
+    if (!Number.isFinite(seconds) || seconds <= 0) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
+  const togglePlayAudio = () => {
+    if (!audioRef.current) return;
+    if (isPlayingAudio) {
+      audioRef.current.pause();
+      setIsPlayingAudio(false);
+    } else {
+      audioRef.current.play().then(() => {
+        setIsPlayingAudio(true);
+      }).catch(err => {
+        console.warn('Audio playback error:', err);
+      });
+    }
+  };
+
+  const handleAudioSeek = (e) => {
+    const newTime = Number(e.target.value);
+    setAudioCurrentTime(newTime);
+    if (audioRef.current) {
+      audioRef.current.currentTime = newTime;
+    }
+  };
+
+  const handleSkipAudio = (offset) => {
+    if (!audioRef.current) return;
+    const target = Math.min(Math.max(0, audioRef.current.currentTime + offset), audioDuration || 300);
+    audioRef.current.currentTime = target;
+    setAudioCurrentTime(target);
+  };
 
   useEffect(() => {
     if (searchParams.get('configure') === '1' && isWebDeveloper) setConfigurationOpen(true);
@@ -950,16 +996,16 @@ export function LessonPage() {
                           Class 01 Curriculum
                         </span>
                         <span className="text-[10px] font-bold text-slate-400">
-                          2 Files Uploaded
+                          3 Course Resources (2 Books + 1 Audio)
                         </span>
                       </div>
                       <h3 className="mt-1 text-2xl font-black text-white">
-                        Class 1 Study Materials & PDFs
+                        Class 1 Study Materials & Resources
                       </h3>
                     </div>
                   </div>
                   <p className="text-xs text-slate-400 max-w-xs">
-                    Open each document in a new tab for distraction-free study and full-screen reading.
+                    Open documents in a new tab or play the listening drill audio directly below.
                   </p>
                 </div>
 
@@ -1046,6 +1092,145 @@ export function LessonPage() {
                         <ExternalLink size={15} />
                       </a>
                     </div>
+                  </div>
+                </div>
+
+                {/* Audio File Section - Directly Under The Books */}
+                <div className="relative overflow-hidden rounded-2xl border border-emerald-400/30 bg-gradient-to-br from-emerald-950/40 via-slate-900/90 to-slate-950 p-6 shadow-xl shadow-emerald-950/30">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/10 pb-4">
+                    <div className="flex items-start sm:items-center gap-3">
+                      <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl border transition ${
+                        isPlayingAudio 
+                          ? 'border-emerald-400/50 bg-emerald-500/20 text-emerald-300 shadow-lg shadow-emerald-500/30 animate-pulse' 
+                          : 'border-white/10 bg-white/5 text-emerald-400'
+                      }`}>
+                        <Headphones size={24} />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-200">
+                            🎧 Audio Drill · Part 1 Track
+                          </span>
+                          <span className="text-[10px] font-semibold text-slate-400">
+                            Google Drive Audio
+                          </span>
+                        </div>
+                        <h4 className="mt-1 text-lg font-black text-white">
+                          Class 1: Official IELTS Listening Audio Drill (Part 1)
+                        </h4>
+                        <p className="text-xs text-slate-300">
+                          Official listening audio for Form &amp; Note Completion Sprint, Dates &amp; Distractor Defense drills.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Live Equalizer Status */}
+                    <div className="flex items-center gap-2 shrink-0 bg-white/5 rounded-xl px-3 py-1.5 border border-white/10 self-start sm:self-auto">
+                      <div className="flex items-end gap-1 h-4">
+                        <span className={`inline-block w-1 rounded-full bg-emerald-400 ${isPlayingAudio ? 'animate-[soundwave-bar-1_1s_ease-in-out_infinite]' : 'h-2'}`} />
+                        <span className={`inline-block w-1 rounded-full bg-teal-400 ${isPlayingAudio ? 'animate-[soundwave-bar-2_0.8s_ease-in-out_infinite]' : 'h-3'}`} />
+                        <span className={`inline-block w-1 rounded-full bg-cyan-400 ${isPlayingAudio ? 'animate-[soundwave-bar-3_1.1s_ease-in-out_infinite]' : 'h-1.5'}`} />
+                        <span className={`inline-block w-1 rounded-full bg-emerald-300 ${isPlayingAudio ? 'animate-[soundwave-bar-4_0.9s_ease-in-out_infinite]' : 'h-3.5'}`} />
+                      </div>
+                      <span className="text-[11px] font-bold text-emerald-300">
+                        {isPlayingAudio ? 'Audio Playing' : 'Ready to Play'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Player Controls & Scrubber */}
+                  <div className="mt-5 space-y-4">
+                    <div className="flex flex-wrap items-center gap-3">
+                      {/* Play / Pause Button */}
+                      <button
+                        type="button"
+                        onClick={togglePlayAudio}
+                        className={`glow-button flex items-center justify-center gap-2.5 py-3 px-6 text-xs font-black uppercase tracking-wider transition ${
+                          isPlayingAudio
+                            ? 'glow-button-green bg-emerald-500 text-slate-950 font-black shadow-lg shadow-emerald-500/40 hover:bg-emerald-400 hover:scale-[1.02]'
+                            : 'glow-button-blue bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-600/30 hover:scale-[1.02]'
+                        }`}
+                      >
+                        {isPlayingAudio ? (
+                          <>
+                            <Pause size={18} className="fill-current" />
+                            <span>Pause Audio</span>
+                          </>
+                        ) : (
+                          <>
+                            <Play size={18} className="fill-current" />
+                            <span>Play Audio</span>
+                          </>
+                        )}
+                      </button>
+
+                      {/* Rewind 10s */}
+                      <button
+                        type="button"
+                        onClick={() => handleSkipAudio(-10)}
+                        title="Rewind 10 seconds"
+                        className="glow-button glow-button-muted py-2.5 px-3 text-xs font-bold flex items-center gap-1.5"
+                      >
+                        <RotateCcw size={14} />
+                        <span>-10s</span>
+                      </button>
+
+                      {/* Forward 10s */}
+                      <button
+                        type="button"
+                        onClick={() => handleSkipAudio(10)}
+                        title="Forward 10 seconds"
+                        className="glow-button glow-button-muted py-2.5 px-3 text-xs font-bold flex items-center gap-1.5"
+                      >
+                        <span>+10s</span>
+                        <RotateCw size={14} />
+                      </button>
+
+                      {/* Google Drive Link */}
+                      <a
+                        href="https://drive.google.com/file/d/1ODDAamucZshhbOanDN_UC36khUdPZcPT/view?usp=sharing"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-auto glow-button glow-button-muted py-2.5 px-3.5 text-xs font-bold flex items-center gap-1.5 text-slate-300 hover:text-white"
+                      >
+                        <span>Open Audio in Drive</span>
+                        <ExternalLink size={13} />
+                      </a>
+                    </div>
+
+                    {/* Timeline & Progress Bar */}
+                    <div className="rounded-xl border border-white/10 bg-slate-950/60 p-3 space-y-1.5">
+                      <input
+                        type="range"
+                        min="0"
+                        max={audioDuration || 100}
+                        step="0.1"
+                        value={audioCurrentTime}
+                        onChange={handleAudioSeek}
+                        className="w-full accent-emerald-400 cursor-pointer h-1.5 bg-white/10 rounded-lg"
+                      />
+                      <div className="flex items-center justify-between text-[11px] font-mono font-bold text-slate-400">
+                        <span className="text-emerald-300">{formatAudioTime(audioCurrentTime)}</span>
+                        <span>{formatAudioTime(audioDuration)}</span>
+                      </div>
+                    </div>
+
+                    {/* HTML5 Audio Element */}
+                    <audio
+                      ref={audioRef}
+                      preload="metadata"
+                      onTimeUpdate={(e) => setAudioCurrentTime(e.currentTarget.currentTime)}
+                      onLoadedMetadata={(e) => setAudioDuration(e.currentTarget.duration)}
+                      onEnded={() => {
+                        setIsPlayingAudio(false);
+                        setAudioCurrentTime(0);
+                      }}
+                      onPause={() => setIsPlayingAudio(false)}
+                      onPlay={() => setIsPlayingAudio(true)}
+                    >
+                      <source src="/audio/day1-ielts-listening-audio.mp3" type="audio/mpeg" />
+                      <source src="https://drive.usercontent.google.com/download?id=1ODDAamucZshhbOanDN_UC36khUdPZcPT&export=download" type="audio/mpeg" />
+                    </audio>
                   </div>
                 </div>
               </div>

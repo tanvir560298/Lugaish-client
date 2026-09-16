@@ -39,6 +39,10 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
     practiceBookEmbedUrl: 'https://drive.google.com/file/d/10KSNZalZosook_mGGlK82PIBe4maasm2/preview',
     practiceBookTitle: 'Official IELTS Practice Tests Book (@IELTS_Practice_Tests.pdf)',
     pdfUrl: 'https://drive.google.com/file/d/10KSNZalZosook_mGGlK82PIBe4maasm2/view?usp=sharing',
+    audioUrl: 'https://drive.google.com/file/d/1ODDAamucZshhbOanDN_UC36khUdPZcPT/view?usp=sharing',
+    audioEmbedUrl: 'https://drive.google.com/file/d/1ODDAamucZshhbOanDN_UC36khUdPZcPT/preview',
+    audioFileUrl: '/audio/day1-ielts-listening-audio.mp3',
+    audioTitle: 'Official IELTS Listening Audio Drill (Part 1)',
     status: 'published',
   },
   {
