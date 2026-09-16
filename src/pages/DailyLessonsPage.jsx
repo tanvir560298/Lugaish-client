@@ -3,6 +3,7 @@ import {
   BookOpen,
   CheckCircle2,
   Clock3,
+  ExternalLink,
   Film,
   FileText,
   Headphones,
@@ -571,6 +572,9 @@ export function DailyLessonsPage() {
                       <span className="rounded-full border border-blue-400/30 bg-blue-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-blue-200">
                         Listening Day
                       </span>
+                      <span className="rounded-full border border-indigo-400/30 bg-indigo-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-indigo-200">
+                        2 Books Ready
+                      </span>
                       <span className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-300">
                         Band 6 Target
                       </span>
@@ -596,13 +600,13 @@ export function DailyLessonsPage() {
 
                 {/* Strategy Highlight Badges */}
                 <div className="relative z-10 mt-5 grid gap-2 sm:grid-cols-2">
-                  <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] p-3 text-xs text-slate-300">
-                    <span className="text-purple-400 font-bold">🎯</span>
-                    <span>Pre-Audio 30s Information Prediction</span>
+                  <div className="flex items-center gap-2 rounded-xl border border-purple-500/20 bg-purple-500/10 p-3 text-xs text-purple-200">
+                    <span className="text-purple-400 font-bold">📑</span>
+                    <span>Class 1 Slides & Strategy Guide</span>
                   </div>
-                  <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] p-3 text-xs text-slate-300">
-                    <span className="text-emerald-400 font-bold">🛡️</span>
-                    <span>Distractor Self-Correction Defense</span>
+                  <div className="flex items-center gap-2 rounded-xl border border-indigo-500/20 bg-indigo-500/10 p-3 text-xs text-indigo-200">
+                    <span className="text-indigo-400 font-bold">📘</span>
+                    <span>Official Practice Tests Book Included</span>
                   </div>
                   <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] p-3 text-xs text-slate-300">
                     <span className="text-cyan-400 font-bold">🔊</span>
@@ -611,6 +615,67 @@ export function DailyLessonsPage() {
                   <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] p-3 text-xs text-slate-300">
                     <span className="text-amber-400 font-bold">🏆</span>
                     <span>Target: 10/10 Score (+500 XP)</span>
+                  </div>
+                </div>
+
+                {/* Direct Course PDF Materials Inside Card */}
+                <div className="relative z-10 mt-6 space-y-2.5 rounded-2xl border border-purple-400/30 bg-purple-950/40 p-4 backdrop-blur-md">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-purple-300 flex items-center gap-1.5">
+                      <span>📚 Course PDF Materials</span>
+                      <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-[9px] font-bold text-emerald-300">2 Ready</span>
+                    </p>
+                    <span className="text-[10px] font-bold text-slate-400">Click to open & download</span>
+                  </div>
+
+                  <div className="grid gap-2.5 sm:grid-cols-2">
+                    {/* Tips PDF */}
+                    <a
+                      href="https://drive.google.com/file/d/1xvDT_G_oAXLwRy4Os1XjkypZvvPjsR_x/view?usp=sharing"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex items-center justify-between gap-2.5 rounded-xl border border-purple-400/30 bg-purple-900/30 p-3 transition hover:border-purple-400 hover:bg-purple-900/60 hover:scale-[1.01]"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-purple-500/20 text-purple-300 group-hover:scale-105 transition">
+                          <FileText size={18} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-black text-white flex items-center gap-1.5">
+                            <span>Tips PDF</span>
+                            <span className="rounded bg-purple-500/30 px-1 py-0.2 text-[9px] font-bold text-purple-200">Slides</span>
+                          </p>
+                          <p className="truncate text-[10px] font-medium text-slate-300">
+                            Part 1 Guide & Strategies
+                          </p>
+                        </div>
+                      </div>
+                      <ExternalLink size={14} className="shrink-0 text-slate-400 group-hover:text-purple-300" />
+                    </a>
+
+                    {/* Book PDF */}
+                    <a
+                      href="https://drive.google.com/file/d/10KSNZalZosook_mGGlK82PIBe4maasm2/view?usp=sharing"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex items-center justify-between gap-2.5 rounded-xl border border-indigo-400/30 bg-indigo-900/30 p-3 transition hover:border-indigo-400 hover:bg-indigo-900/60 hover:scale-[1.01]"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-indigo-500/20 text-indigo-300 group-hover:scale-105 transition">
+                          <BookOpen size={18} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs font-black text-white flex items-center gap-1.5">
+                            <span>Book PDF</span>
+                            <span className="rounded bg-indigo-500/30 px-1 py-0.2 text-[9px] font-bold text-indigo-200">Full Book</span>
+                          </p>
+                          <p className="truncate text-[10px] font-medium text-slate-300">
+                            @IELTS_Practice_Tests.pdf
+                          </p>
+                        </div>
+                      </div>
+                      <ExternalLink size={14} className="shrink-0 text-slate-400 group-hover:text-indigo-300" />
+                    </a>
                   </div>
                 </div>
 

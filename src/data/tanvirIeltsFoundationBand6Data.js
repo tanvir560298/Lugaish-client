@@ -35,6 +35,10 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
     actionTarget: '/lesson/1',
     slideUrl: 'https://drive.google.com/file/d/1xvDT_G_oAXLwRy4Os1XjkypZvvPjsR_x/view?usp=sharing',
     slideEmbedUrl: 'https://drive.google.com/file/d/1xvDT_G_oAXLwRy4Os1XjkypZvvPjsR_x/preview',
+    practiceBookUrl: 'https://drive.google.com/file/d/10KSNZalZosook_mGGlK82PIBe4maasm2/view?usp=sharing',
+    practiceBookEmbedUrl: 'https://drive.google.com/file/d/10KSNZalZosook_mGGlK82PIBe4maasm2/preview',
+    practiceBookTitle: 'Official IELTS Practice Tests Book (@IELTS_Practice_Tests.pdf)',
+    pdfUrl: 'https://drive.google.com/file/d/10KSNZalZosook_mGGlK82PIBe4maasm2/view?usp=sharing',
     status: 'published',
   },
   {
