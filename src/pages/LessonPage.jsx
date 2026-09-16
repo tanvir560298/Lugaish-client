@@ -261,8 +261,17 @@ export function LessonPage() {
       })
       .catch(requestError => {
         if (ignore) return;
-        if (isWebDeveloper && requestError.status === 404) {
-          const draftLesson = { videos: [], moduleType: 'video', modulePublished: false, title: '', description: '', moduleIntroTitle: '', moduleIntroText: '' };
+        if ((isWebDeveloper || language === 'paid_batch' || staticLesson) && (requestError.status === 404 || requestError.status === 400)) {
+          const draftLesson = {
+            videos: [],
+            moduleType: 'video',
+            modulePublished: true,
+            title: staticLesson?.title ?? `Day ${day} lesson`,
+            description: staticLesson?.description ?? '',
+            moduleIntroTitle: staticLesson?.topicTitle ?? '',
+            moduleIntroText: staticLesson?.coreStructure ?? '',
+            quiz: staticLesson?.quiz ?? [],
+          };
           setLesson(draftLesson);
           setModuleForm(getModuleForm(draftLesson, staticLesson, day));
           setSelectedVideoId('');

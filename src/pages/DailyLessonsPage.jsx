@@ -213,11 +213,14 @@ export function DailyLessonsPage() {
   const [hasLoadedDayModules, setHasLoadedDayModules] = useState(false);
   const [dayModuleError, setDayModuleError] = useState('');
   const isWebDeveloper = !isStudentPreview(state) && [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
-  const canAccessPrivateBatch = isWebDeveloper || state.privateBatchAccess || isEmailLinkedWithPrivateBatch(state.userEmail);
-  const rawEnrolled = state.enrolledPathways?.length ? state.enrolledPathways : [state.activePathway];
-  const enrolledPathways = rawEnrolled.filter(pathwayKey => {
+  const canAccessPrivateBatch = isWebDeveloper || state.privateBatchAccess || isEmailLinkedWithPrivateBatch(state.userEmail) || (isStudentPreview(state) && isEmailLinkedWithPrivateBatch('tahmadium@gmail.com'));
+  const baseEnrolled = [...new Set([
+    ...(state.enrolledPathways?.length ? state.enrolledPathways : ['arabic', 'english']),
+    ...(canAccessPrivateBatch ? ['paid_batch'] : []),
+  ])];
+  const enrolledPathways = baseEnrolled.filter(pathwayKey => {
     if (pathwayKey === 'paid_batch') return canAccessPrivateBatch;
-    return true;
+    return Boolean(courseData[pathwayKey]);
   });
   const availableToEnroll = Object.keys(courseData).filter(pathway => {
     if (enrolledPathways.includes(pathway)) return false;
@@ -446,7 +449,15 @@ export function DailyLessonsPage() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {days.map((day, index) => {
           let presentation = MODULE_PRESENTATION[day.moduleType] ?? null;
-          if (['arabic', 'english'].includes(state.activePathway)) {
+          if (state.activePathway === 'paid_batch') {
+            presentation = {
+              label: day.staticLesson?.dayType || 'Class Masterclass',
+              startLabel: 'Open Class Topic',
+              reviewLabel: 'Review Topic',
+              Icon: BookOpen,
+              accent: 'text-purple-300',
+            };
+          } else if (['arabic', 'english'].includes(state.activePathway)) {
             if (day.day % 2 !== 0) {
               presentation = {
                 label: 'PDF Learning Day',
@@ -481,13 +492,18 @@ export function DailyLessonsPage() {
             || (day.staticLesson && state.completedLessons?.includes(day.staticLesson.id))
             || isNextQuizCompleted
           );
-          const availableFromServer = day.available === true || (
+          const isPaidBatch = state.activePathway === 'paid_batch';
+          const availableFromServer = isPaidBatch || day.available === true || (
             ['arabic', 'english'].includes(state.activePathway)
             && Boolean(day.staticLesson)
             && day.day <= dayModuleData.courseDay
           );
           const fallbackIsNext = index === 0 || Boolean(days[index - 1]?.staticLesson && state.completedLessons.includes(days[index - 1].staticLesson.id));
-          const isLocked = planReadOnlyForLearner || (!isWebDeveloper && (premiumLocked || !isPublished || (hasRemoteDayPlan ? !availableFromServer : !fallbackIsNext && !completed)));
+          const isLocked = planReadOnlyForLearner || (!isWebDeveloper && (
+            premiumLocked
+            || !isPublished
+            || (isPaidBatch ? false : (hasRemoteDayPlan ? !availableFromServer : !fallbackIsNext && !completed))
+          ));
           const Icon = presentation?.Icon ?? Clock3;
           const actionLabel = planPendingForLearner
             ? 'Loading plan'
@@ -498,8 +514,8 @@ export function DailyLessonsPage() {
             : isLocked
               ? (premiumLocked ? 'Premium required' : !isPublished ? 'Coming soon' : 'Complete previous day')
               : completed
-                ? presentation.reviewLabel
-                : presentation.startLabel;
+                ? (presentation?.reviewLabel || 'Review Topic')
+                : (presentation?.startLabel || 'Open Class Topic');
 
           return (
             <article
