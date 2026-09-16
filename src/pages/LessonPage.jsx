@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import confetti from 'canvas-confetti';
 import {
   ArrowLeft,
+  Award,
   CheckCircle2,
   Clock3,
   ExternalLink,
   FileText,
+  Headphones,
   ListVideo,
   Lock,
   LoaderCircle,
@@ -15,6 +17,8 @@ import {
   RefreshCw,
   Save,
   Settings2,
+  Sparkles,
+  Target,
   Trash2,
   UsersRound,
   Video,
@@ -722,11 +726,11 @@ export function LessonPage() {
         </div>
       ) : isLoading ? (
         <div className="section-card grid min-h-72 place-items-center"><LoaderCircle size={34} className="animate-spin text-slate-400" /></div>
-      ) : (moduleType !== 'video' && !['arabic', 'english'].includes(language)) ? (
+      ) : (moduleType !== 'video' && !['arabic', 'english', 'paid_batch'].includes(language)) ? (
         <ModuleTypePanel lesson={lesson} language={language} day={day} isWebDeveloper={isWebDeveloper} navigate={navigate} />
       ) : (
         <>
-          {!['arabic', 'english'].includes(language) && (
+          {!['arabic', 'english', 'paid_batch'].includes(language) && (
             <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
               <div className="overflow-hidden rounded-lg border border-white/10 bg-slate-950 shadow-2xl shadow-black/20">
                 {selectedVideo && !selectedVideoLocked && selectedVideo.youtubeId ? (
@@ -863,6 +867,224 @@ export function LessonPage() {
             </div>
           )}
 
+          {language === 'paid_batch' && (
+            <div className="space-y-8">
+              {/* Paid Batch Master Header Card */}
+              <div className="relative overflow-hidden rounded-3xl border border-purple-500/30 bg-gradient-to-br from-purple-950/70 via-slate-900/90 to-slate-950 p-6 sm:p-8 shadow-2xl shadow-purple-950/40">
+                <div className="pointer-events-none absolute -right-10 -top-10 h-64 w-64 rounded-full bg-purple-500/15 blur-3xl" />
+                <div className="pointer-events-none absolute -bottom-10 left-1/4 h-52 w-52 rounded-full bg-blue-500/10 blur-2xl" />
+
+                <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="max-w-3xl">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-purple-400/40 bg-purple-500/20 px-3 py-1 text-xs font-black uppercase tracking-wider text-purple-200">
+                        💎 Level 6 Private Batch
+                      </span>
+                      <span className="inline-flex items-center gap-1 rounded-full border border-blue-400/30 bg-blue-500/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-blue-200">
+                        Month {Math.ceil(day / 10)} · Class {String(day).padStart(2, '0')}
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-emerald-300">
+                        <Headphones size={13} /> {staticLesson?.dayType || 'Listening Day'}
+                      </span>
+                    </div>
+
+                    <h2 className="mt-4 text-2xl font-black text-white sm:text-4xl">
+                      {staticLesson?.topicTitle || `Topic ${day}`}
+                    </h2>
+                    <p className="mt-3 text-base leading-7 text-slate-300">
+                      {staticLesson?.coreStructure}
+                    </p>
+                  </div>
+
+                  <div className="shrink-0 flex flex-col sm:flex-row lg:flex-col gap-3">
+                    <button
+                      type="button"
+                      onClick={completePdfDay}
+                      disabled={isVideoCompleting || isPdfCompleted}
+                      className={`glow-button ${
+                        isPdfCompleted
+                          ? 'glow-button-green bg-emerald-500/20 border-emerald-400/40 text-emerald-100 cursor-default'
+                          : 'glow-button-blue shadow-lg shadow-purple-600/30 disabled:opacity-60'
+                      } py-4 px-6 text-sm font-black uppercase tracking-wider`}
+                    >
+                      {isVideoCompleting ? (
+                        <LoaderCircle size={18} className="animate-spin" />
+                      ) : (
+                        <CheckCircle2 size={18} />
+                      )}
+                      {isVideoCompleting ? 'Saving XP...' : isPdfCompleted ? 'Completed (+500 XP)' : 'Mark Topic Complete (+500 XP)'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => navigate('/daily-lessons')}
+                      className="glow-button glow-button-muted py-3 px-5 text-xs font-bold"
+                    >
+                      <ArrowLeft size={15} /> All 60 Topics
+                    </button>
+                  </div>
+                </div>
+
+                {videoCompletionMessage && !isPdfCompleted && (
+                  <p className="relative z-10 mt-4 text-sm font-semibold text-amber-200">{videoCompletionMessage}</p>
+                )}
+                {pdfReward && (
+                  <div className="relative z-10 mt-5 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-emerald-200 text-sm font-bold flex items-center gap-3">
+                    <Sparkles className="shrink-0 text-emerald-300" size={20} />
+                    <span>Topic completed! 500 XP has been added to your profile progress.</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Day 1 Special Blueprint: IELTS Listening Part 1 Master Strategy */}
+              {day === 1 && (
+                <div className="section-card border-blue-500/20 p-6 sm:p-8">
+                  <div className="flex items-center gap-3">
+                    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-blue-500/15 text-blue-300">
+                      <Target size={24} />
+                    </div>
+                    <div>
+                      <p className="text-xs font-black uppercase tracking-[0.24em] text-blue-300">Listening Part 1 Master Blueprint</p>
+                      <h3 className="mt-1 text-xl font-black text-white">The 4-Pillar Strategy for Band 6.0</h3>
+                    </div>
+                  </div>
+
+                  <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                      <div className="flex items-center gap-2 font-black text-white">
+                        <span className="grid h-6 w-6 place-items-center rounded-full bg-blue-500/20 text-xs font-bold text-blue-300">1</span>
+                        <span>Pre-Listening Prediction (৩০ সেকেন্ডে অনুমান)</span>
+                      </div>
+                      <p className="mt-2 text-xs leading-5 text-slate-400">
+                        অডিও শুরু হওয়ার আগের ৩০ সেকেন্ডে প্রতিটি গ্যাপ দেখে ঠিক করুন কী টাইপের উত্তর হবে: Name, Phone Number, Date, Postcode নাকি Price। Noun নাকি Number লাগবে তা আগেই মার্ক করুন।
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                      <div className="flex items-center gap-2 font-black text-white">
+                        <span className="grid h-6 w-6 place-items-center rounded-full bg-purple-500/20 text-xs font-bold text-purple-300">2</span>
+                        <span>Spelling & Number Traps (উচ্চারণ ফাঁদ)</span>
+                      </div>
+                      <p className="mt-2 text-xs leading-5 text-slate-400">
+                        IELTS-এ নাম স্পেলিংয়ের সময় <strong>A vs E vs I</strong> এবং <strong>G vs J</strong> সবচেয়ে বেশি গোলমাল করায়। নাম্বারের ক্ষেত্রে <strong>teen</strong> (15) vs <strong>ty</strong> (50) এর পার্থক্য জোর দিয়ে শুনুন।
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                      <div className="flex items-center gap-2 font-black text-white">
+                        <span className="grid h-6 w-6 place-items-center rounded-full bg-amber-500/20 text-xs font-bold text-amber-300">3</span>
+                        <span>Distractor Defense (স্পিকারের সেলফ-কারেকশন)</span>
+                      </div>
+                      <p className="mt-2 text-xs leading-5 text-slate-400">
+                        স্পিকার প্রথমে ভুল বা পুরনো তথ্য দেবে: <em>"My address is 22 Park Rd... sorry, wait, we moved to 24 Park Rd"</em>। স্পিকারের পুরো বাক্য শেষ না হওয়া পর্যন্ত তাড়াহুড়ো করে উত্তর লিখবেন না।
+                      </p>
+                    </div>
+
+                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
+                      <div className="flex items-center gap-2 font-black text-white">
+                        <span className="grid h-6 w-6 place-items-center rounded-full bg-emerald-500/20 text-xs font-bold text-emerald-300">4</span>
+                        <span>Word Limit Strictness (শব্দের সীমাবদ্ধতা)</span>
+                      </div>
+                      <p className="mt-2 text-xs leading-5 text-slate-400">
+                        ইনস্ট্রাকশন খেয়াল করুন: <strong>ONE WORD AND/OR A NUMBER</strong>। যদি দুটি শব্দ লেখেন তবে উত্তর সঠিক হলেও মার্ক শূন্য (0) পাবেন। সিঙ্গুলার/প্লুরাল বানান নির্ভুল রাখুন।
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 4 Pillars of Daily Curriculum Focus */}
+              <div className="grid gap-6 lg:grid-cols-2">
+                {/* Live Class Activity */}
+                <div className="section-card p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-cyan-500/15 text-cyan-300">
+                      <Headphones size={20} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-cyan-300">Live Class Activity</p>
+                      <h4 className="font-black text-white">লাইভ অডিও ড্রিল ও প্র্যাকটিস</h4>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-sm leading-6 text-slate-300">
+                    {staticLesson?.liveActivity || 'লাইভ ক্লাসে অডিও ড্রিল ও স্পিড প্র্যাকটিস সম্পন্ন করা হবে।'}
+                  </p>
+                </div>
+
+                {/* Self-Study Action Item */}
+                <div className="section-card p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-emerald-500/15 text-emerald-300">
+                      <FileText size={20} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-emerald-300">Homework & Action Item</p>
+                      <h4 className="font-black text-white">সেলফ-স্টাডি ও কেমব্রিজ অ্যাসাইনমেন্ট</h4>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-sm leading-6 text-slate-300">
+                    {staticLesson?.actionItem || 'প্র্যাকটিস শিট ডাউনলোড করে টেস্ট সল্ভ করুন।'}
+                  </p>
+                </div>
+
+                {/* Expected Student Output */}
+                <div className="section-card p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-amber-500/15 text-amber-300">
+                      <Award size={20} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-amber-300">Submission Output</p>
+                      <h4 className="font-black text-white">শিক্ষার্থী যা সাবমিট করবে</h4>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-sm leading-6 text-slate-300">
+                    {staticLesson?.studentOutput || 'অ্যাসাইনমেন্ট সম্পন্ন করে স্কোর সাবমিট করুন।'}
+                  </p>
+                </div>
+
+                {/* Tanvir's Pro Tip */}
+                <div className="section-card border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-transparent p-6">
+                  <div className="flex items-center gap-3">
+                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-amber-400/20 text-amber-300">
+                      <Sparkles size={20} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-amber-300">Instructor Note & Strategy</p>
+                      <h4 className="font-black text-white">তানভীরের গাইডলাইন ও টিপস</h4>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-sm leading-6 text-slate-300">
+                    {staticLesson?.classNotes || 'প্রতিদিনের প্র্যাকটিসে মনোযোগ দিন এবং মিস্টেক লগ তৈরি করুন।'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Bottom Quick Bar */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/10 pt-6">
+                <button
+                  type="button"
+                  onClick={() => navigate('/daily-lessons')}
+                  className="glow-button glow-button-muted w-full sm:w-auto"
+                >
+                  <ArrowLeft size={16} /> Back to Paid Batch Schedule
+                </button>
+                <button
+                  type="button"
+                  onClick={completePdfDay}
+                  disabled={isVideoCompleting || isPdfCompleted}
+                  className={`glow-button ${
+                    isPdfCompleted
+                      ? 'glow-button-green bg-emerald-500/20 border-emerald-400/40 text-emerald-100 cursor-default'
+                      : 'glow-button-blue disabled:opacity-60'
+                  } w-full sm:w-auto`}
+                >
+                  {isVideoCompleting ? <LoaderCircle size={16} className="animate-spin" /> : <CheckCircle2 size={16} />}
+                  {isPdfCompleted ? 'Topic Completed (+500 XP)' : 'Mark Topic Complete (+500 XP)'}
+                </button>
+              </div>
+            </div>
+          )}
+
            {['arabic', 'english'].includes(language) && day % 2 === 0 && (
             <div className="section-card overflow-hidden p-6 sm:p-8 text-center max-w-2xl mx-auto">
               <div className="mx-auto grid h-20 w-20 place-items-center rounded-2xl bg-amber-500/15 text-amber-300">
@@ -913,7 +1135,7 @@ export function LessonPage() {
             </div>
           )}
 
-          {!['arabic', 'english'].includes(language) && !isWebDeveloper && lessonVideos.length > 0 && (
+          {!['arabic', 'english', 'paid_batch'].includes(language) && !isWebDeveloper && lessonVideos.length > 0 && (
             <div className="section-card flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-400">Video sequence</p>
@@ -931,7 +1153,7 @@ export function LessonPage() {
         </>
       ))}
 
-      {!['arabic', 'english'].includes(language) && !isLoading && !error && dayResources.length > 0 && (
+      {!['arabic', 'english', 'paid_batch'].includes(language) && !isLoading && !error && dayResources.length > 0 && (
         <section className="section-card overflow-hidden p-6 sm:p-8" aria-labelledby="day-resources-title">
           <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Day {day} · Beyond the class</p>
           <h2 id="day-resources-title" className="mt-2 text-2xl font-black text-white">Optional Arabic learning resource</h2>
