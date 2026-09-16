@@ -230,7 +230,6 @@ export function LessonPage() {
   const [moduleForm, setModuleForm] = useState(() => getModuleForm(null, staticLesson, day));
   const [isModuleSaving, setIsModuleSaving] = useState(false);
   const [moduleMessage, setModuleMessage] = useState('');
-  const [activeResourceTab, setActiveResourceTab] = useState('all');
   const [configurationOpen, setConfigurationOpen] = useState(searchParams.get('configure') === '1');
   const isConfigurationView = isWebDeveloper && configurationOpen;
 
@@ -938,204 +937,118 @@ export function LessonPage() {
                 )}
               </div>
 
-              {/* Study Materials Navigation Hub */}
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-purple-500/20 bg-slate-900/80 p-3.5 backdrop-blur-md">
-                <div className="flex items-center gap-2.5 px-1">
-                  <div className="grid h-8 w-8 place-items-center rounded-xl bg-purple-500/20 text-purple-300">
-                    <BookOpen size={16} />
-                  </div>
-                  <div>
-                    <p className="text-xs font-black uppercase tracking-wider text-white">
-                      Class 1 Study Library
-                    </p>
-                    <p className="text-[10px] font-bold text-purple-300/80">
-                      2 Official Course Books & Guides Uploaded
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setActiveResourceTab('all')}
-                    className={`rounded-xl px-3 py-1.5 text-xs font-bold transition ${
-                      activeResourceTab === 'all'
-                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-600/30'
-                        : 'text-slate-400 hover:text-white hover:bg-white/5'
-                    }`}
-                  >
-                    View Both Books (2)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveResourceTab('slides')}
-                    className={`rounded-xl px-3 py-1.5 text-xs font-bold transition ${
-                      activeResourceTab === 'slides'
-                        ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                        : 'text-slate-400 hover:text-white hover:bg-white/5'
-                    }`}
-                  >
-                    📑 1. Tips PDF (Slides & Strategy)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveResourceTab('book')}
-                    className={`rounded-xl px-3 py-1.5 text-xs font-bold transition ${
-                      activeResourceTab === 'book'
-                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                        : 'text-slate-400 hover:text-white hover:bg-white/5'
-                    }`}
-                  >
-                    📘 2. Book PDF (@IELTS_Practice_Tests)
-                  </button>
-                </div>
-              </div>
-
-              {/* Book 1: Class 1 Tips PDF Section */}
-              {(activeResourceTab === 'all' || activeResourceTab === 'slides') && (
-                <div className="section-card border-purple-500/30 p-6 sm:p-8">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-purple-500/15 text-purple-300">
-                        <FileText size={24} />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="inline-flex items-center gap-1 rounded-full border border-purple-400/30 bg-purple-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-purple-200">
-                            <Eye size={12} /> Tips PDF
-                          </span>
-                          <span className="text-[10px] font-bold text-slate-400">
-                            Class 01 Resource · Book 1
-                          </span>
-                        </div>
-                        <h3 className="mt-1 text-xl font-black text-white">
-                          Class 1: Tips PDF (Instructional Slides & Strategy Guide)
-                        </h3>
-                      </div>
+              {/* Study Materials & Book PDFs Hub */}
+              <div className="section-card border-purple-500/30 p-6 sm:p-8 space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-white/10 pb-5">
+                  <div className="flex items-center gap-3">
+                    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-purple-500/20 text-purple-300">
+                      <BookOpen size={24} />
                     </div>
-
-                    <a
-                      href="https://drive.google.com/file/d/1xvDT_G_oAXLwRy4Os1XjkypZvvPjsR_x/view?usp=sharing"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="glow-button glow-button-blue inline-flex items-center justify-center gap-2 py-3 px-5 text-xs font-black uppercase tracking-wider shadow-lg shadow-blue-500/25 transition hover:scale-[1.02]"
-                    >
-                      <span>Open in New Tab</span>
-                      <ExternalLink size={15} />
-                    </a>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-purple-400/30 bg-purple-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-purple-200">
+                          Class 01 Curriculum
+                        </span>
+                        <span className="text-[10px] font-bold text-slate-400">
+                          2 Files Uploaded
+                        </span>
+                      </div>
+                      <h3 className="mt-1 text-2xl font-black text-white">
+                        Class 1 Study Materials & PDFs
+                      </h3>
+                    </div>
                   </div>
-
-                  <p className="mt-3 text-sm leading-6 text-slate-300">
-                    Review the official instructional slide deck and Part 1 strategies (Tips PDF) directly below:
+                  <p className="text-xs text-slate-400 max-w-xs">
+                    Open each document in a new tab for distraction-free study and full-screen reading.
                   </p>
+                </div>
 
-                  {/* Embedded Interactive Slide Viewer */}
-                  <div className="mt-5 relative aspect-[16/10] sm:aspect-[16/9] w-full overflow-hidden rounded-2xl border border-white/15 bg-slate-950 shadow-2xl">
-                    <iframe
-                      src="https://drive.google.com/file/d/1xvDT_G_oAXLwRy4Os1XjkypZvvPjsR_x/preview"
-                      title="Class 1 Tips PDF"
-                      className="h-full w-full border-0"
-                      allow="autoplay; encrypted-media; fullscreen"
-                      loading="lazy"
-                    />
-                  </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {/* Book 1: Tips PDF Card */}
+                  <div className="relative overflow-hidden rounded-2xl border border-purple-400/30 bg-gradient-to-br from-purple-950/60 via-slate-900/80 to-slate-950 p-6 flex flex-col justify-between transition hover:border-purple-400/60 shadow-xl shadow-purple-950/30">
+                    <div>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-purple-400/30 bg-purple-500/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-purple-200">
+                          📑 Tips PDF · Slides
+                        </span>
+                        <span className="text-[10px] font-semibold text-slate-400">Google Drive PDF</span>
+                      </div>
 
-                  {/* Footer Toolbar */}
-                  <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-3.5 text-xs text-slate-300">
-                    <div className="flex items-center gap-2.5">
-                      <span className="relative flex h-2.5 w-2.5">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
-                      </span>
-                      <span className="font-semibold text-emerald-300">Tips PDF Preview Active</span>
+                      <div className="mt-4 flex items-start gap-3">
+                        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-purple-500/20 text-purple-300">
+                          <FileText size={24} />
+                        </div>
+                        <div>
+                          <h4 className="text-lg font-black text-white">
+                            Tips PDF
+                          </h4>
+                          <p className="text-xs font-semibold text-purple-300">
+                            IELTS Listening Mastery & Part 1 Guide
+                          </p>
+                        </div>
+                      </div>
+
+                      <p className="mt-4 text-sm leading-6 text-slate-300">
+                        Official instructional slide deck covering Part 1 trap defense, 30s prediction techniques, and spelling traps.
+                      </p>
                     </div>
-                    <div className="flex items-center gap-2 text-slate-400">
-                      <span>For full screen presentation or offline study:</span>
+
+                    <div className="mt-6 pt-4 border-t border-white/10">
                       <a
                         href="https://drive.google.com/file/d/1xvDT_G_oAXLwRy4Os1XjkypZvvPjsR_x/view?usp=sharing"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 font-bold text-blue-300 hover:text-blue-200 underline underline-offset-4"
+                        className="glow-button glow-button-blue flex w-full items-center justify-center gap-2 py-3.5 px-5 text-xs font-black uppercase tracking-wider shadow-lg shadow-purple-600/30 transition hover:scale-[1.02]"
                       >
-                        Open Google Drive Slides <ExternalLink size={12} />
+                        <span>Open Tips PDF in New Tab</span>
+                        <ExternalLink size={15} />
                       </a>
                     </div>
                   </div>
-                </div>
-              )}
 
-              {/* Book 2: Class 1 Book PDF Section */}
-              {(activeResourceTab === 'all' || activeResourceTab === 'book') && (
-                <div className="section-card border-indigo-500/30 p-6 sm:p-8">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-indigo-500/15 text-indigo-300">
-                        <BookOpen size={24} />
+                  {/* Book 2: Book PDF Card */}
+                  <div className="relative overflow-hidden rounded-2xl border border-indigo-400/30 bg-gradient-to-br from-indigo-950/60 via-slate-900/80 to-slate-950 p-6 flex flex-col justify-between transition hover:border-indigo-400/60 shadow-xl shadow-indigo-950/30">
+                    <div>
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="inline-flex items-center gap-1 rounded-full border border-indigo-400/30 bg-indigo-500/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-indigo-200">
+                          📘 Book PDF · Full Tests
+                        </span>
+                        <span className="text-[10px] font-semibold text-slate-400">Google Drive PDF</span>
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="inline-flex items-center gap-1 rounded-full border border-indigo-400/30 bg-indigo-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-indigo-200">
-                            <BookOpen size={12} /> Book PDF
-                          </span>
-                          <span className="text-[10px] font-bold text-slate-400">
-                            Class 01 Resource · Book 2
-                          </span>
+
+                      <div className="mt-4 flex items-start gap-3">
+                        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-indigo-500/20 text-indigo-300">
+                          <BookOpen size={24} />
                         </div>
-                        <h3 className="mt-1 text-xl font-black text-white">
-                          Class 1: Book PDF (Official IELTS Practice Tests Book)
-                        </h3>
+                        <div>
+                          <h4 className="text-lg font-black text-white">
+                            Book PDF
+                          </h4>
+                          <p className="text-xs font-semibold text-indigo-300">
+                            @IELTS_Practice_Tests.pdf
+                          </p>
+                        </div>
                       </div>
+
+                      <p className="mt-4 text-sm leading-6 text-slate-300">
+                        Complete Cambridge IELTS practice tests and audio drill worksheets to complete today&apos;s exercises and homework.
+                      </p>
                     </div>
 
-                    <a
-                      href="https://drive.google.com/file/d/10KSNZalZosook_mGGlK82PIBe4maasm2/view?usp=sharing"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="glow-button glow-button-blue inline-flex items-center justify-center gap-2 py-3 px-5 text-xs font-black uppercase tracking-wider shadow-lg shadow-indigo-500/25 transition hover:scale-[1.02]"
-                    >
-                      <span>Open in New Tab</span>
-                      <ExternalLink size={15} />
-                    </a>
-                  </div>
-
-                  <p className="mt-3 text-sm leading-6 text-slate-300">
-                    Access the complete official IELTS Practice Tests collection (@IELTS_Practice_Tests.pdf) directly below for listening drills and homework tests:
-                  </p>
-
-                  {/* Embedded Interactive Practice Tests Book Viewer */}
-                  <div className="mt-5 relative aspect-[16/10] sm:aspect-[16/9] w-full overflow-hidden rounded-2xl border border-white/15 bg-slate-950 shadow-2xl">
-                    <iframe
-                      src="https://drive.google.com/file/d/10KSNZalZosook_mGGlK82PIBe4maasm2/preview"
-                      title="Class 1 Official IELTS Practice Tests Book"
-                      className="h-full w-full border-0"
-                      allow="autoplay; encrypted-media; fullscreen"
-                      loading="lazy"
-                    />
-                  </div>
-
-                  {/* Footer Toolbar */}
-                  <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-3.5 text-xs text-slate-300">
-                    <div className="flex items-center gap-2.5">
-                      <span className="relative flex h-2.5 w-2.5">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-indigo-400 opacity-75"></span>
-                        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-indigo-400"></span>
-                      </span>
-                      <span className="font-semibold text-indigo-300">Interactive Practice Book Reader Active</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-slate-400">
-                      <span>For full screen presentation or offline study:</span>
+                    <div className="mt-6 pt-4 border-t border-white/10">
                       <a
                         href="https://drive.google.com/file/d/10KSNZalZosook_mGGlK82PIBe4maasm2/view?usp=sharing"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 font-bold text-indigo-300 hover:text-indigo-200 underline underline-offset-4"
+                        className="glow-button glow-button-blue flex w-full items-center justify-center gap-2 py-3.5 px-5 text-xs font-black uppercase tracking-wider shadow-lg shadow-indigo-600/30 transition hover:scale-[1.02]"
                       >
-                        Open Google Drive Book <ExternalLink size={12} />
+                        <span>Open Book PDF in New Tab</span>
+                        <ExternalLink size={15} />
                       </a>
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
 
               {/* Bottom Quick Bar */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/10 pt-6">
