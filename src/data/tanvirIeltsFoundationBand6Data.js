@@ -43,6 +43,9 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
     audioEmbedUrl: 'https://drive.google.com/file/d/1ODDAamucZshhbOanDN_UC36khUdPZcPT/preview',
     audioFileUrl: '/audio/day1-ielts-listening-audio.mp3',
     audioTitle: 'Official IELTS Listening Audio Drill (Part 1)',
+    questionImageUrl: 'https://drive.google.com/file/d/12tb8zkiP2Y7tab9n6NE7KJodfemPJuYY/view?usp=sharing',
+    questionImageFileUrl: '/images/day1-listening-question-sheet.jpg',
+    questionImageTitle: 'Class 1: Listening Form Completion Question Sheet',
     status: 'published',
   },
   {

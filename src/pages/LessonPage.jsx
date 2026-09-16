@@ -28,6 +28,7 @@ import {
   UsersRound,
   Video,
   Volume2,
+  X,
 } from 'lucide-react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client.js';
@@ -242,6 +243,8 @@ export function LessonPage() {
   const [audioCurrentTime, setAudioCurrentTime] = useState(0);
   const [audioDuration, setAudioDuration] = useState(0);
   const audioRef = useRef(null);
+  const [showQuestionImage, setShowQuestionImage] = useState(true);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
   const formatAudioTime = (seconds) => {
     if (!Number.isFinite(seconds) || seconds <= 0) return '0:00';
@@ -996,7 +999,7 @@ export function LessonPage() {
                           Class 01 Curriculum
                         </span>
                         <span className="text-[10px] font-bold text-slate-400">
-                          3 Course Resources (2 Books + 1 Audio)
+                          4 Course Resources (2 Books + Audio + Question Sheet)
                         </span>
                       </div>
                       <h3 className="mt-1 text-2xl font-black text-white">
@@ -1233,7 +1236,163 @@ export function LessonPage() {
                     </audio>
                   </div>
                 </div>
+
+                {/* Question Picture Section - After Audio File */}
+                <div className="relative overflow-hidden rounded-2xl border border-cyan-400/30 bg-gradient-to-br from-cyan-950/40 via-slate-900/90 to-slate-950 p-6 shadow-xl shadow-cyan-950/30">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/10 pb-4">
+                    <div className="flex items-start sm:items-center gap-3">
+                      <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-cyan-400/30 bg-cyan-500/15 text-cyan-300">
+                        <FileText size={24} />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center gap-1 rounded-full border border-cyan-400/30 bg-cyan-500/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-cyan-200">
+                            📝 Question Picture · IELTS Part 1
+                          </span>
+                          <span className="text-[10px] font-semibold text-slate-400">
+                            Questions 1–10 Form Completion
+                          </span>
+                        </div>
+                        <h4 className="mt-1 text-lg font-black text-white">
+                          Class 1: Form Completion Question Sheet
+                        </h4>
+                        <p className="text-xs text-slate-300">
+                          Solve these questions while listening to the audio drill above. Click to view or open in a new tab.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      {/* View Question Picture Button */}
+                      <button
+                        type="button"
+                        onClick={() => setShowQuestionImage(!showQuestionImage)}
+                        className="glow-button glow-button-muted py-2.5 px-4 text-xs font-bold flex items-center gap-1.5"
+                      >
+                        <Eye size={15} />
+                        <span>{showQuestionImage ? 'Hide Picture' : 'View This Question Picture'}</span>
+                      </button>
+
+                      {/* Open in New Tab Button */}
+                      <a
+                        href="/images/day1-listening-question-sheet.jpg"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="glow-button glow-button-blue flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-black uppercase tracking-wider shadow-lg shadow-cyan-600/30 transition hover:scale-[1.02]"
+                      >
+                        <span>Open in New Tab</span>
+                        <ExternalLink size={14} />
+                      </a>
+
+                      {/* Google Drive Direct Link */}
+                      <a
+                        href="https://drive.google.com/file/d/12tb8zkiP2Y7tab9n6NE7KJodfemPJuYY/view?usp=sharing"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="glow-button glow-button-muted py-2.5 px-3 text-xs font-bold flex items-center gap-1.5 text-slate-400 hover:text-white"
+                        title="Open original on Google Drive"
+                      >
+                        <span>Drive</span>
+                        <ExternalLink size={13} />
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Inline Question Picture Display */}
+                  {showQuestionImage && (
+                    <div className="mt-5 space-y-3">
+                      <div className="relative group overflow-hidden rounded-2xl border border-white/15 bg-slate-950 shadow-2xl">
+                        <img
+                          src="/images/day1-listening-question-sheet.jpg"
+                          alt="IELTS Listening Part 1 Form Completion Question Sheet"
+                          className="w-full h-auto object-contain cursor-zoom-in transition duration-300 group-hover:scale-[1.005]"
+                          onClick={() => setIsImageModalOpen(true)}
+                          loading="lazy"
+                        />
+                        <div
+                          onClick={() => setIsImageModalOpen(true)}
+                          className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-4 cursor-zoom-in"
+                        >
+                          <span className="rounded-lg bg-black/70 backdrop-blur-md px-3 py-1.5 text-xs font-bold text-white flex items-center gap-1.5">
+                            <Eye size={14} /> Click to expand / fullscreen modal
+                          </span>
+                          <a
+                            href="/images/day1-listening-question-sheet.jpg"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="rounded-lg bg-cyan-600 px-3 py-1.5 text-xs font-black text-white hover:bg-cyan-500 transition flex items-center gap-1 shadow-lg shadow-cyan-600/40"
+                          >
+                            <span>Open in New Tab</span>
+                            <ExternalLink size={12} />
+                          </a>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap items-center justify-between text-xs text-slate-400 px-1">
+                        <span className="flex items-center gap-1.5 font-medium text-slate-300">
+                          💡 Tip: Open in a new tab to view full 2752 × 1536 resolution alongside your audio player.
+                        </span>
+                        <a
+                          href="/images/day1-listening-question-sheet.jpg"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-bold text-cyan-300 hover:text-cyan-200 underline underline-offset-4 flex items-center gap-1"
+                        >
+                          Direct Full Resolution (2752 × 1536) <ExternalLink size={12} />
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
+
+              {/* Fullscreen Question Picture Modal / Lightbox */}
+              {isImageModalOpen && (
+                <div
+                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-md"
+                  onClick={() => setIsImageModalOpen(false)}
+                >
+                  <div
+                    className="relative max-h-[95vh] max-w-6xl w-full overflow-hidden rounded-2xl border border-white/20 bg-slate-950 shadow-2xl flex flex-col"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex items-center justify-between border-b border-white/10 px-5 py-3.5 bg-slate-900/90">
+                      <div className="flex items-center gap-2">
+                        <span className="rounded-full border border-cyan-400/30 bg-cyan-500/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-cyan-200">
+                          Question Sheet
+                        </span>
+                        <span className="text-xs font-bold text-white">Class 1 · Form Completion Sprint</span>
+                      </div>
+                      <div className="flex items-center gap-2.5">
+                        <a
+                          href="/images/day1-listening-question-sheet.jpg"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="glow-button glow-button-blue py-1.5 px-3 text-xs font-bold flex items-center gap-1.5"
+                        >
+                          <span>Open in New Tab</span>
+                          <ExternalLink size={13} />
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => setIsImageModalOpen(false)}
+                          className="rounded-lg border border-white/10 p-1.5 text-slate-400 hover:bg-white/10 hover:text-white transition"
+                        >
+                          <X size={18} />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="overflow-auto p-3 max-h-[85vh] flex items-center justify-center bg-black/50">
+                      <img
+                        src="/images/day1-listening-question-sheet.jpg"
+                        alt="IELTS Listening Part 1 Form Completion Question Sheet"
+                        className="max-h-[80vh] w-auto object-contain rounded-lg shadow-2xl"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Bottom Quick Bar */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/10 pt-6">

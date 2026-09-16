@@ -4,6 +4,7 @@ import {
   CheckCircle2,
   Clock3,
   ExternalLink,
+  Eye,
   Film,
   FileText,
   Headphones,
@@ -641,7 +642,7 @@ export function DailyLessonsPage() {
                   <div className="flex items-center justify-between">
                     <p className="text-[11px] font-black uppercase tracking-widest text-purple-300 flex items-center gap-1.5">
                       <span>📚 Course Materials</span>
-                      <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-[9px] font-bold text-emerald-300">2 Books + 1 Audio</span>
+                      <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-[9px] font-bold text-emerald-300">2 Books + Audio + Question Sheet</span>
                     </p>
                     <span className="text-[10px] font-bold text-slate-400">Click to open &amp; play</span>
                   </div>
@@ -755,6 +756,49 @@ export function DailyLessonsPage() {
                       <source src="/audio/day1-ielts-listening-audio.mp3" type="audio/mpeg" />
                       <source src="https://drive.usercontent.google.com/download?id=1ODDAamucZshhbOanDN_UC36khUdPZcPT&export=download" type="audio/mpeg" />
                     </audio>
+                  </div>
+
+                  {/* Question Picture Row - After Audio File */}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-xl border border-cyan-400/30 bg-cyan-950/40 p-3 transition hover:border-cyan-400/50">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-cyan-500/20 text-cyan-300">
+                        <FileText size={18} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-black text-white flex items-center gap-1.5">
+                          <span>Question Picture</span>
+                          <span className="rounded bg-cyan-500/30 px-1 py-0.2 text-[9px] font-bold text-cyan-200">Worksheet</span>
+                        </p>
+                        <p className="truncate text-[10px] font-medium text-slate-300">
+                          Part 1 Form Completion Questions 1–10
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                      <a
+                        href="/images/day1-listening-question-sheet.jpg"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-1.5 rounded-lg bg-cyan-600/30 border border-cyan-400/30 px-3.5 py-2 text-xs font-black text-cyan-200 hover:bg-cyan-600 hover:text-white transition shadow-md"
+                      >
+                        <Eye size={13} />
+                        <span>View Question Picture</span>
+                        <ExternalLink size={13} />
+                      </a>
+
+                      <a
+                        href="https://drive.google.com/file/d/12tb8zkiP2Y7tab9n6NE7KJodfemPJuYY/view?usp=sharing"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="rounded-lg border border-white/10 bg-white/5 p-2 text-slate-400 hover:text-white transition"
+                        title="Open in Google Drive"
+                      >
+                        <ExternalLink size={14} />
+                      </a>
+                    </div>
                   </div>
                 </div>
 
