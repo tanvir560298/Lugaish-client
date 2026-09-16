@@ -360,6 +360,62 @@ a {
   animation: scaleIn 0.6s ease-out;
 }
 
+@keyframes day-active-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 25px rgba(168, 85, 247, 0.4),
+      0 0 60px rgba(59, 130, 246, 0.2),
+      inset 0 0 20px rgba(168, 85, 247, 0.15);
+    border-color: rgba(192, 132, 252, 0.65);
+  }
+  50% {
+    box-shadow:
+      0 0 45px rgba(168, 85, 247, 0.75),
+      0 0 90px rgba(16, 185, 129, 0.35),
+      inset 0 0 35px rgba(168, 85, 247, 0.3);
+    border-color: rgba(52, 211, 153, 0.85);
+  }
+}
+
+@keyframes live-beam-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes soundwave-bar-1 {
+  0%, 100% { height: 6px; }
+  50% { height: 20px; }
+}
+
+@keyframes soundwave-bar-2 {
+  0%, 100% { height: 18px; }
+  50% { height: 7px; }
+}
+
+@keyframes soundwave-bar-3 {
+  0%, 100% { height: 9px; }
+  50% { height: 22px; }
+}
+
+@keyframes soundwave-bar-4 {
+  0%, 100% { height: 20px; }
+  50% { height: 11px; }
+}
+
+.animate-day-active-card {
+  animation: day-active-pulse 3s ease-in-out infinite;
+}
+
+.animate-live-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.8), transparent);
+  background-size: 200% 100%;
+  animation: live-beam-shimmer 2.5s infinite linear;
+}
+
 /* Light Mode Styles */
 :root[data-theme='light'] .site-header {
   background-color: rgba(255, 255, 255, 0.9);

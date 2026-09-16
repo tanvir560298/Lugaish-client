@@ -1657,13 +1657,13 @@ export const COURSE_DATA = {
     flag: '💎',
     isPrivate: true,
     accent: 'purple',
-    description: 'Exclusive Level 6 Private Batch: Complete IELTS Bridge — English Foundation to Band 6. 60 masterclasses + 12 full weekend mocks.',
+    description: 'Exclusive Level 6 Private Batch: Complete IELTS Bridge — English Foundation to Band 6. Day 1 is live!',
     modules: [
       {
         id: 'pb-mod-1',
         title: 'Paid Batch — Level 6 Foundation to Band 6',
-        description: '60 comprehensive classes structured into Core Language Repair and Guided Band 6 Practice.',
-        lessons: IELTS_FOUNDATION_BAND_6_60_CLASSES.map((cls, index) => {
+        description: 'Focus solely on Day 1: IELTS Listening Part 1 Masterclass.',
+        lessons: IELTS_FOUNDATION_BAND_6_60_CLASSES.filter(cls => cls.day === 1).map((cls, index) => {
           const day = cls.day || index + 1;
           return {
             id: `pb-les-${day}`,

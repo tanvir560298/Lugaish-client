@@ -240,10 +240,10 @@ export function DailyLessonsPage() {
   const hasRemoteDayPlan = hasLoadedDayModules && !dayModuleError;
   const courseStartedForLearner = dayModuleData.courseStarted === true;
   const days = useMemo(() => {
-    if (isWebDeveloper) return plannedDays;
     if (state.activePathway === 'paid_batch') {
-      return plannedDays;
+      return plannedDays.filter(day => day.day === 1);
     }
+    if (isWebDeveloper) return plannedDays;
     if (!hasRemoteDayPlan || !courseStartedForLearner) return [];
 
     // Learners only see dates that the server has explicitly configured,
@@ -351,10 +351,16 @@ export function DailyLessonsPage() {
         <div className="relative p-6 sm:p-8 lg:p-10">
           <div className="absolute inset-y-0 right-0 hidden w-1/2 bg-gradient-to-l from-blue-500/10 to-transparent lg:block" />
           <div className="relative max-w-3xl">
-            <p className="mb-3 text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Daily lessons</p>
-            <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl">Pick today&apos;s learning box.</h1>
+            <p className="mb-3 text-xs font-black uppercase tracking-[0.28em] text-purple-300">
+              {state.activePathway === 'paid_batch' ? '💎 Level 6 Private Batch · Single Focus' : 'Daily lessons'}
+            </p>
+            <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl">
+              {state.activePathway === 'paid_batch' ? 'Day 1: IELTS Listening Masterclass' : 'Pick today\'s learning box.'}
+            </h1>
             <p className="mt-4 text-base leading-relaxed text-slate-400 sm:text-lg">
-              Each date has one learning format chosen by your course team: a video lesson, AI practice session, or interview.
+              {state.activePathway === 'paid_batch'
+                ? 'Welcome to your private batch! Today is Day 1 — zero distractions, pure focus on Listening Module Part 1.'
+                : 'Each date has one learning format chosen by your course team: a video lesson, AI practice session, or interview.'}
             </p>
           </div>
         </div>
@@ -446,15 +452,16 @@ export function DailyLessonsPage() {
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div className={state.activePathway === 'paid_batch' ? 'mx-auto max-w-2xl w-full' : 'grid gap-4 sm:grid-cols-2 xl:grid-cols-3'}>
         {days.map((day, index) => {
+          const isPaidBatch = state.activePathway === 'paid_batch';
           let presentation = MODULE_PRESENTATION[day.moduleType] ?? null;
-          if (state.activePathway === 'paid_batch') {
+          if (isPaidBatch) {
             presentation = {
-              label: day.staticLesson?.dayType || 'Class Masterclass',
-              startLabel: 'Open Class Topic',
-              reviewLabel: 'Review Topic',
-              Icon: BookOpen,
+              label: day.staticLesson?.dayType || 'Listening Day',
+              startLabel: 'Launch Day 1 Masterclass',
+              reviewLabel: 'Review Day 1 Masterclass',
+              Icon: Headphones,
               accent: 'text-purple-300',
             };
           } else if (['arabic', 'english'].includes(state.activePathway)) {
@@ -477,7 +484,7 @@ export function DailyLessonsPage() {
             }
           }
           const scheduledDate = formatScheduledDate(day.daySchedule?.scheduledFor);
-          const isCurrentDay = !isWebDeveloper && day.day === dayModuleData.courseDay;
+          const isCurrentDay = isPaidBatch ? (day.day === 1) : (!isWebDeveloper && day.day === dayModuleData.courseDay);
           const isPublished = Boolean(day.published);
           const premiumLocked = Boolean(day.premiumLocked);
           const planPendingForLearner = !hasLoadedDayModules && !isWebDeveloper;
@@ -492,7 +499,6 @@ export function DailyLessonsPage() {
             || (day.staticLesson && state.completedLessons?.includes(day.staticLesson.id))
             || isNextQuizCompleted
           );
-          const isPaidBatch = state.activePathway === 'paid_batch';
           const availableFromServer = isPaidBatch || day.available === true || (
             ['arabic', 'english'].includes(state.activePathway)
             && Boolean(day.staticLesson)
@@ -516,6 +522,114 @@ export function DailyLessonsPage() {
               : completed
                 ? (presentation?.reviewLabel || 'Review Topic')
                 : (presentation?.startLabel || 'Open Class Topic');
+
+          if (isPaidBatch && day.day === 1) {
+            return (
+              <article
+                key={day.id}
+                className="section-card relative overflow-hidden p-6 sm:p-8 transition border-2 border-purple-400/80 bg-gradient-to-br from-purple-950/80 via-slate-900/95 to-slate-950 shadow-[0_0_50px_rgba(168,85,247,0.35),0_0_90px_rgba(59,130,246,0.2)] animate-day-active-card"
+              >
+                {/* Live Beam Shimmer Top Border */}
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-1 animate-live-shimmer" />
+
+                {/* Ambient Radial Background Pulses */}
+                <div className="pointer-events-none absolute -right-12 -top-12 h-56 w-56 rounded-full bg-purple-500/20 blur-3xl animate-pulse" />
+                <div className="pointer-events-none absolute -bottom-10 -left-10 h-48 w-48 rounded-full bg-cyan-500/15 blur-2xl animate-pulse" style={{ animationDelay: '1.2s' }} />
+
+                {/* Top Active Radar & Equalizer Status Bar */}
+                <div className="relative z-10 mb-6 flex items-center justify-between rounded-2xl border border-purple-400/30 bg-purple-950/70 px-4 py-3 shadow-lg shadow-purple-950/50 backdrop-blur-md">
+                  <div className="flex items-center gap-3">
+                    <span className="relative flex h-3.5 w-3.5">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-80"></span>
+                      <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-emerald-400"></span>
+                    </span>
+                    <div>
+                      <p className="text-[11px] font-black uppercase tracking-widest text-emerald-300">
+                        🔥 TODAY WE ARE ON DAY 1
+                      </p>
+                      <p className="text-[10px] font-bold text-slate-400">
+                        IELTS Listening Module · Part 1
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-end gap-1.5 h-6 px-2">
+                    <span className="inline-block w-1 rounded-full bg-purple-400 animate-[soundwave-bar-1_1s_ease-in-out_infinite]"></span>
+                    <span className="inline-block w-1 rounded-full bg-cyan-400 animate-[soundwave-bar-2_0.8s_ease-in-out_infinite]"></span>
+                    <span className="inline-block w-1 rounded-full bg-emerald-400 animate-[soundwave-bar-3_1.1s_ease-in-out_infinite]"></span>
+                    <span className="inline-block w-1 rounded-full bg-amber-400 animate-[soundwave-bar-4_0.9s_ease-in-out_infinite]"></span>
+                  </div>
+                </div>
+
+                {/* Card Title & Animated Icon */}
+                <div className="relative z-10 mb-5 flex items-start justify-between gap-4">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full border border-purple-400/30 bg-purple-500/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-purple-200">
+                        Class 01
+                      </span>
+                      <span className="rounded-full border border-blue-400/30 bg-blue-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-blue-200">
+                        Listening Day
+                      </span>
+                      <span className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-300">
+                        Band 6 Target
+                      </span>
+                    </div>
+
+                    <h2 className="mt-3 text-2xl font-black text-white sm:text-3xl">
+                      Topic 1: Listening Module Part 1
+                    </h2>
+                    <p className="mt-1 text-xs font-semibold text-purple-200">
+                      Form & Note Completion Masterclass
+                    </p>
+                  </div>
+
+                  <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-xl shadow-purple-500/40 animate-bounce">
+                    <Headphones size={26} />
+                  </div>
+                </div>
+
+                {/* Core Focus & Key Mechanics */}
+                <p className="relative z-10 text-sm leading-6 text-slate-300">
+                  {day.staticLesson?.coreStructure || 'IELTS Listening Part 1 — Form & Note Completion Masterclass (Names, Numbers, Postcodes, Dates & Distractor Defense)।'}
+                </p>
+
+                {/* Strategy Highlight Badges */}
+                <div className="relative z-10 mt-5 grid gap-2 sm:grid-cols-2">
+                  <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] p-3 text-xs text-slate-300">
+                    <span className="text-purple-400 font-bold">🎯</span>
+                    <span>Pre-Audio 30s Information Prediction</span>
+                  </div>
+                  <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] p-3 text-xs text-slate-300">
+                    <span className="text-emerald-400 font-bold">🛡️</span>
+                    <span>Distractor Self-Correction Defense</span>
+                  </div>
+                  <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] p-3 text-xs text-slate-300">
+                    <span className="text-cyan-400 font-bold">🔊</span>
+                    <span>A vs E vs I & G vs J Spelling Traps</span>
+                  </div>
+                  <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] p-3 text-xs text-slate-300">
+                    <span className="text-amber-400 font-bold">🏆</span>
+                    <span>Target: 10/10 Score (+500 XP)</span>
+                  </div>
+                </div>
+
+                {/* Launch Button */}
+                <div className="relative z-10 mt-7">
+                  <button
+                    type="button"
+                    onClick={() => openDay(day)}
+                    className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-emerald-600 px-6 py-4 text-sm font-black uppercase tracking-widest text-white shadow-xl shadow-purple-600/30 transition hover:scale-[1.01] hover:shadow-2xl hover:shadow-emerald-500/40 active:scale-[0.99]"
+                  >
+                    <span className="pointer-events-none absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full" />
+                    <Headphones size={18} className="animate-pulse" />
+                    <span>{completed ? 'Review Day 1 Masterclass' : 'Launch Day 1 Listening Masterclass'}</span>
+                    <Sparkles size={16} className="text-amber-300 animate-spin" style={{ animationDuration: '4s' }} />
+                  </button>
+                </div>
+              </article>
+            );
+          }
 
           return (
             <article
