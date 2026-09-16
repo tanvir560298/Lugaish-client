@@ -1,8 +1,51 @@
 {
   "subject": "arabic",
   "current_day": 8,
-  "last_run_timestamp": "2026-09-16T13:12:54.557584",
-  "day_initialized_at": "2026-09-15T15:46:19.136752",
-  "today_questions": {},
-  "pending_answers": {}
+  "last_run_timestamp": "2026-09-16T15:38:24.598746",
+  "day_initialized_at": "2026-09-16T15:38:24.598449",
+  "today_questions": {
+    "1": {
+      "question": "হারফে জার (যেমন: فِي) এর পরের বিশেষ্যটির (Noun) শেষ হরকতে কী বসে?",
+      "options": [
+        "পেশ / Dammah",
+        "জবর / Fathah",
+        "জের / Kasrah",
+        "সাকিন / Sukun"
+      ],
+      "answer_index": 2,
+      "correct_option_letter": "C",
+      "explanation": "সঠিক উত্তর C) জের / Kasrah। হারফে জার এর পরের বিশেষ্যটি মাজরুর হয় এবং এর শেষ অক্ষরে জের বা Kasrah বসে।"
+    },
+    "2": {
+      "question": "“টেবিলের ওপরে” এর সঠিক আরবী রূপ কোনটি?",
+      "options": [
+        "عَلَى الْمَكْتَبُ (‘Alaa al-maktabu)",
+        "عَلَى الْمَكْتَبِ (‘Alaa al-maktabi)",
+        "فِي الْمَكْتَبِ (Fii al-maktabi)",
+        "عَلَى الْمَكْتَبَ (‘Alaa al-maktaba)"
+      ],
+      "answer_index": 1,
+      "correct_option_letter": "B",
+      "explanation": "সঠিক উত্তর B) عَلَى الْمَكْتَبِ (‘Alaa al-maktabi)। “عَلَى” হারফে জারের পরে “الْمَكْتَبِ” এর শেষে জের হয়ে সঠিক রূপ হবে “عَلَى الْمَكْتَبِ”।"
+    },
+    "3": {
+      "question": "আরবী ভাষায় “فِي” (Fii) এবং “عَلَى” (Alaa) শব্দ দুটিকে কী বলা হয়?",
+      "options": [
+        "সর্বনাম (Pronouns)",
+        "হারফে জার / অব্যয় (Prepositions)",
+        "ইশারা / নির্দেশক (Pointers)",
+        "বিশেষণ (Adjectives)"
+      ],
+      "answer_index": 1,
+      "correct_option_letter": "B",
+      "explanation": "সঠিক উত্তর B) হারফে জার / অব্যয় (Prepositions)। “فِي” (মধ্যে) এবং “عَلَى” (উপরে) শব্দ দুটি হলো হারফে জার (Prepositions)।"
+    }
+  },
+  "pending_answers": {
+    "1": {
+      "post_id": "mock_post_id_123456789",
+      "posted_at": "2026-09-16T15:38:24.598742",
+      "revealed": false
+    }
+  }
 }
