@@ -451,7 +451,8 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
     try {
       const response = await api.removeUser(user.id);
       setUsers(previous => previous.filter(item => item.id !== user.id));
-      setMessage(response.message || 'Member removed successfully.');
+      actions.setPrivateBatchAccess(user.email, false);
+      setMessage(response?.message || 'Member removed successfully.');
     } catch (error) {
       setMessage(error.message || 'Could not remove this member.');
     } finally {
