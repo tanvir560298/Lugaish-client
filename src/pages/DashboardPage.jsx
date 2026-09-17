@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { Award, BookOpenCheck, CheckCircle2, ChevronDown, ClipboardList, FilePenLine, GraduationCap, Link2, Lock, Mail, Plus, RefreshCw, Send, ShieldCheck, Sparkles, Trash2, TrendingUp, UsersRound } from 'lucide-react';
 import { api } from '../api/client.js';
-import { isEmailLinkedWithPrivateBatch, useAppContext } from '../state/AppContext.jsx';
+import { getUnlinkedPrivateBatchEmails, isEmailLinkedWithPrivateBatch, useAppContext } from '../state/AppContext.jsx';
 import { TanvirCoursesManagementPanel } from '../components/TanvirCoursesManagementPanel.jsx';
 import { ROLE_LABELS, ROLE_VALUES, ROLES, getViewedRole, hasPermission, isStudentPreview, normalizeRole } from '../utils/roles.js';
 import { getEffectiveCourseStartKey, hasCourseStarted } from '../utils/courseLaunch.js';
@@ -364,10 +364,17 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
       .then(data => {
         if (!ignore) {
           const rawUsers = data.users ?? [];
-          setUsers(rawUsers.map(u => ({
-            ...u,
-            privateBatchAccess: Boolean(u.privateBatchAccess || isEmailLinkedWithPrivateBatch(u.email)),
-          })));
+          const unlinkedEmails = getUnlinkedPrivateBatchEmails().map(e => String(e).toLowerCase());
+          setUsers(rawUsers.map(u => {
+            const emailLower = (u.email || '').toLowerCase();
+            const isUnlinked = Boolean(u.privateBatchExplicitlyRevoked || unlinkedEmails.includes(emailLower));
+            const hasAccess = !isUnlinked && Boolean(u.privateBatchAccess || isEmailLinkedWithPrivateBatch(u.email));
+            return {
+              ...u,
+              privateBatchAccess: hasAccess,
+              privateBatchExplicitlyRevoked: isUnlinked,
+            };
+          }));
           setMessage('');
           setCanRetry(false);
           setSeatLimits({
@@ -411,11 +418,20 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
     setMessage('');
     try {
       const response = await api.updateUserPrivateBatch(user.id, { privateBatchAccess: nextLinked });
-      setUsers(prev => prev.map(u => (u.id === user.id ? { ...u, privateBatchAccess: nextLinked } : u)));
-      actions.setPrivateBatchAccess(user.email, nextLinked);
-      setMessage(response?.message || (nextLinked ? `Linked ${user.name || user.email} with Private Batch (Paid).` : `Unlinked ${user.name || user.email} from Private Batch.`));
+      const updatedAccess = response?.user?.privateBatchAccess !== undefined ? Boolean(response.user.privateBatchAccess) : nextLinked;
+      setUsers(prev => prev.map(u => (u.id === user.id ? {
+        ...u,
+        privateBatchAccess: updatedAccess,
+        privateBatchExplicitlyRevoked: !updatedAccess,
+      } : u)));
+      actions.setPrivateBatchAccess(user.email, updatedAccess);
+      setMessage(response?.message || (updatedAccess ? `Linked ${user.name || user.email} with Private Batch (Paid).` : `Unlinked ${user.name || user.email} from Private Batch.`));
     } catch (error) {
-      setUsers(prev => prev.map(u => (u.id === user.id ? { ...u, privateBatchAccess: nextLinked } : u)));
+      setUsers(prev => prev.map(u => (u.id === user.id ? {
+        ...u,
+        privateBatchAccess: nextLinked,
+        privateBatchExplicitlyRevoked: !nextLinked,
+      } : u)));
       actions.setPrivateBatchAccess(user.email, nextLinked);
       setMessage(nextLinked ? `Linked ${user.name || user.email} with Private Batch (Paid).` : `Unlinked ${user.name || user.email} from Private Batch.`);
     } finally {

@@ -6,6 +6,7 @@ import { COURSE_START_DATE_KEY, getEffectiveCourseStartKey, hasCourseStarted } f
 
 const LOCAL_STORAGE_KEY = 'lugaish_state_v1';
 const LINKED_PRIVATE_BATCH_STORAGE_KEY = 'lugaish_linked_private_batch_emails';
+const UNLINKED_PRIVATE_BATCH_STORAGE_KEY = 'lugaish_unlinked_private_batch_emails';
 const ACTIVITY_DAY_COUNT = 84;
 const WEB_DEVELOPER_EMAILS = new Set(['tahmadium@gmail.com']);
 const TESTER_EMAILS = new Set(['chatgpt.tanvir1@gmail.com']);
@@ -32,9 +33,20 @@ export function getLinkedPrivateBatchEmails() {
   }
 }
 
+export function getUnlinkedPrivateBatchEmails() {
+  try {
+    const raw = localStorage.getItem(UNLINKED_PRIVATE_BATCH_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
 export function isEmailLinkedWithPrivateBatch(email) {
   if (!email) return false;
   const lower = String(email).toLowerCase();
+  const unlinked = getUnlinkedPrivateBatchEmails().map(e => String(e).toLowerCase());
+  if (unlinked.includes(lower)) return false;
   if (PAID_BATCH_PRECONFIGURED_EMAILS.has(lower)) return true;
   const list = getLinkedPrivateBatchEmails();
   return list.map(e => String(e).toLowerCase()).includes(lower);
@@ -42,11 +54,16 @@ export function isEmailLinkedWithPrivateBatch(email) {
 
 export function saveLinkedPrivateBatchEmail(email, isLinked) {
   if (!email) return;
-  const list = getLinkedPrivateBatchEmails().filter(e => String(e).toLowerCase() !== String(email).toLowerCase());
+  const lower = String(email).toLowerCase();
+  const linked = getLinkedPrivateBatchEmails().filter(e => String(e).toLowerCase() !== lower);
+  const unlinked = getUnlinkedPrivateBatchEmails().filter(e => String(e).toLowerCase() !== lower);
   if (isLinked) {
-    list.push(String(email).toLowerCase());
+    linked.push(lower);
+  } else {
+    unlinked.push(lower);
   }
-  localStorage.setItem(LINKED_PRIVATE_BATCH_STORAGE_KEY, JSON.stringify(list));
+  localStorage.setItem(LINKED_PRIVATE_BATCH_STORAGE_KEY, JSON.stringify(linked));
+  localStorage.setItem(UNLINKED_PRIVATE_BATCH_STORAGE_KEY, JSON.stringify(unlinked));
 }
 
 const defaultState = {
@@ -128,7 +145,14 @@ function loadState() {
 
   try {
     const parsed = JSON.parse(raw);
-    return normalizeFreshProgress({ ...defaultState, ...parsed });
+    return normalizeFreshProgress({
+      ...defaultState,
+      ...parsed,
+      learnerProfile: {
+        ...defaultState.learnerProfile,
+        ...(parsed.learnerProfile ?? {}),
+      },
+    });
   } catch (error) {
     localStorage.removeItem(LOCAL_STORAGE_KEY);
     return { ...defaultState, activityData: generateActivityData() };
@@ -136,15 +160,20 @@ function loadState() {
 }
 
 function saveState(state) {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // Ignore storage quota limits in preview
+  }
 }
 
 function computeLevel(xp) {
   return Math.floor(xp / 500) + 1;
 }
 
-function getFirstLessonId(pathway) {
-  return COURSE_DATA[pathway]?.modules[0]?.lessons[0]?.id ?? defaultState.activeLessonId;
+export function getFirstLessonId(pathway) {
+  const selectedPathway = COURSE_DATA[pathway] ?? COURSE_DATA.english;
+  return selectedPathway?.modules?.[0]?.lessons?.[0]?.id ?? 'en-les-1';
 }
 
 export function expandCompletedLessons(lessonIds) {
@@ -166,20 +195,28 @@ export function expandCompletedLessons(lessonIds) {
 }
 
 function normalizeState(state) {
+  const emailLower = state.userEmail?.toLowerCase();
   const isTesterMode = state.webDeveloperMode === 'tester';
   const isStaff = normalizeRole(state.userRole) === ROLES.webDeveloper
-    || WEB_DEVELOPER_EMAILS.has(state.userEmail?.toLowerCase())
-    || TESTER_EMAILS.has(state.userEmail?.toLowerCase());
-  const isLinked = Boolean(
-    state.privateBatchAccess
-    || isEmailLinkedWithPrivateBatch(state.userEmail)
-    || state.enrolledPathways?.includes('paid_batch')
+    || WEB_DEVELOPER_EMAILS.has(emailLower)
+    || TESTER_EMAILS.has(emailLower);
+
+  const unlinkedEmails = getUnlinkedPrivateBatchEmails().map(e => String(e).toLowerCase());
+  const isExplicitlyRevoked = Boolean(
+    state.privateBatchExplicitlyRevoked
+    || (emailLower && unlinkedEmails.includes(emailLower))
   );
-  const hasPrivateAccess = Boolean(isStaff || isLinked);
+
+  let hasPrivateAccess = false;
+  if (isStaff && !isTesterMode) {
+    hasPrivateAccess = true;
+  } else if (!isExplicitlyRevoked) {
+    hasPrivateAccess = Boolean(state.privateBatchAccess || isEmailLinkedWithPrivateBatch(state.userEmail));
+  }
 
   const activePathway = COURSE_DATA[state.activePathway] && (state.activePathway !== 'paid_batch' || hasPrivateAccess)
     ? state.activePathway
-    : defaultState.activePathway;
+    : (state.activePathway === 'paid_batch' ? 'english' : defaultState.activePathway);
 
   const rawEnrolled = Array.isArray(state.enrolledPathways) ? state.enrolledPathways : [activePathway];
   const enrolledFiltered = rawEnrolled.filter(pathway => {
@@ -198,6 +235,7 @@ function normalizeState(state) {
   return {
     ...state,
     privateBatchAccess: hasPrivateAccess,
+    privateBatchExplicitlyRevoked: isExplicitlyRevoked,
     completedLessons,
     activePathway,
     enrolledPathways: [...new Set(normalizedEnrolledPathways)],
@@ -250,14 +288,21 @@ export function AppProvider({ children }) {
       try {
         const user = await api.currentUser();
         if (!ignore) {
-          setState(previous => ({
+          const emailLower = (user?.email || '').toLowerCase();
+          const unlinkedEmails = getUnlinkedPrivateBatchEmails().map(e => String(e).toLowerCase());
+          const isRevoked = Boolean(user?.privateBatchExplicitlyRevoked || (emailLower && unlinkedEmails.includes(emailLower)));
+          const hasAccess = !isRevoked && Boolean(user?.privateBatchAccess || isEmailLinkedWithPrivateBatch(user?.email));
+          const baseEnrolled = (user?.enrolledPathways ?? []).filter(p => p !== 'paid_batch' || hasAccess);
+
+          setState(previous => normalizeState({
             ...previous,
             userName: user?.name ?? previous.userName,
             userEmail: user?.email ?? previous.userEmail,
             userRole: normalizeRole(user?.role ?? previous.userRole),
             permissions: user?.permissions ?? getRolePermissions(user?.role ?? previous.userRole),
-            privateBatchAccess: Boolean(user?.privateBatchAccess || isEmailLinkedWithPrivateBatch(user?.email) || user?.enrolledPathways?.includes('paid_batch')),
-            enrolledPathways: user?.enrolledPathways ?? previous.enrolledPathways,
+            privateBatchAccess: hasAccess,
+            privateBatchExplicitlyRevoked: isRevoked,
+            enrolledPathways: baseEnrolled.length ? baseEnrolled : previous.enrolledPathways,
             isPremium: Boolean(user?.isPremium),
             referralCode: user?.referralCode ?? previous.referralCode,
             learnerProfile: {
@@ -286,13 +331,21 @@ export function AppProvider({ children }) {
 
           setAuthToken(response.token);
           if (!ignore) {
-            setState(previous => ({
+            const emailLower = (response.user?.email || firebaseSession.user.email || '').toLowerCase();
+            const unlinkedEmails = getUnlinkedPrivateBatchEmails().map(e => String(e).toLowerCase());
+            const isRevoked = Boolean(response.user?.privateBatchExplicitlyRevoked || (emailLower && unlinkedEmails.includes(emailLower)));
+            const hasAccess = !isRevoked && Boolean(response.user?.privateBatchAccess || isEmailLinkedWithPrivateBatch(emailLower));
+            const baseEnrolled = (response.user?.enrolledPathways ?? previous.enrolledPathways ?? []).filter(p => p !== 'paid_batch' || hasAccess);
+
+            setState(previous => normalizeState({
               ...previous,
               userName: response.user?.name ?? previous.userName,
               userEmail: response.user?.email ?? previous.userEmail,
               userRole: normalizeRole(response.user?.role ?? previous.userRole),
               permissions: response.user?.permissions ?? getRolePermissions(response.user?.role ?? previous.userRole),
-              enrolledPathways: response.user?.enrolledPathways ?? previous.enrolledPathways,
+              privateBatchAccess: hasAccess,
+              privateBatchExplicitlyRevoked: isRevoked,
+              enrolledPathways: baseEnrolled,
               isLoggedIn: true,
             }));
           }
@@ -531,18 +584,26 @@ export function AppProvider({ children }) {
       }
 
       setAuthToken(response.token);
-      setState(prev => ({
+      const emailLower = (response.user?.email ?? firebaseEmail ?? '').toLowerCase();
+      const unlinkedEmails = getUnlinkedPrivateBatchEmails().map(e => String(e).toLowerCase());
+      const isRevoked = Boolean(response.user?.privateBatchExplicitlyRevoked || (emailLower && unlinkedEmails.includes(emailLower)));
+      const hasAccess = !isRevoked && Boolean(response.user?.privateBatchAccess || isEmailLinkedWithPrivateBatch(emailLower));
+      const targetLang = response.user?.languageSelected ?? languageSelected ?? 'english';
+      const initialPathway = (targetLang === 'paid_batch' && !hasAccess) ? 'english' : targetLang;
+
+      setState(prev => normalizeState({
         ...prev,
         userName: response.user?.name ?? prev.userName,
         userEmail: response.user?.email ?? prev.userEmail,
         userRole: normalizeRole(response.user?.role ?? prev.userRole),
         permissions: response.user?.permissions ?? getRolePermissions(response.user?.role ?? prev.userRole),
-        privateBatchAccess: Boolean(response.user?.privateBatchAccess || isEmailLinkedWithPrivateBatch(response.user?.email ?? firebaseEmail) || response.user?.enrolledPathways?.includes('paid_batch')),
-        activePathway: response.user?.languageSelected ?? languageSelected ?? prev.activePathway,
-        activeLessonId: getFirstLessonId(response.user?.languageSelected ?? languageSelected ?? prev.activePathway),
+        privateBatchAccess: hasAccess,
+        privateBatchExplicitlyRevoked: isRevoked,
+        activePathway: initialPathway,
+        activeLessonId: getFirstLessonId(initialPathway),
         enrolledPathways: Array.isArray(response.user?.enrolledPathways)
-          ? response.user.enrolledPathways
-          : [response.user?.languageSelected ?? languageSelected ?? prev.activePathway],
+          ? response.user.enrolledPathways.filter(p => p !== 'paid_batch' || hasAccess)
+          : [initialPathway],
         isPremium: Boolean(response.user?.isPremium),
         referralCode: response.user?.referralCode ?? prev.referralCode,
         learnerProfile: {
@@ -623,6 +684,8 @@ export function AppProvider({ children }) {
         return normalizeState({
           ...prev,
           privateBatchAccess: Boolean(isLinked),
+          privateBatchExplicitlyRevoked: !isLinked,
+          enrolledPathways: (prev.enrolledPathways || []).filter(p => p !== 'paid_batch' || Boolean(isLinked)),
         });
       });
     },

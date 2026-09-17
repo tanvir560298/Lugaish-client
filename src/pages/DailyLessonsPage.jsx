@@ -23,7 +23,7 @@ import {
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client.js';
-import { isEmailLinkedWithPrivateBatch, useAppContext } from '../state/AppContext.jsx';
+import { getUnlinkedPrivateBatchEmails, isEmailLinkedWithPrivateBatch, useAppContext } from '../state/AppContext.jsx';
 import { ROLES, isStudentPreview } from '../utils/roles.js';
 
 const LEARNER_PREVIEW_DAYS = 8;
@@ -257,12 +257,16 @@ export function DailyLessonsPage() {
       });
     }
   };
+  const emailLower = (state.userEmail || '').toLowerCase();
+  const unlinkedEmails = getUnlinkedPrivateBatchEmails().map(e => String(e).toLowerCase());
+  const isRevoked = Boolean(state.privateBatchExplicitlyRevoked || (emailLower && unlinkedEmails.includes(emailLower)));
   const isWebDeveloper = !isStudentPreview(state) && [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
   const canAccessPrivateBatch = isWebDeveloper
-    || Boolean(state.privateBatchAccess)
-    || state.enrolledPathways?.includes('paid_batch')
-    || isEmailLinkedWithPrivateBatch(state.userEmail)
-    || (isStudentPreview(state) && Boolean(state.privateBatchAccess || isEmailLinkedWithPrivateBatch(state.userEmail) || state.userEmail === 'tahmadium@gmail.com'));
+    || (!isRevoked && (
+      Boolean(state.privateBatchAccess)
+      || isEmailLinkedWithPrivateBatch(state.userEmail)
+      || (isStudentPreview(state) && Boolean(state.privateBatchAccess || isEmailLinkedWithPrivateBatch(state.userEmail) || state.userEmail === 'tahmadium@gmail.com'))
+    ));
   const baseEnrolled = [...new Set([
     ...(state.enrolledPathways?.length ? state.enrolledPathways : ['arabic', 'english']),
     ...(canAccessPrivateBatch ? ['paid_batch'] : []),
