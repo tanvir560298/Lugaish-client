@@ -48,19 +48,19 @@ export function getUnlinkedPrivateBatchEmails() {
 
 export function isEmailLinkedWithPrivateBatch(email) {
   if (!email) return false;
-  const lower = String(email).toLowerCase();
-  const unlinked = getUnlinkedPrivateBatchEmails().map(e => String(e).toLowerCase());
+  const lower = String(email).trim().toLowerCase();
+  const unlinked = getUnlinkedPrivateBatchEmails().map(e => String(e).trim().toLowerCase());
   if (unlinked.includes(lower)) return false;
   if (PAID_BATCH_PRECONFIGURED_EMAILS.has(lower)) return true;
   const list = getLinkedPrivateBatchEmails();
-  return list.map(e => String(e).toLowerCase()).includes(lower);
+  return list.map(e => String(e).trim().toLowerCase()).includes(lower);
 }
 
 export function saveLinkedPrivateBatchEmail(email, isLinked) {
   if (!email) return;
-  const lower = String(email).toLowerCase();
-  const linked = getLinkedPrivateBatchEmails().filter(e => String(e).toLowerCase() !== lower);
-  const unlinked = getUnlinkedPrivateBatchEmails().filter(e => String(e).toLowerCase() !== lower);
+  const lower = String(email).trim().toLowerCase();
+  const linked = getLinkedPrivateBatchEmails().filter(e => String(e).trim().toLowerCase() !== lower);
+  const unlinked = getUnlinkedPrivateBatchEmails().filter(e => String(e).trim().toLowerCase() !== lower);
   if (isLinked) {
     linked.push(lower);
   } else {
