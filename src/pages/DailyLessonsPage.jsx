@@ -216,6 +216,7 @@ export function DailyLessonsPage() {
   });
   const [hasLoadedDayModules, setHasLoadedDayModules] = useState(false);
   const [dayModuleError, setDayModuleError] = useState('');
+  const [selectedPaidMonth, setSelectedPaidMonth] = useState(1);
   const [isDay1AudioPlaying, setIsDay1AudioPlaying] = useState(false);
   const day1AudioRef = useRef(null);
 
@@ -242,7 +243,7 @@ export function DailyLessonsPage() {
 
   const toggleDay1Audio2 = () => {
     if (!day1Audio2Ref.current) return;
-    if (isDay1Audio2Playing) {
+    if (isDay1AudioPlaying) {
       day1Audio2Ref.current.pause();
       setIsDay1Audio2Playing(false);
     } else {
@@ -261,6 +262,7 @@ export function DailyLessonsPage() {
   const unlinkedEmails = getUnlinkedPrivateBatchEmails().map(e => String(e).toLowerCase());
   const isRevoked = Boolean(state.privateBatchExplicitlyRevoked || (emailLower && unlinkedEmails.includes(emailLower)));
   const isWebDeveloper = !isStudentPreview(state) && [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
+  const studentPaidMonths = Math.max(Number(state.paidBatchMonths) || 1, 1);
   const canAccessPrivateBatch = isWebDeveloper
     || (!isRevoked && (
       Boolean(state.privateBatchAccess)
@@ -294,7 +296,13 @@ export function DailyLessonsPage() {
   const courseStartedForLearner = dayModuleData.courseStarted === true;
   const days = useMemo(() => {
     if (state.activePathway === 'paid_batch') {
-      return plannedDays.filter(day => day.day === 1);
+      if (selectedPaidMonth === 'all') {
+        return plannedDays;
+      }
+      const targetMonth = Math.min(Math.max(Number(selectedPaidMonth) || 1, 1), 5);
+      const startDay = (targetMonth - 1) * 12 + 1;
+      const endDay = targetMonth * 12;
+      return plannedDays.filter(day => day.day >= startDay && day.day <= endDay);
     }
     if (isWebDeveloper) return plannedDays;
     if (!hasRemoteDayPlan || !courseStartedForLearner) return [];
@@ -315,7 +323,7 @@ export function DailyLessonsPage() {
 
       return day.configured && day.published && day.available === true;
     });
-  }, [courseStartedForLearner, dayModuleData.courseDay, hasRemoteDayPlan, isWebDeveloper, plannedDays, state.activePathway]);
+  }, [courseStartedForLearner, dayModuleData.courseDay, hasRemoteDayPlan, isWebDeveloper, plannedDays, selectedPaidMonth, state.activePathway]);
 
   useEffect(() => {
     if (!comingSoon) return undefined;
@@ -405,14 +413,14 @@ export function DailyLessonsPage() {
           <div className="absolute inset-y-0 right-0 hidden w-1/2 bg-gradient-to-l from-blue-500/10 to-transparent lg:block" />
           <div className="relative max-w-3xl">
             <p className="mb-3 text-xs font-black uppercase tracking-[0.28em] text-purple-300">
-              {state.activePathway === 'paid_batch' ? '💎 Level 6 Private Batch · Single Focus' : 'Daily lessons'}
+              {state.activePathway === 'paid_batch' ? '💎 Level 6 Private Batch · 60 Classes IELTS Bridge' : 'Daily lessons'}
             </p>
             <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl">
-              {state.activePathway === 'paid_batch' ? 'Day 1: IELTS Listening Masterclass' : 'Pick today\'s learning box.'}
+              {state.activePathway === 'paid_batch' ? 'Level 6 IELTS Foundation Curriculum' : 'Pick today\'s learning box.'}
             </h1>
             <p className="mt-4 text-base leading-relaxed text-slate-400 sm:text-lg">
               {state.activePathway === 'paid_batch'
-                ? 'Welcome to your private batch! Today is Day 1 — zero distractions, pure focus on Listening Module Part 1.'
+                ? 'Comprehensive 60-day IELTS bridge structured into 5 monthly phases (12 classes per month). Your unlocked months remain permanently preserved in your account.'
                 : 'Each date has one learning format chosen by your course team: a video lesson, AI practice session, or interview.'}
             </p>
           </div>
@@ -472,6 +480,73 @@ export function DailyLessonsPage() {
         )}
       </div>
 
+      {state.activePathway === 'paid_batch' && (
+        <div className="space-y-4">
+          <div className="flex flex-col gap-4 rounded-3xl border border-purple-500/25 bg-gradient-to-br from-purple-950/40 via-slate-900/70 to-slate-950 p-5 shadow-xl sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-xs font-black uppercase tracking-wider text-purple-200">Enrolled Status:</span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-purple-400/40 bg-purple-500/20 px-3 py-1 text-xs font-black uppercase tracking-wider text-purple-200">
+                💎 {isWebDeveloper ? 'All 5 Months (Staff Full Access)' : `Month ${studentPaidMonths} (Days 1–${studentPaidMonths * 12})`}
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-0.5 text-[11px] font-bold text-emerald-300">
+                <CheckCircle2 size={13} /> Lifetime Access Preserved
+              </span>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-1">Filter Month:</span>
+              {[1, 2, 3, 4, 5].map(monthNum => {
+                const isUnlocked = isWebDeveloper || monthNum <= studentPaidMonths;
+                const isSelected = selectedPaidMonth === monthNum;
+                return (
+                  <button
+                    key={monthNum}
+                    type="button"
+                    onClick={() => setSelectedPaidMonth(monthNum)}
+                    className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-black transition ${
+                      isSelected
+                        ? 'border-purple-400 bg-purple-600 text-white shadow-md shadow-purple-900/50'
+                        : isUnlocked
+                          ? 'border-purple-400/30 bg-purple-500/10 text-purple-200 hover:bg-purple-500/20'
+                          : 'border-white/10 bg-white/5 text-slate-500 hover:text-slate-400'
+                    }`}
+                  >
+                    {isUnlocked ? <span className="text-emerald-400 font-bold">✓</span> : <span className="text-amber-400">🔒</span>}
+                    <span>Month {monthNum}</span>
+                    <span className="text-[10px] opacity-70">({(monthNum - 1) * 12 + 1}–{monthNum * 12})</span>
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => setSelectedPaidMonth('all')}
+                className={`rounded-xl border px-3 py-1.5 text-xs font-black transition ${
+                  selectedPaidMonth === 'all'
+                    ? 'border-purple-400 bg-purple-600 text-white shadow-md shadow-purple-900/50'
+                    : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-300'
+                }`}
+              >
+                All 60
+              </button>
+            </div>
+          </div>
+
+          {selectedPaidMonth !== 'all' && selectedPaidMonth > studentPaidMonths && !isWebDeveloper && (
+            <div className="rounded-2xl border border-amber-400/30 bg-amber-500/10 p-5 text-amber-200 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <Lock className="shrink-0 text-amber-400" size={24} />
+                <div>
+                  <h4 className="text-sm font-black text-white">Month {selectedPaidMonth} Enrollment Required (Days {(selectedPaidMonth - 1) * 12 + 1}–{selectedPaidMonth * 12})</h4>
+                  <p className="mt-1 text-xs leading-relaxed text-amber-200/80">
+                    Your current subscription covers up to Month {studentPaidMonths} (Days 1–{studentPaidMonths * 12}). Your completed Month 1 classes remain permanently stored in your account. Contact Tanvir to enroll in Month {selectedPaidMonth}.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {dayModuleError && (
         <p className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
           {isWebDeveloper
@@ -505,15 +580,17 @@ export function DailyLessonsPage() {
         </div>
       )}
 
-      <div className={state.activePathway === 'paid_batch' ? 'mx-auto max-w-2xl w-full' : 'grid gap-4 sm:grid-cols-2 xl:grid-cols-3'}>
+      <div className={state.activePathway === 'paid_batch' ? 'grid gap-5 sm:grid-cols-2 xl:grid-cols-3' : 'grid gap-4 sm:grid-cols-2 xl:grid-cols-3'}>
         {days.map((day, index) => {
           const isPaidBatch = state.activePathway === 'paid_batch';
+          const dayNum = day.day;
+          const dayMonth = Math.ceil(dayNum / 12);
           let presentation = MODULE_PRESENTATION[day.moduleType] ?? null;
           if (isPaidBatch) {
             presentation = {
-              label: day.staticLesson?.dayType || 'Listening Day',
-              startLabel: 'Launch Day 1 Masterclass',
-              reviewLabel: 'Review Day 1 Masterclass',
+              label: day.staticLesson?.dayType || (dayNum === 1 ? 'Listening Day' : `Month ${dayMonth} · Class ${dayNum}`),
+              startLabel: dayNum === 1 ? 'Launch Day 1 Masterclass' : `Open Class ${dayNum}`,
+              reviewLabel: dayNum === 1 ? 'Review Day 1 Masterclass' : `Review Class ${dayNum}`,
               Icon: Headphones,
               accent: 'text-purple-300',
             };
@@ -558,7 +635,8 @@ export function DailyLessonsPage() {
             && day.day <= dayModuleData.courseDay
           );
           const fallbackIsNext = index === 0 || Boolean(days[index - 1]?.staticLesson && state.completedLessons.includes(days[index - 1].staticLesson.id));
-          const isLocked = planReadOnlyForLearner || (!isWebDeveloper && (
+          const isMonthLocked = isPaidBatch && !isWebDeveloper && (day.day > (studentPaidMonths * 12));
+          const isLocked = isMonthLocked || planReadOnlyForLearner || (!isWebDeveloper && (
             premiumLocked
             || !isPublished
             || (isPaidBatch ? false : (hasRemoteDayPlan ? !availableFromServer : !fallbackIsNext && !completed))
@@ -568,6 +646,8 @@ export function DailyLessonsPage() {
             ? 'Loading plan'
             : planUnavailableForLearner
               ? 'Plan unavailable'
+            : isMonthLocked
+              ? `🔒 Month ${dayMonth} Required`
             : !day.moduleType
             ? (isWebDeveloper ? 'Configure day' : 'Coming soon')
             : isLocked
@@ -580,7 +660,7 @@ export function DailyLessonsPage() {
             return (
               <article
                 key={day.id}
-                className="section-card relative overflow-hidden p-6 sm:p-8 transition border-2 border-purple-400/80 bg-gradient-to-br from-purple-950/80 via-slate-900/95 to-slate-950 shadow-[0_0_50px_rgba(168,85,247,0.35),0_0_90px_rgba(59,130,246,0.2)] animate-day-active-card"
+                className="section-card sm:col-span-2 xl:col-span-3 relative overflow-hidden p-6 sm:p-8 transition border-2 border-purple-400/80 bg-gradient-to-br from-purple-950/80 via-slate-900/95 to-slate-950 shadow-[0_0_50px_rgba(168,85,247,0.35),0_0_90px_rgba(59,130,246,0.2)] animate-day-active-card"
               >
                 {/* Live Beam Shimmer Top Border */}
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-1 animate-live-shimmer" />
@@ -963,17 +1043,23 @@ export function DailyLessonsPage() {
                   onClick={() => {
                     if (planReadOnlyForLearner) return;
                     if (isLocked && !isWebDeveloper) {
-                      setComingSoon(premiumLocked ? 'Arabic Premium' : !isPublished ? `Day ${day.day}` : 'Complete the previous day');
+                      if (isMonthLocked) {
+                        setComingSoon(`Class ${day.day} requires Month ${dayMonth} enrollment.`);
+                      } else {
+                        setComingSoon(premiumLocked ? 'Arabic Premium' : !isPublished ? `Day ${day.day}` : 'Complete the previous day');
+                      }
                       return;
                     }
                     openDay(day);
                   }}
                   className={`flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm font-black uppercase tracking-widest transition disabled:cursor-not-allowed ${
                     isLocked && !isWebDeveloper
-                      ? 'bg-white/5 text-slate-500'
+                      ? 'border border-white/5 bg-white/5 text-slate-500'
                       : completed
                         ? 'border border-emerald-400/20 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500 hover:text-white'
-                        : 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-emerald-500'
+                        : isPaidBatch
+                          ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25 hover:from-purple-500 hover:to-indigo-500'
+                          : 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-emerald-500'
                   }`}
                 >
                   {actionLabel}

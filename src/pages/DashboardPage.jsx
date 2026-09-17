@@ -145,9 +145,10 @@ function getInitials(name = '', email = '') {
     .join('') || 'L';
 }
 
-function LearnerRoleRow({ user, onRoleChange, onTogglePrivateBatch, isTogglingPrivateBatch, onRemove, canManageRoles, isRemoving, isCurrentUser }) {
+function LearnerRoleRow({ user, onRoleChange, onTogglePrivateBatch, onChangePrivateBatchMonth, isTogglingPrivateBatch, onRemove, canManageRoles, isRemoving, isCurrentUser }) {
   const role = normalizeRole(user.role);
   const progressEntries = Object.entries(user.learningProgress ?? {});
+  const studentMonths = Math.max(Number(user.paidBatchMonths) || 1, 1);
 
   return (
     <div className={`grid gap-4 border-t border-white/10 px-4 py-4 transition hover:bg-white/[0.03] ${canManageRoles ? 'lg:grid-cols-[1.35fr_0.65fr_280px]' : 'lg:grid-cols-[1.35fr_0.75fr]' } lg:items-center`}>
@@ -160,37 +161,58 @@ function LearnerRoleRow({ user, onRoleChange, onTogglePrivateBatch, isTogglingPr
             <p className="truncate text-sm font-black text-white">{user.name || 'Unnamed learner'}</p>
             {user.privateBatchAccess && (
               <span className="inline-flex items-center gap-1 rounded-full border border-purple-400/30 bg-purple-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-purple-300">
-                <span>💎</span> Paid Batch
+                <span>💎</span> Month {studentMonths} (Days 1–{studentMonths * 12})
               </span>
             )}
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-2">
             <p className="truncate text-xs font-semibold text-slate-500">{user.email}</p>
             {canManageRoles && (
-              <button
-                type="button"
-                onClick={() => onTogglePrivateBatch?.(user)}
-                disabled={isTogglingPrivateBatch}
-                className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-black uppercase tracking-wider transition ${
-                  user.privateBatchAccess
-                    ? 'border-purple-400/30 bg-purple-500/15 text-purple-200 hover:bg-purple-500/25 hover:border-purple-400/60'
-                    : 'border-blue-400/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 hover:border-blue-400/60'
-                } disabled:cursor-wait disabled:opacity-50`}
-                title={user.privateBatchAccess ? 'Unlink learner from Paid Batch' : 'Grant access to exclusive Paid Batch'}
-              >
-                {user.privateBatchAccess ? (
-                  <>
-                    <CheckCircle2 size={12} className="text-purple-400" />
-                    <span>Linked: Private Batch</span>
-                    <span className="ml-1 text-[9px] text-slate-400 underline hover:text-red-300">Unlink</span>
-                  </>
-                ) : (
-                  <>
-                    <Plus size={12} className="text-blue-400" />
-                    <span>Link with Private Batch</span>
-                  </>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => onTogglePrivateBatch?.(user)}
+                  disabled={isTogglingPrivateBatch}
+                  className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-black uppercase tracking-wider transition ${
+                    user.privateBatchAccess
+                      ? 'border-purple-400/30 bg-purple-500/15 text-purple-200 hover:bg-purple-500/25 hover:border-purple-400/60'
+                      : 'border-blue-400/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 hover:border-blue-400/60'
+                  } disabled:cursor-wait disabled:opacity-50`}
+                  title={user.privateBatchAccess ? 'Unlink learner from Paid Batch' : 'Grant access to exclusive Paid Batch'}
+                >
+                  {user.privateBatchAccess ? (
+                    <>
+                      <CheckCircle2 size={12} className="text-purple-400" />
+                      <span>Linked: Batch</span>
+                      <span className="ml-1 text-[9px] text-slate-400 underline hover:text-red-300">Unlink</span>
+                    </>
+                  ) : (
+                    <>
+                      <Plus size={12} className="text-blue-400" />
+                      <span>Link with Private Batch</span>
+                    </>
+                  )}
+                </button>
+
+                {user.privateBatchAccess && (
+                  <div className="flex items-center gap-1 rounded-lg border border-purple-400/30 bg-purple-950/70 px-2 py-0.5">
+                    <span className="text-[10px] font-black uppercase text-purple-300">Tier:</span>
+                    <select
+                      value={studentMonths}
+                      onChange={e => onChangePrivateBatchMonth?.(user, Number(e.target.value))}
+                      disabled={isTogglingPrivateBatch}
+                      className="bg-transparent text-[11px] font-bold text-white outline-none cursor-pointer"
+                      title="Set subscription month tier for this student"
+                    >
+                      <option value={1} className="bg-slate-900 text-white">Month 1 (Days 1–12)</option>
+                      <option value={2} className="bg-slate-900 text-white">Month 2 (Days 1–24)</option>
+                      <option value={3} className="bg-slate-900 text-white">Month 3 (Days 1–36)</option>
+                      <option value={4} className="bg-slate-900 text-white">Month 4 (Days 1–48)</option>
+                      <option value={5} className="bg-slate-900 text-white">Month 5 (Days 1–60)</option>
+                    </select>
+                  </div>
                 )}
-              </button>
+              </div>
             )}
           </div>
           {progressEntries.length > 0 && (
@@ -373,6 +395,7 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
               ...u,
               privateBatchAccess: hasAccess,
               privateBatchExplicitlyRevoked: isUnlinked,
+              paidBatchMonths: Math.max(Number(u.paidBatchMonths) || 1, 1),
             };
           }));
           setMessage('');
@@ -417,14 +440,19 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
     setTogglingBatchUserId(user.id);
     setMessage('');
     try {
-      const response = await api.updateUserPrivateBatch(user.id, { privateBatchAccess: nextLinked });
+      const response = await api.updateUserPrivateBatch(user.id, {
+        privateBatchAccess: nextLinked,
+        paidBatchMonths: user.paidBatchMonths || 1,
+      });
       const updatedAccess = response?.user?.privateBatchAccess !== undefined ? Boolean(response.user.privateBatchAccess) : nextLinked;
+      const updatedMonths = Math.max(Number(response?.user?.paidBatchMonths) || Number(user.paidBatchMonths) || 1, 1);
       setUsers(prev => prev.map(u => (u.id === user.id ? {
         ...u,
         privateBatchAccess: updatedAccess,
         privateBatchExplicitlyRevoked: !updatedAccess,
+        paidBatchMonths: updatedMonths,
       } : u)));
-      actions.setPrivateBatchAccess(user.email, updatedAccess);
+      actions.setPrivateBatchAccess(user.email, updatedAccess, updatedMonths);
       setMessage(response?.message || (updatedAccess ? `Linked ${user.name || user.email} with Private Batch (Paid).` : `Unlinked ${user.name || user.email} from Private Batch.`));
     } catch (error) {
       setUsers(prev => prev.map(u => (u.id === user.id ? {
@@ -432,8 +460,40 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
         privateBatchAccess: nextLinked,
         privateBatchExplicitlyRevoked: !nextLinked,
       } : u)));
-      actions.setPrivateBatchAccess(user.email, nextLinked);
+      actions.setPrivateBatchAccess(user.email, nextLinked, user.paidBatchMonths || 1);
       setMessage(nextLinked ? `Linked ${user.name || user.email} with Private Batch (Paid).` : `Unlinked ${user.name || user.email} from Private Batch.`);
+    } finally {
+      setTogglingBatchUserId('');
+    }
+  };
+
+  const changePrivateBatchMonth = async (user, newMonth) => {
+    const months = Math.min(Math.max(Number(newMonth) || 1, 1), 5);
+    setTogglingBatchUserId(user.id);
+    setMessage('');
+    try {
+      const response = await api.updateUserPrivateBatch(user.id, {
+        privateBatchAccess: true,
+        paidBatchMonths: months,
+      });
+      const updatedMonths = Math.max(Number(response?.user?.paidBatchMonths) || months, 1);
+      setUsers(prev => prev.map(u => (u.id === user.id ? {
+        ...u,
+        paidBatchMonths: updatedMonths,
+        privateBatchAccess: true,
+        privateBatchExplicitlyRevoked: false,
+      } : u)));
+      actions.setPrivateBatchAccess(user.email, true, updatedMonths);
+      setMessage(response?.message || `Updated ${user.name || user.email} to Month ${updatedMonths} (Days 1–${updatedMonths * 12}).`);
+    } catch (error) {
+      setUsers(prev => prev.map(u => (u.id === user.id ? {
+        ...u,
+        paidBatchMonths: months,
+        privateBatchAccess: true,
+        privateBatchExplicitlyRevoked: false,
+      } : u)));
+      actions.setPrivateBatchAccess(user.email, true, months);
+      setMessage(`Updated ${user.name || user.email} to Month ${months} (Days 1–${months * 12}).`);
     } finally {
       setTogglingBatchUserId('');
     }
@@ -515,6 +575,7 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
                 user={user}
                 onRoleChange={updateRole}
                 onTogglePrivateBatch={togglePrivateBatch}
+                onChangePrivateBatchMonth={changePrivateBatchMonth}
                 isTogglingPrivateBatch={togglingBatchUserId === user.id}
                 onRemove={removeUser}
                 canManageRoles={canManageRoles}

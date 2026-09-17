@@ -1657,17 +1657,19 @@ export const COURSE_DATA = {
     flag: '💎',
     isPrivate: true,
     accent: 'purple',
-    description: 'Exclusive Level 6 Private Batch: Complete IELTS Bridge — English Foundation to Band 6. Day 1 is live!',
+    description: 'Exclusive Level 6 Private Batch: Complete IELTS Bridge — English Foundation to Band 6 (60 Classes / 5 Months).',
     modules: [
       {
         id: 'pb-mod-1',
         title: 'Paid Batch — Level 6 Foundation to Band 6',
-        description: 'Focus solely on Day 1: IELTS Listening Part 1 Masterclass.',
-        lessons: IELTS_FOUNDATION_BAND_6_60_CLASSES.filter(cls => cls.day === 1).map((cls, index) => {
+        description: 'Comprehensive 60-Class IELTS Foundation Curriculum organized into 5 monthly phases (12 classes per month).',
+        lessons: IELTS_FOUNDATION_BAND_6_60_CLASSES.map((cls, index) => {
           const day = cls.day || index + 1;
+          const month = Math.ceil(day / 12);
           return {
             id: `pb-les-${day}`,
             day,
+            month,
             title: `Lesson ${day}: ${cls.title || `Topic ${day}`}`,
             topicTitle: cls.title || `Topic ${day}`,
             dayType: cls.dayType || 'Study Day',

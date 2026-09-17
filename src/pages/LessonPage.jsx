@@ -207,6 +207,8 @@ export function LessonPage() {
   const day = Math.max(Number.parseInt(dayParam, 10) || 1, 1);
   const language = state.activePathway;
   const isWebDeveloper = !isStudentPreview(state) && [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
+  const studentPaidMonths = Math.max(Number(state.paidBatchMonths) || 1, 1);
+  const isPaidBatchMonthLocked = language === 'paid_batch' && !isWebDeveloper && (day > (studentPaidMonths * 12));
   const canDeleteExistingContent = state.userRole !== ROLES.intern;
   const staticLessons = useMemo(() => pathway.modules.flatMap(module => module.lessons), [pathway]);
   const staticLesson = staticLessons[day - 1] ?? null;
@@ -811,7 +813,39 @@ export function LessonPage() {
         </div>
       )}
 
-      {!isConfigurationView && (error ? (
+      {!isConfigurationView && (isPaidBatchMonthLocked ? (
+        <div className="section-card relative overflow-hidden p-8 sm:p-12 text-center border-2 border-purple-500/40 bg-gradient-to-br from-purple-950/90 via-slate-900/95 to-slate-950 shadow-2xl">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(168,85,247,0.15),transparent_60%)]" />
+          <div className="relative z-10 max-w-xl mx-auto flex flex-col items-center">
+            <div className="grid h-16 w-16 place-items-center rounded-3xl border border-purple-400/40 bg-purple-500/20 text-purple-300 shadow-xl shadow-purple-950">
+              <Lock size={32} />
+            </div>
+            <span className="mt-6 rounded-full border border-purple-400/30 bg-purple-500/15 px-3 py-1 text-xs font-black uppercase tracking-widest text-purple-300">
+              Month {Math.ceil(day / 12)} Access Required
+            </span>
+            <h2 className="mt-4 text-2xl sm:text-3xl font-black text-white">
+              Class {day} is Locked
+            </h2>
+            <p className="mt-3 text-sm sm:text-base leading-relaxed text-slate-300">
+              This class is part of <strong>Month {Math.ceil(day / 12)}</strong> (Classes {(Math.ceil(day / 12) - 1) * 12 + 1}–{Math.ceil(day / 12) * 12}). Your current subscription covers up to Month {studentPaidMonths} (Days 1–{studentPaidMonths * 12}).
+            </p>
+            <div className="mt-4 rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-2.5 text-xs font-bold text-emerald-300 flex items-center gap-2">
+              <CheckCircle2 size={16} />
+              <span>Your completed Month 1 classes remain permanently available in your account.</span>
+            </div>
+            <p className="mt-4 text-xs font-semibold text-purple-200/80">
+              Please contact Tanvir to enroll in Month {Math.ceil(day / 12)} and unlock the next 12 classes.
+            </p>
+            <button
+              type="button"
+              onClick={() => navigate('/daily-lessons')}
+              className="glow-button glow-button-blue mt-8 py-3.5 px-6 text-sm font-black uppercase tracking-wider"
+            >
+              <ArrowLeft size={16} /> Back to Daily Lessons
+            </button>
+          </div>
+        </div>
+      ) : error ? (
         <div className="section-card flex min-h-72 flex-col items-center justify-center p-8 text-center">
           <RefreshCw size={34} className="text-amber-300" />
           <h2 className="mt-4 text-xl font-black text-white">This learning day could not load</h2>
@@ -975,7 +1009,7 @@ export function LessonPage() {
                         💎 Level 6 Private Batch
                       </span>
                       <span className="inline-flex items-center gap-1 rounded-full border border-blue-400/30 bg-blue-500/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-blue-200">
-                        Month {Math.ceil(day / 10)} · Class {String(day).padStart(2, '0')}
+                        Month {Math.ceil(day / 12)} · Class {String(day).padStart(2, '0')}
                       </span>
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-emerald-300">
                         <Headphones size={13} /> {staticLesson?.dayType || 'Listening Day'}

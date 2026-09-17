@@ -88,6 +88,7 @@ const defaultState = {
   permissions: [],
   isPremium: false,
   privateBatchAccess: false,
+  paidBatchMonths: 1,
   referralCode: '',
   learnerProfile: {
     profession: '',
@@ -235,11 +236,13 @@ function normalizeState(state) {
 
   const normalizedEnrolledPathways = enrolledFiltered.length ? enrolledFiltered : [activePathway];
   const completedLessons = expandCompletedLessons(state.completedLessons);
+  const paidBatchMonths = isStaff && !isTesterMode ? 5 : Math.max(Number(state.paidBatchMonths) || 1, 1);
 
   return {
     ...state,
     privateBatchAccess: hasPrivateAccess,
     privateBatchExplicitlyRevoked: isExplicitlyRevoked,
+    paidBatchMonths,
     completedLessons,
     activePathway,
     enrolledPathways: [...new Set(normalizedEnrolledPathways)],
@@ -306,6 +309,7 @@ export function AppProvider({ children }) {
             permissions: user?.permissions ?? getRolePermissions(user?.role ?? previous.userRole),
             privateBatchAccess: hasAccess,
             privateBatchExplicitlyRevoked: isRevoked,
+            paidBatchMonths: Math.max(Number(user?.paidBatchMonths) || 1, 1),
             enrolledPathways: baseEnrolled.length ? baseEnrolled : previous.enrolledPathways,
             isPremium: Boolean(user?.isPremium),
             referralCode: user?.referralCode ?? previous.referralCode,
@@ -349,6 +353,7 @@ export function AppProvider({ children }) {
               permissions: response.user?.permissions ?? getRolePermissions(response.user?.role ?? previous.userRole),
               privateBatchAccess: hasAccess,
               privateBatchExplicitlyRevoked: isRevoked,
+              paidBatchMonths: Math.max(Number(response.user?.paidBatchMonths) || 1, 1),
               enrolledPathways: baseEnrolled,
               isLoggedIn: true,
             }));
@@ -603,6 +608,7 @@ export function AppProvider({ children }) {
         permissions: response.user?.permissions ?? getRolePermissions(response.user?.role ?? prev.userRole),
         privateBatchAccess: hasAccess,
         privateBatchExplicitlyRevoked: isRevoked,
+        paidBatchMonths: Math.max(Number(response.user?.paidBatchMonths) || 1, 1),
         activePathway: initialPathway,
         activeLessonId: getFirstLessonId(initialPathway),
         enrolledPathways: Array.isArray(response.user?.enrolledPathways)
@@ -680,7 +686,7 @@ export function AppProvider({ children }) {
         return { ...prev, xp, badges, activityData };
       });
     },
-    setPrivateBatchAccess(email, isLinked) {
+    setPrivateBatchAccess(email, isLinked, months) {
       saveLinkedPrivateBatchEmail(email, isLinked);
       setState(prev => {
         const isCurrent = prev.userEmail?.toLowerCase() === email?.toLowerCase();
@@ -689,6 +695,7 @@ export function AppProvider({ children }) {
           ...prev,
           privateBatchAccess: Boolean(isLinked),
           privateBatchExplicitlyRevoked: !isLinked,
+          paidBatchMonths: months ? Math.max(Number(months) || 1, 1) : prev.paidBatchMonths,
           enrolledPathways: (prev.enrolledPathways || []).filter(p => p !== 'paid_batch' || Boolean(isLinked)),
         });
       });
