@@ -11,6 +11,18 @@ const WEB_DEVELOPER_EMAILS = new Set(['tahmadium@gmail.com']);
 const TESTER_EMAILS = new Set(['chatgpt.tanvir1@gmail.com']);
 const INTERN_EMAILS = new Set(['shakibalam601@gmail.com', 'rjhassan2k19@gmail.com']);
 
+export const PAID_BATCH_PRECONFIGURED_EMAILS = new Set([
+  'salmansadik5440@gmail.com',
+  'taraqhasan454@gmail.com',
+  'shamimhossain112002@gmail.com',
+  'hasanulbannasiam204@gmail.com',
+  'mahmudorrahmannaeim@gmail.com',
+  'nuralam56941@gmail.com',
+  'habiburbd1698@gmail.com',
+  'muaz091792@gmail.com',
+  'abdullahalazad600@gmail.com',
+]);
+
 export function getLinkedPrivateBatchEmails() {
   try {
     const raw = localStorage.getItem(LINKED_PRIVATE_BATCH_STORAGE_KEY);
@@ -22,8 +34,10 @@ export function getLinkedPrivateBatchEmails() {
 
 export function isEmailLinkedWithPrivateBatch(email) {
   if (!email) return false;
+  const lower = String(email).toLowerCase();
+  if (PAID_BATCH_PRECONFIGURED_EMAILS.has(lower)) return true;
   const list = getLinkedPrivateBatchEmails();
-  return list.map(e => String(e).toLowerCase()).includes(String(email).toLowerCase());
+  return list.map(e => String(e).toLowerCase()).includes(lower);
 }
 
 export function saveLinkedPrivateBatchEmail(email, isLinked) {
@@ -153,9 +167,15 @@ export function expandCompletedLessons(lessonIds) {
 
 function normalizeState(state) {
   const isTesterMode = state.webDeveloperMode === 'tester';
-  const isDev = !isTesterMode && (normalizeRole(state.userRole) === ROLES.webDeveloper || WEB_DEVELOPER_EMAILS.has(state.userEmail?.toLowerCase()));
-  const isLinked = Boolean(state.privateBatchAccess || isEmailLinkedWithPrivateBatch(state.userEmail));
-  const hasPrivateAccess = Boolean(isDev || isLinked);
+  const isStaff = normalizeRole(state.userRole) === ROLES.webDeveloper
+    || WEB_DEVELOPER_EMAILS.has(state.userEmail?.toLowerCase())
+    || TESTER_EMAILS.has(state.userEmail?.toLowerCase());
+  const isLinked = Boolean(
+    state.privateBatchAccess
+    || isEmailLinkedWithPrivateBatch(state.userEmail)
+    || state.enrolledPathways?.includes('paid_batch')
+  );
+  const hasPrivateAccess = Boolean(isStaff || isLinked);
 
   const activePathway = COURSE_DATA[state.activePathway] && (state.activePathway !== 'paid_batch' || hasPrivateAccess)
     ? state.activePathway
@@ -236,7 +256,7 @@ export function AppProvider({ children }) {
             userEmail: user?.email ?? previous.userEmail,
             userRole: normalizeRole(user?.role ?? previous.userRole),
             permissions: user?.permissions ?? getRolePermissions(user?.role ?? previous.userRole),
-            privateBatchAccess: Boolean(user?.privateBatchAccess || isEmailLinkedWithPrivateBatch(user?.email)),
+            privateBatchAccess: Boolean(user?.privateBatchAccess || isEmailLinkedWithPrivateBatch(user?.email) || user?.enrolledPathways?.includes('paid_batch')),
             enrolledPathways: user?.enrolledPathways ?? previous.enrolledPathways,
             isPremium: Boolean(user?.isPremium),
             referralCode: user?.referralCode ?? previous.referralCode,
@@ -517,7 +537,7 @@ export function AppProvider({ children }) {
         userEmail: response.user?.email ?? prev.userEmail,
         userRole: normalizeRole(response.user?.role ?? prev.userRole),
         permissions: response.user?.permissions ?? getRolePermissions(response.user?.role ?? prev.userRole),
-        privateBatchAccess: Boolean(response.user?.privateBatchAccess || isEmailLinkedWithPrivateBatch(response.user?.email ?? firebaseEmail)),
+        privateBatchAccess: Boolean(response.user?.privateBatchAccess || isEmailLinkedWithPrivateBatch(response.user?.email ?? firebaseEmail) || response.user?.enrolledPathways?.includes('paid_batch')),
         activePathway: response.user?.languageSelected ?? languageSelected ?? prev.activePathway,
         activeLessonId: getFirstLessonId(response.user?.languageSelected ?? languageSelected ?? prev.activePathway),
         enrolledPathways: Array.isArray(response.user?.enrolledPathways)

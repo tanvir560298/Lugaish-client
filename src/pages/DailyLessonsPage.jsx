@@ -258,7 +258,11 @@ export function DailyLessonsPage() {
     }
   };
   const isWebDeveloper = !isStudentPreview(state) && [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
-  const canAccessPrivateBatch = isWebDeveloper || state.privateBatchAccess || isEmailLinkedWithPrivateBatch(state.userEmail) || (isStudentPreview(state) && isEmailLinkedWithPrivateBatch('tahmadium@gmail.com'));
+  const canAccessPrivateBatch = isWebDeveloper
+    || Boolean(state.privateBatchAccess)
+    || state.enrolledPathways?.includes('paid_batch')
+    || isEmailLinkedWithPrivateBatch(state.userEmail)
+    || (isStudentPreview(state) && Boolean(state.privateBatchAccess || isEmailLinkedWithPrivateBatch(state.userEmail) || state.userEmail === 'tahmadium@gmail.com'));
   const baseEnrolled = [...new Set([
     ...(state.enrolledPathways?.length ? state.enrolledPathways : ['arabic', 'english']),
     ...(canAccessPrivateBatch ? ['paid_batch'] : []),
