@@ -994,7 +994,7 @@ export function DailyLessonsPage() {
             );
           }
 
-          if (isPaidBatch && day.day === 3) {
+          if (isPaidBatch && day.day === 2) {
             return (
               <article
                 key={day.id}
@@ -1020,7 +1020,7 @@ export function DailyLessonsPage() {
                         <span>TODAY'S SPEAKING REELS MASTERCLASS</span>
                       </p>
                       <p className="text-[10px] font-bold text-slate-400">
-                        Class 03 · IELTS Speaking Module · Vertical Video Feed
+                        Class 02 · IELTS Speaking Module · Vertical Video Feed
                       </p>
                     </div>
                   </div>
@@ -1041,7 +1041,7 @@ export function DailyLessonsPage() {
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="rounded-full border border-purple-400/30 bg-purple-500/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-purple-200">
-                        Class 03
+                        Class 02
                       </span>
                       <span className="rounded-full border border-pink-400/30 bg-pink-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-pink-200">
                         Speaking Day
@@ -1055,7 +1055,7 @@ export function DailyLessonsPage() {
                     </div>
 
                     <h2 className="mt-3 text-2xl font-black text-white sm:text-3xl">
-                      {day.staticLesson?.topicTitle || 'Topic 3: High-Impact Self-Introduction'}
+                      {day.staticLesson?.topicTitle || 'Topic 2: High-Impact Self-Introduction'}
                     </h2>
                     <p className="mt-1 text-xs font-semibold text-pink-200">
                       How to Introduce Yourself — Master Elevator Pitch Formula
@@ -1101,7 +1101,7 @@ export function DailyLessonsPage() {
                   >
                     <span className="pointer-events-none absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full" />
                     <Film size={18} className="animate-pulse" />
-                    <span>{completed ? 'Review Day 3 Speaking Reels' : 'Launch Day 3 Speaking Reels Masterclass'}</span>
+                    <span>{completed ? 'Review Day 2 Speaking Reels' : 'Launch Day 2 Speaking Reels Masterclass'}</span>
                     <Sparkles size={16} className="text-amber-300 animate-spin" style={{ animationDuration: '4s' }} />
                   </button>
                 </div>

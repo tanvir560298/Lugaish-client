@@ -1064,12 +1064,12 @@ export function LessonPage() {
                 )}
               </div>
 
-              {/* Speaking Day 3 (or any day with reels): Dedicated Speaking Reels Masterclass */}
-              {(day === 3 || (staticLesson?.reels && staticLesson.reels.length > 0)) && (
+              {/* Speaking Day 2 (or any day with reels): Dedicated Speaking Reels Masterclass */}
+              {(day === 2 || (staticLesson?.reels && staticLesson.reels.length > 0)) && (
                 <div className="space-y-6">
                   <SpeakingReelsFeed
                     reels={staticLesson?.reels || []}
-                    topicTitle={staticLesson?.topicTitle || 'Topic 3: High-Impact Self-Introduction'}
+                    topicTitle={staticLesson?.topicTitle || 'Topic 2: High-Impact Self-Introduction'}
                     onComplete={completePdfDay}
                     isCompleted={isPdfCompleted}
                     isCompleting={isVideoCompleting}
@@ -1628,8 +1628,8 @@ export function LessonPage() {
               </>
               )}
 
-              {/* Other Days (when not Day 1 and not Day 3 reels): Standard Study Topic Overview */}
-              {day !== 1 && day !== 3 && (!staticLesson?.reels || staticLesson.reels.length === 0) && (
+              {/* Other Days (when not Day 1 and not Day 2 reels): Standard Study Topic Overview */}
+              {day !== 1 && day !== 2 && (!staticLesson?.reels || staticLesson.reels.length === 0) && (
                 <div className="section-card border-purple-500/30 p-6 sm:p-8 space-y-6">
                   <div className="flex items-center gap-3 border-b border-white/10 pb-4">
                     <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-purple-500/20 text-purple-300">
