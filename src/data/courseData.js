@@ -1697,6 +1697,7 @@ export const COURSE_DATA = {
             audio2FileUrl: cls.audio2FileUrl || '',
             audio2Title: cls.audio2Title || '',
             weekendMock: cls.weekendMock || null,
+            reels: cls.reels || [],
             langCode: 'en-US',
             cards: [],
             phrases: [],

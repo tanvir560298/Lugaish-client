@@ -33,6 +33,7 @@ import {
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { LEARNING_RESOURCES } from '../data/learningResources.js';
+import { SpeakingReelsFeed } from '../components/SpeakingReelsFeed.jsx';
 import { useAppContext, getPathFromState } from '../state/AppContext.jsx';
 import { ROLES, isStudentPreview } from '../utils/roles.js';
 
@@ -1012,7 +1013,7 @@ export function LessonPage() {
                         Month {Math.ceil(day / 12)} · Class {String(day).padStart(2, '0')}
                       </span>
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-emerald-300">
-                        <Headphones size={13} /> {staticLesson?.dayType || 'Listening Day'}
+                        {staticLesson?.dayType?.includes('Speaking') ? <Mic size={13} /> : <Headphones size={13} />} {staticLesson?.dayType || 'Study Day'}
                       </span>
                     </div>
 
@@ -1063,8 +1064,23 @@ export function LessonPage() {
                 )}
               </div>
 
-              {/* Study Materials & Book PDFs Hub */}
-              <div className="section-card border-purple-500/30 p-6 sm:p-8 space-y-6">
+              {/* Speaking Day 3 (or any day with reels): Dedicated Speaking Reels Masterclass */}
+              {(day === 3 || (staticLesson?.reels && staticLesson.reels.length > 0)) && (
+                <div className="space-y-6">
+                  <SpeakingReelsFeed
+                    reels={staticLesson?.reels || []}
+                    topicTitle={staticLesson?.topicTitle || 'Topic 3: High-Impact Self-Introduction'}
+                    onComplete={completePdfDay}
+                    isCompleted={isPdfCompleted}
+                    isCompleting={isVideoCompleting}
+                  />
+                </div>
+              )}
+
+              {/* Day 1: Study Materials & Book PDFs Hub */}
+              {day === 1 && (
+                <>
+                <div className="section-card border-purple-500/30 p-6 sm:p-8 space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-white/10 pb-5">
                   <div className="flex items-center gap-3">
                     <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-purple-500/20 text-purple-300">
@@ -1607,6 +1623,63 @@ export function LessonPage() {
                       />
                     </div>
                   </div>
+                </div>
+              )}
+              </>
+              )}
+
+              {/* Other Days (when not Day 1 and not Day 3 reels): Standard Study Topic Overview */}
+              {day !== 1 && day !== 3 && (!staticLesson?.reels || staticLesson.reels.length === 0) && (
+                <div className="section-card border-purple-500/30 p-6 sm:p-8 space-y-6">
+                  <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+                    <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-purple-500/20 text-purple-300">
+                      <BookOpen size={24} />
+                    </div>
+                    <div>
+                      <span className="inline-flex items-center gap-1 rounded-full border border-purple-400/30 bg-purple-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-purple-200">
+                        Month {Math.ceil(day / 12)} · Class {String(day).padStart(2, '0')}
+                      </span>
+                      <h3 className="text-xl font-black text-white mt-1">{staticLesson?.topicTitle || `Topic ${day}`}</h3>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-purple-300">Core Structure</h4>
+                      <p className="text-sm text-slate-200 leading-relaxed">{staticLesson?.coreStructure || 'Comprehensive study structure for this class.'}</p>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-cyan-300">Live Activity</h4>
+                      <p className="text-sm text-slate-200 leading-relaxed">{staticLesson?.liveActivity || 'Live interaction sprint and guided practice.'}</p>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-emerald-300">Action Item / Homework</h4>
+                      <p className="text-sm text-slate-200 leading-relaxed">{staticLesson?.actionItem || 'Complete your daily class assignment.'}</p>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-amber-300">Expected Student Output</h4>
+                      <p className="text-sm text-slate-200 leading-relaxed">{staticLesson?.studentOutput || 'Submit homework in the student portal.'}</p>
+                    </div>
+                  </div>
+
+                  {staticLesson?.classNotes && (
+                    <div className="rounded-2xl border border-purple-400/20 bg-purple-950/40 p-4">
+                      <p className="text-xs font-black uppercase tracking-wider text-purple-300 mb-1">💡 Instructor Tip from Tanvir</p>
+                      <p className="text-xs text-slate-200 leading-relaxed">{staticLesson.classNotes}</p>
+                    </div>
+                  )}
+
+                  {staticLesson?.actionTarget && (
+                    <div className="pt-2">
+                      <a
+                        href={staticLesson.actionTarget}
+                        className="glow-button glow-button-blue inline-flex items-center gap-2 py-3 px-6 text-xs font-black uppercase tracking-wider"
+                      >
+                        <Mic size={16} />
+                        <span>{staticLesson.actionLabel || 'Start Daily Practice Drill'}</span>
+                      </a>
+                    </div>
+                  )}
                 </div>
               )}
 
