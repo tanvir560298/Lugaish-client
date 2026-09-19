@@ -39,8 +39,7 @@ export function SpeakingReelsFeed({
   const [isPlaying, setIsPlaying] = useState(true);
   const [isVideoActuallyPlaying, setIsVideoActuallyPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [fitMode, setFitMode] = useState('contain'); // 'contain' (full video, no crop) vs 'cover' (fills screen)
-  const [viewMode, setViewMode] = useState('phone'); // 'phone' (reels frame) vs 'theater' (16:9 wide)
+  const [viewMode, setViewMode] = useState(() => (typeof window !== 'undefined' && window.innerWidth >= 1024 ? 'theater' : 'phone'));
   const [playbackRate, setPlaybackRate] = useState(1);
   const [likes, setLikes] = useState(() => reels.map(r => r.likesCount || 300));
   const [hasLiked, setHasLiked] = useState(() => reels.map(() => false));
@@ -371,19 +370,17 @@ export function SpeakingReelsFeed({
                     {!isUpcoming ? (
                       <div className="relative h-full w-full cursor-pointer overflow-hidden bg-black" onClick={togglePlay}>
                         {/* Ambient blurred backdrop for letterboxing so no edges get cut off */}
-                        {fitMode === 'contain' && (
-                          <div className="pointer-events-none absolute inset-0 overflow-hidden select-none">
-                            <video
-                              src={reel.videoUrl}
-                              aria-hidden="true"
-                              className="h-full w-full object-cover blur-2xl opacity-40 scale-125"
-                              muted
-                              playsInline
-                              tabIndex={-1}
-                            />
-                            <div className="absolute inset-0 bg-slate-950/40" />
-                          </div>
-                        )}
+                        <div className="pointer-events-none absolute inset-0 overflow-hidden select-none">
+                          <video
+                            src={reel.videoUrl}
+                            aria-hidden="true"
+                            className="h-full w-full object-cover blur-3xl opacity-40 scale-125"
+                            muted
+                            playsInline
+                            tabIndex={-1}
+                          />
+                          <div className="absolute inset-0 bg-slate-950/30" />
+                        </div>
 
                         <video
                           ref={el => videoRefs.current[index] = el}
@@ -391,7 +388,7 @@ export function SpeakingReelsFeed({
                           playsInline
                           loop
                           preload="auto"
-                          className={`relative z-10 h-full w-full ${fitMode === 'contain' ? 'object-contain' : 'object-cover'}`}
+                          className="relative z-10 h-full w-full object-contain mx-auto select-none pointer-events-auto"
                           onPlay={() => {
                             setIsPlaying(true);
                             setIsVideoActuallyPlaying(true);
@@ -559,20 +556,20 @@ export function SpeakingReelsFeed({
                         <span className="text-amber-300">{playbackRate}x</span>
                       </button>
 
-                      {/* Fit Mode Toggle (No-Crop vs Fill) */}
+                      {/* View Mode Toggle Button */}
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setFitMode(m => m === 'contain' ? 'cover' : 'contain');
+                          setViewMode(v => v === 'theater' ? 'phone' : 'theater');
                         }}
-                        title={fitMode === 'contain' ? 'Full Video Mode (No Crop). Click to Fill' : 'Fill Mode (Cropped). Click for Full Video'}
+                        title={viewMode === 'theater' ? 'Switch to Mobile Reels Feed' : 'Switch to Fullscreen Widescreen View'}
                         className="grid h-11 w-11 place-items-center rounded-full bg-black/50 border border-white/20 text-white backdrop-blur-md transition hover:bg-black/70"
                       >
-                        {fitMode === 'contain' ? (
-                          <Minimize2 size={18} className="text-cyan-300" />
+                        {viewMode === 'theater' ? (
+                          <Smartphone size={18} className="text-purple-300" />
                         ) : (
-                          <Maximize2 size={18} className="text-amber-300" />
+                          <Monitor size={18} className="text-cyan-300" />
                         )}
                       </button>
 
