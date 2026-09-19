@@ -23,7 +23,6 @@ export const PAID_BATCH_PRECONFIGURED_EMAILS = new Set([
   'habiburbd1698@gmail.com',
   'muaz091792@gmail.com',
   'abdullahalazad600@gmail.com',
-  'md907648@gmail.com',
   'chatgpt.tanvir1@gmail.com',
   'emdad.pmbd.oic@gmail.com',
 ]);
