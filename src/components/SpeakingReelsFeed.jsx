@@ -138,11 +138,14 @@ export function SpeakingReelsFeed({
   const togglePlay = () => {
     const activeVideo = videoRefs.current[activeIndex];
     if (activeVideo) {
-      if (!activeVideo.paused) {
+      if (!activeVideo.paused && !activeVideo.ended) {
         activeVideo.pause();
         setIsPlaying(false);
         setIsVideoActuallyPlaying(false);
       } else {
+        if (activeVideo.ended || (activeVideo.duration && activeVideo.currentTime >= (activeVideo.duration - 0.3))) {
+          activeVideo.currentTime = 0;
+        }
         activeVideo.play()
           .then(() => {
             setIsPlaying(true);
@@ -414,7 +417,6 @@ export function SpeakingReelsFeed({
                           ref={el => videoRefs.current[index] = el}
                           src={reel.videoUrl}
                           playsInline
-                          loop
                           preload="auto"
                           className="relative z-10 h-full w-full object-contain mx-auto select-none pointer-events-auto"
                           onPlay={() => {
@@ -422,6 +424,10 @@ export function SpeakingReelsFeed({
                             setIsVideoActuallyPlaying(true);
                           }}
                           onPause={() => {
+                            setIsVideoActuallyPlaying(false);
+                          }}
+                          onEnded={() => {
+                            setIsPlaying(false);
                             setIsVideoActuallyPlaying(false);
                           }}
                           onTimeUpdate={(e) => {
@@ -442,15 +448,19 @@ export function SpeakingReelsFeed({
                           }}
                         />
 
-                        {/* Centered Play / Pause Animation Indicator */}
+                        {/* Centered Play / Pause / Replay Animation Indicator */}
                         {(!isPlaying || !isVideoActuallyPlaying) && isActive && (
                           <div className="pointer-events-none absolute inset-0 z-20 grid place-items-center bg-black/40 backdrop-blur-[2px]">
                             <div className="flex flex-col items-center gap-2.5">
                               <div className="grid h-20 w-20 place-items-center rounded-full bg-gradient-to-tr from-purple-600 via-indigo-600 to-pink-600 text-white shadow-2xl backdrop-blur-md animate-scale-up">
-                                <Play size={36} className="fill-current ml-1" />
+                                {videoRefs.current[index]?.ended ? (
+                                  <RotateCcw size={36} className="text-white" />
+                                ) : (
+                                  <Play size={36} className="fill-current ml-1" />
+                                )}
                               </div>
                               <span className="rounded-full bg-black/80 px-3.5 py-1.5 text-xs font-bold text-white backdrop-blur-md shadow-xl border border-white/15">
-                                Tap anywhere to play
+                                {videoRefs.current[index]?.ended ? 'Video finished · Tap to replay' : 'Tap anywhere to play'}
                               </span>
                             </div>
                           </div>
