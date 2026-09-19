@@ -23,7 +23,9 @@ import {
   RotateCcw,
   Square,
   Clock,
-  Award
+  Award,
+  Smartphone,
+  Monitor
 } from 'lucide-react';
 
 export function SpeakingReelsFeed({
@@ -35,7 +37,10 @@ export function SpeakingReelsFeed({
 }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [isVideoActuallyPlaying, setIsVideoActuallyPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [fitMode, setFitMode] = useState('contain'); // 'contain' (full video, no crop) vs 'cover' (fills screen)
+  const [viewMode, setViewMode] = useState('phone'); // 'phone' (reels frame) vs 'theater' (16:9 wide)
   const [playbackRate, setPlaybackRate] = useState(1);
   const [likes, setLikes] = useState(() => reels.map(r => r.likesCount || 300));
   const [hasLiked, setHasLiked] = useState(() => reels.map(() => false));
@@ -134,12 +139,24 @@ export function SpeakingReelsFeed({
   const togglePlay = () => {
     const activeVideo = videoRefs.current[activeIndex];
     if (activeVideo) {
-      if (isPlaying) {
+      if (!activeVideo.paused) {
         activeVideo.pause();
         setIsPlaying(false);
+        setIsVideoActuallyPlaying(false);
       } else {
-        activeVideo.play().catch(() => {});
-        setIsPlaying(true);
+        activeVideo.play()
+          .then(() => {
+            setIsPlaying(true);
+            setIsVideoActuallyPlaying(true);
+          })
+          .catch(() => {
+            activeVideo.muted = true;
+            setIsMuted(true);
+            activeVideo.play().then(() => {
+              setIsPlaying(true);
+              setIsVideoActuallyPlaying(true);
+            }).catch(() => {});
+          });
       }
     } else {
       setIsPlaying(prev => !prev);
@@ -256,7 +273,37 @@ export function SpeakingReelsFeed({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* View Mode Toggle: Phone vs Widescreen */}
+          <div className="flex items-center rounded-xl border border-white/10 bg-slate-900/90 p-1 shadow-inner">
+            <button
+              type="button"
+              onClick={() => setViewMode('phone')}
+              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition ${
+                viewMode === 'phone'
+                  ? 'bg-purple-600 text-white shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+              title="Mobile Reels View"
+            >
+              <Smartphone size={13} />
+              <span>Reels Mode</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('theater')}
+              className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition ${
+                viewMode === 'theater'
+                  ? 'bg-purple-600 text-white shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+              title="Widescreen Theater View (16:9)"
+            >
+              <Monitor size={13} />
+              <span>Widescreen (16:9)</span>
+            </button>
+          </div>
+
           <button
             type="button"
             onClick={() => setShowCheatSheet(true)}
@@ -283,22 +330,30 @@ export function SpeakingReelsFeed({
       </div>
 
       {/* Main Grid: Reels Vertical Phone + Side Study Hub */}
-      <div className="grid gap-8 lg:grid-cols-12 lg:items-start">
-        {/* Left Column: Reels Player (9:16 vertical feed container) */}
-        <div className="lg:col-span-7 flex flex-col items-center">
-          {/* Phone Frame Canvas */}
-          <div className="relative w-full max-w-[390px] rounded-[2.75rem] border-4 border-slate-800/80 bg-slate-950 p-2.5 shadow-[0_0_60px_rgba(168,85,247,0.3)] ring-1 ring-white/10">
-            {/* Top Phone Notch / Dynamic Island */}
-            <div className="pointer-events-none absolute left-1/2 top-4 z-40 -translate-x-1/2 h-5 w-28 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center">
-              <div className="h-2 w-2 rounded-full bg-blue-500/60 animate-pulse mr-2" />
-              <div className="h-1.5 w-1.5 rounded-full bg-slate-700" />
-            </div>
+      <div className={`grid gap-8 ${viewMode === 'theater' ? 'grid-cols-1' : 'lg:grid-cols-12'} lg:items-start`}>
+        {/* Left Column: Reels Player (9:16 vertical feed container or 16:9 theater) */}
+        <div className={`${viewMode === 'theater' ? 'w-full max-w-4xl mx-auto' : 'lg:col-span-7'} flex flex-col items-center`}>
+          {/* Frame Canvas */}
+          <div className={`relative w-full ${
+            viewMode === 'theater'
+              ? 'max-w-4xl rounded-3xl border-2 border-purple-500/40 bg-slate-950 p-2 shadow-[0_0_70px_rgba(168,85,247,0.35)] ring-1 ring-white/10'
+              : 'max-w-[400px] rounded-[2.75rem] border-4 border-slate-800/80 bg-slate-950 p-2.5 shadow-[0_0_60px_rgba(168,85,247,0.3)] ring-1 ring-white/10'
+          }`}>
+            {/* Top Phone Notch / Dynamic Island (Only in Phone mode) */}
+            {viewMode === 'phone' && (
+              <div className="pointer-events-none absolute left-1/2 top-4 z-40 -translate-x-1/2 h-5 w-28 rounded-full bg-slate-900 border border-white/10 flex items-center justify-center">
+                <div className="h-2 w-2 rounded-full bg-blue-500/60 animate-pulse mr-2" />
+                <div className="h-1.5 w-1.5 rounded-full bg-slate-700" />
+              </div>
+            )}
 
             {/* Scrollable Reels Viewport (Snap Scroll) */}
             <div
               ref={feedContainerRef}
               onScroll={handleScroll}
-              className="relative h-[680px] w-full overflow-y-scroll snap-y snap-mandatory rounded-[2.25rem] bg-black scrollbar-none"
+              className={`relative ${
+                viewMode === 'theater' ? 'h-[480px] sm:h-[540px]' : 'h-[680px]'
+              } w-full overflow-y-scroll snap-y snap-mandatory rounded-[2.25rem] bg-black scrollbar-none`}
               style={{ scrollBehavior: 'smooth' }}
             >
               {reels.map((reel, index) => {
@@ -308,17 +363,42 @@ export function SpeakingReelsFeed({
                 return (
                   <div
                     key={reel.id || index}
-                    className="relative h-[680px] w-full snap-start snap-always shrink-0 overflow-hidden bg-slate-950 flex flex-col justify-between"
+                    className={`relative ${
+                      viewMode === 'theater' ? 'h-[480px] sm:h-[540px]' : 'h-[680px]'
+                    } w-full snap-start snap-always shrink-0 overflow-hidden bg-slate-950 flex flex-col justify-between`}
                   >
                     {/* Video Player or Upcoming Teaser */}
                     {!isUpcoming ? (
-                      <div className="relative h-full w-full cursor-pointer" onClick={togglePlay}>
+                      <div className="relative h-full w-full cursor-pointer overflow-hidden bg-black" onClick={togglePlay}>
+                        {/* Ambient blurred backdrop for letterboxing so no edges get cut off */}
+                        {fitMode === 'contain' && (
+                          <div className="pointer-events-none absolute inset-0 overflow-hidden select-none">
+                            <video
+                              src={reel.videoUrl}
+                              aria-hidden="true"
+                              className="h-full w-full object-cover blur-2xl opacity-40 scale-125"
+                              muted
+                              playsInline
+                              tabIndex={-1}
+                            />
+                            <div className="absolute inset-0 bg-slate-950/40" />
+                          </div>
+                        )}
+
                         <video
                           ref={el => videoRefs.current[index] = el}
                           src={reel.videoUrl}
                           playsInline
                           loop
-                          className="h-full w-full object-cover"
+                          preload="auto"
+                          className={`relative z-10 h-full w-full ${fitMode === 'contain' ? 'object-contain' : 'object-cover'}`}
+                          onPlay={() => {
+                            setIsPlaying(true);
+                            setIsVideoActuallyPlaying(true);
+                          }}
+                          onPause={() => {
+                            setIsVideoActuallyPlaying(false);
+                          }}
                           onTimeUpdate={(e) => {
                             if (isActive) {
                               setCurrentTime(e.currentTarget.currentTime);
@@ -329,7 +409,6 @@ export function SpeakingReelsFeed({
                             if (isActive) setDuration(e.currentTarget.duration);
                           }}
                           onError={(e) => {
-                            // Fallback to direct drive user content stream if static video has issue
                             if (reel.fallbackVideoUrl && e.currentTarget.src !== reel.fallbackVideoUrl) {
                               e.currentTarget.src = reel.fallbackVideoUrl;
                               e.currentTarget.load();
@@ -339,10 +418,15 @@ export function SpeakingReelsFeed({
                         />
 
                         {/* Centered Play / Pause Animation Indicator */}
-                        {!isPlaying && isActive && (
-                          <div className="pointer-events-none absolute inset-0 grid place-items-center bg-black/30 backdrop-blur-[2px]">
-                            <div className="grid h-20 w-20 place-items-center rounded-full bg-purple-600/80 text-white shadow-2xl backdrop-blur-md animate-scale-up">
-                              <Play size={36} className="fill-current ml-1" />
+                        {(!isPlaying || !isVideoActuallyPlaying) && isActive && (
+                          <div className="pointer-events-none absolute inset-0 z-20 grid place-items-center bg-black/40 backdrop-blur-[2px]">
+                            <div className="flex flex-col items-center gap-2.5">
+                              <div className="grid h-20 w-20 place-items-center rounded-full bg-gradient-to-tr from-purple-600 via-indigo-600 to-pink-600 text-white shadow-2xl backdrop-blur-md animate-scale-up">
+                                <Play size={36} className="fill-current ml-1" />
+                              </div>
+                              <span className="rounded-full bg-black/80 px-3.5 py-1.5 text-xs font-bold text-white backdrop-blur-md shadow-xl border border-white/15">
+                                Tap anywhere to play
+                              </span>
                             </div>
                           </div>
                         )}
@@ -475,6 +559,23 @@ export function SpeakingReelsFeed({
                         <span className="text-amber-300">{playbackRate}x</span>
                       </button>
 
+                      {/* Fit Mode Toggle (No-Crop vs Fill) */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setFitMode(m => m === 'contain' ? 'cover' : 'contain');
+                        }}
+                        title={fitMode === 'contain' ? 'Full Video Mode (No Crop). Click to Fill' : 'Fill Mode (Cropped). Click for Full Video'}
+                        className="grid h-11 w-11 place-items-center rounded-full bg-black/50 border border-white/20 text-white backdrop-blur-md transition hover:bg-black/70"
+                      >
+                        {fitMode === 'contain' ? (
+                          <Minimize2 size={18} className="text-cyan-300" />
+                        ) : (
+                          <Maximize2 size={18} className="text-amber-300" />
+                        )}
+                      </button>
+
                       {/* 4-Pillars Formula Cheat Sheet Button */}
                       <button
                         type="button"
@@ -495,7 +596,7 @@ export function SpeakingReelsFeed({
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          title="Open on Google Drive"
+                          title="Open original video on Google Drive"
                           className="grid h-11 w-11 place-items-center rounded-full bg-black/50 border border-white/20 text-slate-300 backdrop-blur-md transition hover:text-white"
                         >
                           <ExternalLink size={16} />
@@ -595,7 +696,7 @@ export function SpeakingReelsFeed({
         </div>
 
         {/* Right Column: Interactive Speaking Study Hub & Voice Recorder */}
-        <div className="lg:col-span-5 space-y-6">
+        <div className={`${viewMode === 'theater' ? 'w-full max-w-4xl mx-auto mt-6' : 'lg:col-span-5'} space-y-6`}>
           {/* Speaking Formula Card */}
           <div className="relative overflow-hidden rounded-3xl border border-purple-400/30 bg-gradient-to-br from-purple-950/70 via-slate-900/90 to-slate-950 p-6 shadow-2xl shadow-purple-950/30">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
