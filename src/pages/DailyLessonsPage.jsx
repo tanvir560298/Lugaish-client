@@ -1031,7 +1031,7 @@ export function DailyLessonsPage() {
                       <span>Reels Mode</span>
                     </span>
                     <span className="rounded-full bg-purple-500/20 border border-purple-400/30 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-purple-200">
-                      5 Reels Feed
+                      5 Reels + Finale Video
                     </span>
                   </div>
                 </div>

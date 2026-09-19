@@ -357,7 +357,8 @@ export function SpeakingReelsFeed({
             >
               {reels.map((reel, index) => {
                 const isActive = index === activeIndex;
-                const isUpcoming = Boolean(reel.isUpcoming || !reel.videoUrl);
+                const isYouTube = Boolean(reel.youtubeId || reel.youtubeEmbedUrl);
+                const isUpcoming = Boolean(reel.isUpcoming || (!reel.videoUrl && !isYouTube));
 
                 return (
                   <div
@@ -366,8 +367,35 @@ export function SpeakingReelsFeed({
                       viewMode === 'theater' ? 'h-[480px] sm:h-[540px]' : 'h-[680px]'
                     } w-full snap-start snap-always shrink-0 overflow-hidden bg-slate-950 flex flex-col justify-between`}
                   >
-                    {/* Video Player or Upcoming Teaser */}
-                    {!isUpcoming ? (
+                    {/* Video Player, YouTube Embed, or Upcoming Teaser */}
+                    {isYouTube ? (
+                      <div className="relative h-full w-full bg-black flex flex-col justify-center items-center overflow-hidden">
+                        {/* Ambient blurred backdrop using YouTube thumbnail */}
+                        <div
+                          className="pointer-events-none absolute inset-0 bg-cover bg-center blur-3xl opacity-35 scale-125"
+                          style={{ backgroundImage: `url(https://i.ytimg.com/vi/${reel.youtubeId || '2mJRqQUGNRA'}/hqdefault.jpg)` }}
+                        />
+                        <div className="absolute inset-0 bg-slate-950/40 pointer-events-none" />
+
+                        {/* Top Finale Banner Tag */}
+                        <div className="absolute top-4 left-4 z-20 pointer-events-none">
+                          <span className="inline-flex items-center gap-1.5 rounded-full border border-red-500/50 bg-red-600/90 px-3 py-1 text-xs font-black uppercase tracking-wider text-white shadow-lg backdrop-blur-md">
+                            🎬 Grand Finale Case Study
+                          </span>
+                        </div>
+
+                        {/* Responsive Widescreen YouTube Frame */}
+                        <div className="relative z-10 w-full aspect-video max-w-full shadow-2xl px-2">
+                          <iframe
+                            src={reel.youtubeEmbedUrl || `https://www.youtube.com/embed/${reel.youtubeId}?rel=0`}
+                            title={reel.title || 'IELTS Speaking Grand Finale Case Study'}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowFullScreen
+                            className="w-full h-full rounded-2xl border border-white/20 shadow-2xl"
+                          />
+                        </div>
+                      </div>
+                    ) : !isUpcoming ? (
                       <div className="relative h-full w-full cursor-pointer overflow-hidden bg-black" onClick={togglePlay}>
                         {/* Ambient blurred backdrop for letterboxing so no edges get cut off */}
                         <div className="pointer-events-none absolute inset-0 overflow-hidden select-none">
@@ -597,6 +625,20 @@ export function SpeakingReelsFeed({
                           className="grid h-11 w-11 place-items-center rounded-full bg-black/50 border border-white/20 text-slate-300 backdrop-blur-md transition hover:text-white"
                         >
                           <ExternalLink size={16} />
+                        </a>
+                      )}
+
+                      {/* YouTube Video Link if provided */}
+                      {reel.youtubeUrl && (
+                        <a
+                          href={reel.youtubeUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          title="Open case study on YouTube"
+                          className="grid h-11 w-11 place-items-center rounded-full bg-red-600/90 border border-red-400/40 text-white backdrop-blur-md transition hover:scale-110 shadow-lg shadow-red-600/40"
+                        >
+                          <Play size={16} className="fill-current ml-0.5" />
                         </a>
                       )}
                     </div>

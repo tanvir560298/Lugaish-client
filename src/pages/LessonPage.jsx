@@ -1066,7 +1066,7 @@ export function LessonPage() {
 
               {/* Speaking Day 2 (or any day with reels): Dedicated Speaking Reels Masterclass */}
               {(day === 2 || (staticLesson?.reels && staticLesson.reels.length > 0)) && (
-                <div className="space-y-6">
+                <div className="space-y-8">
                   <SpeakingReelsFeed
                     reels={staticLesson?.reels || []}
                     topicTitle={staticLesson?.topicTitle || 'Topic 2: High-Impact Self-Introduction'}
@@ -1074,6 +1074,60 @@ export function LessonPage() {
                     isCompleted={isPdfCompleted}
                     isCompleting={isVideoCompleting}
                   />
+
+                  {/* Grand Finale YouTube Case Study Card */}
+                  <div className="section-card border-red-500/30 p-6 sm:p-8 space-y-6 bg-gradient-to-br from-red-950/40 via-slate-900/90 to-slate-950">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-white/10 pb-5">
+                      <div className="flex items-center gap-3">
+                        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-red-500/20 text-red-400">
+                          <Video size={24} />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center gap-1 rounded-full border border-red-500/40 bg-red-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-red-300">
+                              🎬 Grand Finale Video
+                            </span>
+                            <span className="text-[10px] font-bold text-slate-400">
+                              IELTS Speaking Band 0.0 Case Study
+                            </span>
+                          </div>
+                          <h3 className="mt-1 text-2xl font-black text-white">
+                            What NOT To Do in IELTS Speaking (Can't Communicate Man)
+                          </h3>
+                        </div>
+                      </div>
+
+                      <a
+                        href="https://youtu.be/2mJRqQUGNRA?si=GNUlhj86nmxM_yMP"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="glow-button py-2 px-3.5 text-xs font-bold flex items-center gap-1.5 bg-red-600/80 text-white border-red-400/40 hover:bg-red-500 shrink-0"
+                      >
+                        <ExternalLink size={14} /> Watch on YouTube
+                      </a>
+                    </div>
+
+                    {/* YouTube Widescreen Player */}
+                    <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-white/10 bg-black shadow-2xl">
+                      <iframe
+                        src="https://www.youtube.com/embed/2mJRqQUGNRA?rel=0"
+                        title="IELTS Speaking Band 0.0 | Can't Communicate Man"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                        className="h-full w-full"
+                      />
+                    </div>
+
+                    {/* Tanvir's Takeaways */}
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-5">
+                      <p className="text-xs font-black uppercase tracking-wider text-amber-300 flex items-center gap-2 mb-2">
+                        <Sparkles size={15} /> Tanvir's Lesson Analysis:
+                      </p>
+                      <p className="text-sm text-slate-200 leading-relaxed">
+                        Watch how the speaker freezes due to sentence-memorization anxiety. When introducing yourself, never rely on pre-memorized paragraphs. Anchor yourself with the <strong>4 Pillars (Name, Background, Focus, Passion)</strong> to speak freely with natural flow and zero panic.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
 
