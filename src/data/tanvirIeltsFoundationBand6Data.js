@@ -179,17 +179,242 @@ export const IELTS_FOUNDATION_BAND_6_60_CLASSES = [
   {
     day: 3,
     month: 1,
-    title: 'Topic 3',
-    dayType: 'Speaking Day',
-    coreStructure: 'দৈনন্দিন অভ্যাস ও চলমান কাজের পার্থক্য; সঠিক অক্সিলিয়ারি ভার্ব (am/is/are/do/does) ব্যবহার।',
-    liveActivity: '"Describe your day and what is happening right now" স্পিকিং ড্রিল।',
-    actionItem: 'নিজের দৈনন্দিন রুটিন নিয়ে ১০টি নির্ভুল বাক্যের প্যারাগ্রাফ লেখা।',
-    studyTopic: 'Habitual actions (Present Simple) vs right-now occurrences (Present Continuous).',
-    studentOutput: 'Submit 10-sentence paragraph contrasting daily routines with ongoing actions.',
-    classNotes: 'Do not mix up "I am go" with "I go" or "I am going". Keep auxiliaries crystal clear.',
+    title: 'Topic 3: Writing & Speaking Joint Module — Self-Paragraph & AI Feedback',
+    topicTitle: 'Topic 3: Writing & Speaking Joint Module (Handwritten Paragraph AI Evaluation & Routine Drill)',
+    dayType: 'Writing & Speaking Day',
+    coreStructure: 'দৈনন্দিন অভ্যাস ও চলমান কাজের পার্থক্য (Present Simple vs Present Continuous); অক্সিলিয়ারি ভার্ব (am/is/are/do/does) এবং নিজের সম্পর্কে ১০ বাক্যের নির্ভুল প্যারাগ্রাফ লিখন।',
+    liveActivity: 'লাইভ ড্রিল: খাতায় নিজের সম্পর্কে ১০টি বাক্য লেখা + ছবি তুলে AI Evaluation প্রম্পট দিয়ে মূল্যায়ন + ৯০ সেকেন্ডের স্পিকিং প্র্যাকটিস।',
+    actionItem: 'খাতায় নিজের ও দৈনন্দিন রুটিন নিয়ে ১০টি বাক্য লিখে ছবি তোলা, AI প্রম্পট কপি করে ChatGPT/Claude-এ সাবমিট করা এবং স্পিকিং অডিও রেকর্ড করা।',
+    studyTopic: 'Joint Writing & Speaking Module: 10-sentence self-introduction paragraph, eliminating run-ons, avoiding "am + verb", and speech fluency.',
+    studentOutput: '১) AI দ্বারা মূল্যায়িত খাতার প্যারাগ্রাফের ফিডব্যাক পর্যালোচনা করা, ২) ১ মিনিটের স্পিকিং ড্রিল সাবমিট করা।',
+    classNotes: 'Tip from Tanvir: প্যারাগ্রাফ লেখার সময় "am/is/are" অযথা অ্যাকশন ভার্বের সাথে মেশাবেন না (যেমন: "I am go" এর বদলে "I go")। বাক্যগুলো ছোট ও স্পষ্ট রাখুন এবং নিচের AI প্রম্পট ব্যবহার করে তাত্ক্ষণিক মূল্যায়ন দেখে নিন।',
     actionType: 'ai_speaking',
     actionLabel: 'Record Routine vs Current Drill',
     actionTarget: '/speaking-practice?language=english&day=3',
+    evaluationPrompt: `You are helping me as an instructor in a beginner English writing class.
+
+I will upload a picture of a student’s handwritten paragraph. Usually, the student will write around 10 or more sentences about themselves.
+
+Your job is to carefully read the ENTIRE paragraph first and then evaluate it. Do not judge the student's writing based on only one sentence or one mistake.
+
+IMPORTANT:
+This is only a classroom IELTS-foundation-style evaluation. It is NOT an official IELTS Writing band score because the student is not completing an official IELTS Writing Task.
+
+Follow these instructions carefully:
+
+1. READ THE WHOLE PARAGRAPH
+
+First, carefully read everything the student has written.
+
+Try to understand the student's overall meaning, sentence structure, basic grammar, vocabulary, and how well the ideas connect.
+
+If some handwriting is unclear, do NOT invent or guess the word. Mention that the particular word is unclear if necessary.
+
+2. OVERALL WRITING LEVEL
+
+Decide whether the student's paragraph demonstrates writing ability above a very basic IELTS Band 1-style foundation level.
+
+Judge the WHOLE paragraph, not individual sentences.
+
+If the paragraph is clearly above this very basic level, write:
+
+"Congratulations! Your writing shows ability above a very basic IELTS Band 1 foundation level."
+
+Do NOT unnecessarily give Band 2, Band 3, Band 4, etc. The purpose is only to check whether the writing is above the very basic Band 1-style foundation level.
+
+If the writing is not yet above that level, explain simply why.
+
+Consider things such as:
+
+* whether the sentences communicate understandable meaning
+* whether the student can form basic sentences
+* whether the paragraph gives understandable information
+* whether ideas are reasonably connected
+* whether grammar mistakes make the meaning difficult to understand
+
+Do not fail a student just because of a few spelling or grammar mistakes.
+
+3. WHY?
+
+Give a very short explanation of WHY you gave that result.
+
+Use simple English that a beginner student can understand.
+
+For example:
+
+"Most of your sentences communicate clear ideas. There are some grammar mistakes, but I can understand what you want to say."
+
+Or, if the writing is too weak:
+
+"Some sentences are incomplete, and several ideas are difficult to understand. Try to write shorter and complete sentences."
+
+Keep this section short.
+
+4. SIMPLE SPELLING MISTAKES
+
+Find obvious spelling mistakes in SIMPLE, COMMON English words.
+
+For now, focus especially on basic words such as:
+word, boy, girl, school, student, friend, family, tree, house, like, live, name, good, happy, teacher, etc.
+
+You may also correct another word if the spelling mistake is very obvious.
+
+However:
+
+* Do not focus heavily on difficult or advanced vocabulary.
+* Do not guess when handwriting is unclear.
+* Do not report a word as misspelled unless you are reasonably sure.
+
+Use this format:
+
+"Simple spelling mistakes found in this paragraph:"
+
+wrong word → correct word
+
+Example:
+frend → friend
+studant → student
+becuse → because
+
+If there are no clear simple spelling mistakes, write:
+
+"No clear simple spelling mistakes found."
+
+5. ONE MAIN THING TO IMPROVE
+
+Choose ONLY ONE important thing the student should focus on next.
+
+Do not give a long list of grammar mistakes.
+
+Choose the most useful improvement based on the whole paragraph.
+
+Examples:
+
+* Start every sentence with a capital letter.
+* Use a full stop at the end of each sentence.
+* Try to write complete sentences.
+* Be careful with "am / is / are."
+* Try to connect your ideas more clearly.
+* Check basic spelling before finishing your paragraph.
+
+Write only ONE main improvement.
+
+6. BEST LEARNING WORD
+
+Choose EXACTLY ONE word that the student actually used in the paragraph.
+
+The word should be the BEST LEARNING WORD from that student's writing.
+
+Do not automatically choose the easiest word.
+
+Choose the word that has the most educational value or can help the class learn something useful.
+
+For example, if the paragraph contains:
+school, friend, tree, photosynthesis
+
+"photosynthesis" is probably the better learning word because students can learn more from it.
+
+However, the word does not have to be difficult. If the paragraph only contains simple vocabulary, choose the most useful or interesting word available.
+
+NEVER choose a word that the student did not actually write.
+
+Use this exact heading:
+
+"The best learning word from this paragraph is: [WORD]"
+
+7. SIMPLE SENTENCES USING THE BEST WORD
+
+Give 2 or 3 very simple, natural English sentences using that word.
+
+The sentences should help beginner students understand the meaning and usage of the word.
+
+For example:
+
+The best learning word from this paragraph is: photosynthesis
+
+Simple sample sentences with this word:
+
+1. Plants make food through photosynthesis.
+2. Photosynthesis needs sunlight.
+3. Photosynthesis helps plants grow.
+
+Keep the sentences simple enough for beginner English learners.
+
+8. SOMETHING THE STUDENT DID WELL
+
+Find ONE positive thing about the student's paragraph.
+
+Keep it genuine and specific.
+
+Examples:
+
+* You introduced yourself clearly.
+* You gave several details about your family.
+* You used some good vocabulary.
+* Most of your ideas were understandable.
+* You tried to write complete sentences.
+
+Do not give fake praise if something is not present in the writing.
+
+9. RESPONSE STYLE
+
+Keep the feedback:
+
+* simple
+* supportive
+* short
+* classroom-friendly
+* easy for beginner English learners to understand
+
+Do not use complicated linguistic terminology unless absolutely necessary.
+
+Do not rewrite the entire paragraph unless I specifically ask you to.
+
+Do not correct every grammar mistake on the first writing-module day.
+
+Focus on encouraging the student while identifying the most important improvement.
+
+10. USE THIS EXACT OUTPUT STRUCTURE
+
+Overall Writing:
+[Your evaluation]
+
+Why:
+[Very short explanation based on the whole paragraph]
+
+Simple Spelling Mistakes:
+[wrong → correct, or "No clear simple spelling mistakes found."]
+
+Main Thing to Improve:
+[Only ONE improvement]
+
+Best Learning Word:
+The best learning word from this paragraph is: [WORD]
+
+Simple Sample Sentences:
+
+1. [Sentence]
+2. [Sentence]
+3. [Sentence, if useful]
+
+Something You Did Well:
+[One short positive observation]
+
+IMPORTANT FINAL RULES:
+
+* Evaluate the WHOLE paragraph.
+* Never judge the writing based on one sentence only.
+* Never invent text that is not visible.
+* Never invent spelling mistakes.
+* If handwriting is unclear, say it is unclear instead of guessing.
+* Choose only ONE best learning word.
+* The best learning word MUST appear in the student's paragraph.
+* Keep the example sentences easy.
+* Give only ONE main improvement.
+* Do not provide an official IELTS band score.
+* Keep the feedback suitable for the first day of a beginner writing module.
+
+Now analyze the uploaded student's handwritten paragraph using exactly this system.`,
     status: 'published',
   },
   {

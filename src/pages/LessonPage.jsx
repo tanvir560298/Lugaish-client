@@ -4,8 +4,11 @@ import {
   ArrowLeft,
   Award,
   BookOpen,
+  Bot,
+  Check,
   CheckCircle2,
   Clock3,
+  Copy,
   ExternalLink,
   Eye,
   FileText,
@@ -15,6 +18,7 @@ import {
   LoaderCircle,
   Mic,
   Pause,
+  PenTool,
   Play,
   Plus,
   RefreshCw,
@@ -254,6 +258,36 @@ export function LessonPage() {
   const [audio2CurrentTime, setAudio2CurrentTime] = useState(0);
   const [audio2Duration, setAudio2Duration] = useState(0);
   const audio2Ref = useRef(null);
+
+  // Day 3 Writing & Speaking Joint Module Prompt Copy State
+  const [isPromptCopied, setIsPromptCopied] = useState(false);
+  const [copyFeedbackToast, setCopyFeedbackToast] = useState('');
+
+  const handleCopyPrompt = async (promptText) => {
+    const textToCopy = promptText || staticLesson?.evaluationPrompt || '';
+    if (!textToCopy) return;
+
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(textToCopy);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = textToCopy;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      setIsPromptCopied(true);
+      setCopyFeedbackToast('Prompt copied to clipboard! Paste it into ChatGPT or Claude.');
+      setTimeout(() => setIsPromptCopied(false), 3000);
+      setTimeout(() => setCopyFeedbackToast(''), 4000);
+    } catch (err) {
+      console.error('Failed to copy prompt:', err);
+    }
+  };
 
   const formatAudioTime = (seconds) => {
     if (!Number.isFinite(seconds) || seconds <= 0) return '0:00';
@@ -1013,7 +1047,7 @@ export function LessonPage() {
                         Month {Math.ceil(day / 12)} · Class {String(day).padStart(2, '0')}
                       </span>
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-emerald-300">
-                        {staticLesson?.dayType?.includes('Speaking') ? <Mic size={13} /> : <Headphones size={13} />} {staticLesson?.dayType || 'Study Day'}
+                        {staticLesson?.dayType?.includes('Writing') ? <PenTool size={13} /> : (staticLesson?.dayType?.includes('Speaking') ? <Mic size={13} /> : <Headphones size={13} />)} {staticLesson?.dayType || 'Study Day'}
                       </span>
                     </div>
 
@@ -1682,8 +1716,311 @@ export function LessonPage() {
               </>
               )}
 
-              {/* Other Days (when not Day 1 and not Day 2 reels): Standard Study Topic Overview */}
-              {day !== 1 && day !== 2 && (!staticLesson?.reels || staticLesson.reels.length === 0) && (
+              {/* Day 3 (or any lesson with evaluationPrompt): Dedicated Writing & Speaking Joint Module */}
+              {(day === 3 || Boolean(staticLesson?.evaluationPrompt)) && (
+                <div className="space-y-8">
+                  {/* Master Joint Module Intro Card */}
+                  <div className="relative overflow-hidden rounded-3xl border border-cyan-500/30 bg-gradient-to-br from-indigo-950/70 via-slate-900/90 to-slate-950 p-6 sm:p-8 shadow-2xl shadow-cyan-950/30">
+                    <div className="pointer-events-none absolute -right-12 -top-12 h-64 w-64 rounded-full bg-cyan-500/15 blur-3xl" />
+                    <div className="pointer-events-none absolute -bottom-10 left-1/3 h-52 w-52 rounded-full bg-purple-500/15 blur-2xl" />
+
+                    <div className="relative z-10 space-y-6">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-white/10 pb-5">
+                        <div className="space-y-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-400/40 bg-cyan-500/20 px-3 py-1 text-xs font-black uppercase tracking-wider text-cyan-200">
+                              <PenTool size={13} /> Writing & Speaking Joint Module
+                            </span>
+                            <span className="inline-flex items-center gap-1 rounded-full border border-purple-400/30 bg-purple-500/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-purple-200">
+                              Class 03 · 10-Sentence Self-Intro & Routine
+                            </span>
+                            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-emerald-300">
+                              <Bot size={13} /> AI Evaluator System
+                            </span>
+                          </div>
+                          <h3 className="text-2xl sm:text-3xl font-black text-white">
+                            Day 3: Handwritten Paragraph AI Evaluation & Routine Speaking Sprint
+                          </h3>
+                          <p className="text-sm text-slate-300 max-w-3xl leading-relaxed">
+                            আজকের ক্লাসে আমরা ইংরেজি লিখন ও কথন—উভয় মাধ্যমেই নিজেদের দৈনন্দিন রুটিন এবং পরিচয় প্রকাশের দক্ষতা তৈরি করব। খাতার প্যারাগ্রাফের ছবি তুলে নিচে দেওয়া <strong>Tanvir's AI Evaluator Prompt</strong> দিয়ে তাৎক্ষণিক মূল্যায়ন করুন এবং একই সাথে স্পিকিং ড্রিল সম্পন্ন করুন।
+                          </p>
+                        </div>
+
+                        {/* Top Action Buttons */}
+                        <div className="shrink-0 flex flex-col sm:flex-row md:flex-col gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => handleCopyPrompt(staticLesson?.evaluationPrompt)}
+                            className={`glow-button ${
+                              isPromptCopied
+                                ? 'bg-emerald-500 text-white border-emerald-400 shadow-lg shadow-emerald-500/40'
+                                : 'glow-button-blue shadow-lg shadow-cyan-600/30'
+                            } py-3.5 px-5 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition hover:scale-[1.02]`}
+                          >
+                            {isPromptCopied ? <Check size={16} /> : <Copy size={16} />}
+                            <span>{isPromptCopied ? 'Copied to Clipboard!' : 'Copy Evaluation Prompt'}</span>
+                          </button>
+                          <a
+                            href="https://chatgpt.com"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="glow-button glow-button-muted py-2.5 px-4 text-xs font-bold flex items-center justify-center gap-2 text-slate-300 hover:text-white"
+                          >
+                            <ExternalLink size={14} /> Open ChatGPT
+                          </a>
+                        </div>
+                      </div>
+
+                      {/* 3-Step Guided Workflow Cards */}
+                      <div>
+                        <h4 className="text-xs font-black uppercase tracking-wider text-cyan-300 mb-3 flex items-center gap-1.5">
+                          <Sparkles size={14} /> How to complete today's assignment (সহজ ৩টি ধাপ):
+                        </h4>
+                        <div className="grid gap-3.5 sm:grid-cols-3">
+                          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-1.5 transition hover:border-cyan-400/40">
+                            <div className="flex items-center gap-2">
+                              <span className="grid h-6 w-6 place-items-center rounded-full bg-cyan-500/20 text-xs font-black text-cyan-300">1</span>
+                              <p className="text-sm font-black text-white">খাতায় ১০ বাক্য লিখুন</p>
+                            </div>
+                            <p className="text-xs text-slate-300 leading-relaxed">
+                              নিজের পরিচয় ও প্রতিদিনের রুটিন নিয়ে খাতায় প্রায় ১০টি বাক্য স্পষ্ট হস্তাক্ষরে লিখুন এবং ভালো আলোতে ছবি তুলুন।
+                            </p>
+                          </div>
+
+                          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-1.5 transition hover:border-purple-400/40">
+                            <div className="flex items-center gap-2">
+                              <span className="grid h-6 w-6 place-items-center rounded-full bg-purple-500/20 text-xs font-black text-purple-300">2</span>
+                              <p className="text-sm font-black text-white">প্রম্পটটি কপি করুন</p>
+                            </div>
+                            <p className="text-xs text-slate-300 leading-relaxed">
+                              নিচের <strong>"Copy Evaluation Prompt"</strong> বাটনে ক্লিক করুন। পুরো ইনস্ট্রাক্টর ফ্রেমওয়ার্ক আপনার ক্লিপবোর্ডে কপি হবে।
+                            </p>
+                          </div>
+
+                          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-1.5 transition hover:border-emerald-400/40">
+                            <div className="flex items-center gap-2">
+                              <span className="grid h-6 w-6 place-items-center rounded-full bg-emerald-500/20 text-xs font-black text-emerald-300">3</span>
+                              <p className="text-sm font-black text-white">AI-তে ছবি আপলোড করুন</p>
+                            </div>
+                            <p className="text-xs text-slate-300 leading-relaxed">
+                              ChatGPT / Claude / Gemini খুলে প্রম্পট পেস্ট করুন এবং খাতার ছবিটি আপলোড দিন। তাৎক্ষণিক মূল্যায়ন ও কারেকশন পেয়ে যাবেন।
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Dedicated AI Evaluation Prompt Card */}
+                  <div className="section-card border-cyan-500/30 p-6 sm:p-8 space-y-6 bg-gradient-to-br from-slate-900/95 via-slate-950 to-slate-900">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/10 pb-5">
+                      <div className="flex items-start sm:items-center gap-3.5">
+                        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-cyan-500/30 to-blue-600/30 text-cyan-300 border border-cyan-400/30 shadow-lg shadow-cyan-500/20">
+                          <Bot size={24} />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center gap-1 rounded-full border border-cyan-400/30 bg-cyan-500/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-cyan-200">
+                              📋 Official AI Instructor Prompt
+                            </span>
+                            <span className="text-[10px] font-bold text-slate-400">
+                              Classroom IELTS Foundation Evaluator
+                            </span>
+                          </div>
+                          <h4 className="mt-1 text-xl sm:text-2xl font-black text-white">
+                            Handwritten Paragraph AI Evaluation System Prompt
+                          </h4>
+                          <p className="text-xs text-slate-300">
+                            Tanvir's 10-point evaluation criteria (Band 1+ foundation threshold, simple spelling detection & single best learning word).
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Primary Copy Button in Header */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button
+                          type="button"
+                          id="copy-evaluation-prompt-btn"
+                          onClick={() => handleCopyPrompt(staticLesson?.evaluationPrompt)}
+                          className={`glow-button ${
+                            isPromptCopied
+                              ? 'bg-emerald-500 border-emerald-400 text-white shadow-lg shadow-emerald-500/40'
+                              : 'glow-button-blue shadow-lg shadow-cyan-600/30'
+                          } py-2.5 px-5 text-xs font-black uppercase tracking-wider flex items-center gap-2 transition hover:scale-[1.02]`}
+                        >
+                          {isPromptCopied ? <Check size={16} /> : <Copy size={16} />}
+                          <span>{isPromptCopied ? 'Copied Prompt!' : 'Copy Evaluation Prompt'}</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {copyFeedbackToast && (
+                      <div className="rounded-xl border border-emerald-400/40 bg-emerald-500/15 p-3 text-emerald-200 text-xs font-bold flex items-center gap-2">
+                        <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
+                        <span>{copyFeedbackToast}</span>
+                      </div>
+                    )}
+
+                    {/* Direct AI Launcher Pills */}
+                    <div className="flex flex-wrap items-center gap-2.5 text-xs font-bold text-slate-300">
+                      <span className="text-slate-400 text-xs">কপি করার পর সরাসরি ওপেন করুন:</span>
+                      <a
+                        href="https://chatgpt.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-emerald-300 hover:bg-emerald-500/20 hover:border-emerald-400/50 transition flex items-center gap-1.5"
+                      >
+                        <span>ChatGPT (OpenAI)</span>
+                        <ExternalLink size={12} />
+                      </a>
+                      <a
+                        href="https://claude.ai"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-amber-300 hover:bg-amber-500/20 hover:border-amber-400/50 transition flex items-center gap-1.5"
+                      >
+                        <span>Claude (Anthropic)</span>
+                        <ExternalLink size={12} />
+                      </a>
+                      <a
+                        href="https://gemini.google.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-xl border border-blue-500/30 bg-blue-500/10 px-3 py-1.5 text-blue-300 hover:bg-blue-500/20 hover:border-blue-400/50 transition flex items-center gap-1.5"
+                      >
+                        <span>Google Gemini</span>
+                        <ExternalLink size={12} />
+                      </a>
+                    </div>
+
+                    {/* Styled Prompt Code Box */}
+                    <div className="relative rounded-2xl border border-white/15 bg-slate-950/90 shadow-2xl overflow-hidden">
+                      {/* Prompt Header inside Box */}
+                      <div className="flex items-center justify-between border-b border-white/10 px-4 py-2.5 bg-slate-900/80 text-xs text-slate-400">
+                        <div className="flex items-center gap-2">
+                          <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                          <span className="font-mono font-semibold text-slate-300">prompt-evaluation-template.txt</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyPrompt(staticLesson?.evaluationPrompt)}
+                          className="flex items-center gap-1.5 text-[11px] font-bold text-cyan-300 hover:text-cyan-200 transition"
+                        >
+                          {isPromptCopied ? <Check size={13} /> : <Copy size={13} />}
+                          <span>{isPromptCopied ? 'Copied' : 'Copy'}</span>
+                        </button>
+                      </div>
+
+                      {/* Scrollable Prompt Content */}
+                      <div className="max-h-96 overflow-y-auto p-4 sm:p-6 font-mono text-xs sm:text-[13px] leading-relaxed text-slate-200 whitespace-pre-wrap select-all selection:bg-cyan-500/30 selection:text-cyan-100">
+                        {staticLesson?.evaluationPrompt}
+                      </div>
+
+                      {/* Bottom Bar inside Box with Secondary Copy Button */}
+                      <div className="border-t border-white/10 px-4 py-3 bg-slate-900/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
+                        <span className="text-[11px] text-slate-400">
+                          Tip: পুরো প্রম্পটটি ওপরের বা নিচের যে কোনো বাটন চেপে এক ক্লিকেই কপি করতে পারেন।
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyPrompt(staticLesson?.evaluationPrompt)}
+                          className={`glow-button ${
+                            isPromptCopied
+                              ? 'bg-emerald-500 border-emerald-400 text-white'
+                              : 'glow-button-blue'
+                          } py-2 px-4 text-xs font-bold flex items-center justify-center gap-1.5 self-end sm:self-auto`}
+                        >
+                          {isPromptCopied ? <Check size={14} /> : <Copy size={14} />}
+                          <span>{isPromptCopied ? 'Copied to Clipboard' : 'Copy Full Prompt'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Speaking Practice Joint Drill Card */}
+                  <div className="section-card border-emerald-500/30 p-6 sm:p-8 space-y-6 bg-gradient-to-br from-emerald-950/30 via-slate-900/90 to-slate-950">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/10 pb-5">
+                      <div className="flex items-start sm:items-center gap-3.5">
+                        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 shadow-lg shadow-emerald-500/20">
+                          <Mic size={24} />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-200">
+                              🎙️ Speaking Drill · 90 Seconds
+                            </span>
+                            <span className="text-[10px] font-bold text-slate-400">
+                              Present Simple vs Present Continuous
+                            </span>
+                          </div>
+                          <h4 className="mt-1 text-xl sm:text-2xl font-black text-white">
+                            Speaking Practice: Daily Routine vs Right-Now Occurrences
+                          </h4>
+                          <p className="text-xs text-slate-300">
+                            Contrast habitual actions with what you are doing right now without stumbling on auxiliary verbs.
+                          </p>
+                        </div>
+                      </div>
+
+                      <a
+                        href="/speaking-practice?language=english&day=3"
+                        className="glow-button glow-button-green py-3 px-5 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition hover:scale-[1.02] shrink-0"
+                      >
+                        <Mic size={16} />
+                        <span>Launch Day 3 Speaking Drill</span>
+                      </a>
+                    </div>
+
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
+                        <h5 className="text-xs font-black uppercase tracking-wider text-emerald-300">Pattern 1: Habitual Routine (Present Simple)</h5>
+                        <p className="text-sm text-slate-200 leading-relaxed font-sans">
+                          "I usually wake up at 7:00 AM, take a light breakfast, and review my English vocabulary for 30 minutes."
+                        </p>
+                        <p className="text-xs text-slate-400 italic">💡 Rule: No "am/is/are" before action verbs (Never say "I am wake up").</p>
+                      </div>
+
+                      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
+                        <h5 className="text-xs font-black uppercase tracking-wider text-cyan-300">Pattern 2: Current Focus (Present Continuous)</h5>
+                        <p className="text-sm text-slate-200 leading-relaxed font-sans">
+                          "Right now, I am preparing for my IELTS exam and practicing to bridge my foundation up to Band 6.0."
+                        </p>
+                        <p className="text-xs text-slate-400 italic">💡 Rule: "am/is/are" + verb-ing indicates what is taking place right now.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Curriculum Core Breakdown Grid */}
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 space-y-2">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-purple-300">Core Structure</h4>
+                      <p className="text-sm text-slate-200 leading-relaxed">{staticLesson?.coreStructure}</p>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 space-y-2">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-cyan-300">Live Activity</h4>
+                      <p className="text-sm text-slate-200 leading-relaxed">{staticLesson?.liveActivity}</p>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 space-y-2">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-emerald-300">Action Item / Homework</h4>
+                      <p className="text-sm text-slate-200 leading-relaxed">{staticLesson?.actionItem}</p>
+                    </div>
+                    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 space-y-2">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-amber-300">Expected Student Output</h4>
+                      <p className="text-sm text-slate-200 leading-relaxed">{staticLesson?.studentOutput}</p>
+                    </div>
+                  </div>
+
+                  {staticLesson?.classNotes && (
+                    <div className="rounded-2xl border border-purple-400/20 bg-purple-950/40 p-4">
+                      <p className="text-xs font-black uppercase tracking-wider text-purple-300 mb-1">💡 Instructor Tip from Tanvir</p>
+                      <p className="text-xs text-slate-200 leading-relaxed">{staticLesson.classNotes}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Other Days (when not Day 1, Day 2 reels, or Day 3 evaluation prompt): Standard Study Topic Overview */}
+              {day !== 1 && day !== 2 && day !== 3 && (!staticLesson?.reels || staticLesson.reels.length === 0) && !staticLesson?.evaluationPrompt && (
                 <div className="section-card border-purple-500/30 p-6 sm:p-8 space-y-6">
                   <div className="flex items-center gap-3 border-b border-white/10 pb-4">
                     <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-purple-500/20 text-purple-300">

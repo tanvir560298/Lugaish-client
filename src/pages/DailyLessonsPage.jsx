@@ -13,6 +13,7 @@ import {
   Lock,
   Mic,
   Pause,
+  PenTool,
   Play,
   Plus,
   Settings2,
@@ -588,12 +589,18 @@ export function DailyLessonsPage() {
           const dayMonth = Math.ceil(dayNum / 12);
           let presentation = MODULE_PRESENTATION[day.moduleType] ?? null;
           if (isPaidBatch) {
+            const dayType = day.staticLesson?.dayType || '';
+            const isJointModule = dayType.includes('Writing') && dayType.includes('Speaking');
+            const isWriting = dayType.includes('Writing');
+            const isSpeaking = dayType.includes('Speaking');
+            const IconComponent = isJointModule || isWriting ? PenTool : (isSpeaking ? Mic : Headphones);
+
             presentation = {
               label: day.staticLesson?.dayType || (dayNum === 1 ? 'Listening Day' : `Month ${dayMonth} · Class ${dayNum}`),
-              startLabel: dayNum === 1 ? 'Launch Day 1 Masterclass' : `Open Class ${dayNum}`,
-              reviewLabel: dayNum === 1 ? 'Review Day 1 Masterclass' : `Review Class ${dayNum}`,
-              Icon: Headphones,
-              accent: 'text-purple-300',
+              startLabel: dayNum === 1 ? 'Launch Day 1 Masterclass' : (dayNum === 2 ? 'Launch Day 2 Speaking' : (dayNum === 3 ? 'Launch Day 3 Joint Module' : `Open Class ${dayNum}`)),
+              reviewLabel: dayNum === 1 ? 'Review Day 1 Masterclass' : (dayNum === 2 ? 'Review Day 2 Speaking' : (dayNum === 3 ? 'Review Day 3 Joint Module' : `Review Class ${dayNum}`)),
+              Icon: IconComponent,
+              accent: isJointModule ? 'text-cyan-300' : (isWriting ? 'text-amber-300' : (isSpeaking ? 'text-emerald-300' : 'text-purple-300')),
             };
           } else if (['arabic', 'english'].includes(state.activePathway)) {
             if (day.day % 2 !== 0) {
