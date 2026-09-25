@@ -49,7 +49,15 @@ export async function getBankSettings() {
   }
   const local = getLocalItem(STORAGE_KEY_BANK_SETTINGS, null);
   if (local && (local.accountNumber || local.iban || local.screenshotUrl)) {
-    return { ...DEFAULT_BANK_SETTINGS, ...local };
+    return {
+      ...DEFAULT_BANK_SETTINGS,
+      ...local,
+      screenshotUrl: local.screenshotUrl || DEFAULT_BANK_SETTINGS.screenshotUrl,
+      accountNumber: local.accountNumber || DEFAULT_BANK_SETTINGS.accountNumber,
+      iban: local.iban || DEFAULT_BANK_SETTINGS.iban,
+      bankName: local.bankName || DEFAULT_BANK_SETTINGS.bankName,
+      accountName: local.accountName || DEFAULT_BANK_SETTINGS.accountName,
+    };
   }
   return DEFAULT_BANK_SETTINGS;
 }
