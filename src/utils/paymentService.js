@@ -13,10 +13,11 @@ export const DEFAULT_BANK_SETTINGS = {
   branchName: '',
   routingNumber: '',
   mobileBanking: '',
-  transferInstructions: 'Please transfer the monthly tuition to the bank account shown above or scan the QR code. You can use either the Account Number or IBAN. Use your name or email as the transfer reference. Once transferred, click "I\'ve transferred the payment" and submit your details. We will verify and update you within 24 hours.',
+  transferInstructions: 'Please transfer the monthly tuition (50 SAR) to the bank account shown above or scan the QR code. You can use either the Account Number or IBAN. Use your name or email as the transfer reference. Once transferred, click "I\'ve transferred the payment" and submit your details. We will verify and update you within 24 hours.',
 };
 
-export const MONTHLY_TUITION_FEE = 3000;
+export const MONTHLY_TUITION_FEE = 50;
+export const TUITION_CURRENCY = 'SAR';
 export const TOTAL_MONTHS = 5;
 
 function getLocalItem(key, fallback) {
@@ -102,7 +103,7 @@ export async function getStudentPaymentStatus(email, studentName, paidBatchMonth
     return {
       month: monthNum,
       fee: MONTHLY_TUITION_FEE,
-      currency: 'BDT',
+      currency: 'SAR',
       status: monthNum <= studentPaidMonths ? 'received' : 'due',
       userEmail: normEmail,
       userName: studentName || 'Learner',
@@ -157,7 +158,7 @@ export async function submitTransferDetails(email, studentName, { month, senderN
     userName: studentName || 'Learner',
     month: monthNum,
     fee: MONTHLY_TUITION_FEE,
-    currency: 'BDT',
+    currency: 'SAR',
     status: 'pending', // MUST NEVER BE RECEIVED ON SUBMIT
     senderName: payload.senderName,
     transferDate: payload.transferDate,
@@ -232,7 +233,7 @@ export async function adminConfirmPayment(userEmail, month, status, adminNotes =
       userName: normEmail.split('@')[0],
       month: monthNum,
       fee: MONTHLY_TUITION_FEE,
-      currency: 'BDT',
+      currency: 'SAR',
       status,
       adminNotes,
       confirmedAt: status === 'received' ? new Date().toISOString() : null,

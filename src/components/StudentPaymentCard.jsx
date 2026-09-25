@@ -190,7 +190,7 @@ export function StudentPaymentCard({ user, onPaymentUpdated }) {
           <div className="grid gap-3.5 sm:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-1">
               <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Monthly Tuition Fee</span>
-              <p className="text-2xl font-black text-white">৳{fee.toLocaleString()} <span className="text-xs text-slate-400 font-normal">BDT</span></p>
+              <p className="text-2xl font-black text-white">{fee} <span className="text-xs text-slate-400 font-normal">SAR (Riyals / ﷼)</span></p>
               <p className="text-[11px] text-slate-400">Covers 12 guided classes + mocks</p>
             </div>
 
@@ -322,7 +322,7 @@ export function StudentPaymentCard({ user, onPaymentUpdated }) {
                       <div>
                         <p className="font-bold text-white">Month {m.month} (Classes {(m.month - 1) * 12 + 1}–{m.month * 12})</p>
                         <p className="text-[11px] text-slate-400">
-                          Tuition: ৳{(m.fee || MONTHLY_TUITION_FEE).toLocaleString()} BDT
+                          Tuition: {m.fee || MONTHLY_TUITION_FEE} SAR (Riyals)
                           {m.transferDate && ` · Transferred: ${m.transferDate}`}
                           {m.transactionRef && ` · Ref: ${m.transactionRef}`}
                         </p>

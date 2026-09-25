@@ -94,7 +94,7 @@ export function TransferSubmissionModal({
             </div>
             <div>
               <span className="inline-flex items-center gap-1 rounded-full border border-purple-400/30 bg-purple-500/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-purple-200">
-                Month {month} Tuition · ৳{fee.toLocaleString()} BDT
+                Month {month} Tuition · {fee} SAR (Riyals)
               </span>
               <h3 className="text-xl font-black text-white mt-1">Submit Transfer Details</h3>
             </div>

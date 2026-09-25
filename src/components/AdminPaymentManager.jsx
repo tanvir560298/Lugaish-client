@@ -508,7 +508,7 @@ export function AdminPaymentManager({ onStudentRecordUpdated }) {
 
                         <div className="text-right pr-2">
                           <p className="text-[10px] font-bold uppercase text-slate-500">Monthly Tuition</p>
-                          <p className="text-lg font-black text-white">৳{(record.fee || MONTHLY_TUITION_FEE).toLocaleString()} <span className="text-xs text-slate-400 font-normal">BDT</span></p>
+                          <p className="text-lg font-black text-white">{(record.fee || MONTHLY_TUITION_FEE)} <span className="text-xs text-slate-400 font-normal">SAR (Riyals)</span></p>
                         </div>
 
                         {/* Action buttons */}
@@ -848,11 +848,11 @@ export function AdminPaymentManager({ onStudentRecordUpdated }) {
                   onChange={(e) => setNewStudentMonth(Number(e.target.value))}
                   className="w-full rounded-xl border border-white/10 bg-slate-800 px-3 py-2 text-sm text-white focus:border-blue-400 focus:outline-none"
                 >
-                  <option value={1}>Month 1 (Classes 1–12) — ৳3,000</option>
-                  <option value={2}>Month 2 (Classes 13–24) — ৳3,000</option>
-                  <option value={3}>Month 3 (Classes 25–36) — ৳3,000</option>
-                  <option value={4}>Month 4 (Classes 37–48) — ৳3,000</option>
-                  <option value={5}>Month 5 (Classes 49–60) — ৳3,000</option>
+                  <option value={1}>Month 1 (Classes 1–12) — 50 SAR</option>
+                  <option value={2}>Month 2 (Classes 13–24) — 50 SAR</option>
+                  <option value={3}>Month 3 (Classes 25–36) — 50 SAR</option>
+                  <option value={4}>Month 4 (Classes 37–48) — 50 SAR</option>
+                  <option value={5}>Month 5 (Classes 49–60) — 50 SAR</option>
                 </select>
               </div>
 

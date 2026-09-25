@@ -29,6 +29,7 @@ import { getUnlinkedPrivateBatchEmails, isEmailLinkedWithPrivateBatch, useAppCon
 import { ROLES, isStudentPreview } from '../utils/roles.js';
 import { BankDetailsModal } from '../components/BankDetailsModal.jsx';
 import { TransferSubmissionModal } from '../components/TransferSubmissionModal.jsx';
+import { StudentPaymentCard } from '../components/StudentPaymentCard.jsx';
 import { getBankSettings, submitTransferDetails, MONTHLY_TUITION_FEE } from '../utils/paymentService.js';
 
 const LEARNER_PREVIEW_DAYS = 8;
@@ -522,6 +523,15 @@ export function DailyLessonsPage() {
               <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-0.5 text-[11px] font-bold text-emerald-300">
                 <CheckCircle2 size={13} /> Lifetime Access Preserved
               </span>
+
+              <button
+                type="button"
+                onClick={handleOpenBankDetails}
+                className="inline-flex items-center gap-1.5 rounded-full border border-cyan-400/40 bg-cyan-500/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-cyan-200 hover:bg-cyan-500/25 transition shadow-sm"
+              >
+                <span>💳</span>
+                <span>Bank Details (50 SAR)</span>
+              </button>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
@@ -562,6 +572,9 @@ export function DailyLessonsPage() {
             </div>
           </div>
 
+          {/* STUDENT TUITION & BANK PAYMENT CARD */}
+          <StudentPaymentCard user={state} />
+
           {selectedPaidMonth !== 'all' && selectedPaidMonth > studentPaidMonths && !isWebDeveloper && (
             <div className="rounded-2xl border border-amber-400/30 bg-amber-500/10 p-5 text-amber-200 shadow-lg space-y-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -570,7 +583,7 @@ export function DailyLessonsPage() {
                   <div>
                     <h4 className="text-sm font-black text-white">Month {selectedPaidMonth} Enrollment Required (Days {(selectedPaidMonth - 1) * 12 + 1}–{selectedPaidMonth * 12})</h4>
                     <p className="mt-1 text-xs leading-relaxed text-amber-200/80">
-                      Your current subscription covers up to Month {studentPaidMonths} (Days 1–{studentPaidMonths * 12}). Your completed classes remain permanently stored in your account. Transfer the tuition fee (৳{MONTHLY_TUITION_FEE.toLocaleString()} BDT) for Month {selectedPaidMonth} to unlock these lessons.
+                      Your current subscription covers up to Month {studentPaidMonths} (Days 1–{studentPaidMonths * 12}). Your completed classes remain permanently stored in your account. Transfer the tuition fee (50 SAR / 50 Riyals) for Month {selectedPaidMonth} to unlock these lessons.
                     </p>
                   </div>
                 </div>
