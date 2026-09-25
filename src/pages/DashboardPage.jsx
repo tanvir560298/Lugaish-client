@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { Award, BookOpenCheck, CheckCircle2, ChevronDown, ClipboardList, FilePenLine, GraduationCap, Link2, Lock, Mail, Plus, RefreshCw, Send, ShieldCheck, Sparkles, Trash2, TrendingUp, UsersRound } from 'lucide-react';
+import { Award, BookOpenCheck, Building2, CheckCircle2, ChevronDown, ClipboardList, FilePenLine, GraduationCap, Link2, Lock, Mail, Plus, RefreshCw, Send, ShieldCheck, Sparkles, Trash2, TrendingUp, UsersRound } from 'lucide-react';
 import { api } from '../api/client.js';
 import { getUnlinkedPrivateBatchEmails, isEmailLinkedWithPrivateBatch, useAppContext } from '../state/AppContext.jsx';
 import { TanvirCoursesManagementPanel } from '../components/TanvirCoursesManagementPanel.jsx';
+import { StudentPaymentCard } from '../components/StudentPaymentCard.jsx';
+import { AdminPaymentManager } from '../components/AdminPaymentManager.jsx';
 import { ROLE_LABELS, ROLE_VALUES, ROLES, getViewedRole, hasPermission, isStudentPreview, normalizeRole } from '../utils/roles.js';
 import { getEffectiveCourseStartKey, hasCourseStarted } from '../utils/courseLaunch.js';
 import { getLocalCertificates, saveLocalCertificate, getEligibleLocalMilestones, purgeInvalidLocalCertificates, getViewedCertificateCodes, markCertificateViewed } from '../utils/certificateStorage.js';
@@ -1027,6 +1029,12 @@ export function DashboardPage() {
               {achievementError && <p className="mt-4 text-sm font-semibold text-red-200">{achievementError}</p>}
             </div>
           )}
+
+          {/* --- STUDENT TUITION & MANUAL PAYMENT CARD --- */}
+          {(!isStaff || isStudentPreview(state) || state.privateBatchAccess) && (
+            <StudentPaymentCard user={state} />
+          )}
+
           {isStaff && (
             <div className="section-card p-6 sm:p-8">
               <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
@@ -1038,7 +1046,7 @@ export function DashboardPage() {
                       ? 'Your course changes are isolated in a private tester sandbox and never alter learner-facing content.'
                       : role === ROLES.intern
                         ? 'You can add, edit, upload, and publish website content. Existing content and accounts cannot be deleted from your Intern account.'
-                      : 'Your dashboard changes based on account role. Learners see progress, staff see publishing and lesson tools, and the web developer can manage roles.'}
+                        : 'Your dashboard changes based on account role. Learners see progress, staff see publishing and lesson tools, and the web developer can manage roles.'}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -1050,13 +1058,21 @@ export function DashboardPage() {
                 </div>
               </div>
 
-              <div className={`mt-6 grid gap-4 md:grid-cols-2 ${isWebDeveloper ? 'xl:grid-cols-5' : 'xl:grid-cols-4'}`}>
+              <div className={`mt-6 grid gap-4 md:grid-cols-2 ${(isWebDeveloper || canManageRoles) ? 'xl:grid-cols-6' : 'xl:grid-cols-4'}`}>
                 {isWebDeveloper && (
                   <StaffActionCard
                     icon={<GraduationCap size={21} />}
                     title="Tanvir's Courses"
                     description="View, launch, and work with courses offered by Tanvir Ahmad."
                     to="#tanvir-courses-hub"
+                  />
+                )}
+                {(canManageRoles || isWebDeveloper) && (
+                  <StaffActionCard
+                    icon={<Building2 size={21} />}
+                    title="Tuition Payments"
+                    description="Bank screenshot, student verification queue, and manual payment confirmations."
+                    to="#tuition-payment-manager"
                   />
                 )}
                 <StaffActionCard
@@ -1092,6 +1108,8 @@ export function DashboardPage() {
           )}
 
           {isWebDeveloper && <TanvirCoursesManagementPanel />}
+
+          {(canManageRoles || isWebDeveloper) && <AdminPaymentManager />}
 
           <RoleManagementPanel canManageRoles={canManageRoles} canViewRoles={canViewRoles} />
 

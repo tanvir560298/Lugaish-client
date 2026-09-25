@@ -27,6 +27,9 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { getUnlinkedPrivateBatchEmails, isEmailLinkedWithPrivateBatch, useAppContext } from '../state/AppContext.jsx';
 import { ROLES, isStudentPreview } from '../utils/roles.js';
+import { BankDetailsModal } from '../components/BankDetailsModal.jsx';
+import { TransferSubmissionModal } from '../components/TransferSubmissionModal.jsx';
+import { getBankSettings, submitTransferDetails, MONTHLY_TUITION_FEE } from '../utils/paymentService.js';
 
 const LEARNER_PREVIEW_DAYS = 8;
 const WEB_DEVELOPER_PLANNING_DAYS = 90;
@@ -260,6 +263,32 @@ export function DailyLessonsPage() {
       });
     }
   };
+
+  // Manual payment state & modals
+  const [isBankModalOpen, setIsBankModalOpen] = useState(false);
+  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+  const [bankDetails, setBankDetails] = useState(null);
+  const [submissionNotice, setSubmissionNotice] = useState('');
+
+  const handleOpenBankDetails = async () => {
+    try {
+      const details = await getBankSettings();
+      setBankDetails(details);
+    } catch {
+      // Fallback
+    }
+    setIsBankModalOpen(true);
+  };
+
+  const handleSubmitTransfer = async (formData) => {
+    await submitTransferDetails(state.userEmail, state.userName, { 
+      ...formData, 
+      month: selectedPaidMonth !== 'all' ? selectedPaidMonth : 2 
+    });
+    setSubmissionNotice(`Transfer details submitted for Month ${selectedPaidMonth !== 'all' ? selectedPaidMonth : 2}! We'll verify and update you within 24 hours.`);
+    setTimeout(() => setSubmissionNotice(''), 6000);
+  };
+
   const emailLower = (state.userEmail || '').toLowerCase();
   const unlinkedEmails = getUnlinkedPrivateBatchEmails().map(e => String(e).toLowerCase());
   const isRevoked = Boolean(state.privateBatchExplicitlyRevoked || (emailLower && unlinkedEmails.includes(emailLower)));
@@ -534,16 +563,42 @@ export function DailyLessonsPage() {
           </div>
 
           {selectedPaidMonth !== 'all' && selectedPaidMonth > studentPaidMonths && !isWebDeveloper && (
-            <div className="rounded-2xl border border-amber-400/30 bg-amber-500/10 p-5 text-amber-200 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <Lock className="shrink-0 text-amber-400" size={24} />
-                <div>
-                  <h4 className="text-sm font-black text-white">Month {selectedPaidMonth} Enrollment Required (Days {(selectedPaidMonth - 1) * 12 + 1}–{selectedPaidMonth * 12})</h4>
-                  <p className="mt-1 text-xs leading-relaxed text-amber-200/80">
-                    Your current subscription covers up to Month {studentPaidMonths} (Days 1–{studentPaidMonths * 12}). Your completed Month 1 classes remain permanently stored in your account. Contact Tanvir to enroll in Month {selectedPaidMonth}.
-                  </p>
+            <div className="rounded-2xl border border-amber-400/30 bg-amber-500/10 p-5 text-amber-200 shadow-lg space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <Lock className="shrink-0 text-amber-400" size={24} />
+                  <div>
+                    <h4 className="text-sm font-black text-white">Month {selectedPaidMonth} Enrollment Required (Days {(selectedPaidMonth - 1) * 12 + 1}–{selectedPaidMonth * 12})</h4>
+                    <p className="mt-1 text-xs leading-relaxed text-amber-200/80">
+                      Your current subscription covers up to Month {studentPaidMonths} (Days 1–{studentPaidMonths * 12}). Your completed classes remain permanently stored in your account. Transfer the tuition fee (৳{MONTHLY_TUITION_FEE.toLocaleString()} BDT) for Month {selectedPaidMonth} to unlock these lessons.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleOpenBankDetails}
+                    className="rounded-xl border border-white/20 bg-white/10 px-3.5 py-2 text-xs font-bold text-white hover:bg-white/20 transition"
+                  >
+                    View bank details
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsSubmitModalOpen(true)}
+                    className="rounded-xl border border-purple-400/30 bg-purple-600 px-3.5 py-2 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-purple-900/40 hover:bg-purple-500 transition"
+                  >
+                    I've transferred payment
+                  </button>
                 </div>
               </div>
+
+              {submissionNotice && (
+                <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/15 p-3 text-xs font-bold text-emerald-200">
+                  <CheckCircle2 size={16} className="shrink-0 text-emerald-400" />
+                  <span>{submissionNotice}</span>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -597,8 +652,8 @@ export function DailyLessonsPage() {
 
             presentation = {
               label: day.staticLesson?.dayType || (dayNum === 1 ? 'Listening Day' : `Month ${dayMonth} · Class ${dayNum}`),
-              startLabel: dayNum === 1 ? 'Launch Day 1 Masterclass' : (dayNum === 2 ? 'Launch Day 2 Speaking' : (dayNum === 3 ? 'Launch Day 3 Joint Module' : `Open Class ${dayNum}`)),
-              reviewLabel: dayNum === 1 ? 'Review Day 1 Masterclass' : (dayNum === 2 ? 'Review Day 2 Speaking' : (dayNum === 3 ? 'Review Day 3 Joint Module' : `Review Class ${dayNum}`)),
+              startLabel: dayNum === 1 ? 'Launch Day 1 Masterclass' : (dayNum === 2 ? 'Launch Day 2 Speaking' : (dayNum === 3 ? 'Launch Day 3 Joint Module' : (dayNum === 4 ? 'Launch Day 4 Dialogue Practice' : `Open Class ${dayNum}`))),
+              reviewLabel: dayNum === 1 ? 'Review Day 1 Masterclass' : (dayNum === 2 ? 'Review Day 2 Speaking' : (dayNum === 3 ? 'Review Day 3 Joint Module' : (dayNum === 4 ? 'Review Day 4 Dialogue Practice' : `Review Class ${dayNum}`))),
               Icon: IconComponent,
               accent: isJointModule ? 'text-cyan-300' : (isWriting ? 'text-amber-300' : (isSpeaking ? 'text-emerald-300' : 'text-purple-300')),
             };
@@ -1237,6 +1292,23 @@ export function DailyLessonsPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Bank Details Modal */}
+      <BankDetailsModal
+        isOpen={isBankModalOpen}
+        onClose={() => setIsBankModalOpen(false)}
+        bankDetails={bankDetails}
+      />
+
+      {/* Transfer Submission Modal */}
+      <TransferSubmissionModal
+        isOpen={isSubmitModalOpen}
+        onClose={() => setIsSubmitModalOpen(false)}
+        onSubmit={handleSubmitTransfer}
+        month={selectedPaidMonth !== 'all' ? selectedPaidMonth : 2}
+        studentName={state.userName || ''}
+        fee={MONTHLY_TUITION_FEE}
+      />
     </section>
   );
 }

@@ -1732,17 +1732,19 @@ export function LessonPage() {
                               <PenTool size={13} /> Writing & Speaking Joint Module
                             </span>
                             <span className="inline-flex items-center gap-1 rounded-full border border-purple-400/30 bg-purple-500/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-purple-200">
-                              Class 03 · 10-Sentence Self-Intro & Routine
+                              {day === 4 ? 'Class 04 · Dialogue Practice Session (Speaking & Writing)' : 'Class 03 · 10-Sentence Self-Intro & Routine'}
                             </span>
                             <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-emerald-300">
-                              <Bot size={13} /> AI Evaluator System
+                              <Bot size={13} /> {day === 4 ? 'AI Practice Partner' : 'AI Evaluator System'}
                             </span>
                           </div>
                           <h3 className="text-2xl sm:text-3xl font-black text-white">
-                            Day 3: Handwritten Paragraph AI Evaluation & Routine Speaking Sprint
+                            {day === 4 ? 'Day 4: Dialogue Practice Session — Writing & Speaking Joint Module with AI Partner' : 'Day 3: Handwritten Paragraph AI Evaluation & Routine Speaking Sprint'}
                           </h3>
                           <p className="text-sm text-slate-300 max-w-3xl leading-relaxed">
-                            আজকের ক্লাসে আমরা ইংরেজি লিখন ও কথন—উভয় মাধ্যমেই নিজেদের দৈনন্দিন রুটিন এবং পরিচয় প্রকাশের দক্ষতা তৈরি করব। খাতার প্যারাগ্রাফের ছবি তুলে নিচে দেওয়া <strong>Tanvir's AI Evaluator Prompt</strong> দিয়ে তাৎক্ষণিক মূল্যায়ন করুন এবং একই সাথে স্পিকিং ড্রিল সম্পন্ন করুন।
+                            {day === 4
+                              ? 'আজকের ক্লাসে আমরা ইংরেজি লিখন ও কথনের সমন্বয়ে ডায়ালগ বা কথোপকথন অনুশীলন (Dialogue Practice) করব। নিচে দেওয়া AI প্রম্পটটি কপি করে ChatGPT বা Claude-এ পেস্ট করে একজন ধৈর্যশীল স্পিকিং পার্টনারের সাথে সহজ ৪টি প্রশ্নের ডায়ালগ সম্পন্ন করুন এবং তাত্ক্ষণিক ফিডব্যাক রিপোর্ট নিন।'
+                              : 'আজকের ক্লাসে আমরা ইংরেজি লিখন ও কথন—উভয় মাধ্যমেই নিজেদের দৈনন্দিন রুটিন এবং পরিচয় প্রকাশের দক্ষতা তৈরি করব। খাতার প্যারাগ্রাফের ছবি তুলে নিচে দেওয়া Tanvir\'s AI Evaluator Prompt দিয়ে তাৎক্ষণিক মূল্যায়ন করুন এবং একই সাথে স্পিকিং ড্রিল সম্পন্ন করুন।'}
                           </p>
                         </div>
 
@@ -1758,7 +1760,7 @@ export function LessonPage() {
                             } py-3.5 px-5 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition hover:scale-[1.02]`}
                           >
                             {isPromptCopied ? <Check size={16} /> : <Copy size={16} />}
-                            <span>{isPromptCopied ? 'Copied to Clipboard!' : 'Copy Evaluation Prompt'}</span>
+                            <span>{isPromptCopied ? 'Copied to Clipboard!' : (day === 4 ? 'Copy Dialogue Practice Prompt' : 'Copy Evaluation Prompt')}</span>
                           </button>
                           <a
                             href="https://chatgpt.com"
@@ -1776,37 +1778,71 @@ export function LessonPage() {
                         <h4 className="text-xs font-black uppercase tracking-wider text-cyan-300 mb-3 flex items-center gap-1.5">
                           <Sparkles size={14} /> How to complete today's assignment (সহজ ৩টি ধাপ):
                         </h4>
-                        <div className="grid gap-3.5 sm:grid-cols-3">
-                          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-1.5 transition hover:border-cyan-400/40">
-                            <div className="flex items-center gap-2">
-                              <span className="grid h-6 w-6 place-items-center rounded-full bg-cyan-500/20 text-xs font-black text-cyan-300">1</span>
-                              <p className="text-sm font-black text-white">খাতায় ১০ বাক্য লিখুন</p>
+                        {day === 4 ? (
+                          <div className="grid gap-3.5 sm:grid-cols-3">
+                            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-1.5 transition hover:border-cyan-400/40">
+                              <div className="flex items-center gap-2">
+                                <span className="grid h-6 w-6 place-items-center rounded-full bg-cyan-500/20 text-xs font-black text-cyan-300">1</span>
+                                <p className="text-sm font-black text-white">প্রম্পটটি কপি করুন</p>
+                              </div>
+                              <p className="text-xs text-slate-300 leading-relaxed">
+                                নিচের <strong>"Copy Dialogue Practice Prompt"</strong> বাটনে ক্লিক করুন। পুরো প্র্যাকটিস পার্টনার ফ্রেমওয়ার্ক আপনার ক্লিপবোর্ডে কপি হবে।
+                              </p>
                             </div>
-                            <p className="text-xs text-slate-300 leading-relaxed">
-                              নিজের পরিচয় ও প্রতিদিনের রুটিন নিয়ে খাতায় প্রায় ১০টি বাক্য স্পষ্ট হস্তাক্ষরে লিখুন এবং ভালো আলোতে ছবি তুলুন।
-                            </p>
-                          </div>
 
-                          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-1.5 transition hover:border-purple-400/40">
-                            <div className="flex items-center gap-2">
-                              <span className="grid h-6 w-6 place-items-center rounded-full bg-purple-500/20 text-xs font-black text-purple-300">2</span>
-                              <p className="text-sm font-black text-white">প্রম্পটটি কপি করুন</p>
+                            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-1.5 transition hover:border-purple-400/40">
+                              <div className="flex items-center gap-2">
+                                <span className="grid h-6 w-6 place-items-center rounded-full bg-purple-500/20 text-xs font-black text-purple-300">2</span>
+                                <p className="text-sm font-black text-white">AI-তে পেস্ট ও স্টার্ট</p>
+                              </div>
+                              <p className="text-xs text-slate-300 leading-relaxed">
+                                ChatGPT বা Claude খুলে প্রম্পট পেস্ট করুন। আপনি টেক্সট চ্যাটে লিখতে পারেন অথবা Voice Mode চালু করে সরাসরি কথা বলতে পারেন।
+                              </p>
                             </div>
-                            <p className="text-xs text-slate-300 leading-relaxed">
-                              নিচের <strong>"Copy Evaluation Prompt"</strong> বাটনে ক্লিক করুন। পুরো ইনস্ট্রাক্টর ফ্রেমওয়ার্ক আপনার ক্লিপবোর্ডে কপি হবে।
-                            </p>
-                          </div>
 
-                          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-1.5 transition hover:border-emerald-400/40">
-                            <div className="flex items-center gap-2">
-                              <span className="grid h-6 w-6 place-items-center rounded-full bg-emerald-500/20 text-xs font-black text-emerald-300">3</span>
-                              <p className="text-sm font-black text-white">AI-তে ছবি আপলোড করুন</p>
+                            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-1.5 transition hover:border-emerald-400/40">
+                              <div className="flex items-center gap-2">
+                                <span className="grid h-6 w-6 place-items-center rounded-full bg-emerald-500/20 text-xs font-black text-emerald-300">3</span>
+                                <p className="text-sm font-black text-white">৪টি প্রশ্ন ও রিপোর্ট</p>
+                              </div>
+                              <p className="text-xs text-slate-300 leading-relaxed">
+                                AI আপনাকে একটি একটি করে মোট ৪টি সহজ প্রশ্ন করবে। উত্তর শেষ হলে স্বয়ংক্রিয়ভাবে ২৫০ শব্দের সামারি ও কারেকশন রিপোর্ট পাবেন।
+                              </p>
                             </div>
-                            <p className="text-xs text-slate-300 leading-relaxed">
-                              ChatGPT / Claude / Gemini খুলে প্রম্পট পেস্ট করুন এবং খাতার ছবিটি আপলোড দিন। তাৎক্ষণিক মূল্যায়ন ও কারেকশন পেয়ে যাবেন।
-                            </p>
                           </div>
-                        </div>
+                        ) : (
+                          <div className="grid gap-3.5 sm:grid-cols-3">
+                            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-1.5 transition hover:border-cyan-400/40">
+                              <div className="flex items-center gap-2">
+                                <span className="grid h-6 w-6 place-items-center rounded-full bg-cyan-500/20 text-xs font-black text-cyan-300">1</span>
+                                <p className="text-sm font-black text-white">খাতায় ১০ বাক্য লিখুন</p>
+                              </div>
+                              <p className="text-xs text-slate-300 leading-relaxed">
+                                নিজের পরিচয় ও প্রতিদিনের রুটিন নিয়ে খাতায় প্রায় ১০টি বাক্য স্পষ্ট হস্তাক্ষরে লিখুন এবং ভালো আলোতে ছবি তুলুন।
+                              </p>
+                            </div>
+
+                            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-1.5 transition hover:border-purple-400/40">
+                              <div className="flex items-center gap-2">
+                                <span className="grid h-6 w-6 place-items-center rounded-full bg-purple-500/20 text-xs font-black text-purple-300">2</span>
+                                <p className="text-sm font-black text-white">প্রম্পটটি কপি করুন</p>
+                              </div>
+                              <p className="text-xs text-slate-300 leading-relaxed">
+                                নিচের <strong>"Copy Evaluation Prompt"</strong> বাটনে ক্লিক করুন। পুরো ইনস্ট্রাক্টর ফ্রেমওয়ার্ক আপনার ক্লিপবোর্ডে কপি হবে।
+                              </p>
+                            </div>
+
+                            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-1.5 transition hover:border-emerald-400/40">
+                              <div className="flex items-center gap-2">
+                                <span className="grid h-6 w-6 place-items-center rounded-full bg-emerald-500/20 text-xs font-black text-emerald-300">3</span>
+                                <p className="text-sm font-black text-white">AI-তে ছবি আপলোড করুন</p>
+                              </div>
+                              <p className="text-xs text-slate-300 leading-relaxed">
+                                ChatGPT / Claude / Gemini খুলে প্রম্পট পেস্ট করুন এবং খাতার ছবিটি আপলোড দিন। তাৎক্ষণিক মূল্যায়ন ও কারেকশন পেয়ে যাবেন।
+                              </p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1821,17 +1857,19 @@ export function LessonPage() {
                         <div>
                           <div className="flex items-center gap-2">
                             <span className="inline-flex items-center gap-1 rounded-full border border-cyan-400/30 bg-cyan-500/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-cyan-200">
-                              📋 Official AI Instructor Prompt
+                              {day === 4 ? '💬 Official AI Practice Partner Prompt' : '📋 Official AI Instructor Prompt'}
                             </span>
                             <span className="text-[10px] font-bold text-slate-400">
-                              Classroom IELTS Foundation Evaluator
+                              {day === 4 ? 'Beginner IELTS Dialogue Practice Partner' : 'Classroom IELTS Foundation Evaluator'}
                             </span>
                           </div>
                           <h4 className="mt-1 text-xl sm:text-2xl font-black text-white">
-                            Handwritten Paragraph AI Evaluation System Prompt
+                            {day === 4 ? 'AI Dialogue Practice Partner & Feedback System Prompt' : 'Handwritten Paragraph AI Evaluation System Prompt'}
                           </h4>
                           <p className="text-xs text-slate-300">
-                            Tanvir's 10-point evaluation criteria (Band 1+ foundation threshold, simple spelling detection & single best learning word).
+                            {day === 4
+                              ? 'Tanvir\'s 4-question conversational dialogue framework, gentle patient pacing & 5-step beginner feedback report.'
+                              : 'Tanvir\'s 10-point evaluation criteria (Band 1+ foundation threshold, simple spelling detection & single best learning word).'}
                           </p>
                         </div>
                       </div>
@@ -1849,7 +1887,7 @@ export function LessonPage() {
                           } py-2.5 px-5 text-xs font-black uppercase tracking-wider flex items-center gap-2 transition hover:scale-[1.02]`}
                         >
                           {isPromptCopied ? <Check size={16} /> : <Copy size={16} />}
-                          <span>{isPromptCopied ? 'Copied Prompt!' : 'Copy Evaluation Prompt'}</span>
+                          <span>{isPromptCopied ? 'Copied Prompt!' : (day === 4 ? 'Copy Dialogue Practice Prompt' : 'Copy Evaluation Prompt')}</span>
                         </button>
                       </div>
                     </div>
@@ -1931,7 +1969,7 @@ export function LessonPage() {
                           } py-2 px-4 text-xs font-bold flex items-center justify-center gap-1.5 self-end sm:self-auto`}
                         >
                           {isPromptCopied ? <Check size={14} /> : <Copy size={14} />}
-                          <span>{isPromptCopied ? 'Copied to Clipboard' : 'Copy Full Prompt'}</span>
+                          <span>{isPromptCopied ? 'Copied to Clipboard' : (day === 4 ? 'Copy Full Dialogue Prompt' : 'Copy Full Prompt')}</span>
                         </button>
                       </div>
                     </div>
@@ -1947,47 +1985,69 @@ export function LessonPage() {
                         <div>
                           <div className="flex items-center gap-2">
                             <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-200">
-                              🎙️ Speaking Drill · 90 Seconds
+                              {day === 4 ? '🎙️ Dialogue & Speaking Drill · 90 Seconds' : '🎙️ Speaking Drill · 90 Seconds'}
                             </span>
                             <span className="text-[10px] font-bold text-slate-400">
-                              Present Simple vs Present Continuous
+                              {day === 4 ? 'Past Simple Experience & Dialogue Flow' : 'Present Simple vs Present Continuous'}
                             </span>
                           </div>
                           <h4 className="mt-1 text-xl sm:text-2xl font-black text-white">
-                            Speaking Practice: Daily Routine vs Right-Now Occurrences
+                            {day === 4 ? 'Speaking Practice: Past Experience & Conversational Dialogue' : 'Speaking Practice: Daily Routine vs Right-Now Occurrences'}
                           </h4>
                           <p className="text-xs text-slate-300">
-                            Contrast habitual actions with what you are doing right now without stumbling on auxiliary verbs.
+                            {day === 4
+                              ? 'Describe past events using simple past verbs (went, saw, bought) and respond to everyday dialogue questions with confidence.'
+                              : 'Contrast habitual actions with what you are doing right now without stumbling on auxiliary verbs.'}
                           </p>
                         </div>
                       </div>
 
                       <a
-                        href="/speaking-practice?language=english&day=3"
+                        href={`/speaking-practice?language=english&day=${day}`}
                         className="glow-button glow-button-green py-3 px-5 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition hover:scale-[1.02] shrink-0"
                       >
                         <Mic size={16} />
-                        <span>Launch Day 3 Speaking Drill</span>
+                        <span>{day === 4 ? 'Launch Day 4 Dialogue Drill' : 'Launch Day 3 Speaking Drill'}</span>
                       </a>
                     </div>
 
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
-                        <h5 className="text-xs font-black uppercase tracking-wider text-emerald-300">Pattern 1: Habitual Routine (Present Simple)</h5>
-                        <p className="text-sm text-slate-200 leading-relaxed font-sans">
-                          "I usually wake up at 7:00 AM, take a light breakfast, and review my English vocabulary for 30 minutes."
-                        </p>
-                        <p className="text-xs text-slate-400 italic">💡 Rule: No "am/is/are" before action verbs (Never say "I am wake up").</p>
-                      </div>
+                    {day === 4 ? (
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
+                          <h5 className="text-xs font-black uppercase tracking-wider text-emerald-300">Pattern 1: Past Experience (went / bought / visited)</h5>
+                          <p className="text-sm text-slate-200 leading-relaxed font-sans">
+                            "Last weekend, I went to the local market and bought some fresh fruits for my family."
+                          </p>
+                          <p className="text-xs text-slate-400 italic">💡 Rule: Use past simple verbs directly for completed actions without auxiliary confusion.</p>
+                        </div>
 
-                      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
-                        <h5 className="text-xs font-black uppercase tracking-wider text-cyan-300">Pattern 2: Current Focus (Present Continuous)</h5>
-                        <p className="text-sm text-slate-200 leading-relaxed font-sans">
-                          "Right now, I am preparing for my IELTS exam and practicing to bridge my foundation up to Band 6.0."
-                        </p>
-                        <p className="text-xs text-slate-400 italic">💡 Rule: "am/is/are" + verb-ing indicates what is taking place right now.</p>
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
+                          <h5 className="text-xs font-black uppercase tracking-wider text-cyan-300">Pattern 2: Conversational Dialogue Response</h5>
+                          <p className="text-sm text-slate-200 leading-relaxed font-sans">
+                            "Yes, I really enjoy spending time with my family because it helps me feel relaxed and happy."
+                          </p>
+                          <p className="text-xs text-slate-400 italic">💡 Rule: Give a direct answer first, then add a simple reason using "because".</p>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
+                          <h5 className="text-xs font-black uppercase tracking-wider text-emerald-300">Pattern 1: Habitual Routine (Present Simple)</h5>
+                          <p className="text-sm text-slate-200 leading-relaxed font-sans">
+                            "I usually wake up at 7:00 AM, take a light breakfast, and review my English vocabulary for 30 minutes."
+                          </p>
+                          <p className="text-xs text-slate-400 italic">💡 Rule: No "am/is/are" before action verbs (Never say "I am wake up").</p>
+                        </div>
+
+                        <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
+                          <h5 className="text-xs font-black uppercase tracking-wider text-cyan-300">Pattern 2: Current Focus (Present Continuous)</h5>
+                          <p className="text-sm text-slate-200 leading-relaxed font-sans">
+                            "Right now, I am preparing for my IELTS exam and practicing to bridge my foundation up to Band 6.0."
+                          </p>
+                          <p className="text-xs text-slate-400 italic">💡 Rule: "am/is/are" + verb-ing indicates what is taking place right now.</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Curriculum Core Breakdown Grid */}
@@ -2019,8 +2079,8 @@ export function LessonPage() {
                 </div>
               )}
 
-              {/* Other Days (when not Day 1, Day 2 reels, or Day 3 evaluation prompt): Standard Study Topic Overview */}
-              {day !== 1 && day !== 2 && day !== 3 && (!staticLesson?.reels || staticLesson.reels.length === 0) && !staticLesson?.evaluationPrompt && (
+              {/* Other Days (when not Day 1, Day 2 reels, or Day 3/Day 4 evaluation prompt): Standard Study Topic Overview */}
+              {day !== 1 && day !== 2 && day !== 3 && day !== 4 && (!staticLesson?.reels || staticLesson.reels.length === 0) && !staticLesson?.evaluationPrompt && (
                 <div className="section-card border-purple-500/30 p-6 sm:p-8 space-y-6">
                   <div className="flex items-center gap-3 border-b border-white/10 pb-4">
                     <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-purple-500/20 text-purple-300">

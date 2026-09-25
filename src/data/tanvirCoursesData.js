@@ -670,27 +670,27 @@ export function saveTanvirCourses(courses) {
 export function loadCoursePlan(courseId) {
   if (typeof window === 'undefined') return DEFAULT_COURSE_PLANS[courseId] || [];
   try {
-    const raw = localStorage.getItem(`lugaish_plan_${courseId}_v7`);
+    const raw = localStorage.getItem(`lugaish_plan_${courseId}_v8`);
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
         // Guarantee IELTS Band 7 has full 48 classes
         if (courseId === 'tanvir-ielts-comprehensive-band-7' && parsed.length < 48) {
           const fullPlan = DEFAULT_COURSE_PLANS[courseId];
-          localStorage.setItem(`lugaish_plan_${courseId}_v7`, JSON.stringify(fullPlan));
+          localStorage.setItem(`lugaish_plan_${courseId}_v8`, JSON.stringify(fullPlan));
           return fullPlan;
         }
         // Guarantee IELTS Band 6 has full 60 classes
         if (courseId === 'tanvir-ielts-foundation-band-6' && parsed.length < 60) {
           const fullPlan = DEFAULT_COURSE_PLANS[courseId];
-          localStorage.setItem(`lugaish_plan_${courseId}_v7`, JSON.stringify(fullPlan));
+          localStorage.setItem(`lugaish_plan_${courseId}_v8`, JSON.stringify(fullPlan));
           return fullPlan;
         }
         return parsed;
       }
     }
     const initial = DEFAULT_COURSE_PLANS[courseId] || [];
-    localStorage.setItem(`lugaish_plan_${courseId}_v7`, JSON.stringify(initial));
+    localStorage.setItem(`lugaish_plan_${courseId}_v8`, JSON.stringify(initial));
     return initial;
   } catch {
     return DEFAULT_COURSE_PLANS[courseId] || [];
@@ -700,7 +700,7 @@ export function loadCoursePlan(courseId) {
 export function saveCoursePlan(courseId, plan) {
   if (typeof window === 'undefined') return;
   try {
-    localStorage.setItem(`lugaish_plan_${courseId}_v7`, JSON.stringify(plan));
+    localStorage.setItem(`lugaish_plan_${courseId}_v8`, JSON.stringify(plan));
   } catch (err) {
     console.error('Failed to save course plan to localStorage', err);
   }

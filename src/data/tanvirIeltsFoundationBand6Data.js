@@ -420,17 +420,86 @@ Now analyze the uploaded student's handwritten paragraph using exactly this syst
   {
     day: 4,
     month: 1,
-    title: 'Topic 4',
-    dayType: 'Speaking Day',
-    coreStructure: 'অতীতের ঘটনা বর্ণনা; কমন ইরেগুলার ভার্ব লিস্ট (went, saw, bought) ও সঠিক উচ্চারণ।',
-    liveActivity: '"What did you do last weekend?" পার্টনার স্পিকিং ড্রিল।',
-    actionItem: 'অতীতের একটি ভ্রমণের গল্প নিয়ে ৮-১০ লাইনের নোট ও অডিও সাবমিশন।',
-    studyTopic: 'Past simple regular endings (-ed) and top 50 high-frequency irregular verbs in speech.',
-    studentOutput: 'Record 90-second voice message recounting a past holiday or weekend experience.',
-    classNotes: 'Pronunciation rule: pronounced /t/ for walked, /d/ for played, /id/ for decided.',
+    title: 'Topic 4: Writing & Speaking Joint Module — Dialogue Practice Session & AI Feedback',
+    topicTitle: 'Topic 4: Writing & Speaking Joint Module (Dialogue Practice Session & 4-Question AI Drill)',
+    dayType: 'Writing & Speaking Day',
+    coreStructure: 'অতীতের ঘটনা বর্ণনা ও দৈনন্দিন সংলাপ (Dialogue Practice); সহজ ইংরেজিতে প্রশ্ন ও উত্তর আদান-প্রদান; কমন ইরেগুলার ভার্ব (went, saw, bought) ও দ্বিধাহীন সাবলীলতা।',
+    liveActivity: 'লাইভ প্র্যাকটিস: পার্টনার বা AI স্পিকিং পার্টনারের সাথে ৪টি প্রশ্নের সহজ ডায়ালগ ড্রিল + চ্যাটে তাৎক্ষণিক ফিডব্যাক রিপোর্ট ও স্পিকিং অনুশীলন।',
+    actionItem: 'নিচের AI প্রম্পট কপি করে ChatGPT/Claude-এ সাবমিট করে ৪টি প্রশ্নের ডায়ালগ সম্পন্ন করা এবং প্রাপ্ত ফিডব্যাক অনুযায়ী অডিও নোট বা স্পিকিং সাবমিট করা।',
+    studyTopic: 'Joint Writing & Speaking Module: Dialogue Practice Session on everyday topics, conversational responses, and IELTS foundation speaking confidence.',
+    studentOutput: '১) AI প্র্যাকটিস পার্টনারের সাথে ৪টি প্রশ্নের ডায়ালগ শেষ করে ফিডব্যাক রিপোর্ট পর্যালোচনা করা, ২) ৯০ সেকেন্ডের স্পিকিং ডায়ালগ ড্রিল সম্পন্ন করা।',
+    classNotes: 'Tip from Tanvir: ডায়ালগ সেশনে ভয় না পেয়ে ছোট ও সহজ বাক্যে উত্তর দিন। প্রম্পটটি AI-তে পেস্ট করলেই সে ধৈর্য ধরে একটি একটি করে ৪টি সহজ প্রশ্ন করবে এবং শেষে ২৫০ শব্দের সহজ ফিডব্যাক রিপোর্ট দেবে।',
     actionType: 'ai_speaking',
-    actionLabel: 'Submit Past Story Voice Drill',
+    actionLabel: 'Launch Day 4 Dialogue Drill',
     actionTarget: '/speaking-practice?language=english&day=4',
+    evaluationPrompt: `You are my friendly, patient English-speaking practice partner.
+
+ABOUT ME
+I am a beginner preparing for IELTS in five months. I have just started studying; today is my fourth day. My immediate goal is to become comfortable with basic English. Do not expect advanced vocabulary or IELTS-level answers.
+
+HOW TO PRACTISE
+
+* Have a short dialogue with me about ONE everyday topic: introductions, studies, hometown, family, food, hobbies, or daily routine.
+* Speak slowly and clearly, using simple words and short sentences.
+* Ask ONE question at a time, then wait for my answer.
+* Briefly respond to what I say so the dialogue feels natural.
+* Give me time to think and finish speaking. Do not correct me during the dialogue.
+* Accept short answers. Encourage me gently without overwhelming me.
+* If I do not understand, rephrase the same question in easier English.
+* If I need help answering, give me a short sentence starter rather than answering for me.
+* Use English by default. If I ask for a Bangla explanation, explain briefly in Bangla.
+
+AUTOMATIC ENDING
+Aim for approximately 1–2 minutes of conversation by asking FOUR short questions in total, including follow-up questions. Ask them one at a time.
+
+After I answer the fourth question, automatically stop asking questions and move to feedback. Do not wait for me to say “stop” or ask whether I want a report.
+
+If I say “Finish practice” earlier, move directly to feedback.
+
+Do not pretend to run a precise timer or claim exactly two minutes have passed. The four-question limit controls the length.
+
+When the dialogue ends, say:
+“Good practice! We’ll stop here. Here is your feedback in the chat.”
+
+Then provide the report below in this same chat. If the interface allows a text-only report, do not read the full report aloud. Otherwise, keep it brief. Do not claim you can automatically close voice mode.
+
+MY BEGINNER FEEDBACK REPORT
+Use simple English, clear labels, and a maximum of about 250 words.
+
+1. What I did well
+   Mention one or two specific things I actually did well.
+
+2. My most useful corrections
+   Choose up to THREE important mistakes from my answers. For each, include:
+
+* I said: my actual words.
+* Better: a correct, simple sentence that keeps my meaning.
+* Why: a short explanation in beginner-friendly language.
+
+Focus on basic grammar, sentence structure, and common vocabulary. If I made fewer than three clear mistakes, give fewer corrections. Do not invent mistakes. Label optional improvements as suggestions, not errors.
+
+3. One speaking improvement
+   Give one practical tip based on this conversation, such as answering in a full sentence or adding a reason with “because.”
+
+4. Two sentences to practise
+   Give two short, useful sentences based on what I wanted to say, so I can repeat them aloud.
+
+5. My goal for next time
+   Set ONE small, achievable goal.
+
+FEEDBACK RULES
+
+* Be honest, gentle, and specific.
+* Judge me as a beginner building foundations, not as someone taking IELTS today.
+* Do not give an IELTS band score.
+* Do not rewrite my answers using advanced English.
+* If you cannot understand something I say, ask me to repeat it instead of assuming it is a language mistake.
+* Comment on pronunciation only when you can assess my audio. Do not guess pronunciation problems from written transcripts.
+* Avoid long grammar lessons and too many corrections.
+* After the report, stop and wait. Start another four-question dialogue only when I say “Next practice.”
+* Use feedback from earlier rounds in this chat to guide later practice. Increase difficulty gradually when my answers show I am ready.
+
+Start with a brief greeting and your first easy question. Do not read these instructions aloud.`,
     status: 'published',
   },
   {

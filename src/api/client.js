@@ -289,4 +289,40 @@ export const api = {
   activateLatestSignupCampaign() {
     return request('/email/campaigns/latest/activate-signup', { method: 'POST' });
   },
+  getBankDetails() {
+    return request('/payment/bank-details');
+  },
+  updateBankDetails(payload) {
+    return request('/payment/bank-details', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  },
+  getPaymentStatus() {
+    return request('/payment/status');
+  },
+  submitPaymentTransfer(payload) {
+    return request('/payment/submit', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+  listAdminPaymentRecords() {
+    return request('/payment/admin/records');
+  },
+  confirmPayment(payload) {
+    return request('/payment/admin/confirm', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+  remindPayment(payload) {
+    return request('/payment/admin/remind', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+  dismissPaymentNotification(id) {
+    return request(`/payment/notifications/${id}/dismiss`, { method: 'POST' });
+  },
 };
