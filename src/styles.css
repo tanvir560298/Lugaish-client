@@ -1278,3 +1278,23 @@ a {
   }
   .no-print { display: none !important; }
 }
+
+/* Keep learning destinations visible and clear on phones and tablets. */
+.learning-bottom-nav {
+  background: var(--surface-strong);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+.learning-bottom-nav a[aria-current='page'] {
+  background: rgba(59, 130, 246, 0.15);
+  color: var(--text-primary);
+  box-shadow: inset 0 2px #3b82f6;
+}
+.learning-bottom-nav a:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+}
+@media (max-width: 1279px) {
+  .has-mobile-navigation { padding-bottom: calc(5rem + env(safe-area-inset-bottom)); }
+}

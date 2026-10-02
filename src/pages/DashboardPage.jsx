@@ -894,6 +894,10 @@ export function DashboardPage() {
 
   return (
     <section className="space-y-10">
+      <div>
+        <h1 className="text-3xl font-bold text-white">{role === ROLES.learner ? 'My Progress' : 'Staff Dashboard'}</h1>
+        <p className="mt-2 text-slate-400">View your completed lessons, attendance, and certificates. To study, open My Classes.</p>
+      </div>
       <div className="grid gap-6 xl:grid-cols-[340px_1fr]">
         <aside className="space-y-6">
           <div className="section-card p-8 text-center">
@@ -1168,7 +1172,7 @@ export function DashboardPage() {
                 onClick={() => actions.switchPathway(selectedCourse)}
                 className="glow-button glow-button-blue justify-center text-center"
               >
-                Open Today
+                Go to My Classes
               </Link>
             </div>
           </div>

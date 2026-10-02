@@ -448,12 +448,12 @@ export function DailyLessonsPage() {
               {state.activePathway === 'paid_batch' ? '💎 Level 6 Private Batch · 60 Classes IELTS Bridge' : 'Daily lessons'}
             </p>
             <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl">
-              {state.activePathway === 'paid_batch' ? 'Level 6 IELTS Foundation Curriculum' : 'Pick today\'s learning box.'}
+              My Classes
             </h1>
             <p className="mt-4 text-base leading-relaxed text-slate-400 sm:text-lg">
               {state.activePathway === 'paid_batch'
                 ? 'Comprehensive 60-day IELTS bridge structured into 5 monthly phases (12 classes per month). Your unlocked months remain permanently preserved in your account.'
-                : 'Each date has one learning format chosen by your course team: a video lesson, AI practice session, or interview.'}
+                : 'Find your lessons, videos, PDFs, and quizzes here. Choose your course below, then open an available class.'}
             </p>
           </div>
         </div>
@@ -665,8 +665,8 @@ export function DailyLessonsPage() {
 
             presentation = {
               label: day.staticLesson?.dayType || (dayNum === 1 ? 'Listening Day' : `Month ${dayMonth} · Class ${dayNum}`),
-              startLabel: dayNum === 1 ? 'Launch Day 1 Masterclass' : (dayNum === 2 ? 'Launch Day 2 Speaking' : (dayNum === 3 ? 'Launch Day 3 Joint Module' : (dayNum === 4 ? 'Launch Day 4 Dialogue Practice' : `Open Class ${dayNum}`))),
-              reviewLabel: dayNum === 1 ? 'Review Day 1 Masterclass' : (dayNum === 2 ? 'Review Day 2 Speaking' : (dayNum === 3 ? 'Review Day 3 Joint Module' : (dayNum === 4 ? 'Review Day 4 Dialogue Practice' : `Review Class ${dayNum}`))),
+              startLabel: dayNum === 1 ? 'Start Listening Lesson' : (dayNum === 2 ? 'Start Speaking Practice' : (dayNum === 3 ? 'Start Lesson' : (dayNum === 4 ? 'Start Conversation Practice' : `Open Class ${dayNum}`))),
+              reviewLabel: dayNum === 1 ? 'Review Listening Lesson' : (dayNum === 2 ? 'Review Day 2 Speaking' : (dayNum === 3 ? 'Review Day 3 Joint Module' : (dayNum === 4 ? 'Review Day 4 Dialogue Practice' : `Review Class ${dayNum}`))),
               Icon: IconComponent,
               accent: isJointModule ? 'text-cyan-300' : (isWriting ? 'text-amber-300' : (isSpeaking ? 'text-emerald-300' : 'text-purple-300')),
             };
@@ -1061,7 +1061,7 @@ export function DailyLessonsPage() {
                   >
                     <span className="pointer-events-none absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full" />
                     <Headphones size={18} className="animate-pulse" />
-                    <span>{completed ? 'Review Day 1 Masterclass' : 'Launch Day 1 Listening Masterclass'}</span>
+                    <span>{completed ? 'Review Listening Lesson' : 'Start Listening Lesson'}</span>
                     <Sparkles size={16} className="text-amber-300 animate-spin" style={{ animationDuration: '4s' }} />
                   </button>
                 </div>
@@ -1176,7 +1176,7 @@ export function DailyLessonsPage() {
                   >
                     <span className="pointer-events-none absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full" />
                     <Film size={18} className="animate-pulse" />
-                    <span>{completed ? 'Review Day 2 Speaking Reels' : 'Launch Day 2 Speaking Reels Masterclass'}</span>
+                    <span>{completed ? 'Review Speaking Practice' : 'Start Speaking Practice'}</span>
                     <Sparkles size={16} className="text-amber-300 animate-spin" style={{ animationDuration: '4s' }} />
                   </button>
                 </div>

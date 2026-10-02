@@ -108,7 +108,7 @@ export function LoginPage({ mode = 'login' }) {
   const { state, actions } = useAppContext();
   const navigate = useNavigate();
   const location = useLocation();
-  const redirectTo = location.state?.from?.pathname ?? '/dashboard';
+  const redirectTo = location.state?.from?.pathname ?? '/daily-lessons';
   const isSignup = SIGNUP_ENABLED && (mode === 'signup' || location.pathname === '/signup');
   const incomingReferralCode = new URLSearchParams(location.search).get('ref')?.trim().toUpperCase() || '';
   const [isSubmitting, setIsSubmitting] = useState(false);

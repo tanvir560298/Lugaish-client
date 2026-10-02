@@ -12,7 +12,7 @@ export function AuthPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { actions, state } = useAppContext();
-  const redirectTo = location.state?.from?.pathname ?? '/dashboard';
+  const redirectTo = location.state?.from?.pathname ?? '/daily-lessons';
 
   if (state.isLoggedIn) {
     return <Navigate to={redirectTo} replace />;

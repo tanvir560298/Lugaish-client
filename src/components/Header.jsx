@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { useAppContext } from '../state/AppContext.jsx';
@@ -17,23 +17,24 @@ import {
   Code2,
   Eye,
 } from 'lucide-react';
-import { ROLES } from '../utils/roles.js';
+import { ROLES, getViewedRole } from '../utils/roles.js';
 import { getUnviewedCertificateCount } from '../utils/certificateStorage.js';
 
 const navLinks = [
-  { href: '/', label: 'Overview', icon: <LayoutDashboard size={16} />, exact: true },
-  { href: '/daily-lessons', label: 'Today', icon: <CalendarDays size={16} /> },
-  { href: '/pricing', label: 'Plans', icon: <CreditCard size={16} /> },
-  { href: '/architects', label: 'Architects', icon: <Hammer size={16} /> },
+  { href: '/', label: 'Home', description: 'Explore our courses and how learning works', icon: <LayoutDashboard size={16} />, exact: true },
+  { href: '/daily-lessons', label: 'My Classes', description: 'Your lessons, videos, PDFs, and quizzes', icon: <CalendarDays size={16} /> },
+  { href: '/pricing', label: 'Courses & Fees', description: 'Explore courses and pricing', icon: <CreditCard size={16} /> },
+  { href: '/architects', label: 'Our Team', description: 'Meet the people behind your courses', icon: <Hammer size={16} /> },
 ];
 
 export function Header() {
   const { state, actions } = useAppContext();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  useEffect(() => setMobileOpen(false), [location.pathname]);
   const level = Math.floor(state.xp / 500) + 1;
   const themeLabel = state.theme === 'dark' ? 'Light mode' : 'Dark mode';
-  const dashboardLink = { href: '/dashboard', label: 'Dashboard', icon: <Gauge size={16} /> };
+  const dashboardLink = { href: '/dashboard', label: getViewedRole(state) === ROLES.learner ? 'My Progress' : 'Staff Dashboard', description: 'View progress, attendance, and certificates', icon: <Gauge size={16} /> };
   const visibleNavLinks = state.isLoggedIn ? [...navLinks, dashboardLink] : navLinks;
   const canSwitchMode = state.userRole === ROLES.webDeveloper;
   const isTesterMode = canSwitchMode && state.webDeveloperMode === 'tester';
@@ -76,9 +77,11 @@ export function Header() {
                 <Link
                   key={link.href}
                   to={link.href}
+                  aria-current={isActive ? 'page' : undefined}
+                  title={link.description}
                   className={`
                     nav-link header-nav-link
-                    relative flex items-center gap-1.5 px-3 py-2 text-xs font-black uppercase tracking-[0.12em] transition-all 2xl:px-4
+                    relative flex items-center gap-1.5 px-3 py-2 text-xs font-semibold whitespace-nowrap transition-all 2xl:px-4
                     ${isActive ? 'nav-link-active text-white' : 'text-slate-400 hover:text-slate-200'}
                   `}
                 >
@@ -167,7 +170,9 @@ export function Header() {
           <button
             className="header-menu header-icon-button relative xl:hidden p-2 text-white bg-white/5 rounded-xl border border-white/10"
             onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Open navigation menu"
+            aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-navigation"
           >
             {unviewedCertificateCount > 0 && (
               <span className="absolute -top-1 -right-1 flex h-3 w-3">
@@ -187,7 +192,8 @@ export function Header() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="mobile-nav xl:hidden border-t border-white/5 bg-[#020617] overflow-hidden"
+            id="mobile-navigation"
+            className="mobile-nav max-h-[calc(100dvh-9rem)] overflow-y-auto xl:hidden border-t border-white/5 bg-[#020617]"
           >
             <div className="p-4 space-y-2 sm:p-6 sm:space-y-4">
               <button
@@ -222,11 +228,12 @@ export function Header() {
                   key={link.href}
                   to={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-between rounded-2xl px-3 py-3 text-lg font-black text-white italic sm:text-xl"
+                  aria-current={isLinkActive(link) ? 'page' : undefined}
+                  className={`flex items-center justify-between rounded-2xl px-3 py-3 text-base font-semibold text-white ${isLinkActive(link) ? 'bg-white/10' : ''}`}
                 >
                   <div className="flex items-center gap-4">
                     <span className="text-emerald-500">{link.icon}</span>
-                    {link.label}
+                    <span>{link.label}<span className="mt-1 block text-xs font-normal text-slate-400">{link.description}</span></span>
                   </div>
                   {link.href === '/dashboard' && unviewedCertificateCount > 0 && (
                     <span className="rounded-full bg-amber-400/20 border border-amber-400/40 px-2.5 py-0.5 text-xs font-black uppercase tracking-wider text-amber-300 not-italic">
