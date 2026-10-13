@@ -7,7 +7,9 @@
       "provenance": "Original implementation in this repository; no external models or texture downloads",
       "licensing": "Project source; no new third-party asset license",
       "scale": 1,
-      "animations": ["hinged entrance door"],
+      "animations": [
+        "hinged entrance door"
+      ],
       "cost": "1280x720 screen card, 768x256 signs, repeating 256x256 floor; one shadow-casting light at standard quality"
     },
     {
@@ -16,7 +18,12 @@
       "provenance": "Original procedural mesh implementation",
       "licensing": "Project source; no downloaded character assets",
       "scale": "approximately 1.77 metres tall",
-      "animations": ["idle", "walk", "run", "wave"],
+      "animations": [
+        "idle",
+        "walk",
+        "run",
+        "wave"
+      ],
       "replacementBoundary": "entity ref: x, z, yaw, animation, visible, waveUntil; replace Avatar without changing controller or teacher path"
     },
     {
@@ -26,7 +33,7 @@
       "licensing": "Existing project content; upstream redistribution rights were not independently established by this change",
       "scale": "aspect ratio derived from video metadata; letterboxed in a 3.74 x 2.104 metre screen",
       "animations": [],
-      "verification": "First clip: H.264, 1280x720, 30.835 seconds; actual texture playback verified in local Chrome"
+      "verification": "Historical verification only. Retired from public builds; originals retained in private archive and Git history. Never used as current authorized lecture content."
     },
     {
       "path": "server-authorized lesson videos via existing api.getLesson",

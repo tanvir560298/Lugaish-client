@@ -2,8 +2,10 @@ import { validateReleaseEnvironment } from "./scripts/release/validate-env.js";
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import { assertCleanReleaseSources } from "./scripts/release/clean-source.js";
+import { assertRetiredAssetsAbsent } from "./scripts/release/retired-assets.js";
 
 export default defineConfig(({ mode }) => {
+  assertRetiredAssetsAbsent("public");
   let evidence;
   if (process.env.RELEASE_BUILD === "true") {
     const env = {

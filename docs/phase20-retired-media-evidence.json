@@ -1,0 +1,31 @@
+{
+  "privateArchiveIgnored": true,
+  "backupHashesVerified": true,
+  "permanentlyDeleted": false,
+  "files": [
+    {
+      "originalPath": "public/audio/day1-ielts-listening-audio.mp3",
+      "bytes": 992804,
+      "sha256": "a9ca34a002ed18efc886f44e8add7218cc3f0f9feb8d5a8e40671312ea6ee0d2",
+      "restorable": true
+    },
+    {
+      "originalPath": "public/audio/day1-ielts-listening-audio-2.mp3",
+      "bytes": 647276,
+      "sha256": "5ac95a22a576a67d806ed2eab7d70bb4cfd2eca800f390b218d916e78f7eb806",
+      "restorable": true
+    },
+    {
+      "originalPath": "public/images/day1-listening-question-sheet.jpg",
+      "bytes": 1810288,
+      "sha256": "0f565ab15aaadceffd42008f5a0cbe79932cbc255b7e9daa5d95067b3068f7de",
+      "restorable": true
+    },
+    {
+      "originalPath": "src/data/tanvirIeltsFoundationBand6Data.js",
+      "bytes": 92482,
+      "sha256": "2988c41f33f254b95af6f0ae60f6ec65623c7c53f998e201fa017f110c1d9dd3",
+      "restorable": true
+    }
+  ]
+}

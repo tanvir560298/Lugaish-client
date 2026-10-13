@@ -1,210 +1,149 @@
-import { LearningNext } from '../learning/review/LearningNext.jsx';
-import { DailyGoal } from '../learning/DailyGoal.jsx';
-import { AnimatePresence, motion } from 'framer-motion';
+import { LearningNext } from "../learning/review/LearningNext.jsx";
+import { DailyGoal } from "../learning/DailyGoal.jsx";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   BookOpen,
   CheckCircle2,
   Clock3,
-  ExternalLink,
-  Eye,
   Film,
-  FileText,
-  Flame,
   Headphones,
-  ListChecks,
   Lock,
   Mic,
-  Pause,
-  PenTool,
-  Play,
   Plus,
   Settings2,
   Sparkles,
   TimerReset,
   UsersRound,
   Video,
-} from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { api } from '../api/client.js';
-import { useAppContext } from '../state/AppContext.jsx';
-import { serverLearningAccess } from '../state/identityPolicy.js';
-import { ROLES, isStudentPreview } from '../utils/roles.js';
-import { BankDetailsModal } from '../components/BankDetailsModal.jsx';
-import { TransferSubmissionModal } from '../components/TransferSubmissionModal.jsx';
-import { StudentPaymentCard } from '../components/StudentPaymentCard.jsx';
-import { getBankSettings, submitTransferDetails, MONTHLY_TUITION_FEE } from '../utils/paymentService.js';
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { api } from "../api/client.js";
+import { useAppContext } from "../state/AppContext.jsx";
+import { serverLearningAccess } from "../state/identityPolicy.js";
+import {
+  emptyDailyPlan,
+  normalizeDailyPlan,
+  dailyCards,
+  dailyCardState,
+  dailyDestination,
+} from "../learning/dailyPlan.js";
+import { ROLES, isStudentPreview } from "../utils/roles.js";
+import { BankDetailsModal } from "../components/BankDetailsModal.jsx";
+import { TransferSubmissionModal } from "../components/TransferSubmissionModal.jsx";
+import { StudentPaymentCard } from "../components/StudentPaymentCard.jsx";
+import {
+  getBankSettings,
+  submitTransferDetails,
+  MONTHLY_TUITION_FEE,
+} from "../utils/paymentService.js";
 
-const LEARNER_PREVIEW_DAYS = 8;
 const WEB_DEVELOPER_PLANNING_DAYS = 90;
 
 function formatScheduledDate(dateKey) {
-  if (typeof dateKey !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return '';
-  const [year, month, day] = dateKey.split('-').map(Number);
-  return new Intl.DateTimeFormat('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'Asia/Dhaka',
+  if (typeof dateKey !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(dateKey))
+    return "";
+  const [year, month, day] = dateKey.split("-").map(Number);
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "Asia/Dhaka",
   }).format(new Date(Date.UTC(year, month - 1, day)));
 }
 
 const MODULE_PRESENTATION = {
   video: {
-    label: 'Video lesson',
-    startLabel: 'Start lesson',
-    reviewLabel: 'Review lesson',
+    label: "Video lesson",
+    startLabel: "Start lesson",
+    reviewLabel: "Review lesson",
     Icon: Film,
-    accent: 'text-blue-300',
+    accent: "text-blue-300",
   },
   ai_practice: {
-    label: 'AI practice session',
-    startLabel: 'Start practice',
-    reviewLabel: 'Review practice',
+    label: "AI practice session",
+    startLabel: "Start practice",
+    reviewLabel: "Review practice",
     Icon: Mic,
-    accent: 'text-emerald-300',
+    accent: "text-emerald-300",
   },
   interview: {
-    label: 'Interview session',
-    startLabel: 'Join interview',
-    reviewLabel: 'Open interview',
+    label: "Interview session",
+    startLabel: "Join interview",
+    reviewLabel: "Open interview",
     Icon: UsersRound,
-    accent: 'text-violet-300',
+    accent: "text-violet-300",
   },
 };
 
-function getStaticLessons(pathway) {
-  let dayNumber = 0;
-  return pathway.modules.flatMap(module => module.lessons.map(lesson => {
-    dayNumber += 1;
-    return {
-      ...lesson,
-      moduleTitle: module.title,
-      dayNumber,
-    };
-  }));
-}
-
-function buildDayCards(staticLessons, remoteModules, minimumDays) {
-  const modulesByDay = new Map(remoteModules.map(module => [module.day, module]));
-  const highestConfiguredDay = remoteModules.reduce((highestDay, module) => Math.max(highestDay, module.day), 0);
-  const dayCount = Math.max(minimumDays, staticLessons.length, highestConfiguredDay);
-
-  return Array.from({ length: dayCount }, (_, index) => {
-    const day = index + 1;
-    const staticLesson = staticLessons[index];
-    const remoteModule = modulesByDay.get(day);
-
-    if (remoteModule) {
-      return {
-        ...remoteModule,
-        day,
-        id: staticLesson?.id ?? `configured-${day}`,
-        staticLesson,
-        configured: true,
-      };
-    }
-
-    if (staticLesson) {
-      return {
-        day,
-        id: staticLesson.id,
-        title: staticLesson.title,
-        description: staticLesson.description,
-        moduleType: 'video',
-        published: true,
-        available: false,
-        questionCount: 0,
-        staticLesson,
-        configured: false,
-      };
-    }
-
-    return {
-      day,
-      id: `placeholder-${day}`,
-      title: 'Coming soon',
-      description: 'This day can be configured as a video lesson, AI practice session, or interview.',
-      moduleType: null,
-      published: false,
-      available: false,
-      questionCount: 0,
-      staticLesson: null,
-      configured: false,
-    };
-  });
-}
-
-function ModuleStats({ day, language }) {
-  const lesson = day.staticLesson;
-  const baseClass = 'rounded-2xl border border-white/10 bg-white/5 p-3';
-
-  if (language === 'paid_batch' || day.staticLesson?.dayType) {
-    return (
-      <div className="mt-6 flex flex-wrap items-center gap-2">
-        <span className="rounded-xl border border-purple-400/25 bg-purple-500/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-purple-300">
-          {day.staticLesson?.dayType || 'Class Masterclass'}
-        </span>
-        {day.staticLesson?.weekendMock && (
-          <span className="rounded-xl border border-amber-400/25 bg-amber-500/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-amber-300">
-            Full Mock Included
-          </span>
-        )}
-      </div>
-    );
-  }
-
-  if (['arabic', 'english'].includes(language)) {
-    if (day.day % 2 !== 0) {
-      return (
-        <div className="mt-6 grid grid-cols-2 gap-2 text-center">
-          <div className={baseClass}><FileText size={16} className="mx-auto mb-2 text-emerald-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">PDF Study</p></div>
-          <div className={baseClass}><BookOpen size={16} className="mx-auto mb-2 text-blue-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Reading Task</p></div>
-        </div>
-      );
-    } else {
-      return (
-        <div className="mt-6 grid grid-cols-2 gap-2 text-center">
-          <div className={baseClass}><ListChecks size={16} className="mx-auto mb-2 text-amber-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">MCQ Quiz</p></div>
-          <div className={baseClass}><Sparkles size={16} className="mx-auto mb-2 text-emerald-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Practice</p></div>
-        </div>
-      );
-    }
-  }
-
-  if (day.moduleType === 'ai_practice') {
-    return (
-      <div className="mt-6 grid grid-cols-3 gap-2 text-center">
-        <div className={baseClass}><Mic size={16} className="mx-auto mb-2 text-emerald-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Voice</p></div>
-        <div className={baseClass}><Headphones size={16} className="mx-auto mb-2 text-blue-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{day.questionCount || 0} Questions</p></div>
-        <div className={baseClass}><Sparkles size={16} className="mx-auto mb-2 text-amber-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Feedback</p></div>
-      </div>
-    );
-  }
-
-  if (day.moduleType === 'interview') {
-    return (
-      <div className="mt-6 grid grid-cols-3 gap-2 text-center">
-        <div className={baseClass}><UsersRound size={16} className="mx-auto mb-2 text-violet-300" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Live queue</p></div>
-        <div className={baseClass}><Video size={16} className="mx-auto mb-2 text-blue-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Interview</p></div>
-        <div className={baseClass}><Clock3 size={16} className="mx-auto mb-2 text-amber-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Weekly</p></div>
-      </div>
-    );
-  }
-
-  if (!day.moduleType) {
+function ModuleStats({ day }) {
+  const baseClass = "rounded-2xl border border-white/10 bg-white/5 p-3";
+  if (!day.moduleType)
     return (
       <div className="mt-6 rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-3 text-center text-[10px] font-bold uppercase tracking-wider text-slate-500">
         Waiting for the course plan
       </div>
     );
-  }
-
+  if (day.moduleType === "ai_practice")
+    return (
+      <div className="mt-6 grid grid-cols-3 gap-2 text-center">
+        <div className={baseClass}>
+          <Mic size={16} className="mx-auto mb-2 text-emerald-400" />
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            Voice
+          </p>
+        </div>
+        <div className={baseClass}>
+          <Headphones size={16} className="mx-auto mb-2 text-blue-400" />
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            {day.questionCount} Questions
+          </p>
+        </div>
+        <div className={baseClass}>
+          <Sparkles size={16} className="mx-auto mb-2 text-amber-400" />
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            Practice
+          </p>
+        </div>
+      </div>
+    );
+  if (day.moduleType === "interview")
+    return (
+      <div className="mt-6 grid grid-cols-3 gap-2 text-center">
+        <div className={baseClass}>
+          <UsersRound size={16} className="mx-auto mb-2 text-violet-300" />
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            Live queue
+          </p>
+        </div>
+        <div className={baseClass}>
+          <Video size={16} className="mx-auto mb-2 text-blue-400" />
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            Interview
+          </p>
+        </div>
+        <div className={baseClass}>
+          <Clock3 size={16} className="mx-auto mb-2 text-amber-400" />
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+            Scheduled
+          </p>
+        </div>
+      </div>
+    );
   return (
-    <div className="mt-6 grid grid-cols-3 gap-2 text-center">
-      <div className={baseClass}><Film size={16} className="mx-auto mb-2 text-blue-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Video</p></div>
-      <div className={baseClass}><BookOpen size={16} className="mx-auto mb-2 text-emerald-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{lesson?.cards?.length ?? 0} Cards</p></div>
-      <div className={baseClass}><ListChecks size={16} className="mx-auto mb-2 text-amber-400" /><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{lesson?.quiz?.length ?? 0} Quiz</p></div>
+    <div className="mt-6 grid grid-cols-2 gap-2 text-center">
+      <div className={baseClass}>
+        <Film size={16} className="mx-auto mb-2 text-blue-400" />
+        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          {day.videoCount} Videos
+        </p>
+      </div>
+      <div className={baseClass}>
+        <BookOpen size={16} className="mx-auto mb-2 text-emerald-400" />
+        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          Lesson content
+        </p>
+      </div>
     </div>
   );
 }
@@ -213,66 +152,15 @@ export function DailyLessonsPage() {
   const { state, actions, courseData } = useAppContext();
   const navigate = useNavigate();
   const [comingSoon, setComingSoon] = useState(null);
-  const [dayModuleData, setDayModuleData] = useState({
-    modules: [],
-    completedDays: [],
-    currentDay: 0,
-    courseDay: 0,
-    courseStarted: false,
-    courseStartAt: '',
-    courseStartDate: '',
-    nextUnlockAt: '',
-  });
+  const [dayModuleData, setDayModuleData] = useState(() => emptyDailyPlan());
   const [hasLoadedDayModules, setHasLoadedDayModules] = useState(false);
-  const [dayModuleError, setDayModuleError] = useState('');
+  const [dayModuleError, setDayModuleError] = useState("");
   const [selectedPaidMonth, setSelectedPaidMonth] = useState(1);
-  const [isDay1AudioPlaying, setIsDay1AudioPlaying] = useState(false);
-  const day1AudioRef = useRef(null);
-
-  const toggleDay1Audio = () => {
-    if (!day1AudioRef.current) return;
-    if (isDay1AudioPlaying) {
-      day1AudioRef.current.pause();
-      setIsDay1AudioPlaying(false);
-    } else {
-      if (day1Audio2Ref.current && isDay1Audio2Playing) {
-        day1Audio2Ref.current.pause();
-        setIsDay1Audio2Playing(false);
-      }
-      day1AudioRef.current.play().then(() => {
-        setIsDay1AudioPlaying(true);
-      }).catch(err => {
-        console.warn('Audio playback error:', err);
-      });
-    }
-  };
-
-  const [isDay1Audio2Playing, setIsDay1Audio2Playing] = useState(false);
-  const day1Audio2Ref = useRef(null);
-
-  const toggleDay1Audio2 = () => {
-    if (!day1Audio2Ref.current) return;
-    if (isDay1AudioPlaying) {
-      day1Audio2Ref.current.pause();
-      setIsDay1Audio2Playing(false);
-    } else {
-      if (day1AudioRef.current && isDay1AudioPlaying) {
-        day1AudioRef.current.pause();
-        setIsDay1AudioPlaying(false);
-      }
-      day1Audio2Ref.current.play().then(() => {
-        setIsDay1Audio2Playing(true);
-      }).catch(err => {
-        console.warn('Audio 2 playback error:', err);
-      });
-    }
-  };
-
   // Manual payment state & modals
   const [isBankModalOpen, setIsBankModalOpen] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [bankDetails, setBankDetails] = useState(null);
-  const [submissionNotice, setSubmissionNotice] = useState('');
+  const [submissionNotice, setSubmissionNotice] = useState("");
 
   const handleOpenBankDetails = async () => {
     try {
@@ -285,73 +173,91 @@ export function DailyLessonsPage() {
   };
 
   const handleSubmitTransfer = async (formData) => {
-    await submitTransferDetails(state.userEmail, state.userName, { 
-      ...formData, 
-      month: selectedPaidMonth !== 'all' ? selectedPaidMonth : 2 
+    await submitTransferDetails(state.userEmail, state.userName, {
+      ...formData,
+      month: selectedPaidMonth !== "all" ? selectedPaidMonth : 2,
     });
-    setSubmissionNotice(`Transfer details submitted for Month ${selectedPaidMonth !== 'all' ? selectedPaidMonth : 2}! We'll verify and update you within 24 hours.`);
-    setTimeout(() => setSubmissionNotice(''), 6000);
+    setSubmissionNotice(
+      `Transfer details submitted for Month ${selectedPaidMonth !== "all" ? selectedPaidMonth : 2}! We'll verify and update you within 24 hours.`,
+    );
+    setTimeout(() => setSubmissionNotice(""), 6000);
   };
 
-  const isWebDeveloper = !isStudentPreview(state) && [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
+  const isWebDeveloper =
+    !isStudentPreview(state) &&
+    [
+      ROLES.webDeveloper,
+      ROLES.tester,
+      ROLES.instructor,
+      ROLES.editor,
+      ROLES.intern,
+    ].includes(state.userRole);
   const studentPaidMonths = Math.max(Number(state.paidBatchMonths) || 1, 1);
   const learnerAccess = serverLearningAccess(state);
-  const canAccessPrivateBatch = isWebDeveloper || learnerAccess.privateBatchAccess;
-  const baseEnrolled = [...new Set([
-    ...(isWebDeveloper ? Object.keys(courseData) : learnerAccess.enrolledPathways),
-    ...(canAccessPrivateBatch ? ['paid_batch'] : []),
-  ])];
-  const enrolledPathways = baseEnrolled.filter(pathwayKey => {
-    if (pathwayKey === 'paid_batch') return canAccessPrivateBatch;
+  const canAccessPrivateBatch =
+    isWebDeveloper || learnerAccess.privateBatchAccess;
+  const baseEnrolled = [
+    ...new Set([
+      ...(isWebDeveloper
+        ? Object.keys(courseData)
+        : learnerAccess.enrolledPathways),
+      ...(canAccessPrivateBatch ? ["paid_batch"] : []),
+    ]),
+  ];
+  const enrolledPathways = baseEnrolled.filter((pathwayKey) => {
+    if (pathwayKey === "paid_batch") return canAccessPrivateBatch;
     return Boolean(courseData[pathwayKey]);
   });
-  const availableToEnroll = Object.keys(courseData).filter(pathway => {
+  const availableToEnroll = Object.keys(courseData).filter((pathway) => {
     if (enrolledPathways.includes(pathway)) return false;
     if (courseData[pathway]?.isPrivate) return false;
     return true;
   });
-  const pathway = courseData[state.activePathway] ?? courseData.english ?? {title:'Published courses',modules:[]};
-  const staticLessons = useMemo(() => getStaticLessons(pathway), [pathway]);
-  const plannedDays = useMemo(
-    () => buildDayCards(
-      staticLessons,
-      dayModuleData.modules ?? [],
-      isWebDeveloper ? WEB_DEVELOPER_PLANNING_DAYS : LEARNER_PREVIEW_DAYS,
-    ),
-    [dayModuleData.modules, isWebDeveloper, staticLessons],
+  const pathway = courseData[state.activePathway] ?? {
+    title: "Published courses",
+    modules: [],
+  };
+  const planKey = JSON.stringify([
+    state.userEmail,
+    state.isLoggedIn,
+    state.activePathway,
+    state.userRole,
+    state.webDeveloperMode,
+  ]);
+  const hasCurrentPlan = dayModuleData.requestKey === planKey;
+  const loadedCurrentPlan = hasCurrentPlan && hasLoadedDayModules;
+  const currentPlanError = hasCurrentPlan ? dayModuleError : "";
+  const hasRemoteDayPlan = loadedCurrentPlan && !currentPlanError;
+  const courseStartedForLearner =
+    hasRemoteDayPlan && dayModuleData.courseStarted === true;
+  const days = useMemo(
+    () =>
+      dailyCards(dayModuleData, {
+        loaded: hasRemoteDayPlan,
+        error: currentPlanError,
+        staff: isWebDeveloper,
+        language: state.activePathway,
+        privateAccess: canAccessPrivateBatch,
+        paidMonths: studentPaidMonths,
+        selectedMonth: selectedPaidMonth,
+        planningDays: WEB_DEVELOPER_PLANNING_DAYS,
+      }),
+    [
+      dayModuleData,
+      hasRemoteDayPlan,
+      currentPlanError,
+      isWebDeveloper,
+      state.activePathway,
+      canAccessPrivateBatch,
+      studentPaidMonths,
+      selectedPaidMonth,
+    ],
   );
-  const hasRemoteDayPlan = hasLoadedDayModules && !dayModuleError;
-  const courseStartedForLearner = dayModuleData.courseStarted === true;
-  const days = useMemo(() => {
-    if (state.activePathway === 'paid_batch') {
-      if (selectedPaidMonth === 'all') {
-        return plannedDays;
-      }
-      const targetMonth = Math.min(Math.max(Number(selectedPaidMonth) || 1, 1), 5);
-      const startDay = (targetMonth - 1) * 12 + 1;
-      const endDay = targetMonth * 12;
-      return plannedDays.filter(day => day.day >= startDay && day.day <= endDay);
-    }
-    if (isWebDeveloper) return plannedDays;
-    if (!hasRemoteDayPlan || !courseStartedForLearner) return [];
-
-    // Learners only see dates that the server has explicitly configured,
-    // published, and unlocked. Static courseData must never create a generic
-    // practice/video CTA before the real course schedule says it is ready.
-    return plannedDays.filter(day => {
-      // Learners can review every released PDF/quiz day from Day 1 through
-      // today. Future curriculum remains hidden until Bangladesh midnight.
-      if (['arabic', 'english'].includes(state.activePathway) && day.day > dayModuleData.courseDay) return false;
-      if (day.day > dayModuleData.courseDay) return false;
-
-      // Arabic & English have a bundled PDF/quiz curriculum. Keep the calendar sequence
-      // contiguous even if a legacy database row is temporarily missing, so
-      // Day 4 cannot disappear while later days remain visible.
-      if (['arabic', 'english'].includes(state.activePathway) && day.staticLesson) return true;
-
-      return day.configured && day.published && day.available === true;
-    });
-  }, [courseStartedForLearner, dayModuleData.courseDay, hasRemoteDayPlan, isWebDeveloper, plannedDays, selectedPaidMonth, state.activePathway]);
+  const nextAvailableDay = days.find(
+    (day) =>
+      dailyCardState(day, dayModuleData, { loaded: hasRemoteDayPlan })
+        .available,
+  );
 
   useEffect(() => {
     if (!comingSoon) return undefined;
@@ -363,40 +269,25 @@ export function DailyLessonsPage() {
   useEffect(() => {
     let ignore = false;
     setHasLoadedDayModules(false);
-    setDayModuleError('');
+    setDayModuleError("");
 
-    if (state.activePathway === 'paid_batch') {
-      setDayModuleData({
-        modules: [],
-        completedDays: [],
-        currentDay: 1,
-        courseDay: 60,
-        courseStarted: true,
-        courseStartAt: '',
-        courseStartDate: '',
-        nextUnlockAt: '',
-      });
-      setHasLoadedDayModules(true);
-      return undefined;
-    }
+    setDayModuleData(emptyDailyPlan(planKey));
 
-    api.getDayModules(state.activePathway, { learnerPreview: isStudentPreview(state) })
-      .then(response => {
-        if (ignore) return;
-        const courseSchedule = response.courseSchedule ?? response;
-        setDayModuleData({
-          modules: Array.isArray(response.modules) ? response.modules : [],
-          completedDays: Array.isArray(response.completedDays) ? response.completedDays : [],
-          currentDay: Math.max(Number(response.currentDay) || 0, 0),
-          courseDay: Math.max(Number(response.courseDay ?? courseSchedule.calendarDay) || 0, 0),
-          courseStarted: courseSchedule.courseStarted === true,
-          courseStartAt: typeof courseSchedule.courseStartAt === 'string' ? courseSchedule.courseStartAt : '',
-          courseStartDate: typeof courseSchedule.courseStartDate === 'string' ? courseSchedule.courseStartDate : '',
-          nextUnlockAt: typeof response.nextUnlockAt === 'string' ? response.nextUnlockAt : '',
-        });
+    api
+      .getDayModules(state.activePathway, {
+        learnerPreview: isStudentPreview(state),
       })
-      .catch(error => {
-        if (!ignore) setDayModuleError(error.message || 'The latest day plan could not be loaded.');
+      .then((response) => {
+        if (ignore) return;
+        setDayModuleData(
+          normalizeDailyPlan(response, state.activePathway, planKey),
+        );
+      })
+      .catch((error) => {
+        if (!ignore)
+          setDayModuleError(
+            error.message || "The latest day plan could not be loaded.",
+          );
       })
       .finally(() => {
         if (!ignore) setHasLoadedDayModules(true);
@@ -405,52 +296,46 @@ export function DailyLessonsPage() {
     return () => {
       ignore = true;
     };
-  }, [state.activePathway, state.userRole, state.webDeveloperMode]);
+  }, [planKey]);
 
-  const openDay = day => {
-    if (!day.moduleType) {
-      if (isWebDeveloper) navigate(`/lesson/${day.day}?configure=1`);
-      else setComingSoon(`Day ${day.day}`);
+  const openDay = (day) => {
+    if (
+      !isWebDeveloper &&
+      !dailyCardState(day, dayModuleData, {
+        loaded: hasRemoteDayPlan,
+        error: currentPlanError,
+      }).available
+    )
       return;
-    }
-
-    if (!['arabic', 'english'].includes(state.activePathway)) {
-      if (day.moduleType === 'ai_practice') {
-        navigate(`/speaking-practice?language=${state.activePathway}&day=${day.day}`);
-        return;
-      }
-
-      if (day.moduleType === 'interview') {
-        navigate(`/interview?language=${state.activePathway}&day=${day.day}`);
-        return;
-      }
-    }
-
-    if (day.staticLesson?.id) actions.setActiveLesson(day.staticLesson.id, state.activePathway);
-    navigate(`/lesson/${day.day}`);
+    const destination = dailyDestination(day, state.activePathway);
+    if (destination) navigate(destination);
+    else if (isWebDeveloper) navigate(`/lesson/${day.day}?configure=1`);
   };
 
-  const enrollCourse = pathwayKey => {
+  const enrollCourse = (pathwayKey) => {
     actions.enrollPathway(pathwayKey);
   };
 
   return (
     <section className="daily-lessons-page academic-learning space-y-8 pb-20">
-      <LearningNext/>
+      <LearningNext />
       <div className="section-card overflow-hidden p-0">
         <div className="relative p-6 sm:p-8 lg:p-10">
           <div className="absolute inset-y-0 right-0 hidden w-1/2 bg-gradient-to-l from-blue-500/10 to-transparent lg:block" />
           <div className="relative max-w-3xl">
             <p className="mb-3 text-xs font-black uppercase tracking-[0.28em] text-purple-300">
-              {state.activePathway === 'paid_batch' ? pathway.title : 'Your classes & materials'}
+              {state.activePathway === "paid_batch"
+                ? pathway.title
+                : "Your classes & materials"}
             </p>
             <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl">
               My Learning
             </h1>
             <p className="mt-4 text-base leading-relaxed text-slate-400 sm:text-lg">
-              {state.activePathway === 'paid_batch'
-                ? (pathway.description || 'Private lessons are available only with confirmed batch enrollment. Your historical learning records remain saved.')
-                : 'Find your lessons, videos, PDFs, and quizzes here. Choose your course below, then open an available class.'}
+              {state.activePathway === "paid_batch"
+                ? pathway.description ||
+                  "Private lessons are available only with confirmed batch enrollment. Your historical learning records remain saved."
+                : "Find your lessons, videos, PDFs, and quizzes here. Choose your course below, then open an available class."}
             </p>
           </div>
         </div>
@@ -458,11 +343,11 @@ export function DailyLessonsPage() {
 
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="grid gap-2 sm:flex">
-          {enrolledPathways.map(pathwayKey => {
+          {enrolledPathways.map((pathwayKey) => {
             const isActive = state.activePathway === pathwayKey;
             const course = courseData[pathwayKey];
             if (!course) return null;
-            const isPaidBatch = pathwayKey === 'paid_batch';
+            const isPaidBatch = pathwayKey === "paid_batch";
 
             return (
               <button
@@ -472,12 +357,12 @@ export function DailyLessonsPage() {
                 onClick={() => actions.switchPathway(pathwayKey)}
                 className={`flex items-center gap-2 rounded-2xl border px-5 py-3 text-sm font-black uppercase tracking-widest transition ${
                   isActive
-                    ? (isPaidBatch
-                        ? 'border-purple-400/40 bg-purple-600 text-white shadow-lg shadow-purple-500/25'
-                        : 'border-blue-400/30 bg-blue-600 text-white shadow-lg shadow-blue-500/20')
-                    : (isPaidBatch
-                        ? 'border-purple-400/20 bg-purple-500/10 text-purple-200 hover:bg-purple-500/20'
-                        : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10')
+                    ? isPaidBatch
+                      ? "border-purple-400/40 bg-purple-600 text-white shadow-lg shadow-purple-500/25"
+                      : "border-blue-400/30 bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                    : isPaidBatch
+                      ? "border-purple-400/20 bg-purple-500/10 text-purple-200 hover:bg-purple-500/20"
+                      : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
                 }`}
               >
                 {isPaidBatch ? (
@@ -486,7 +371,7 @@ export function DailyLessonsPage() {
                     <span>Paid Batch</span>
                   </>
                 ) : (
-                  <span>{course.title.replace(' Pathway', '')} Lessons</span>
+                  <span>{course.title.replace(" Pathway", "")} Lessons</span>
                 )}
               </button>
             );
@@ -495,7 +380,7 @@ export function DailyLessonsPage() {
 
         {availableToEnroll.length > 0 && (
           <div className="grid gap-2 sm:flex">
-            {availableToEnroll.map(pathwayKey => (
+            {availableToEnroll.map((pathwayKey) => (
               <button
                 key={pathwayKey}
                 type="button"
@@ -503,27 +388,79 @@ export function DailyLessonsPage() {
                 className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-400/25 bg-emerald-500/10 px-5 py-3 text-sm font-black uppercase tracking-widest text-emerald-300 transition hover:bg-emerald-500 hover:text-white"
               >
                 <Plus size={16} />
-                Add {courseData[pathwayKey]?.title?.replace(' Pathway', '') || pathwayKey}
+                Add{" "}
+                {courseData[pathwayKey]?.title?.replace(" Pathway", "") ||
+                  pathwayKey}
               </button>
             ))}
           </div>
         )}
       </div>
 
-      <section className="learning-next-action" aria-label="Your next learning action"><div><span className="platform-eyebrow">READY WHEN YOU ARE</span><h2>{days.length?'Choose your next small step.':'Your next class will appear here.'}</h2><p>{days.length?`${pathway.title} · ${days.length} class entries in the current view. Choose an available class below to begin.`:'We’ll show lessons when your course schedule and access can be verified. You can still make time for personal study.'}</p></div><div>{days.some(d=>d.available===true&&!d.premiumLocked&&d.configured&&d.published)&&<button className="campus-button campus-button-primary" onClick={()=>openDay(days.find(d=>d.available===true&&!d.premiumLocked&&d.configured&&d.published))}>Open an available class</button>}<Link className="campus-button campus-button-secondary" to="/classroom">Choose a classroom lesson</Link><Link className="campus-button campus-button-secondary" to="/study-room">Start a focus session</Link></div></section>
-      <DailyGoal key={`${state.userEmail}:${state.activePathway}`} scope={`${encodeURIComponent(state.userEmail||'learner')}:${state.activePathway}`}/>
+      <section
+        className="learning-next-action"
+        aria-label="Your next learning action"
+      >
+        <div>
+          <span className="platform-eyebrow">READY WHEN YOU ARE</span>
+          <h2>
+            {isWebDeveloper
+              ? "Plan and review your learning days."
+              : days.length
+                ? "Choose your next small step."
+                : "Your next class will appear here."}
+          </h2>
+          <p>
+            {isWebDeveloper
+              ? `${pathway.title} · ${days.length} planning slots. Configure a day and publish reviewed content when it is ready.`
+              : days.length
+                ? `${pathway.title} · ${days.length} class entries in the current view. Choose an available class below to begin.`
+                : "We’ll show lessons when your course schedule and access can be verified. You can still make time for personal study."}
+          </p>
+        </div>
+        <div>
+          {nextAvailableDay && (
+            <button
+              className="campus-button campus-button-primary"
+              onClick={() => openDay(nextAvailableDay)}
+            >
+              Open an available class
+            </button>
+          )}
+          <Link
+            className="campus-button campus-button-secondary"
+            to="/classroom"
+          >
+            Choose a classroom lesson
+          </Link>
+          <Link
+            className="campus-button campus-button-secondary"
+            to="/study-room"
+          >
+            Start a focus session
+          </Link>
+        </div>
+      </section>
+      <DailyGoal
+        key={`${state.userEmail}:${state.activePathway}`}
+        scope={`${encodeURIComponent(state.userEmail || "learner")}:${state.activePathway}`}
+      />
 
-
-      {state.activePathway === 'paid_batch' && (
+      {state.activePathway === "paid_batch" && canAccessPrivateBatch && (
         <div className="space-y-4">
           <div className="flex flex-col gap-4 rounded-3xl border border-purple-500/25 bg-gradient-to-br from-purple-950/40 via-slate-900/70 to-slate-950 p-5 shadow-xl sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-xs font-black uppercase tracking-wider text-purple-200">Enrolled Status:</span>
+              <span className="text-xs font-black uppercase tracking-wider text-purple-200">
+                Enrolled Status:
+              </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-purple-400/40 bg-purple-500/20 px-3 py-1 text-xs font-black uppercase tracking-wider text-purple-200">
-                💎 {isWebDeveloper ? 'All 5 Months (Staff Full Access)' : `Month ${studentPaidMonths} (Days 1–${studentPaidMonths * 12})`}
+                💎{" "}
+                {isWebDeveloper
+                  ? "All 5 Months (Staff Full Access)"
+                  : `Month ${studentPaidMonths} (Days 1–${studentPaidMonths * 12})`}
               </span>
               <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-0.5 text-[11px] font-bold text-emerald-300">
-                <CheckCircle2 size={13} /> Lifetime Access Preserved
+                <CheckCircle2 size={13} /> Saved Progress Preserved
               </span>
 
               <button
@@ -537,9 +474,12 @@ export function DailyLessonsPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-1">Filter Month:</span>
-              {[1, 2, 3, 4, 5].map(monthNum => {
-                const isUnlocked = isWebDeveloper || monthNum <= studentPaidMonths;
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-1">
+                Filter Month:
+              </span>
+              {[1, 2, 3, 4, 5].map((monthNum) => {
+                const isUnlocked =
+                  isWebDeveloper || monthNum <= studentPaidMonths;
                 const isSelected = selectedPaidMonth === monthNum;
                 return (
                   <button
@@ -548,28 +488,34 @@ export function DailyLessonsPage() {
                     onClick={() => setSelectedPaidMonth(monthNum)}
                     className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-black transition ${
                       isSelected
-                        ? 'border-purple-400 bg-purple-600 text-white shadow-md shadow-purple-900/50'
+                        ? "border-purple-400 bg-purple-600 text-white shadow-md shadow-purple-900/50"
                         : isUnlocked
-                          ? 'border-purple-400/30 bg-purple-500/10 text-purple-200 hover:bg-purple-500/20'
-                          : 'border-white/10 bg-white/5 text-slate-500 hover:text-slate-400'
+                          ? "border-purple-400/30 bg-purple-500/10 text-purple-200 hover:bg-purple-500/20"
+                          : "border-white/10 bg-white/5 text-slate-500 hover:text-slate-400"
                     }`}
                   >
-                    {isUnlocked ? <span className="text-emerald-400 font-bold">✓</span> : <span className="text-amber-400">🔒</span>}
+                    {isUnlocked ? (
+                      <span className="text-emerald-400 font-bold">✓</span>
+                    ) : (
+                      <span className="text-amber-400">🔒</span>
+                    )}
                     <span>Month {monthNum}</span>
-                    <span className="text-[10px] opacity-70">({(monthNum - 1) * 12 + 1}–{monthNum * 12})</span>
+                    <span className="text-[10px] opacity-70">
+                      ({(monthNum - 1) * 12 + 1}–{monthNum * 12})
+                    </span>
                   </button>
                 );
               })}
               <button
                 type="button"
-                onClick={() => setSelectedPaidMonth('all')}
+                onClick={() => setSelectedPaidMonth("all")}
                 className={`rounded-xl border px-3 py-1.5 text-xs font-black transition ${
-                  selectedPaidMonth === 'all'
-                    ? 'border-purple-400 bg-purple-600 text-white shadow-md shadow-purple-900/50'
-                    : 'border-white/10 bg-white/5 text-slate-400 hover:text-slate-300'
+                  selectedPaidMonth === "all"
+                    ? "border-purple-400 bg-purple-600 text-white shadow-md shadow-purple-900/50"
+                    : "border-white/10 bg-white/5 text-slate-400 hover:text-slate-300"
                 }`}
               >
-                All 60
+                All classes
               </button>
             </div>
           </div>
@@ -577,57 +523,70 @@ export function DailyLessonsPage() {
           {/* STUDENT TUITION & BANK PAYMENT CARD */}
           <StudentPaymentCard user={state} />
 
-          {selectedPaidMonth !== 'all' && selectedPaidMonth > studentPaidMonths && !isWebDeveloper && (
-            <div className="rounded-2xl border border-amber-400/30 bg-amber-500/10 p-5 text-amber-200 shadow-lg space-y-4">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <Lock className="shrink-0 text-amber-400" size={24} />
-                  <div>
-                    <h4 className="text-sm font-black text-white">Month {selectedPaidMonth} Enrollment Required (Days {(selectedPaidMonth - 1) * 12 + 1}–{selectedPaidMonth * 12})</h4>
-                    <p className="mt-1 text-xs leading-relaxed text-amber-200/80">
-                      Your current subscription covers up to Month {studentPaidMonths} (Days 1–{studentPaidMonths * 12}). Your completed classes remain permanently stored in your account. Transfer the tuition fee (50 SAR / 50 Riyals) for Month {selectedPaidMonth} to unlock these lessons.
-                    </p>
+          {selectedPaidMonth !== "all" &&
+            selectedPaidMonth > studentPaidMonths &&
+            !isWebDeveloper && (
+              <div className="rounded-2xl border border-amber-400/30 bg-amber-500/10 p-5 text-amber-200 shadow-lg space-y-4">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <Lock className="shrink-0 text-amber-400" size={24} />
+                    <div>
+                      <h4 className="text-sm font-black text-white">
+                        Month {selectedPaidMonth} Enrollment Required (Days{" "}
+                        {(selectedPaidMonth - 1) * 12 + 1}–
+                        {selectedPaidMonth * 12})
+                      </h4>
+                      <p className="mt-1 text-xs leading-relaxed text-amber-200/80">
+                        Your current subscription covers up to Month{" "}
+                        {studentPaidMonths} (Days 1–{studentPaidMonths * 12}).
+                        Your completed classes remain permanently stored in your
+                        account. Transfer the tuition fee (50 SAR / 50 Riyals)
+                        for Month {selectedPaidMonth} to unlock these lessons.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={handleOpenBankDetails}
+                      className="rounded-xl border border-white/20 bg-white/10 px-3.5 py-2 text-xs font-bold text-white hover:bg-white/20 transition"
+                    >
+                      View bank details
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsSubmitModalOpen(true)}
+                      className="rounded-xl border border-purple-400/30 bg-purple-600 px-3.5 py-2 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-purple-900/40 hover:bg-purple-500 transition"
+                    >
+                      I've transferred payment
+                    </button>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2 shrink-0">
-                  <button
-                    type="button"
-                    onClick={handleOpenBankDetails}
-                    className="rounded-xl border border-white/20 bg-white/10 px-3.5 py-2 text-xs font-bold text-white hover:bg-white/20 transition"
-                  >
-                    View bank details
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsSubmitModalOpen(true)}
-                    className="rounded-xl border border-purple-400/30 bg-purple-600 px-3.5 py-2 text-xs font-black uppercase tracking-wider text-white shadow-lg shadow-purple-900/40 hover:bg-purple-500 transition"
-                  >
-                    I've transferred payment
-                  </button>
-                </div>
+                {submissionNotice && (
+                  <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/15 p-3 text-xs font-bold text-emerald-200">
+                    <CheckCircle2
+                      size={16}
+                      className="shrink-0 text-emerald-400"
+                    />
+                    <span>{submissionNotice}</span>
+                  </div>
+                )}
               </div>
-
-              {submissionNotice && (
-                <div className="flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/15 p-3 text-xs font-bold text-emerald-200">
-                  <CheckCircle2 size={16} className="shrink-0 text-emerald-400" />
-                  <span>{submissionNotice}</span>
-                </div>
-              )}
-            </div>
-          )}
+            )}
         </div>
       )}
 
-      {dayModuleError && (
+      {currentPlanError && (
         <p className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
           {isWebDeveloper
-            ? `${dayModuleError} You can retry when the connection is back.`
-            : `${dayModuleError} The day plan is read-only until it can be verified, so no lesson can be opened from this screen yet.`}
+            ? `${currentPlanError} You can retry when the connection is back.`
+            : `${currentPlanError} The day plan is read-only until it can be verified, so no lesson can be opened from this screen yet.`}
         </p>
       )}
 
-      {!hasLoadedDayModules && !isWebDeveloper && (
+      {!loadedCurrentPlan && !isWebDeveloper && (
         <p className="rounded-2xl border border-blue-400/20 bg-blue-500/10 px-4 py-3 text-sm text-blue-100">
           Loading your verified course-day plan…
         </p>
@@ -635,563 +594,98 @@ export function DailyLessonsPage() {
 
       {hasRemoteDayPlan && !isWebDeveloper && !courseStartedForLearner && (
         <p className="rounded-2xl border border-blue-400/20 bg-blue-500/10 px-4 py-4 text-sm leading-6 text-blue-100">
-          Your course has not started yet. Daily lessons and speaking tests will appear here only when the server opens the scheduled course date
-          {dayModuleData.courseStartDate || dayModuleData.courseStartAt ? ` (${dayModuleData.courseStartDate || dayModuleData.courseStartAt})` : ''}.
+          Your course has not started yet. Daily lessons and speaking tests will
+          appear here only when the server opens the scheduled course date
+          {dayModuleData.courseStartDate || dayModuleData.courseStartAt
+            ? ` (${dayModuleData.courseStartDate || dayModuleData.courseStartAt})`
+            : ""}
+          .
         </p>
       )}
 
-      {hasRemoteDayPlan && !isWebDeveloper && courseStartedForLearner && days.length === 0 && (
-        <p className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm leading-6 text-slate-300">
-          No published learning box is scheduled for you right now. Your course team&apos;s next server-configured date will appear here when it opens.
-        </p>
-      )}
+      {hasRemoteDayPlan &&
+        !isWebDeveloper &&
+        courseStartedForLearner &&
+        days.length === 0 && (
+          <p className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm leading-6 text-slate-300">
+            No published learning box is scheduled for you right now. Your
+            course team&apos;s next server-configured date will appear here when
+            it opens.
+          </p>
+        )}
 
-      {hasRemoteDayPlan && !isWebDeveloper && dayModuleData.nextUnlockAt && dayModuleData.completedDays.includes(dayModuleData.currentDay) && (
-        <div className="rounded-2xl border border-cyan-300/25 bg-cyan-400/10 px-5 py-4 text-sm leading-6 text-cyan-50">
-          <strong>Day {dayModuleData.currentDay} complete.</strong> Your next learning day unlocks after 12:00 AM Bangladesh time. Your progress is safely stored in your account.
-        </div>
-      )}
+      {hasRemoteDayPlan &&
+        !isWebDeveloper &&
+        dayModuleData.nextUnlockAt &&
+        dayModuleData.completedDays.includes(dayModuleData.currentDay) && (
+          <div className="rounded-2xl border border-cyan-300/25 bg-cyan-400/10 px-5 py-4 text-sm leading-6 text-cyan-50">
+            <strong>Day {dayModuleData.currentDay} complete.</strong> Your next
+            learning day unlocks after 12:00 AM Bangladesh time. Your progress
+            is safely stored in your account.
+          </div>
+        )}
 
-      <div className={state.activePathway === 'paid_batch' ? 'grid gap-5 sm:grid-cols-2 xl:grid-cols-3' : 'grid gap-4 sm:grid-cols-2 xl:grid-cols-3'}>
-        {days.map((day, index) => {
-          const isPaidBatch = state.activePathway === 'paid_batch';
-          const dayNum = day.day;
-          const dayMonth = Math.ceil(dayNum / 12);
-          let presentation = MODULE_PRESENTATION[day.moduleType] ?? null;
-          if (isPaidBatch) {
-            const dayType = day.staticLesson?.dayType || '';
-            const isJointModule = dayType.includes('Writing') && dayType.includes('Speaking');
-            const isWriting = dayType.includes('Writing');
-            const isSpeaking = dayType.includes('Speaking');
-            const IconComponent = isJointModule || isWriting ? PenTool : (isSpeaking ? Mic : Headphones);
-
-            presentation = {
-              label: day.staticLesson?.dayType || (dayNum === 1 ? 'Listening Day' : `Month ${dayMonth} · Class ${dayNum}`),
-              startLabel: dayNum === 1 ? 'Start Listening Lesson' : (dayNum === 2 ? 'Start Speaking Practice' : (dayNum === 3 ? 'Start Lesson' : (dayNum === 4 ? 'Start Conversation Practice' : `Open Class ${dayNum}`))),
-              reviewLabel: dayNum === 1 ? 'Review Listening Lesson' : (dayNum === 2 ? 'Review Day 2 Speaking' : (dayNum === 3 ? 'Review Day 3 Joint Module' : (dayNum === 4 ? 'Review Day 4 Dialogue Practice' : `Review Class ${dayNum}`))),
-              Icon: IconComponent,
-              accent: isJointModule ? 'text-cyan-300' : (isWriting ? 'text-amber-300' : (isSpeaking ? 'text-emerald-300' : 'text-purple-300')),
-            };
-          } else if (['arabic', 'english'].includes(state.activePathway)) {
-            if (day.day % 2 !== 0) {
-              presentation = {
-                label: 'PDF Learning Day',
-                startLabel: 'Open PDF',
-                reviewLabel: 'Review PDF',
-                Icon: BookOpen,
-                accent: 'text-emerald-300',
-              };
-            } else {
-              presentation = {
-                label: 'Quiz Day',
-                startLabel: 'Start Quiz',
-                reviewLabel: 'Review Quiz',
-                Icon: ListChecks,
-                accent: 'text-amber-300',
-              };
-            }
-          }
-          const scheduledDate = formatScheduledDate(day.daySchedule?.scheduledFor);
-          const isCurrentDay = isPaidBatch ? (day.day === 1) : (!isWebDeveloper && day.day === dayModuleData.courseDay);
-          const isPublished = Boolean(day.published);
-          const premiumLocked = Boolean(day.premiumLocked);
-          const planPendingForLearner = !hasLoadedDayModules && !isWebDeveloper;
-          const planUnavailableForLearner = Boolean(dayModuleError) && !isWebDeveloper;
-          const planReadOnlyForLearner = planPendingForLearner || planUnavailableForLearner;
-          const isNextQuizCompleted = day.day % 2 !== 0 && Boolean(
-            (hasRemoteDayPlan && dayModuleData.completedDays?.includes(day.day + 1))
-            || (days[index + 1]?.staticLesson && state.completedLessons?.includes(days[index + 1].staticLesson.id))
+      <div
+        className={
+          state.activePathway === "paid_batch"
+            ? "grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
+            : "grid gap-4 sm:grid-cols-2 xl:grid-cols-3"
+        }
+      >
+        {days.map((day) => {
+          const isPaidBatch = state.activePathway === "paid_batch";
+          const dayMonth = Math.ceil(day.day / 12);
+          const presentation = MODULE_PRESENTATION[day.moduleType] ?? null;
+          const scheduledDate = formatScheduledDate(
+            day.daySchedule?.scheduledFor,
           );
-          const completed = Boolean(
-            (hasRemoteDayPlan && dayModuleData.completedDays?.includes(day.day))
-            || (day.staticLesson && state.completedLessons?.includes(day.staticLesson.id))
-            || isNextQuizCompleted
-          );
-          const availableFromServer = isPaidBatch || day.available === true || (
-            ['arabic', 'english'].includes(state.activePathway)
-            && Boolean(day.staticLesson)
-            && day.day <= dayModuleData.courseDay
-          );
-          const fallbackIsNext = index === 0 || Boolean(days[index - 1]?.staticLesson && state.completedLessons.includes(days[index - 1].staticLesson.id));
-          const isMonthLocked = isPaidBatch && !isWebDeveloper && (day.day > (studentPaidMonths * 12));
-          const isLocked = isMonthLocked || planReadOnlyForLearner || (!isWebDeveloper && (
-            premiumLocked
-            || !isPublished
-            || (isPaidBatch ? false : (hasRemoteDayPlan ? !availableFromServer : !fallbackIsNext && !completed))
-          ));
+          const cardState = dailyCardState(day, dayModuleData, {
+            loaded: hasRemoteDayPlan,
+            error: currentPlanError,
+            staff: isWebDeveloper,
+          });
+          const isCurrentDay = cardState.current;
+          const isPublished =
+            day.published && day.publicationStatus === "published";
+          const premiumLocked = day.premiumLocked === true;
+          const planPendingForLearner = !loadedCurrentPlan && !isWebDeveloper;
+          const planUnavailableForLearner =
+            Boolean(currentPlanError) && !isWebDeveloper;
+          const planReadOnlyForLearner =
+            planPendingForLearner || planUnavailableForLearner;
+          const completed = cardState.completed;
+          const isMonthLocked =
+            isPaidBatch && !isWebDeveloper && day.day > studentPaidMonths * 12;
+          const isLocked = isMonthLocked || cardState.locked;
           const Icon = presentation?.Icon ?? Clock3;
           const actionLabel = planPendingForLearner
-            ? 'Loading plan'
+            ? "Loading plan"
             : planUnavailableForLearner
-              ? 'Plan unavailable'
-            : isMonthLocked
-              ? `🔒 Month ${dayMonth} Required`
-            : !day.moduleType
-            ? (isWebDeveloper ? 'Configure day' : 'Coming soon')
-            : isLocked
-              ? (premiumLocked ? 'Premium required' : !isPublished ? 'Coming soon' : 'Complete previous day')
-              : completed
-                ? (presentation?.reviewLabel || 'Review Topic')
-                : (presentation?.startLabel || 'Open Class Topic');
-
-          if (isPaidBatch && day.day === 1) {
-            return (
-              <article
-                key={day.id}
-                className="section-card sm:col-span-2 xl:col-span-3 relative overflow-hidden p-6 sm:p-8 transition border-2 border-purple-400/80 bg-gradient-to-br from-purple-950/80 via-slate-900/95 to-slate-950 shadow-[0_0_50px_rgba(168,85,247,0.35),0_0_90px_rgba(59,130,246,0.2)] animate-day-active-card"
-              >
-                {/* Live Beam Shimmer Top Border */}
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-1 animate-live-shimmer" />
-
-                {/* Ambient Radial Background Pulses */}
-                <div className="pointer-events-none absolute -right-12 -top-12 h-56 w-56 rounded-full bg-purple-500/20 blur-3xl animate-pulse" />
-                <div className="pointer-events-none absolute -bottom-10 -left-10 h-48 w-48 rounded-full bg-cyan-500/15 blur-2xl animate-pulse" style={{ animationDelay: '1.2s' }} />
-
-                {/* Top Active Radar & Equalizer Status Bar */}
-                <div className="relative z-10 mb-6 flex items-center justify-between rounded-2xl border border-purple-400/30 bg-purple-950/70 px-4 py-3 shadow-lg shadow-purple-950/50 backdrop-blur-md">
-                  <div className="flex items-center gap-3">
-                    <span className="relative flex h-3.5 w-3.5">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-80"></span>
-                      <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-emerald-400"></span>
-                    </span>
-                    <div>
-                      <p className="text-[11px] font-black uppercase tracking-widest text-emerald-300">
-                        🔥 TODAY WE ARE ON DAY 1
-                      </p>
-                      <p className="text-[10px] font-bold text-slate-400">
-                        IELTS Listening Module · Part 1
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-end gap-1.5 h-6 px-2">
-                    <span className="inline-block w-1 rounded-full bg-purple-400 animate-[soundwave-bar-1_1s_ease-in-out_infinite]"></span>
-                    <span className="inline-block w-1 rounded-full bg-cyan-400 animate-[soundwave-bar-2_0.8s_ease-in-out_infinite]"></span>
-                    <span className="inline-block w-1 rounded-full bg-emerald-400 animate-[soundwave-bar-3_1.1s_ease-in-out_infinite]"></span>
-                    <span className="inline-block w-1 rounded-full bg-amber-400 animate-[soundwave-bar-4_0.9s_ease-in-out_infinite]"></span>
-                  </div>
-                </div>
-
-                {/* Card Title & Animated Icon */}
-                <div className="relative z-10 mb-5 flex items-start justify-between gap-4">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full border border-purple-400/30 bg-purple-500/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-purple-200">
-                        Class 01
-                      </span>
-                      <span className="rounded-full border border-blue-400/30 bg-blue-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-blue-200">
-                        Listening Day
-                      </span>
-                      <span className="rounded-full border border-indigo-400/30 bg-indigo-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-indigo-200">
-                        2 Books Ready
-                      </span>
-                      <span className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-300">
-                        Band 6 Target
-                      </span>
-                    </div>
-
-                    <h2 className="mt-3 text-2xl font-black text-white sm:text-3xl">
-                      Topic 1: Listening Module Part 1
-                    </h2>
-                    <p className="mt-1 text-xs font-semibold text-purple-200">
-                      Form & Note Completion Masterclass
-                    </p>
-                  </div>
-
-                  <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white shadow-xl shadow-purple-500/40 animate-bounce">
-                    <Headphones size={26} />
-                  </div>
-                </div>
-
-                {/* Core Focus & Key Mechanics */}
-                <p className="relative z-10 text-sm leading-6 text-slate-300">
-                  {day.staticLesson?.coreStructure || 'IELTS Listening Part 1 — Form & Note Completion Masterclass (Names, Numbers, Postcodes, Dates & Distractor Defense)।'}
-                </p>
-
-                {/* Strategy Highlight Badges */}
-                <div className="relative z-10 mt-5 grid gap-2 sm:grid-cols-2">
-                  <div className="flex items-center gap-2 rounded-xl border border-purple-500/20 bg-purple-500/10 p-3 text-xs text-purple-200">
-                    <span className="text-purple-400 font-bold">📑</span>
-                    <span>Class 1 Slides & Strategy Guide</span>
-                  </div>
-                  <div className="flex items-center gap-2 rounded-xl border border-indigo-500/20 bg-indigo-500/10 p-3 text-xs text-indigo-200">
-                    <span className="text-indigo-400 font-bold">📘</span>
-                    <span>Official Practice Tests Book Included</span>
-                  </div>
-                  <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] p-3 text-xs text-slate-300">
-                    <span className="text-cyan-400 font-bold">🔊</span>
-                    <span>A vs E vs I & G vs J Spelling Traps</span>
-                  </div>
-                  <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] p-3 text-xs text-slate-300">
-                    <span className="text-amber-400 font-bold">🏆</span>
-                    <span>Target: 10/10 Score (+500 XP)</span>
-                  </div>
-                </div>
-
-                {/* Direct Course PDF & Audio Materials Inside Card */}
-                <div className="relative z-10 mt-6 space-y-2.5 rounded-2xl border border-purple-400/30 bg-purple-950/40 p-4 backdrop-blur-md">
-                  <div className="flex items-center justify-between">
-                    <p className="text-[11px] font-black uppercase tracking-widest text-purple-300 flex items-center gap-1.5">
-                      <span>📚 Course Materials</span>
-                      <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 text-[9px] font-bold text-emerald-300">2 Books + 2 Audios + Question Sheet</span>
-                    </p>
-                    <span className="text-[10px] font-bold text-slate-400">Click to open &amp; play</span>
-                  </div>
-
-                  <div className="grid gap-2.5 sm:grid-cols-2">
-                    {/* Tips PDF */}
-                    <a
-                      href="https://drive.google.com/file/d/1xvDT_G_oAXLwRy4Os1XjkypZvvPjsR_x/view?usp=sharing"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group flex items-center justify-between gap-2.5 rounded-xl border border-purple-400/30 bg-purple-900/30 p-3 transition hover:border-purple-400 hover:bg-purple-900/60 hover:scale-[1.01]"
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-purple-500/20 text-purple-300 group-hover:scale-105 transition">
-                          <FileText size={18} />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-black text-white flex items-center gap-1.5">
-                            <span>Tips PDF</span>
-                            <span className="rounded bg-purple-500/30 px-1 py-0.2 text-[9px] font-bold text-purple-200">Slides</span>
-                          </p>
-                          <p className="truncate text-[10px] font-medium text-slate-300">
-                            Part 1 Guide & Strategies
-                          </p>
-                        </div>
-                      </div>
-                      <ExternalLink size={14} className="shrink-0 text-slate-400 group-hover:text-purple-300" />
-                    </a>
-
-                    {/* Book PDF */}
-                    <a
-                      href="https://drive.google.com/file/d/10KSNZalZosook_mGGlK82PIBe4maasm2/view?usp=sharing"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group flex items-center justify-between gap-2.5 rounded-xl border border-indigo-400/30 bg-indigo-900/30 p-3 transition hover:border-indigo-400 hover:bg-indigo-900/60 hover:scale-[1.01]"
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-indigo-500/20 text-indigo-300 group-hover:scale-105 transition">
-                          <BookOpen size={18} />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-black text-white flex items-center gap-1.5">
-                            <span>Book PDF</span>
-                            <span className="rounded bg-indigo-500/30 px-1 py-0.2 text-[9px] font-bold text-indigo-200">Full Book</span>
-                          </p>
-                          <p className="truncate text-[10px] font-medium text-slate-300">
-                            @IELTS_Practice_Tests.pdf
-                          </p>
-                        </div>
-                      </div>
-                      <ExternalLink size={14} className="shrink-0 text-slate-400 group-hover:text-indigo-300" />
-                    </a>
-                  </div>
-
-                  {/* Audio File Player - Directly Under The Books */}
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-xl border border-emerald-400/30 bg-emerald-950/40 p-3 transition hover:border-emerald-400/50">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${
-                        isDay1AudioPlaying ? 'bg-emerald-500 text-slate-950 animate-pulse' : 'bg-emerald-500/20 text-emerald-300'
-                      }`}>
-                        <Headphones size={18} />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs font-black text-white flex items-center gap-1.5">
-                          <span>Listening Drill Audio</span>
-                          <span className="rounded bg-emerald-500/30 px-1 py-0.2 text-[9px] font-bold text-emerald-200">MP3</span>
-                        </p>
-                        <p className="truncate text-[10px] font-medium text-slate-300">
-                          Official Part 1 Form Completion Audio Drill
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleDay1Audio();
-                        }}
-                        className={`flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-black transition shadow-md ${
-                          isDay1AudioPlaying
-                            ? 'bg-emerald-400 text-slate-950 shadow-emerald-400/30'
-                            : 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-emerald-600/30'
-                        }`}
-                      >
-                        {isDay1AudioPlaying ? <Pause size={13} className="fill-current" /> : <Play size={13} className="fill-current" />}
-                        <span>{isDay1AudioPlaying ? 'Pause Audio' : 'Play Audio'}</span>
-                      </button>
-
-                      <a
-                        href="https://drive.google.com/file/d/1ODDAamucZshhbOanDN_UC36khUdPZcPT/view?usp=sharing"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="rounded-lg border border-white/10 bg-white/5 p-2 text-slate-400 hover:text-white transition"
-                        title="Open in Google Drive"
-                      >
-                        <ExternalLink size={14} />
-                      </a>
-                    </div>
-
-                    {/* Hidden Audio Element for Day 1 */}
-                    <audio
-                      ref={day1AudioRef}
-                      preload="none"
-                      onEnded={() => setIsDay1AudioPlaying(false)}
-                      onPause={() => setIsDay1AudioPlaying(false)}
-                      onPlay={() => setIsDay1AudioPlaying(true)}
-                    >
-                      <source src="/audio/day1-ielts-listening-audio.mp3" type="audio/mpeg" />
-                      <source src="https://drive.usercontent.google.com/download?id=1ODDAamucZshhbOanDN_UC36khUdPZcPT&export=download" type="audio/mpeg" />
-                    </audio>
-                  </div>
-
-                  {/* Question Picture Row - After Audio File */}
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-xl border border-cyan-400/30 bg-cyan-950/40 p-3 transition hover:border-cyan-400/50">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-cyan-500/20 text-cyan-300">
-                        <FileText size={18} />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs font-black text-white flex items-center gap-1.5">
-                          <span>Question Picture</span>
-                          <span className="rounded bg-cyan-500/30 px-1 py-0.2 text-[9px] font-bold text-cyan-200">Worksheet</span>
-                        </p>
-                        <p className="truncate text-[10px] font-medium text-slate-300">
-                          Part 1 Form Completion Questions 1–10
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-                      <a
-                        href="/images/day1-listening-question-sheet.jpg"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="flex items-center gap-1.5 rounded-lg bg-cyan-600/30 border border-cyan-400/30 px-3.5 py-2 text-xs font-black text-cyan-200 hover:bg-cyan-600 hover:text-white transition shadow-md"
-                      >
-                        <Eye size={13} />
-                        <span>View Question Picture</span>
-                        <ExternalLink size={13} />
-                      </a>
-
-                      <a
-                        href="https://drive.google.com/file/d/12tb8zkiP2Y7tab9n6NE7KJodfemPJuYY/view?usp=sharing"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="rounded-lg border border-white/10 bg-white/5 p-2 text-slate-400 hover:text-white transition"
-                        title="Open in Google Drive"
-                      >
-                        <ExternalLink size={14} />
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* Audio Drill 2 Row - After Question Picture */}
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-xl border border-teal-400/30 bg-teal-950/40 p-3 transition hover:border-teal-400/50">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${
-                        isDay1Audio2Playing ? 'bg-teal-400 text-slate-950 animate-pulse' : 'bg-teal-500/20 text-teal-300'
-                      }`}>
-                        <Headphones size={18} />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-xs font-black text-white flex items-center gap-1.5">
-                          <span>Listening Drill Audio 2</span>
-                          <span className="rounded bg-teal-500/30 px-1 py-0.2 text-[9px] font-bold text-teal-200">Part 2</span>
-                        </p>
-                        <p className="truncate text-[10px] font-medium text-slate-300">
-                          Follow-up Cambridge Practice Audio Drill
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleDay1Audio2();
-                        }}
-                        className={`flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-black transition shadow-md ${
-                          isDay1Audio2Playing
-                            ? 'bg-teal-400 text-slate-950 shadow-teal-400/30'
-                            : 'bg-teal-600 text-white hover:bg-teal-500 shadow-teal-600/30'
-                        }`}
-                      >
-                        {isDay1Audio2Playing ? <Pause size={13} className="fill-current" /> : <Play size={13} className="fill-current" />}
-                        <span>{isDay1Audio2Playing ? 'Pause Audio 2' : 'Play Audio 2'}</span>
-                      </button>
-
-                      <a
-                        href="https://drive.google.com/file/d/11Q8pZegls5VJjaUu8OiN97Mdf6ldlGUv/view?usp=sharing"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="rounded-lg border border-white/10 bg-white/5 p-2 text-slate-400 hover:text-white transition"
-                        title="Open in Google Drive"
-                      >
-                        <ExternalLink size={14} />
-                      </a>
-                    </div>
-
-                    {/* Hidden Audio 2 Element */}
-                    <audio
-                      ref={day1Audio2Ref}
-                      preload="none"
-                      onEnded={() => setIsDay1Audio2Playing(false)}
-                      onPause={() => setIsDay1Audio2Playing(false)}
-                      onPlay={() => setIsDay1Audio2Playing(true)}
-                    >
-                      <source src="/audio/day1-ielts-listening-audio-2.mp3" type="audio/mpeg" />
-                      <source src="https://drive.usercontent.google.com/download?id=11Q8pZegls5VJjaUu8OiN97Mdf6ldlGUv&export=download" type="audio/mpeg" />
-                    </audio>
-                  </div>
-                </div>
-
-                {/* Launch Button */}
-                <div className="relative z-10 mt-7">
-                  <button
-                    type="button"
-                    onClick={() => openDay(day)}
-                    className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-emerald-600 px-6 py-4 text-sm font-black uppercase tracking-widest text-white shadow-xl shadow-purple-600/30 transition hover:scale-[1.01] hover:shadow-2xl hover:shadow-emerald-500/40 active:scale-[0.99]"
-                  >
-                    <span className="pointer-events-none absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full" />
-                    <Headphones size={18} className="animate-pulse" />
-                    <span>{completed ? 'Review Listening Lesson' : 'Start Listening Lesson'}</span>
-                    <Sparkles size={16} className="text-amber-300 animate-spin" style={{ animationDuration: '4s' }} />
-                  </button>
-                </div>
-              </article>
-            );
-          }
-
-          if (isPaidBatch && day.day === 2) {
-            return (
-              <article
-                key={day.id}
-                className="section-card sm:col-span-2 xl:col-span-3 relative overflow-hidden p-6 sm:p-8 transition border-2 border-pink-400/80 bg-gradient-to-br from-pink-950/80 via-slate-900/95 to-slate-950 shadow-[0_0_50px_rgba(236,72,153,0.35),0_0_90px_rgba(168,85,247,0.25)] animate-day-active-card"
-              >
-                {/* Live Beam Shimmer Top Border */}
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 animate-live-shimmer" />
-
-                {/* Ambient Radial Background Pulses */}
-                <div className="pointer-events-none absolute -right-12 -top-12 h-56 w-56 rounded-full bg-pink-500/20 blur-3xl animate-pulse" />
-                <div className="pointer-events-none absolute -bottom-10 -left-10 h-48 w-48 rounded-full bg-purple-500/20 blur-2xl animate-pulse" style={{ animationDelay: '1.2s' }} />
-
-                {/* Top Active Radar & Reels Status Bar */}
-                <div className="relative z-10 mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-pink-400/30 bg-pink-950/70 px-4 py-3 shadow-lg shadow-pink-950/50 backdrop-blur-md">
-                  <div className="flex items-center gap-3">
-                    <span className="relative flex h-3.5 w-3.5">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-pink-400 opacity-80"></span>
-                      <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-pink-400"></span>
-                    </span>
-                    <div>
-                      <p className="text-[11px] font-black uppercase tracking-widest text-pink-300 flex items-center gap-1.5">
-                        <Flame size={14} className="text-amber-400 animate-pulse" />
-                        <span>TODAY'S SPEAKING REELS MASTERCLASS</span>
-                      </p>
-                      <p className="text-[10px] font-bold text-slate-400">
-                        Class 02 · IELTS Speaking Module · Vertical Video Feed
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className="rounded-full bg-pink-500/20 border border-pink-400/40 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-pink-200 flex items-center gap-1">
-                      <Film size={12} />
-                      <span>Reels Mode</span>
-                    </span>
-                    <span className="rounded-full bg-purple-500/20 border border-purple-400/30 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-purple-200">
-                      5 Reels + Finale Video
-                    </span>
-                  </div>
-                </div>
-
-                {/* Card Title & Animated Icon */}
-                <div className="relative z-10 mb-5 flex items-start justify-between gap-4">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full border border-purple-400/30 bg-purple-500/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-purple-200">
-                        Class 02
-                      </span>
-                      <span className="rounded-full border border-pink-400/30 bg-pink-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-pink-200">
-                        Speaking Day
-                      </span>
-                      <span className="rounded-full border border-cyan-400/30 bg-cyan-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-cyan-200">
-                        4-Pillar Formula
-                      </span>
-                      <span className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-emerald-300">
-                        Voice Drill Included
-                      </span>
-                    </div>
-
-                    <h2 className="mt-3 text-2xl font-black text-white sm:text-3xl">
-                      {day.staticLesson?.topicTitle || 'Topic 2: High-Impact Self-Introduction'}
-                    </h2>
-                    <p className="mt-1 text-xs font-semibold text-pink-200">
-                      How to Introduce Yourself — Master Elevator Pitch Formula
-                    </p>
-                  </div>
-
-                  <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-600 text-white shadow-xl shadow-pink-500/40 animate-pulse">
-                    <Mic size={26} />
-                  </div>
-                </div>
-
-                {/* Core Focus & Key Mechanics */}
-                <p className="relative z-10 text-sm leading-6 text-slate-300">
-                  {day.staticLesson?.coreStructure || 'Name + Background + Current Focus + 1 Unique Passion (The 4-Pillar Formula মুখস্থ ছাড়া ন্যাচারাল ডেলিভারি)।'}
-                </p>
-
-                {/* Strategy Highlight Badges */}
-                <div className="relative z-10 mt-5 grid gap-2 sm:grid-cols-2">
-                  <div className="flex items-center gap-2 rounded-xl border border-pink-500/20 bg-pink-500/10 p-3 text-xs text-pink-200">
-                    <span className="text-pink-400 font-bold">📱</span>
-                    <span>Reels Mode: Swipe &amp; Watch Video Drills</span>
-                  </div>
-                  <div className="flex items-center gap-2 rounded-xl border border-purple-500/20 bg-purple-500/10 p-3 text-xs text-purple-200">
-                    <span className="text-purple-400 font-bold">🎙️</span>
-                    <span>In-Page 60-Second Self-Intro Voice Recorder</span>
-                  </div>
-                  <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] p-3 text-xs text-slate-300">
-                    <span className="text-cyan-400 font-bold">💎</span>
-                    <span>Zero Memorization: 4-Pillar Anchor Method</span>
-                  </div>
-                  <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] p-3 text-xs text-slate-300">
-                    <span className="text-amber-400 font-bold">🏆</span>
-                    <span>Complete Speaking Day (+500 XP)</span>
-                  </div>
-                </div>
-
-                {/* Launch Button */}
-                <div className="relative z-10 mt-7">
-                  <button
-                    type="button"
-                    onClick={() => openDay(day)}
-                    className="group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-2xl bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 px-6 py-4 text-sm font-black uppercase tracking-widest text-white shadow-xl shadow-pink-600/30 transition hover:scale-[1.01] hover:shadow-2xl hover:shadow-purple-500/40 active:scale-[0.99]"
-                  >
-                    <span className="pointer-events-none absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full" />
-                    <Film size={18} className="animate-pulse" />
-                    <span>{completed ? 'Review Speaking Practice' : 'Start Speaking Practice'}</span>
-                    <Sparkles size={16} className="text-amber-300 animate-spin" style={{ animationDuration: '4s' }} />
-                  </button>
-                </div>
-              </article>
-            );
-          }
+              ? "Plan unavailable"
+              : isMonthLocked
+                ? `Month ${dayMonth} required`
+                : !day.moduleType
+                  ? isWebDeveloper
+                    ? "Configure day"
+                    : "Coming soon"
+                  : isLocked
+                    ? premiumLocked
+                      ? "Premium required"
+                      : !isPublished
+                        ? "Coming soon"
+                        : "Not available yet"
+                    : completed
+                      ? presentation.reviewLabel
+                      : presentation.startLabel;
 
           return (
             <article
               key={day.id}
               className={`section-card relative overflow-hidden p-5 transition sm:p-6 ${
-                !isLocked && !completed && day.moduleType ? 'border-blue-400/30 shadow-[0_24px_70px_rgba(37,99,235,0.16)]' : ''
-              } ${isCurrentDay ? 'border-cyan-300/80 ring-2 ring-cyan-300/50 shadow-[0_0_35px_rgba(34,211,238,0.65),0_0_90px_rgba(37,99,235,0.38)]' : ''} ${!day.moduleType && !isWebDeveloper ? 'border-dashed opacity-70' : ''}`}
+                !isLocked && !completed && day.moduleType
+                  ? "border-blue-400/30 shadow-[0_24px_70px_rgba(37,99,235,0.16)]"
+                  : ""
+              } ${isCurrentDay ? "border-cyan-300/80 ring-2 ring-cyan-300/50 shadow-[0_0_35px_rgba(34,211,238,0.65),0_0_90px_rgba(37,99,235,0.38)]" : ""} ${!day.moduleType && !isWebDeveloper ? "border-dashed opacity-70" : ""}`}
             >
               {isCurrentDay && (
                 <>
@@ -1203,43 +697,62 @@ export function DailyLessonsPage() {
               )}
               <div className="relative mb-5 flex items-start justify-between gap-3">
                 <div>
-                  <p className={`text-[10px] font-black uppercase tracking-[0.28em] ${presentation?.accent ?? 'text-slate-500'}`}>Day {day.day}{presentation ? ` · ${presentation.label}` : ''}</p>
-                  {scheduledDate && <p className="mt-1 text-xs font-bold text-slate-500">{scheduledDate}</p>}
+                  <p
+                    className={`text-[10px] font-black uppercase tracking-[0.28em] ${presentation?.accent ?? "text-slate-500"}`}
+                  >
+                    Day {day.day}
+                    {presentation ? ` · ${presentation.label}` : ""}
+                  </p>
+                  {scheduledDate && (
+                    <p className="mt-1 text-xs font-bold text-slate-500">
+                      {scheduledDate}
+                    </p>
+                  )}
                   <h2 className="mt-2 text-xl font-black leading-tight text-white">
-                    {state.activePathway === 'paid_batch'
-                      ? (day.staticLesson?.topicTitle || day.title || `Topic ${day.day}`)
-                      : ['arabic', 'english'].includes(state.activePathway)
-                        ? (day.day % 2 !== 0 ? `Day ${day.day} PDF` : `Day ${day.day} Quiz`)
-                        : day.title}
+                    {day.title}
                   </h2>
                 </div>
-                <div className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl ${
-                  completed ? 'bg-emerald-500/15 text-emerald-400' : isLocked ? 'bg-white/5 text-slate-500' : 'bg-blue-500 text-white'
-                }`}>
-                  {completed ? <CheckCircle2 size={20} /> : isLocked ? <Lock size={18} /> : <Icon size={19} />}
+                <div
+                  className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl ${
+                    completed
+                      ? "bg-emerald-500/15 text-emerald-400"
+                      : isLocked
+                        ? "bg-white/5 text-slate-500"
+                        : "bg-blue-500 text-white"
+                  }`}
+                >
+                  {completed ? (
+                    <CheckCircle2 size={20} />
+                  ) : isLocked ? (
+                    <Lock size={18} />
+                  ) : (
+                    <Icon size={19} />
+                  )}
                 </div>
               </div>
 
               <p className="min-h-12 text-sm leading-6 text-slate-400">
-                {state.activePathway === 'paid_batch'
-                  ? (day.staticLesson?.description || `Study session for Topic ${day.day}`)
-                  : ['arabic', 'english'].includes(state.activePathway)
-                    ? (day.day % 2 !== 0 ? "Read the day's PDF learning resource." : "Complete the day's review quiz.")
-                    : day.description}
+                {day.description}
               </p>
-              <ModuleStats day={day} language={state.activePathway} />
+              <ModuleStats day={day} />
 
               <div className="mt-6 grid gap-2">
                 <button
                   type="button"
-                  disabled={planReadOnlyForLearner || (isLocked && !isWebDeveloper)}
+                  disabled={
+                    planReadOnlyForLearner || (isLocked && !isWebDeveloper)
+                  }
                   onClick={() => {
                     if (planReadOnlyForLearner) return;
                     if (isLocked && !isWebDeveloper) {
                       if (isMonthLocked) {
-                        setComingSoon(`Class ${day.day} requires Month ${dayMonth} enrollment.`);
+                        setComingSoon(
+                          `Class ${day.day} requires Month ${dayMonth} enrollment.`,
+                        );
                       } else {
-                        setComingSoon(premiumLocked ? 'Arabic Premium' : !isPublished ? `Day ${day.day}` : 'Complete the previous day');
+                        setComingSoon(
+                          premiumLocked ? "Premium access" : `Day ${day.day}`,
+                        );
                       }
                       return;
                     }
@@ -1247,12 +760,12 @@ export function DailyLessonsPage() {
                   }}
                   className={`flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-sm font-black uppercase tracking-widest transition disabled:cursor-not-allowed ${
                     isLocked && !isWebDeveloper
-                      ? 'border border-white/5 bg-white/5 text-slate-500'
+                      ? "border border-white/5 bg-white/5 text-slate-500"
                       : completed
-                        ? 'border border-emerald-400/20 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500 hover:text-white'
+                        ? "border border-emerald-400/20 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500 hover:text-white"
                         : isPaidBatch
-                          ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25 hover:from-purple-500 hover:to-indigo-500'
-                          : 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-emerald-500'
+                          ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25 hover:from-purple-500 hover:to-indigo-500"
+                          : "bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-emerald-500"
                   }`}
                 >
                   {actionLabel}
@@ -1265,7 +778,8 @@ export function DailyLessonsPage() {
                     onClick={() => navigate(`/lesson/${day.day}?configure=1`)}
                     className="flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-xs font-black uppercase tracking-widest text-slate-300 transition hover:border-emerald-400/30 hover:bg-emerald-500/10 hover:text-emerald-100"
                   >
-                    <Settings2 size={15} /> {day.configured ? 'Configure day' : 'Plan this day'}
+                    <Settings2 size={15} />{" "}
+                    {day.configured ? "Configure day" : "Plan this day"}
                   </button>
                 )}
               </div>
@@ -1287,21 +801,26 @@ export function DailyLessonsPage() {
               initial={{ scale: 0.82, y: 24 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 12 }}
-              transition={{ type: 'spring', stiffness: 180, damping: 16 }}
+              transition={{ type: "spring", stiffness: 180, damping: 16 }}
               className="relative w-full max-w-md overflow-hidden rounded-[2rem] border border-emerald-400/20 bg-slate-950 p-8 text-center shadow-[0_30px_100px_rgba(16,185,129,0.18)]"
-              onClick={event => event.stopPropagation()}
+              onClick={(event) => event.stopPropagation()}
             >
               <motion.div
                 animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}
+                transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
                 className="mx-auto grid h-24 w-24 place-items-center rounded-full border border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
               >
                 <TimerReset size={42} />
               </motion.div>
-              <p className="mt-6 text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Daily course plan</p>
-              <h2 className="mt-3 text-3xl font-black text-white">{comingSoon} is not open yet</h2>
+              <p className="mt-6 text-xs font-black uppercase tracking-[0.28em] text-emerald-400">
+                Daily course plan
+              </p>
+              <h2 className="mt-3 text-3xl font-black text-white">
+                {comingSoon} is not open yet
+              </h2>
               <p className="mt-3 text-sm leading-6 text-slate-400">
-                Your course team will publish this day when it is ready. Complete the current day to unlock the next scheduled session.
+                Your course team will publish this day when it is ready.
+                Complete the current day to unlock the next scheduled session.
               </p>
             </motion.div>
           </motion.div>
@@ -1320,8 +839,8 @@ export function DailyLessonsPage() {
         isOpen={isSubmitModalOpen}
         onClose={() => setIsSubmitModalOpen(false)}
         onSubmit={handleSubmitTransfer}
-        month={selectedPaidMonth !== 'all' ? selectedPaidMonth : 2}
-        studentName={state.userName || ''}
+        month={selectedPaidMonth !== "all" ? selectedPaidMonth : 2}
+        studentName={state.userName || ""}
         fee={MONTHLY_TUITION_FEE}
       />
     </section>
