@@ -17,8 +17,8 @@
   },
   "compiledAssets": {
     "count": 96,
-    "bytes": 2724192,
-    "gzipBytes": 766228,
+    "bytes": 2724201,
+    "gzipBytes": 766136,
     "largest": [
       {
         "name": "characterController-BVRKmxXz.js",
@@ -26,14 +26,14 @@
         "gzip": 191091
       },
       {
-        "name": "RiggedStudent-gRUhtKyk.js",
+        "name": "RiggedStudent-CcwlsLxP.js",
         "bytes": 358010,
-        "gzip": 106094
+        "gzip": 106093
       },
       {
-        "name": "index-CX0vbyGO.js",
+        "name": "index-BoL_Juci.js",
         "bytes": 295587,
-        "gzip": 94275
+        "gzip": 94290
       }
     ]
   },
@@ -42,7 +42,8 @@
     "integration": 13,
     "syntaxLint": "PASS",
     "build": "PASS",
-    "buildSeconds": 22
+    "buildSeconds": 15.57
   },
-  "publicDeployment": false
+  "publicDeployment": false,
+  "finalInventoryUnchanged": true
 }

@@ -40,7 +40,7 @@ Verified locally October 13, 2026. **Available local engineering and release pre
 
 ## 8. Frontend changes and rendered QA
 
-**COMPLETED:** Enrollment visibility/current-course wording and mutation validation changes described above; Phase 18 editorial design preserved. Release hygiene ignores temporary files, private server env files and binary browser evidence while retaining it locally. Eight obsolete scratch/Puppeteer inspection scripts are excluded from the review candidate; originals remain in the owner's workspace.
+**COMPLETED:** Enrollment visibility/current-course wording and mutation validation changes described above; Phase 18 editorial design preserved. Courses & Fees now uses availability wording that remains correct when a new course is published. Release hygiene ignores temporary files, private server env files and binary browser evidence while retaining it locally. Eight obsolete scratch/Puppeteer inspection scripts are excluded from the review candidate; originals remain in the owner's workspace.
 
 **VERIFIED:** Phase 19 public/authenticated/dashboard matrices (33/12/9), Phase 20 empty/stale/profile checks (18), staff creation/publication journey and nine **compiled production-build** Home/Pricing/Login viewport checks. Compiled routes have no observed page faults, error boundary, horizontal overflow or developer-preview links. [Compiled smoke](visual-checks/phase20-production-smoke.json). This is local preview serving, not a public deployment or full production account test.
 
@@ -67,7 +67,7 @@ Native Idle/Walk/Run preview cycles were exercised. The locomotion diagnostic st
 | `npm test` | **193 passed**, 0 failed/skipped |
 | `npm run test:integration` | **13 passed**, 0 failed/skipped; isolated DBs |
 | `npm run lint` | Syntax checks passed; semantic ESLint unavailable |
-| `npm run build` | Passed, **22.00s**, existing >500KB chunk warning |
+| `npm run build` | Passed, **15.57s**, existing >500KB chunk warning |
 | Targeted Run/access assertions after final test enhancement | Four checks passed |
 | Fresh `npm run test:backup` | Seven-collection BSON restore passed |
 | `npm run build:release` in owner workspace | Correctly refused local HTTP API configuration; **BLOCKED** release environment |
@@ -80,7 +80,7 @@ The isolated committed review worktree independently passed 193 unit tests, 13 i
 
 **VERIFIED:** Frontend/backend production-only audits: **0 / 0** findings. Full audits retain **five frontend high / three backend high** findings through unpatched development-tool `braces` chains. Parser override 7.1.6 removed two moderate findings with frozen-source CSS byte-equivalence. No blind major upgrade.
 
-Final local build: **96 JS/CSS assets, 2,724,192 raw / 766,228 gzip bytes**, compared with initial Phase 19 baseline 2,723,599 / 765,920 (+593 / +308). Largest 3D chunk remains 735,206 raw/191,091 gzip. Aggregate bundle bytes do not establish startup speed, LCP or FPS. No visual quality reduction/heavy asset added. [Detailed baseline](phase19-performance-evidence.json).
+Final local build: **96 JS/CSS assets, 2,724,201 raw / 766,136 gzip bytes**, compared with initial Phase 19 baseline 2,723,599 / 765,920 (+602 / +216). Largest 3D chunk remains 735,206 raw/191,091 gzip. Aggregate bundle bytes do not establish startup speed, LCP or FPS. No visual quality reduction/heavy asset added. [Detailed baseline](phase19-performance-evidence.json).
 
 ## 14–17. Git remotes, branch, commits and push
 
@@ -93,7 +93,7 @@ Final local build: **96 JS/CSS assets, 2,724,192 raw / 766,228 gzip bytes**, com
 | Backend | `088094144e19221dbff7b3e7f09977251795901a` |
 | Frontend campus/release source | `28c837de133bb3e1eeef48210123565e26ff6a90` |
 
-A subsequent local documentation/test/hygiene commit completes the review branch. Exact final HEADs and cleanliness are in the ignored local `release-artifacts/phase20-review-commits.json` receipt. The frontend gitlink refers to the matching committed backend. Private env, backups, dependencies, temporary data and binary QA recordings are excluded. Compact JSON evidence is included; screenshots/recordings remain in the original local workspace. No owner work was reset/discarded; candidate omissions do not delete originals.
+Additional local documentation/test/hygiene commits complete the review branch; final course-availability wording is source commit `13f26c27c78d172b99b2fe64a9d9f7413963a7b2`. Exact final HEADs and cleanliness are in the ignored local `release-artifacts/phase20-review-commits.json` receipt. The frontend gitlink refers to the matching committed backend. Private env, backups, dependencies, temporary data and binary QA recordings are excluded. Compact JSON evidence is included; screenshots/recordings remain in the original local workspace. No owner work was reset/discarded; candidate omissions do not delete originals.
 
 **BLOCKED — push result: NOT PUSHED.** `main` is production-connected. Provider policy for review-branch deployments and the separate backend host is unavailable, so the no-public-deployment condition cannot yet be guaranteed. Review branches have no `origin/main` push upstream, preventing an accidental default push to production. Both repositories must be safely published together for the server gitlink to be fetchable. No force-push, remote-history replacement or PR/merge occurred.
 
