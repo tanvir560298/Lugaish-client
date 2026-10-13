@@ -1,0 +1,69 @@
+name: Prepare release (no deployment)
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        type: choice
+        options: [staging, production]
+        default: staging
+permissions:
+  contents: read
+jobs:
+  prepare:
+    environment: ${{ inputs.target }}
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:7
+        ports: ["27017:27017"]
+        options: --health-cmd "mongosh --quiet --eval 'db.adminCommand({ping:1})'" --health-interval 10s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - run: npm ci --prefix server
+      - run: npm run lint && npm test
+      - run: npm run test:integration
+      - name: Validate public build configuration
+        env:
+          RELEASE_TARGET: ${{ inputs.target }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
+          VITE_TELEMETRY_ENABLED: ${{ vars.VITE_TELEMETRY_ENABLED }}
+        run: |
+          node scripts/release/write-env.mjs ".env.${RELEASE_TARGET}.local"
+          npm run validate:env -- frontend ".env.${RELEASE_TARGET}.local"
+      - run: npm audit --omit=dev && npm audit --omit=dev --prefix server
+      - name: Build for the selected release environment
+        env:
+          RELEASE_TARGET: ${{ inputs.target }}
+        run: |
+          case "$RELEASE_TARGET" in
+            staging) npm run build:staging ;;
+            production) npm run build:release ;;
+            *) exit 1 ;;
+          esac
+      - run: node scripts/release/artifacts.mjs
+      - name: Prepare matching authentication routing
+        env:
+          RELEASE_TARGET: ${{ inputs.target }}
+        run: node scripts/release/vercel-config.mjs ".env.${RELEASE_TARGET}.local" release-artifacts/vercel.json
+      - name: Verify release target and archive integrity
+        env:
+          RELEASE_TARGET: ${{ inputs.target }}
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+        run: |
+          API_ORIGIN=$(node --input-type=module -e 'process.stdout.write(new URL(process.env.VITE_API_URL).origin)')
+          node scripts/release/verify-manifest.mjs release-artifacts "$RELEASE_TARGET" "$API_ORIGIN"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.target }}-release-${{ github.sha }}
+          path: release-artifacts/
+          retention-days: 14

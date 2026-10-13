@@ -1,0 +1,46 @@
+{
+  "license": "CC0 1.0",
+  "licenseURL": "https://polyhaven.com/license",
+  "assets": [
+    {
+      "source": "https://polyhaven.com/a/wood_floor",
+      "author": "Dimitrios Savva"
+    },
+    {
+      "source": "https://polyhaven.com/a/kloofendal_48d_partly_cloudy",
+      "author": "Greg Zaal"
+    }
+  ],
+  "downloads": [
+    {
+      "filename": "wood-color.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/wood_floor/wood_floor_diff_1k.jpg",
+      "md5": "b7e927d2bf2f8f103820ff3890c8407c",
+      "size": 734493
+    },
+    {
+      "filename": "wood-normal.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/wood_floor/wood_floor_nor_gl_1k.jpg",
+      "md5": "620f174d2c09b579c5d02d37b2106668",
+      "size": 423303
+    },
+    {
+      "filename": "wood-roughness.jpg",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/wood_floor/wood_floor_rough_1k.jpg",
+      "md5": "36146634f1dbd1bc30cd071857584c10",
+      "size": 527754
+    },
+    {
+      "filename": "daylight-1k.hdr",
+      "size": 1637206,
+      "md5": "ee096fe9e26ce29d8f110b5ba0579011",
+      "url": "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/kloofendal_48d_partly_cloudy_1k.hdr"
+    },
+    {
+      "filename": "/tmp/lugaish-panorama.jpg",
+      "size": 5275330,
+      "md5": "79255590d87c4d1b7abe4a8b17ffd057",
+      "url": "https://dl.polyhaven.org/file/ph-assets/HDRIs/extra/Tonemapped%20JPG/kloofendal_48d_partly_cloudy.jpg"
+    }
+  ]
+}

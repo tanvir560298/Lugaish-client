@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { BellRing, ExternalLink, FileText, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { api } from '../api/client.js';
-import { LEARNING_RESOURCES } from '../data/learningResources.js';
+import { loadStudyResources } from '../study/resources.js';
 import { useAppContext } from '../state/AppContext.jsx';
 
 export function LearningResourceNotification() {
@@ -20,19 +20,10 @@ export function LearningResourceNotification() {
     }
 
     setIsOpen(false);
-    api.getDayModules(state.activePathway)
-      .then(response => {
+    loadStudyResources(state.activePathway)
+      .then(resources => {
         if (ignore) return;
-        const availableDays = new Set(
-          (Array.isArray(response.modules) ? response.modules : [])
-            .filter(module => module.available === true)
-            .map(module => Number(module.day)),
-        );
-        const availableUnseenResources = (LEARNING_RESOURCES[state.activePathway] ?? [])
-          .filter(resource => (
-            availableDays.has(resource.day)
-            && localStorage.getItem(`lugaish_resource_seen_${resource.id}`) !== 'true'
-          ));
+        const availableUnseenResources = resources.filter(resource => localStorage.getItem(`lugaish_resource_seen_${resource.id}`) !== 'true');
         const resource = availableUnseenResources.at(-1) ?? null;
         setLatestResource(resource);
         setIsOpen(Boolean(resource));

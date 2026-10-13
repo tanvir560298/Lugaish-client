@@ -1,0 +1,276 @@
+{
+  "schema": 1,
+  "measuredAt": "2026-10-12T20:18:52.657Z",
+  "method": "Emitted JS/CSS filesystem byte counts and Node gzipSync defaults; aggregate across all route chunks, not initial-page transferred bytes.",
+  "baseline": {
+    "source": "Existing Phase 18 dist measured at the start of Phase 19, before package edits",
+    "assets": 96,
+    "bytes": 2723599,
+    "gzipBytes": 765920,
+    "largest": [
+      {
+        "name": "characterController-BVRKmxXz.js",
+        "bytes": 735206,
+        "gzipBytes": 191091
+      },
+      {
+        "name": "RiggedStudent-dxn2P4je.js",
+        "bytes": 358010,
+        "gzipBytes": 106095
+      },
+      {
+        "name": "index-BEhvU5jK.js",
+        "bytes": 295941,
+        "gzipBytes": 94385
+      },
+      {
+        "name": "index-CeFynRFj.css",
+        "bytes": 179610,
+        "gzipBytes": 28640
+      },
+      {
+        "name": "firebase-Pc0pl5Su.js",
+        "bytes": 157868,
+        "gzipBytes": 32581
+      },
+      {
+        "name": "DashboardPage-N5X3e_h6.js",
+        "bytes": 156909,
+        "gzipBytes": 33016
+      },
+      {
+        "name": "proxy-DQJZviLx.js",
+        "bytes": 128948,
+        "gzipBytes": 42415
+      },
+      {
+        "name": "CampusPlant-Brv5uVS5.js",
+        "bytes": 64503,
+        "gzipBytes": 23208
+      }
+    ]
+  },
+  "final": {
+    "buildIndexModifiedAt": "2026-10-12T20:17:22.460Z",
+    "assets": 96,
+    "bytes": 2724526,
+    "gzipBytes": 766311,
+    "javascript": {
+      "assets": 87,
+      "bytes": 2452832,
+      "gzipBytes": 714105
+    },
+    "css": {
+      "assets": 9,
+      "bytes": 271694,
+      "gzipBytes": 52206
+    },
+    "largest": [
+      {
+        "name": "characterController-BVRKmxXz.js",
+        "bytes": 735206,
+        "gzipBytes": 191091
+      },
+      {
+        "name": "RiggedStudent-DnRHsWQH.js",
+        "bytes": 358010,
+        "gzipBytes": 106094
+      },
+      {
+        "name": "index-BvtMc7F6.js",
+        "bytes": 295549,
+        "gzipBytes": 94280
+      },
+      {
+        "name": "index-CeFynRFj.css",
+        "bytes": 179610,
+        "gzipBytes": 28640
+      },
+      {
+        "name": "firebase-Pc0pl5Su.js",
+        "bytes": 157868,
+        "gzipBytes": 32581
+      },
+      {
+        "name": "DashboardPage-CPkknl6f.js",
+        "bytes": 157583,
+        "gzipBytes": 33254
+      },
+      {
+        "name": "proxy-5vsZmU_-.js",
+        "bytes": 128948,
+        "gzipBytes": 42415
+      },
+      {
+        "name": "CampusPlant-iKjGj32Q.js",
+        "bytes": 64503,
+        "gzipBytes": 23209
+      },
+      {
+        "name": "SpeakingPracticePage-jCKwd1an.js",
+        "bytes": 52213,
+        "gzipBytes": 15008
+      },
+      {
+        "name": "DailyLessonsPage-kC2HM8gU.js",
+        "bytes": 49436,
+        "gzipBytes": 12000
+      }
+    ]
+  },
+  "delta": {
+    "assets": 0,
+    "bytes": 927,
+    "gzipBytes": 391
+  },
+  "assetIntegrity": [
+    {
+      "path": "images/campus/classroom.jpg",
+      "bytes": 113384,
+      "sha256": "57ca4817139e4416574c9eeccf664babdc613f71b873d0d3e2e99ad49c904469",
+      "builtCopyIdentical": true,
+      "baseline": null
+    },
+    {
+      "path": "images/campus/library.jpg",
+      "bytes": 89396,
+      "sha256": "e70aafd1c13d577ce04b231d945a1088198bd7adf17f4ed9fb5d1f951fe8b8a7",
+      "builtCopyIdentical": true,
+      "baseline": null
+    },
+    {
+      "path": "images/campus/library-arrival.webp",
+      "bytes": 99582,
+      "sha256": "a2d3b52f278d599cda32cf8c15a0c9b5da0709e748767b424499fb427f127079",
+      "builtCopyIdentical": true,
+      "baseline": {
+        "source": "docs/PHASE-18-CONSOLIDATED-VERIFICATION.md",
+        "bytes": 99582,
+        "unchangedBytes": true
+      }
+    },
+    {
+      "path": "avatars/zain-quaternius.png",
+      "bytes": 22582,
+      "sha256": "1567d199f2b8da93941e83e9d4ab130b26f82eab1349ca9e173b5595a3e077ad",
+      "builtCopyIdentical": true,
+      "baseline": null
+    },
+    {
+      "path": "models/student/quaternius/casual-character.glb",
+      "bytes": 1430660,
+      "sha256": "fea7e71271203e7073f1a073fa1208de7402df276f87f80e149bf7589b5d46b4",
+      "builtCopyIdentical": true,
+      "baseline": {
+        "source": "Verified original Quaternius asset metadata and user-supplied checksum",
+        "bytes": 1430660,
+        "sha256": "fea7e71271203e7073f1a073fa1208de7402df276f87f80e149bf7589b5d46b4",
+        "unchanged": true
+      }
+    },
+    {
+      "path": "models/student/student.glb",
+      "bytes": 943252,
+      "sha256": "8c6baf7d9d2dcf554640d482526eed3cad499efc6f6228afeb63b2c98f43cf5d",
+      "builtCopyIdentical": true,
+      "baseline": null
+    },
+    {
+      "path": "audio/library-rain.mp3",
+      "bytes": 336710,
+      "sha256": "18b95c6b83acc6ff4ee94ca824e81db3458af88b02ae12417e3c494a413c3deb",
+      "builtCopyIdentical": true,
+      "baseline": null
+    }
+  ],
+  "cssOverrideVerification": {
+    "identicalToFrozenBefore": true,
+    "bytes": 306732,
+    "sha256": "663a9952a859b851938838bc6d5b9406774de7037abbdaeee7a78987e19206a4",
+    "parserVersion": "7.1.6"
+  },
+  "audit": {
+    "before": {
+      "frontend": {
+        "info": 0,
+        "low": 0,
+        "moderate": 2,
+        "high": 5,
+        "critical": 0,
+        "total": 7
+      },
+      "backend": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 3,
+        "critical": 0,
+        "total": 3
+      }
+    },
+    "final": {
+      "frontend": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 5,
+        "critical": 0,
+        "total": 5
+      },
+      "backend": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 3,
+        "critical": 0,
+        "total": 3
+      },
+      "frontendRuntime": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "backendRuntime": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      }
+    }
+  },
+  "remainingAdvisories": [
+    {
+      "package": "braces",
+      "range": "<=3.0.3",
+      "patchedVersion": null,
+      "severity": "high",
+      "source": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
+      "frontendPaths": [
+        "tailwindcss > chokidar > braces",
+        "tailwindcss > micromatch > braces"
+      ],
+      "backendPaths": [
+        "nodemon > chokidar > braces"
+      ],
+      "scope": "Development and build tooling; both npm audit --omit=dev results are zero. Do not parse untrusted glob patterns in tooling; no forced Tailwind migration or nodemon downgrade applied."
+    }
+  ],
+  "fixedAdvisory": {
+    "package": "postcss-selector-parser",
+    "before": "6.1.4",
+    "after": "7.1.6",
+    "source": "https://github.com/advisories/GHSA-rj75-hqrm-r3gf",
+    "compatibilitySource": "https://raw.githubusercontent.com/postcss/postcss-selector-parser/master/CHANGELOG.md"
+  },
+  "limitations": [
+    "No measured LCP, INP, TTFB, real-device FPS, memory-pressure or concurrent-user claim. Bundle sizes do not prove runtime speed.",
+    "Generated CSS compatibility uses frozen pre-edit source/content. Current CSS may legitimately differ because of subsequent source fixes.",
+    "All selected public assets match production copies; only the GLB and library-arrival image have independently recorded pre-phase baselines. Other assets are current-build integrity checks.",
+    "3D remains route-lazy with an existing >500 KB raw chunk warning. Preserving scene quality and avatar functionality takes priority over arbitrary chunk-score targets."
+  ]
+}

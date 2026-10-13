@@ -1,15 +1,28 @@
+import {InformationPage} from './pages/InformationPage.jsx';
+
+import { CatalogGuard } from './courses/Catalog.jsx';
 import { Suspense, lazy, useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { api } from './api/client.js';
 import { Layout } from './components/Layout.jsx';
 import { SEO } from './components/SEO.jsx';
 import { AppProvider, useAppContext } from './state/AppContext.jsx';
-import { ROLES, isStudentPreview } from './utils/roles.js';
+import { ROLES, isStudentPreview, getViewedRole } from './utils/roles.js';
+
+const IndependentSpeaking = lazy(() => import('./courses/IndependentSpeaking.jsx').then(m => ({default:m.IndependentSpeaking})));
+const ManageCourses = lazy(() => import('./courses/ManageCourses.jsx').then(m => ({default:m.ManageCourses})));
+const LearningSpacesPage = lazy(() => import('./pages/LearningSpacesPage.jsx').then(module => ({ default: module.LearningSpacesPage })));
+const StudyRoomPage = lazy(() => import('./pages/StudyRoomPage.jsx').then(module => ({ default: module.StudyRoomPage })));
+const ClassroomPage = lazy(() => import('./pages/ClassroomPage.jsx').then(module => ({ default: module.ClassroomPage })));
 
 const HomePage = lazy(() => import('./pages/HomePage.jsx').then(module => ({ default: module.HomePage })));
 const DashboardPage = lazy(() => import('./pages/DashboardPage.jsx').then(module => ({ default: module.DashboardPage })));
 const PathwaysPage = lazy(() => import('./pages/PathwaysPage.jsx').then(module => ({ default: module.PathwaysPage })));
+const PublishedLesson = lazy(() => import('./courses/PublishedLesson.jsx').then(m => ({default:m.PublishedLesson})));
 const LessonPage = lazy(() => import('./pages/LessonPage.jsx').then(module => ({ default: module.LessonPage })));
+const SpeakingPreviewPage = lazy(() => import('./pages/SpeakingPreviewPage.jsx').then(module=>({default:module.SpeakingPreviewPage})));
+const PracticePreviewPage = lazy(() => import('./pages/PracticePreviewPage.jsx').then(module => ({ default: module.PracticePreviewPage })));
+const ReviewPage = lazy(() => import('./learning/review/ReviewPage.jsx').then(m=>({default:m.ReviewPage})));
 const QuizPage = lazy(() => import('./pages/QuizPage.jsx').then(module => ({ default: module.QuizPage })));
 const DailyLessonsPage = lazy(() => import('./pages/DailyLessonsPage.jsx').then(module => ({ default: module.DailyLessonsPage })));
 const LoginPage = lazy(() => import('./pages/LoginPage.jsx').then(module => ({ default: module.LoginPage })));
@@ -25,7 +38,7 @@ const CertificatePage = lazy(() => import('./pages/CertificatePage.jsx').then(mo
 
 function PageFallback() {
   return (
-    <div className="grid min-h-[60svh] place-items-center">
+    <div className="grid min-h-[60svh] place-items-center" role="status" aria-label="Loading page">
       <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-500/20 border-t-blue-500" />
     </div>
   );
@@ -134,8 +147,12 @@ function CourseLaunchGuard({ children }) {
   );
 }
 
+function StudentLesson() { const {state}=useAppContext(); return !isStudentPreview(state)&&[ROLES.webDeveloper,ROLES.instructor,ROLES.editor,ROLES.tester].includes(state.userRole)?<LessonPage/>:<PublishedLesson/>; }
+
+function DashboardEntry(){const {state}=useAppContext();return getViewedRole(state)===ROLES.learner?<Navigate to='/progress' replace/>:<DashboardPage/>;}
+
 function ProtectedCourseRoute({ children }) {
-  return <ProtectedRoute><CourseLaunchGuard>{children}</CourseLaunchGuard></ProtectedRoute>;
+  return <ProtectedRoute><CatalogGuard staff><CourseLaunchGuard>{children}</CourseLaunchGuard></CatalogGuard></ProtectedRoute>;
 }
 
 export default function App() {
@@ -147,23 +164,36 @@ export default function App() {
         <Suspense fallback={<PageFallback />}>
           <Routes>
             <Route path='/' element={<HomePage />} />
+            <Route path='/privacy' element={<InformationPage kind="privacy"/>}/>
+            <Route path='/terms' element={<InformationPage kind="terms"/>}/>
+            <Route path='/support' element={<InformationPage kind="support"/>}/>
             <Route path='/login' element={<LoginPage />} />
             <Route path='/signup' element={<Navigate to="/login" replace />} />
             <Route path='/auth' element={<Navigate to="/login" replace />} />
+            <Route path='/manage-courses' element={<ProtectedRoute><ManageCourses /></ProtectedRoute>} />
             <Route path='/pricing' element={<PricingPage />} />
-            <Route path='/course/:language' element={<ProtectedRoute><CoursePage /></ProtectedRoute>} />
-            <Route path='/today' element={<ProtectedCourseRoute><TodayPage /></ProtectedCourseRoute>} />
-            <Route path='/lesson' element={<ProtectedCourseRoute><LessonPage /></ProtectedCourseRoute>} />
-            <Route path='/lesson/:day' element={<ProtectedCourseRoute><LessonPage /></ProtectedCourseRoute>} />
+            <Route path='/course/:language' element={<ProtectedRoute><CatalogGuard><CoursePage /></CatalogGuard></ProtectedRoute>} />
+            <Route path='/learning-spaces' element={<LearningSpacesPage />} />
+            <Route path='/study-room' element={<ProtectedRoute><StudyRoomPage /></ProtectedRoute>} />
+            {import.meta.env.DEV && <Route path='/learning-spaces-preview' element={<LearningSpacesPage devPreview />} />}
+            {import.meta.env.DEV && <Route path='/study-room-preview' element={<StudyRoomPage devPreview />} />}
+            <Route path='/classroom' element={<ProtectedRoute><ClassroomPage /></ProtectedRoute>} />
+            {import.meta.env.DEV && <Route path='/speaking-preview' element={<IndependentSpeaking/>} />}
+            {import.meta.env.DEV && <Route path='/practice-preview' element={<CatalogGuard><PracticePreviewPage /></CatalogGuard>} />}
+            {import.meta.env.DEV && <Route path='/classroom-preview' element={<ClassroomPage devPreview />} />}
+            <Route path='/today' element={<ProtectedCourseRoute><StudentLesson /></ProtectedCourseRoute>} />
+            <Route path='/lesson' element={<ProtectedCourseRoute><StudentLesson /></ProtectedCourseRoute>} />
+            <Route path='/lesson/:day' element={<ProtectedCourseRoute><StudentLesson /></ProtectedCourseRoute>} />
+            <Route path='/review-mistakes' element={<ProtectedRoute><ReviewPage /></ProtectedRoute>} />
             <Route path='/quiz' element={<ProtectedCourseRoute><QuizPage /></ProtectedCourseRoute>} />
-            <Route path='/dashboard' element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path='/dashboard' element={<ProtectedRoute><DashboardEntry /></ProtectedRoute>} />
             <Route path='/profile' element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path='/certificate/:code' element={<CertificatePage />} />
             <Route path='/progress' element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
-            <Route path='/pathways' element={<ProtectedRoute><PathwaysPage /></ProtectedRoute>} />
+            <Route path='/pathways' element={<ProtectedRoute><CatalogGuard><PathwaysPage /></CatalogGuard></ProtectedRoute>} />
             <Route path='/daily-lessons' element={<ProtectedCourseRoute><DailyLessonsPage /></ProtectedCourseRoute>} />
             <Route path='/interview' element={<ProtectedCourseRoute><InterviewPage /></ProtectedCourseRoute>} />
-            <Route path='/speaking-practice' element={<ProtectedCourseRoute><SpeakingPracticePage /></ProtectedCourseRoute>} />
+            <Route path='/speaking-practice' element={<ProtectedRoute><CatalogGuard staff fallback={<IndependentSpeaking/>}><CourseLaunchGuard><SpeakingPracticePage /></CourseLaunchGuard></CatalogGuard></ProtectedRoute>} />
             <Route path='/leaderboard' element={<Navigate to="/daily-lessons" replace />} />
             <Route path="/architects" element={<ArchitectsPage />} />
             <Route path='*' element={<Navigate to='/' replace />} />

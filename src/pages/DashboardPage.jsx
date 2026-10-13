@@ -1,70 +1,122 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
-import { Award, BookOpenCheck, Building2, CheckCircle2, ChevronDown, ClipboardList, FilePenLine, GraduationCap, Link2, Lock, Mail, Plus, RefreshCw, Send, ShieldCheck, Sparkles, Trash2, TrendingUp, UsersRound } from 'lucide-react';
-import { api } from '../api/client.js';
-import { getUnlinkedPrivateBatchEmails, isEmailLinkedWithPrivateBatch, useAppContext } from '../state/AppContext.jsx';
-import { TanvirCoursesManagementPanel } from '../components/TanvirCoursesManagementPanel.jsx';
-import { StudentPaymentCard } from '../components/StudentPaymentCard.jsx';
-import { AdminPaymentManager } from '../components/AdminPaymentManager.jsx';
-import { ROLE_LABELS, ROLE_VALUES, ROLES, getViewedRole, hasPermission, isStudentPreview, normalizeRole } from '../utils/roles.js';
-import { getEffectiveCourseStartKey, hasCourseStarted } from '../utils/courseLaunch.js';
-import { getLocalCertificates, saveLocalCertificate, getEligibleLocalMilestones, purgeInvalidLocalCertificates, getViewedCertificateCodes, markCertificateViewed } from '../utils/certificateStorage.js';
+import {
+  dashboardCourse,
+  dashboardLessons,
+} from "../courses/dashboardPolicy.js";
+import { useEffect, useMemo, useState } from "react";
+import { Link, Navigate } from "react-router-dom";
+import {
+  Award,
+  BookOpenCheck,
+  Building2,
+  CheckCircle2,
+  ChevronDown,
+  ClipboardList,
+  FilePenLine,
+  GraduationCap,
+  Link2,
+  Lock,
+  Mail,
+  Plus,
+  RefreshCw,
+  Send,
+  ShieldCheck,
+  Sparkles,
+  Trash2,
+  TrendingUp,
+  UsersRound,
+} from "lucide-react";
+import { api } from "../api/client.js";
+import {
+  getUnlinkedPrivateBatchEmails,
+  isEmailLinkedWithPrivateBatch,
+  useAppContext,
+} from "../state/AppContext.jsx";
+import { TanvirCoursesManagementPanel } from "../components/TanvirCoursesManagementPanel.jsx";
+import { StudentPaymentCard } from "../components/StudentPaymentCard.jsx";
+import { AdminPaymentManager } from "../components/AdminPaymentManager.jsx";
+import {
+  ROLE_LABELS,
+  ROLE_VALUES,
+  ROLES,
+  getViewedRole,
+  hasPermission,
+  isStudentPreview,
+  normalizeRole,
+} from "../utils/roles.js";
+import {
+  getEffectiveCourseStartKey,
+  hasCourseStarted,
+} from "../utils/courseLaunch.js";
+import {
+  getLocalCertificates,
+  saveLocalCertificate,
+  getEligibleLocalMilestones,
+  purgeInvalidLocalCertificates,
+  getViewedCertificateCodes,
+  markCertificateViewed,
+} from "../utils/certificateStorage.js";
 
 const XP_PER_LEVEL = 500;
 const CONSISTENCY_DAY_COUNT = 14;
-const EMAIL_MANAGER_EMAIL = 'tahmadium@gmail.com';
+const EMAIL_MANAGER_EMAIL = "tahmadium@gmail.com";
 
 const COURSE_MILESTONES = [
   {
     num: 7,
-    title: '7-Day Milestone',
-    subtitle: 'Week 1 Foundation',
-    requirement: 'Complete Days 1–7',
-    badge: 'Week 1',
+    title: "7-Day Milestone",
+    subtitle: "Week 1 Foundation",
+    requirement: "Complete Days 1–7",
+    badge: "Week 1",
   },
   {
     num: 14,
-    title: '14-Day Milestone',
-    subtitle: 'Week 2 Mid-Course',
-    requirement: 'Complete Days 1–14',
-    badge: 'Week 2',
+    title: "14-Day Milestone",
+    subtitle: "Week 2 Mid-Course",
+    requirement: "Complete Days 1–14",
+    badge: "Week 2",
   },
   {
     num: 21,
-    title: '21-Day Milestone',
-    subtitle: 'Week 3 Fluency',
-    requirement: 'Complete Days 1–21',
-    badge: 'Week 3',
+    title: "21-Day Milestone",
+    subtitle: "Week 3 Fluency",
+    requirement: "Complete Days 1–21",
+    badge: "Week 3",
   },
   {
     num: 30,
-    title: '30-Day Mastery',
-    subtitle: 'Course Completion',
-    requirement: 'Complete Days 1–30',
-    badge: 'Full Course',
+    title: "30-Day Mastery",
+    subtitle: "Course Completion",
+    requirement: "Complete Days 1–30",
+    badge: "Full Course",
   },
 ];
 
 function getCourseLessons(pathway) {
-  return pathway.modules.flatMap(module => module.lessons);
+  return dashboardLessons(pathway);
 }
 
 function getLocalDateKey(date = new Date()) {
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
 function getDateFromKey(key) {
-  const [year, month, day] = key.split('-').map(Number);
+  const [year, month, day] = key.split("-").map(Number);
   return new Date(year, month - 1, day);
 }
 
-function getCourseConsistency({ courseActivity = {}, courseStartedAt, selectedCourse }) {
+function getCourseConsistency({
+  courseActivity = {},
+  courseStartedAt,
+  selectedCourse,
+}) {
   const today = new Date();
   const todayKey = getLocalDateKey(today);
-  const startDate = getDateFromKey(getEffectiveCourseStartKey(courseStartedAt?.[selectedCourse]));
+  const startDate = getDateFromKey(
+    getEffectiveCourseStartKey(courseStartedAt?.[selectedCourse]),
+  );
   const activity = courseActivity?.[selectedCourse] ?? {};
 
   return Array.from({ length: CONSISTENCY_DAY_COUNT }, (_, index) => {
@@ -74,8 +126,15 @@ function getCourseConsistency({ courseActivity = {}, courseStartedAt, selectedCo
     const hasCompleted = Boolean(activity[dateKey]);
     const hasStarted = date >= startDate;
     const isToday = dateKey === todayKey;
-    const isMissed = hasStarted && !hasCompleted && date < getDateFromKey(todayKey);
-    const status = hasCompleted ? 'completed' : isMissed ? 'missed' : isToday && hasStarted ? 'today' : 'neutral';
+    const isMissed =
+      hasStarted && !hasCompleted && date < getDateFromKey(todayKey);
+    const status = hasCompleted
+      ? "completed"
+      : isMissed
+        ? "missed"
+        : isToday && hasStarted
+          ? "today"
+          : "neutral";
 
     return {
       date,
@@ -88,20 +147,23 @@ function getCourseConsistency({ courseActivity = {}, courseStartedAt, selectedCo
 
 function RoleBadge({ role }) {
   const normalized = normalizeRole(role);
-  const tone = normalized === ROLES.webDeveloper
-    ? 'border-blue-400/30 bg-blue-500/10 text-blue-100'
-    : normalized === ROLES.instructor
-      ? 'border-emerald-400/30 bg-emerald-500/10 text-emerald-100'
-      : normalized === ROLES.editor
-        ? 'border-amber-400/30 bg-amber-500/10 text-amber-100'
-        : normalized === ROLES.tester
-          ? 'border-violet-400/30 bg-violet-500/10 text-violet-100'
-          : normalized === ROLES.intern
-            ? 'border-cyan-400/30 bg-cyan-500/10 text-cyan-100'
-        : 'border-white/10 bg-white/5 text-slate-300';
+  const tone =
+    normalized === ROLES.webDeveloper
+      ? "border-blue-400/30 bg-blue-500/10 text-blue-100"
+      : normalized === ROLES.instructor
+        ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-100"
+        : normalized === ROLES.editor
+          ? "border-amber-400/30 bg-amber-500/10 text-amber-100"
+          : normalized === ROLES.tester
+            ? "border-violet-400/30 bg-violet-500/10 text-violet-100"
+            : normalized === ROLES.intern
+              ? "border-cyan-400/30 bg-cyan-500/10 text-cyan-100"
+              : "border-white/10 bg-white/5 text-slate-300";
 
   return (
-    <span className={`inline-flex rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] ${tone}`}>
+    <span
+      className={`inline-flex rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] ${tone}`}
+    >
       {ROLE_LABELS[normalized]}
     </span>
   );
@@ -109,7 +171,9 @@ function RoleBadge({ role }) {
 
 function StaffActionCard({ icon, title, description, to, disabled = false }) {
   const content = (
-    <div className={`h-full rounded-2xl border p-5 transition ${disabled ? 'border-white/10 bg-white/[0.03] opacity-60' : 'border-white/10 bg-gradient-to-br from-white/[0.08] to-white/[0.03] hover:-translate-y-1 hover:border-emerald-400/40 hover:bg-white/10'}`}>
+    <div
+      className={`h-full rounded-2xl border p-5 transition ${disabled ? "border-white/10 bg-white/[0.03] opacity-60" : "border-white/10 bg-gradient-to-br from-white/[0.08] to-white/[0.03] hover:-translate-y-1 hover:border-emerald-400/40 hover:bg-white/10"}`}
+    >
       <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-emerald-400/20 bg-emerald-400/10 text-emerald-300 shadow-lg shadow-emerald-950/20">
         {icon}
       </div>
@@ -119,14 +183,14 @@ function StaffActionCard({ icon, title, description, to, disabled = false }) {
   );
 
   if (disabled) return content;
-  if (to?.startsWith('#')) {
+  if (to?.startsWith("#")) {
     return (
       <a
         href={to}
         onClick={(e) => {
           e.preventDefault();
           const target = document.getElementById(to.slice(1));
-          if (target) target.scrollIntoView({ behavior: 'smooth' });
+          if (target) target.scrollIntoView({ behavior: "smooth" });
         }}
         className="block h-full"
       >
@@ -137,38 +201,57 @@ function StaffActionCard({ icon, title, description, to, disabled = false }) {
   return <Link to={to}>{content}</Link>;
 }
 
-function getInitials(name = '', email = '') {
-  const source = name.trim() || email.split('@')[0] || 'Learner';
-  return source
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(part => part[0]?.toUpperCase())
-    .join('') || 'L';
+function getInitials(name = "", email = "") {
+  const source = name.trim() || email.split("@")[0] || "Learner";
+  return (
+    source
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("") || "L"
+  );
 }
 
-function LearnerRoleRow({ user, onRoleChange, onTogglePrivateBatch, onChangePrivateBatchMonth, isTogglingPrivateBatch, onRemove, canManageRoles, isRemoving, isCurrentUser }) {
+function LearnerRoleRow({
+  user,
+  onRoleChange,
+  onTogglePrivateBatch,
+  onChangePrivateBatchMonth,
+  isTogglingPrivateBatch,
+  onRemove,
+  canManageRoles,
+  isRemoving,
+  isCurrentUser,
+}) {
   const role = normalizeRole(user.role);
   const progressEntries = Object.entries(user.learningProgress ?? {});
   const studentMonths = Math.max(Number(user.paidBatchMonths) || 1, 1);
 
   return (
-    <div className={`grid gap-4 border-t border-white/10 px-4 py-4 transition hover:bg-white/[0.03] ${canManageRoles ? 'lg:grid-cols-[1.35fr_0.65fr_280px]' : 'lg:grid-cols-[1.35fr_0.75fr]' } lg:items-center`}>
+    <div
+      className={`grid gap-4 border-t border-white/10 px-4 py-4 transition hover:bg-white/[0.03] ${canManageRoles ? "lg:grid-cols-[1.35fr_0.65fr_280px]" : "lg:grid-cols-[1.35fr_0.75fr]"} lg:items-center`}
+    >
       <div className="flex min-w-0 items-center gap-4">
         <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-white/10 bg-gradient-to-br from-blue-500/30 via-indigo-500/20 to-emerald-500/30 text-sm font-black text-white">
           {getInitials(user.name, user.email)}
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="truncate text-sm font-black text-white">{user.name || 'Unnamed learner'}</p>
+            <p className="truncate text-sm font-black text-white">
+              {user.name || "Unnamed learner"}
+            </p>
             {user.privateBatchAccess && (
               <span className="inline-flex items-center gap-1 rounded-full border border-purple-400/30 bg-purple-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-purple-300">
-                <span>💎</span> Month {studentMonths} (Days 1–{studentMonths * 12})
+                <span>💎</span> Month {studentMonths} (Days 1–
+                {studentMonths * 12})
               </span>
             )}
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-2">
-            <p className="truncate text-xs font-semibold text-slate-500">{user.email}</p>
+            <p className="truncate text-xs font-semibold text-slate-500">
+              {user.email}
+            </p>
             {canManageRoles && (
               <div className="flex flex-wrap items-center gap-2">
                 <button
@@ -177,16 +260,22 @@ function LearnerRoleRow({ user, onRoleChange, onTogglePrivateBatch, onChangePriv
                   disabled={isTogglingPrivateBatch}
                   className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-black uppercase tracking-wider transition ${
                     user.privateBatchAccess
-                      ? 'border-purple-400/30 bg-purple-500/15 text-purple-200 hover:bg-purple-500/25 hover:border-purple-400/60'
-                      : 'border-blue-400/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 hover:border-blue-400/60'
+                      ? "border-purple-400/30 bg-purple-500/15 text-purple-200 hover:bg-purple-500/25 hover:border-purple-400/60"
+                      : "border-blue-400/30 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 hover:border-blue-400/60"
                   } disabled:cursor-wait disabled:opacity-50`}
-                  title={user.privateBatchAccess ? 'Unlink learner from Paid Batch' : 'Grant access to exclusive Paid Batch'}
+                  title={
+                    user.privateBatchAccess
+                      ? "Unlink learner from Paid Batch"
+                      : "Grant access to exclusive Paid Batch"
+                  }
                 >
                   {user.privateBatchAccess ? (
                     <>
                       <CheckCircle2 size={12} className="text-purple-400" />
                       <span>Linked: Batch</span>
-                      <span className="ml-1 text-[9px] text-slate-400 underline hover:text-red-300">Unlink</span>
+                      <span className="ml-1 text-[9px] text-slate-400 underline hover:text-red-300">
+                        Unlink
+                      </span>
                     </>
                   ) : (
                     <>
@@ -198,19 +287,36 @@ function LearnerRoleRow({ user, onRoleChange, onTogglePrivateBatch, onChangePriv
 
                 {user.privateBatchAccess && (
                   <div className="flex items-center gap-1 rounded-lg border border-purple-400/30 bg-purple-950/70 px-2 py-0.5">
-                    <span className="text-[10px] font-black uppercase text-purple-300">Tier:</span>
+                    <span className="text-[10px] font-black uppercase text-purple-300">
+                      Tier:
+                    </span>
                     <select
                       value={studentMonths}
-                      onChange={e => onChangePrivateBatchMonth?.(user, Number(e.target.value))}
+                      onChange={(e) =>
+                        onChangePrivateBatchMonth?.(
+                          user,
+                          Number(e.target.value),
+                        )
+                      }
                       disabled={isTogglingPrivateBatch}
                       className="bg-transparent text-[11px] font-bold text-white outline-none cursor-pointer"
                       title="Set subscription month tier for this student"
                     >
-                      <option value={1} className="bg-slate-900 text-white">Month 1 (Days 1–12)</option>
-                      <option value={2} className="bg-slate-900 text-white">Month 2 (Days 1–24)</option>
-                      <option value={3} className="bg-slate-900 text-white">Month 3 (Days 1–36)</option>
-                      <option value={4} className="bg-slate-900 text-white">Month 4 (Days 1–48)</option>
-                      <option value={5} className="bg-slate-900 text-white">Month 5 (Days 1–60)</option>
+                      <option value={1} className="bg-slate-900 text-white">
+                        Month 1 (Days 1–12)
+                      </option>
+                      <option value={2} className="bg-slate-900 text-white">
+                        Month 2 (Days 1–24)
+                      </option>
+                      <option value={3} className="bg-slate-900 text-white">
+                        Month 3 (Days 1–36)
+                      </option>
+                      <option value={4} className="bg-slate-900 text-white">
+                        Month 4 (Days 1–48)
+                      </option>
+                      <option value={5} className="bg-slate-900 text-white">
+                        Month 5 (Days 1–60)
+                      </option>
                     </select>
                   </div>
                 )}
@@ -220,16 +326,32 @@ function LearnerRoleRow({ user, onRoleChange, onTogglePrivateBatch, onChangePriv
           {progressEntries.length > 0 && (
             <div className="mt-3 space-y-2">
               {progressEntries.map(([language, progress]) => (
-                <div key={language} className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs">
+                <div
+                  key={language}
+                  className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs"
+                >
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-black uppercase tracking-wider text-emerald-300">{language}</span>
-                    <span className="font-bold text-white">Current Day {progress.currentDay}</span>
-                    <span className="text-slate-400">{progress.completedDays?.length ?? 0} days completed</span>
+                    <span className="font-black uppercase tracking-wider text-emerald-300">
+                      {language}
+                    </span>
+                    <span className="font-bold text-white">
+                      Current Day {progress.currentDay}
+                    </span>
+                    <span className="text-slate-400">
+                      {progress.completedDays?.length ?? 0} days completed
+                    </span>
                   </div>
-                  {progress.completedDays?.length > 0 && <p className="mt-1 text-slate-400">Completed: {progress.completedDays.join(', ')}</p>}
+                  {progress.completedDays?.length > 0 && (
+                    <p className="mt-1 text-slate-400">
+                      Completed: {progress.completedDays.join(", ")}
+                    </p>
+                  )}
                   {progress.quizzes?.length > 0 && (
                     <p className="mt-1 text-amber-200">
-                      Quizzes: {progress.quizzes.map(quiz => `Day ${quiz.day} (${quiz.score}%)`).join(' · ')}
+                      Quizzes:{" "}
+                      {progress.quizzes
+                        .map((quiz) => `Day ${quiz.day} (${quiz.score}%)`)
+                        .join(" · ")}
                     </p>
                   )}
                 </div>
@@ -240,7 +362,9 @@ function LearnerRoleRow({ user, onRoleChange, onTogglePrivateBatch, onChangePriv
       </div>
 
       <div className="flex items-center justify-between gap-3 lg:justify-start">
-        <span className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500 lg:hidden">Current</span>
+        <span className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500 lg:hidden">
+          Current
+        </span>
         <RoleBadge role={role} />
       </div>
 
@@ -249,24 +373,35 @@ function LearnerRoleRow({ user, onRoleChange, onTogglePrivateBatch, onChangePriv
           <div className="relative min-w-0 flex-1">
             <select
               value={role}
-              onChange={event => onRoleChange(user.id, event.target.value)}
+              onChange={(event) => onRoleChange(user.id, event.target.value)}
               className="h-11 w-full appearance-none rounded-xl border border-white/10 bg-slate-950 px-3 pr-10 text-xs font-black uppercase tracking-wider text-white outline-none transition focus:border-emerald-400"
             >
-              {ROLE_VALUES.map(item => (
-                <option key={item} value={item}>{ROLE_LABELS[item]}</option>
+              {ROLE_VALUES.map((item) => (
+                <option key={item} value={item}>
+                  {ROLE_LABELS[item]}
+                </option>
               ))}
             </select>
-            <ChevronDown size={16} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <ChevronDown
+              size={16}
+              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+            />
           </div>
           <button
             type="button"
             onClick={() => onRemove(user)}
             disabled={isRemoving || isCurrentUser}
-            title={isCurrentUser ? 'You cannot remove your own account' : `Remove ${user.name || 'member'}`}
+            title={
+              isCurrentUser
+                ? "You cannot remove your own account"
+                : `Remove ${user.name || "member"}`
+            }
             className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-red-400/25 bg-red-500/10 px-3 text-xs font-black uppercase tracking-wider text-red-300 transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
           >
             <Trash2 size={16} />
-            <span className="hidden xl:inline">{isRemoving ? 'Removing...' : 'Remove'}</span>
+            <span className="hidden xl:inline">
+              {isRemoving ? "Removing..." : "Remove"}
+            </span>
           </button>
         </div>
       )}
@@ -276,26 +411,34 @@ function LearnerRoleRow({ user, onRoleChange, onTogglePrivateBatch, onChangePriv
 
 function SeatCapacityPanel({ users, seatLimits }) {
   const courses = [
-    { key: 'english', label: 'English Spelling Masterclass' },
-    { key: 'arabic', label: 'Arabic Pathway' },
+    { key: "english", label: "English enrollment history" },
+    { key: "arabic", label: "Arabic enrollment history" },
   ];
 
-  const pendingApplications = users.flatMap(user => (
-    user.seatApplications ?? []
-  ).filter(application => application.status === 'pending').map(application => ({
-    ...application,
-    userName: user.name,
-    userEmail: user.email,
-  })));
+  const pendingApplications = users.flatMap((user) =>
+    (user.seatApplications ?? [])
+      .filter((application) => application.status === "pending")
+      .map((application) => ({
+        ...application,
+        userName: user.name,
+        userEmail: user.email,
+      })),
+  );
 
   return (
     <div className="section-card p-6 sm:p-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.24em] text-blue-400">Seat capacity</p>
-          <h3 className="mt-2 text-xl font-black text-white">Cohort seats and applications</h3>
+          <p className="text-xs font-black uppercase tracking-[0.24em] text-blue-400">
+            Seat capacity
+          </p>
+          <h3 className="mt-2 text-xl font-black text-white">
+            Archived enrollment history
+          </h3>
           <p className="mt-2 text-sm leading-6 text-slate-400">
-            This shows when each course reaches its student limit and who has requested a priority seat.
+            Historical enrollment records are retained. Publish new courses
+            through Course publication; these counts do not indicate current
+            availability.
           </p>
         </div>
         <div className="grid h-12 w-12 place-items-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-blue-200">
@@ -304,27 +447,40 @@ function SeatCapacityPanel({ users, seatLimits }) {
       </div>
 
       <div className="mt-6 grid gap-4 md:grid-cols-2">
-        {courses.map(course => {
+        {courses.map((course) => {
           const seatLimit = seatLimits[course.key] ?? 100;
-          const enrolledCount = users.filter(user => user.enrolledPathways?.includes(course.key)).length;
+          const enrolledCount = users.filter((user) =>
+            user.enrolledPathways?.includes(course.key),
+          ).length;
           const remaining = Math.max(seatLimit - enrolledCount, 0);
           const isFull = remaining <= 0;
 
           return (
-            <div key={course.key} className={`rounded-2xl border p-5 ${isFull ? 'border-amber-400/30 bg-amber-500/10' : 'border-emerald-400/20 bg-emerald-500/10'}`}>
+            <div
+              key={course.key}
+              className={`rounded-2xl border p-5 ${isFull ? "border-amber-400/30 bg-amber-500/10" : "border-emerald-400/20 bg-emerald-500/10"}`}
+            >
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h4 className="text-base font-black text-white">{course.label}</h4>
-                  <p className="mt-2 text-sm text-slate-400">{isFull ? 'Cohort full' : `${remaining} seats available`}</p>
+                  <h4 className="text-base font-black text-white">
+                    {course.label}
+                  </h4>
+                  <p className="mt-2 text-sm text-slate-400">
+                    {"Historical enrollment count: " + enrolledCount}
+                  </p>
                 </div>
-                <span className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-widest ${isFull ? 'border-amber-300/30 bg-amber-400/10 text-amber-100' : 'border-emerald-300/30 bg-emerald-400/10 text-emerald-100'}`}>
-                  {isFull ? 'Full' : 'Open'}
+                <span
+                  className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-widest ${isFull ? "border-amber-300/30 bg-amber-400/10 text-amber-100" : "border-emerald-300/30 bg-emerald-400/10 text-emerald-100"}`}
+                >
+                  {isFull ? "Full" : "Open"}
                 </span>
               </div>
               <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/10">
                 <div
-                  className={`h-full rounded-full ${isFull ? 'bg-amber-400' : 'bg-emerald-400'}`}
-                  style={{ width: `${Math.min((enrolledCount / seatLimit) * 100, 100)}%` }}
+                  className={`h-full rounded-full ${isFull ? "bg-amber-400" : "bg-emerald-400"}`}
+                  style={{
+                    width: `${Math.min((enrolledCount / seatLimit) * 100, 100)}%`,
+                  }}
                 />
               </div>
               <p className="mt-3 text-xs font-black uppercase tracking-[0.18em] text-slate-400">
@@ -341,26 +497,45 @@ function SeatCapacityPanel({ users, seatLimits }) {
         </div>
         {pendingApplications.length ? (
           pendingApplications.map((application, index) => (
-            <div key={`${application.userEmail}-${application.language}-${application.submittedAt}-${index}`} className="grid gap-3 border-t border-white/10 px-4 py-4 lg:grid-cols-[1fr_0.7fr_0.8fr] lg:items-start">
+            <div
+              key={`${application.userEmail}-${application.language}-${application.submittedAt}-${index}`}
+              className="grid gap-3 border-t border-white/10 px-4 py-4 lg:grid-cols-[1fr_0.7fr_0.8fr] lg:items-start"
+            >
               <div className="min-w-0">
-                <p className="truncate text-sm font-black text-white">{application.userName || 'Unnamed learner'}</p>
-                <p className="truncate text-xs font-semibold text-slate-500">{application.userEmail}</p>
+                <p className="truncate text-sm font-black text-white">
+                  {application.userName || "Unnamed learner"}
+                </p>
+                <p className="truncate text-xs font-semibold text-slate-500">
+                  {application.userEmail}
+                </p>
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Course</p>
-                <p className="mt-1 text-sm font-semibold capitalize text-slate-200">{application.language}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  Course
+                </p>
+                <p className="mt-1 text-sm font-semibold capitalize text-slate-200">
+                  {application.language}
+                </p>
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Message</p>
-                <p className="mt-1 line-clamp-3 text-sm leading-6 text-slate-300">{application.goal || 'No message added.'}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  Message
+                </p>
+                <p className="mt-1 line-clamp-3 text-sm leading-6 text-slate-300">
+                  {application.goal || "No message added."}
+                </p>
                 {application.contactPreference && (
-                  <p className="mt-2 text-xs font-semibold text-emerald-200">Contact: {application.contactPreference}</p>
+                  <p className="mt-2 text-xs font-semibold text-emerald-200">
+                    Contact: {application.contactPreference}
+                  </p>
                 )}
               </div>
             </div>
           ))
         ) : (
-          <div className="px-4 py-5 text-sm font-semibold text-slate-400">No pending applications yet.</div>
+          <div className="px-4 py-5 text-sm font-semibold text-slate-400">
+            No pending applications yet.
+          </div>
         )}
       </div>
     </div>
@@ -372,11 +547,11 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
   const [users, setUsers] = useState([]);
   const [seatLimits, setSeatLimits] = useState({ english: 110, arabic: 55 });
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [canRetry, setCanRetry] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
-  const [removingUserId, setRemovingUserId] = useState('');
-  const [togglingBatchUserId, setTogglingBatchUserId] = useState('');
+  const [removingUserId, setRemovingUserId] = useState("");
+  const [togglingBatchUserId, setTogglingBatchUserId] = useState("");
 
   useEffect(() => {
     if (!canViewRoles) return;
@@ -384,35 +559,52 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
     let ignore = false;
     let retryTimer;
     setIsLoading(true);
-    api.listUsers()
-      .then(data => {
+    api
+      .listUsers()
+      .then((data) => {
         if (!ignore) {
           const rawUsers = data.users ?? [];
-          const unlinkedEmails = getUnlinkedPrivateBatchEmails().map(e => String(e).toLowerCase());
-          setUsers(rawUsers.map(u => {
-            const emailLower = (u.email || '').toLowerCase();
-            const isUnlinked = Boolean(u.privateBatchExplicitlyRevoked || unlinkedEmails.includes(emailLower));
-            const hasAccess = !isUnlinked && Boolean(u.privateBatchAccess || isEmailLinkedWithPrivateBatch(u.email));
-            return {
-              ...u,
-              privateBatchAccess: hasAccess,
-              privateBatchExplicitlyRevoked: isUnlinked,
-              paidBatchMonths: Math.max(Number(u.paidBatchMonths) || 1, 1),
-            };
-          }));
-          setMessage('');
+          const unlinkedEmails = getUnlinkedPrivateBatchEmails().map((e) =>
+            String(e).toLowerCase(),
+          );
+          setUsers(
+            rawUsers.map((u) => {
+              const emailLower = (u.email || "").toLowerCase();
+              const isUnlinked = Boolean(
+                u.privateBatchExplicitlyRevoked ||
+                  unlinkedEmails.includes(emailLower),
+              );
+              const hasAccess =
+                !isUnlinked &&
+                Boolean(
+                  u.privateBatchAccess ||
+                    isEmailLinkedWithPrivateBatch(u.email),
+                );
+              return {
+                ...u,
+                privateBatchAccess: hasAccess,
+                privateBatchExplicitlyRevoked: isUnlinked,
+                paidBatchMonths: Math.max(Number(u.paidBatchMonths) || 1, 1),
+              };
+            }),
+          );
+          setMessage("");
           setCanRetry(false);
           setSeatLimits({
-            english: data.courseSeatLimits?.english ?? data.courseSeatLimit ?? 110,
+            english:
+              data.courseSeatLimits?.english ?? data.courseSeatLimit ?? 110,
             arabic: data.courseSeatLimits?.arabic ?? data.courseSeatLimit ?? 55,
           });
         }
       })
-      .catch(error => {
+      .catch((error) => {
         if (!ignore) {
-          setMessage(error.message || 'Could not load users.');
+          setMessage(error.message || "Could not load users.");
           setCanRetry(true);
-          retryTimer = setTimeout(() => setReloadKey(value => value + 1), 10000);
+          retryTimer = setTimeout(
+            () => setReloadKey((value) => value + 1),
+            10000,
+          );
         }
       })
       .finally(() => {
@@ -426,99 +618,156 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
   }, [canViewRoles, reloadKey]);
 
   const updateRole = async (userId, role) => {
-    setMessage('');
+    setMessage("");
     setCanRetry(false);
     try {
       const response = await api.updateUserRole(userId, { role });
-      setUsers(prev => prev.map(user => (user.id === userId ? { ...user, ...response.user } : user)));
-      setMessage('Role updated.');
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === userId ? { ...user, ...response.user } : user,
+        ),
+      );
+      setMessage("Role updated.");
     } catch (error) {
-      setMessage(error.message || 'Role update failed.');
+      setMessage(error.message || "Role update failed.");
     }
   };
 
-  const togglePrivateBatch = async user => {
+  const togglePrivateBatch = async (user) => {
     const nextLinked = !user.privateBatchAccess;
     setTogglingBatchUserId(user.id);
-    setMessage('');
+    setMessage("");
     try {
       const response = await api.updateUserPrivateBatch(user.id, {
         privateBatchAccess: nextLinked,
         paidBatchMonths: user.paidBatchMonths || 1,
       });
-      const updatedAccess = response?.user?.privateBatchAccess !== undefined ? Boolean(response.user.privateBatchAccess) : nextLinked;
-      const updatedMonths = Math.max(Number(response?.user?.paidBatchMonths) || Number(user.paidBatchMonths) || 1, 1);
-      setUsers(prev => prev.map(u => (u.id === user.id ? {
-        ...u,
-        privateBatchAccess: updatedAccess,
-        privateBatchExplicitlyRevoked: !updatedAccess,
-        paidBatchMonths: updatedMonths,
-      } : u)));
+      const updatedAccess =
+        response?.user?.privateBatchAccess !== undefined
+          ? Boolean(response.user.privateBatchAccess)
+          : nextLinked;
+      const updatedMonths = Math.max(
+        Number(response?.user?.paidBatchMonths) ||
+          Number(user.paidBatchMonths) ||
+          1,
+        1,
+      );
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === user.id
+            ? {
+                ...u,
+                privateBatchAccess: updatedAccess,
+                privateBatchExplicitlyRevoked: !updatedAccess,
+                paidBatchMonths: updatedMonths,
+              }
+            : u,
+        ),
+      );
       actions.setPrivateBatchAccess(user.email, updatedAccess, updatedMonths);
-      setMessage(response?.message || (updatedAccess ? `Linked ${user.name || user.email} with Private Batch (Paid).` : `Unlinked ${user.name || user.email} from Private Batch.`));
+      setMessage(
+        response?.message ||
+          (updatedAccess
+            ? `Linked ${user.name || user.email} with Private Batch (Paid).`
+            : `Unlinked ${user.name || user.email} from Private Batch.`),
+      );
     } catch (error) {
-      setUsers(prev => prev.map(u => (u.id === user.id ? {
-        ...u,
-        privateBatchAccess: nextLinked,
-        privateBatchExplicitlyRevoked: !nextLinked,
-      } : u)));
-      actions.setPrivateBatchAccess(user.email, nextLinked, user.paidBatchMonths || 1);
-      setMessage(nextLinked ? `Linked ${user.name || user.email} with Private Batch (Paid).` : `Unlinked ${user.name || user.email} from Private Batch.`);
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === user.id
+            ? {
+                ...u,
+                privateBatchAccess: nextLinked,
+                privateBatchExplicitlyRevoked: !nextLinked,
+              }
+            : u,
+        ),
+      );
+      actions.setPrivateBatchAccess(
+        user.email,
+        nextLinked,
+        user.paidBatchMonths || 1,
+      );
+      setMessage(
+        nextLinked
+          ? `Linked ${user.name || user.email} with Private Batch (Paid).`
+          : `Unlinked ${user.name || user.email} from Private Batch.`,
+      );
     } finally {
-      setTogglingBatchUserId('');
+      setTogglingBatchUserId("");
     }
   };
 
   const changePrivateBatchMonth = async (user, newMonth) => {
     const months = Math.min(Math.max(Number(newMonth) || 1, 1), 5);
     setTogglingBatchUserId(user.id);
-    setMessage('');
+    setMessage("");
     try {
       const response = await api.updateUserPrivateBatch(user.id, {
         privateBatchAccess: true,
         paidBatchMonths: months,
       });
-      const updatedMonths = Math.max(Number(response?.user?.paidBatchMonths) || months, 1);
-      setUsers(prev => prev.map(u => (u.id === user.id ? {
-        ...u,
-        paidBatchMonths: updatedMonths,
-        privateBatchAccess: true,
-        privateBatchExplicitlyRevoked: false,
-      } : u)));
+      const updatedMonths = Math.max(
+        Number(response?.user?.paidBatchMonths) || months,
+        1,
+      );
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === user.id
+            ? {
+                ...u,
+                paidBatchMonths: updatedMonths,
+                privateBatchAccess: true,
+                privateBatchExplicitlyRevoked: false,
+              }
+            : u,
+        ),
+      );
       actions.setPrivateBatchAccess(user.email, true, updatedMonths);
-      setMessage(response?.message || `Updated ${user.name || user.email} to Month ${updatedMonths} (Days 1–${updatedMonths * 12}).`);
+      setMessage(
+        response?.message ||
+          `Updated ${user.name || user.email} to Month ${updatedMonths} (Days 1–${updatedMonths * 12}).`,
+      );
     } catch (error) {
-      setUsers(prev => prev.map(u => (u.id === user.id ? {
-        ...u,
-        paidBatchMonths: months,
-        privateBatchAccess: true,
-        privateBatchExplicitlyRevoked: false,
-      } : u)));
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === user.id
+            ? {
+                ...u,
+                paidBatchMonths: months,
+                privateBatchAccess: true,
+                privateBatchExplicitlyRevoked: false,
+              }
+            : u,
+        ),
+      );
       actions.setPrivateBatchAccess(user.email, true, months);
-      setMessage(`Updated ${user.name || user.email} to Month ${months} (Days 1–${months * 12}).`);
+      setMessage(
+        `Updated ${user.name || user.email} to Month ${months} (Days 1–${months * 12}).`,
+      );
     } finally {
-      setTogglingBatchUserId('');
+      setTogglingBatchUserId("");
     }
   };
 
-  const removeUser = async user => {
+  const removeUser = async (user) => {
     const confirmed = window.confirm(
       `Remove ${user.name || user.email}? Their account and learning progress will be permanently deleted.`,
     );
     if (!confirmed) return;
 
-    setMessage('');
+    setMessage("");
     setCanRetry(false);
     setRemovingUserId(user.id);
     try {
       const response = await api.removeUser(user.id);
-      setUsers(previous => previous.filter(item => item.id !== user.id));
+      setUsers((previous) => previous.filter((item) => item.id !== user.id));
       actions.setPrivateBatchAccess(user.email, false);
-      setMessage(response?.message || 'Member removed successfully.');
+      setMessage(response?.message || "Member removed successfully.");
     } catch (error) {
-      setMessage(error.message || 'Could not remove this member.');
+      setMessage(error.message || "Could not remove this member.");
     } finally {
-      setRemovingUserId('');
+      setRemovingUserId("");
     }
   };
 
@@ -526,35 +775,47 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
 
   return (
     <div className="space-y-6">
-      {canManageRoles && <SeatCapacityPanel users={users} seatLimits={seatLimits} />}
+      {canManageRoles && (
+        <SeatCapacityPanel users={users} seatLimits={seatLimits} />
+      )}
 
       <div className="section-card p-6 sm:p-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-400">
-              {canManageRoles ? 'Web developer control' : 'Team role directory'}
+              {canManageRoles ? "Web developer control" : "Team role directory"}
             </p>
-            <h3 className="mt-2 text-xl font-black text-white">{canManageRoles ? 'Role management' : 'Role overview'}</h3>
+            <h3 className="mt-2 text-xl font-black text-white">
+              {canManageRoles ? "Role management" : "Role overview"}
+            </h3>
             <p className="mt-2 text-sm text-slate-400">
               {canManageRoles
-                ? 'Promote instructors, editors, or learners after they sign in once.'
-                : 'View learner and staff roles. Only the web developer can make changes.'}
+                ? "Promote instructors, editors, or learners after they sign in once."
+                : "View learner and staff roles. Only the web developer can make changes."}
             </p>
           </div>
-          <RoleBadge role={canManageRoles ? ROLES.webDeveloper : ROLES.instructor} />
+          <RoleBadge
+            role={canManageRoles ? ROLES.webDeveloper : ROLES.instructor}
+          />
         </div>
 
         {message && (
           <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-amber-400/20 bg-amber-400/5 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm font-semibold text-amber-100">{message}{canRetry ? ' Retrying automatically.' : ''}</p>
+            <p className="text-sm font-semibold text-amber-100">
+              {message}
+              {canRetry ? " Retrying automatically." : ""}
+            </p>
             {canRetry && (
               <button
                 type="button"
-                onClick={() => setReloadKey(value => value + 1)}
+                onClick={() => setReloadKey((value) => value + 1)}
                 disabled={isLoading}
                 className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-amber-300/25 bg-amber-300/10 px-3 text-xs font-black uppercase tracking-widest text-amber-100 transition hover:bg-amber-300/20 disabled:cursor-wait disabled:opacity-60"
               >
-                <RefreshCw size={15} className={isLoading ? 'animate-spin' : ''} />
+                <RefreshCw
+                  size={15}
+                  className={isLoading ? "animate-spin" : ""}
+                />
                 Retry now
               </button>
             )}
@@ -562,16 +823,20 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
         )}
 
         <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/20">
-          <div className={`hidden gap-3 bg-white/5 px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 ${canManageRoles ? 'lg:grid-cols-[1.35fr_0.65fr_280px]' : 'lg:grid-cols-[1.35fr_0.75fr]'} lg:grid`}>
+          <div
+            className={`hidden gap-3 bg-white/5 px-4 py-3 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 ${canManageRoles ? "lg:grid-cols-[1.35fr_0.65fr_280px]" : "lg:grid-cols-[1.35fr_0.75fr]"} lg:grid`}
+          >
             <span>User</span>
             <span>Current role</span>
             {canManageRoles && <span>Manage member</span>}
           </div>
 
           {isLoading ? (
-            <div className="px-4 py-5 text-sm font-semibold text-slate-400">Loading users...</div>
+            <div className="px-4 py-5 text-sm font-semibold text-slate-400">
+              Loading users...
+            </div>
           ) : users.length ? (
-            users.map(user => (
+            users.map((user) => (
               <LearnerRoleRow
                 key={user.id}
                 user={user}
@@ -582,11 +847,15 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
                 onRemove={removeUser}
                 canManageRoles={canManageRoles}
                 isRemoving={removingUserId === user.id}
-                isCurrentUser={user.email?.toLowerCase() === state.userEmail?.toLowerCase()}
+                isCurrentUser={
+                  user.email?.toLowerCase() === state.userEmail?.toLowerCase()
+                }
               />
             ))
           ) : (
-            <div className="px-4 py-5 text-sm font-semibold text-slate-400">No users found yet.</div>
+            <div className="px-4 py-5 text-sm font-semibold text-slate-400">
+              No users found yet.
+            </div>
           )}
         </div>
       </div>
@@ -596,71 +865,96 @@ function RoleManagementPanel({ canManageRoles, canViewRoles }) {
 
 function EmailManagementPanel({ defaultTestEmail }) {
   const [status, setStatus] = useState(null);
-  const [subject, setSubject] = useState('');
-  const [message, setMessage] = useState('');
-  const [audience, setAudience] = useState('english');
-  const [testEmail, setTestEmail] = useState(defaultTestEmail || '');
-  const [confirmation, setConfirmation] = useState('');
-  const [notice, setNotice] = useState('');
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+  const [audience, setAudience] = useState("english");
+  const [testEmail, setTestEmail] = useState(defaultTestEmail || "");
+  const [confirmation, setConfirmation] = useState("");
+  const [notice, setNotice] = useState("");
   const [isBusy, setIsBusy] = useState(false);
 
-  const loadStatus = () => api.getMailStatus()
-    .then(setStatus)
-    .catch(error => setNotice(error.message || 'Could not load Gmail status.'));
+  const loadStatus = () =>
+    api
+      .getMailStatus()
+      .then(setStatus)
+      .catch((error) =>
+        setNotice(error.message || "Could not load Gmail status."),
+      );
 
-  useEffect(() => { loadStatus(); }, []);
+  useEffect(() => {
+    loadStatus();
+  }, []);
 
   const connectGmail = async () => {
     setIsBusy(true);
-    setNotice('');
+    setNotice("");
     try {
       const response = await api.getMailOAuthUrl();
       window.location.assign(response.url);
     } catch (error) {
-      setNotice(error.message || 'Could not start Gmail connection.');
+      setNotice(error.message || "Could not start Gmail connection.");
       setIsBusy(false);
     }
   };
 
-  const sendTest = async event => {
+  const sendTest = async (event) => {
     event.preventDefault();
     setIsBusy(true);
-    setNotice('');
+    setNotice("");
     try {
-      const response = await api.sendTestEmail({ email: testEmail, subject, message });
+      const response = await api.sendTestEmail({
+        email: testEmail,
+        subject,
+        message,
+      });
       setNotice(response.message);
     } catch (error) {
-      setNotice(error.message || 'Test email failed.');
+      setNotice(error.message || "Test email failed.");
     } finally {
       setIsBusy(false);
     }
   };
 
   const sendCampaign = async () => {
-    if (!window.confirm(`Send this message separately to enrolled ${audience} students only? This action cannot be undone.`)) return;
+    if (
+      !window.confirm(
+        `Send this message separately to enrolled ${audience} students only? This action cannot be undone.`,
+      )
+    )
+      return;
     setIsBusy(true);
-    setNotice('');
+    setNotice("");
     try {
-      const response = await api.sendEmailCampaign({ subject, message, audience, confirmation });
+      const response = await api.sendEmailCampaign({
+        subject,
+        message,
+        audience,
+        confirmation,
+      });
       setNotice(response.message);
-      setConfirmation('');
+      setConfirmation("");
       await loadStatus();
     } catch (error) {
-      setNotice(error.message || 'Campaign failed.');
+      setNotice(error.message || "Campaign failed.");
     } finally {
       setIsBusy(false);
     }
   };
 
   const activateSignupCampaign = async () => {
-    if (!window.confirm('Automatically send the latest course campaign once to each matching new student until the course starts?')) return;
+    if (
+      !window.confirm(
+        "Automatically send the latest course campaign once to each matching new student until the course starts?",
+      )
+    )
+      return;
     setIsBusy(true);
-    setNotice('');
+    setNotice("");
     try {
       const response = await api.activateLatestSignupCampaign();
       setNotice(response.message);
     } catch (error) {
-      setNotice(error.message || 'Could not enable automatic delivery.');
+      setNotice(error.message || "Could not enable automatic delivery.");
     } finally {
       setIsBusy(false);
     }
@@ -670,52 +964,139 @@ function EmailManagementPanel({ defaultTestEmail }) {
     <div className="section-card p-6 sm:p-8">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-400">Restricted mail console</p>
-          <h3 className="mt-2 flex items-center gap-2 text-xl font-black text-white"><Mail size={21} /> Email users</h3>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">Messages are sent individually, so recipients never see another user's email address.</p>
+          <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-400">
+            Restricted mail console
+          </p>
+          <h3 className="mt-2 flex items-center gap-2 text-xl font-black text-white">
+            <Mail size={21} /> Email users
+          </h3>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+            Messages are sent individually, so recipients never see another
+            user's email address.
+          </p>
         </div>
-        <div className={`rounded-full border px-3 py-2 text-xs font-black ${status?.connected ? 'border-emerald-400/30 bg-emerald-500/10 text-emerald-200' : 'border-amber-400/30 bg-amber-500/10 text-amber-100'}`}>
-          {status?.connected ? `Connected: ${status.senderEmail}` : 'Gmail not connected'}
+        <div
+          className={`rounded-full border px-3 py-2 text-xs font-black ${status?.connected ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-200" : "border-amber-400/30 bg-amber-500/10 text-amber-100"}`}
+        >
+          {status?.connected
+            ? `Connected: ${status.senderEmail}`
+            : "Gmail not connected"}
         </div>
       </div>
 
-      {notice && <p className="mt-5 rounded-2xl border border-blue-400/20 bg-blue-500/10 px-4 py-3 text-sm font-semibold text-blue-100">{notice}</p>}
+      {notice && (
+        <p className="mt-5 rounded-2xl border border-blue-400/20 bg-blue-500/10 px-4 py-3 text-sm font-semibold text-blue-100">
+          {notice}
+        </p>
+      )}
 
-      {status?.connectionError && <p className="mt-5 rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm font-semibold text-amber-100">{status.connectionError}</p>}
+      {status?.connectionError && (
+        <p className="mt-5 rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm font-semibold text-amber-100">
+          {status.connectionError}
+        </p>
+      )}
 
       {!status?.configured || !status?.connected ? (
         <div className="mt-6 rounded-2xl border border-amber-400/20 bg-amber-400/5 p-5">
-          <p className="text-sm text-amber-100">{status?.configured ? 'Connect the approved Gmail sender to continue.' : 'Add the Gmail environment variables to the backend first.'}</p>
+          <p className="text-sm text-amber-100">
+            {status?.configured
+              ? "Connect the approved Gmail sender to continue."
+              : "Add the Gmail environment variables to the backend first."}
+          </p>
           {status?.configured && (
-            <button type="button" onClick={connectGmail} disabled={isBusy} className="glow-button glow-button-blue mt-4">Connect Gmail</button>
+            <button
+              type="button"
+              onClick={connectGmail}
+              disabled={isBusy}
+              className="glow-button glow-button-blue mt-4"
+            >
+              Connect Gmail
+            </button>
           )}
         </div>
       ) : (
         <form onSubmit={sendTest} className="mt-6 space-y-5">
-          <label className="block text-sm font-bold text-slate-200">Subject
-            <input value={subject} onChange={event => setSubject(event.target.value)} maxLength={150} required className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white outline-none focus:border-blue-400/50" />
+          <label className="block text-sm font-bold text-slate-200">
+            Subject
+            <input
+              value={subject}
+              onChange={(event) => setSubject(event.target.value)}
+              maxLength={150}
+              required
+              className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white outline-none focus:border-blue-400/50"
+            />
           </label>
-          <label className="block text-sm font-bold text-slate-200">Message
-            <textarea value={message} onChange={event => setMessage(event.target.value)} maxLength={10000} required rows={7} className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white outline-none focus:border-blue-400/50" />
+          <label className="block text-sm font-bold text-slate-200">
+            Message
+            <textarea
+              value={message}
+              onChange={(event) => setMessage(event.target.value)}
+              maxLength={10000}
+              required
+              rows={7}
+              className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white outline-none focus:border-blue-400/50"
+            />
           </label>
           <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
-            <label className="block text-sm font-bold text-slate-200">Test recipient
-              <input type="email" value={testEmail} onChange={event => setTestEmail(event.target.value)} required className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white outline-none focus:border-blue-400/50" />
+            <label className="block text-sm font-bold text-slate-200">
+              Test recipient
+              <input
+                type="email"
+                value={testEmail}
+                onChange={(event) => setTestEmail(event.target.value)}
+                required
+                className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 text-white outline-none focus:border-blue-400/50"
+              />
             </label>
-            <button type="submit" disabled={isBusy} className="glow-button glow-button-blue justify-center"><Send size={17} /> Send test</button>
+            <button
+              type="submit"
+              disabled={isBusy}
+              className="glow-button glow-button-blue justify-center"
+            >
+              <Send size={17} /> Send test
+            </button>
           </div>
           <div className="rounded-2xl border border-red-400/20 bg-red-500/5 p-5">
             <p className="text-sm font-black text-red-100">Course audience</p>
             <div className="mt-3 grid grid-cols-2 gap-2 rounded-xl border border-white/10 bg-slate-950/40 p-1">
-              {['english', 'arabic'].map(course => (
-                <button key={course} type="button" onClick={() => { setAudience(course); setConfirmation(''); }} className={`rounded-lg px-3 py-3 text-xs font-black uppercase tracking-wider transition ${audience === course ? 'bg-white text-slate-950' : 'text-slate-400 hover:bg-white/10'}`}>
+              {["english", "arabic"].map((course) => (
+                <button
+                  key={course}
+                  type="button"
+                  onClick={() => {
+                    setAudience(course);
+                    setConfirmation("");
+                  }}
+                  className={`rounded-lg px-3 py-3 text-xs font-black uppercase tracking-wider transition ${audience === course ? "bg-white text-slate-950" : "text-slate-400 hover:bg-white/10"}`}
+                >
                   {course} students
                 </button>
               ))}
             </div>
-            <p className="mt-3 text-xs leading-5 text-slate-400">Only students enrolled in the selected course will receive this message. First send a test. Maximum {status.maxRecipientsPerCampaign} recipients per campaign.</p>
-            <input value={confirmation} onChange={event => setConfirmation(event.target.value)} placeholder={`Type: SEND TO ${audience.toUpperCase()} STUDENTS`} className="mt-4 w-full rounded-xl border border-red-400/20 bg-slate-950/40 px-4 py-3 text-white outline-none" />
-            <button type="button" onClick={sendCampaign} disabled={isBusy || confirmation !== `SEND TO ${audience.toUpperCase()} STUDENTS` || !subject || !message} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl bg-red-600 px-5 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-40"><Send size={17} /> Send to {audience} students</button>
+            <p className="mt-3 text-xs leading-5 text-slate-400">
+              Only students enrolled in the selected course will receive this
+              message. First send a test. Maximum{" "}
+              {status.maxRecipientsPerCampaign} recipients per campaign.
+            </p>
+            <input
+              value={confirmation}
+              onChange={(event) => setConfirmation(event.target.value)}
+              placeholder={`Type: SEND TO ${audience.toUpperCase()} STUDENTS`}
+              className="mt-4 w-full rounded-xl border border-red-400/20 bg-slate-950/40 px-4 py-3 text-white outline-none"
+            />
+            <button
+              type="button"
+              onClick={sendCampaign}
+              disabled={
+                isBusy ||
+                confirmation !== `SEND TO ${audience.toUpperCase()} STUDENTS` ||
+                !subject ||
+                !message
+              }
+              className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl bg-red-600 px-5 text-sm font-black text-white disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <Send size={17} /> Send to {audience} students
+            </button>
           </div>
         </form>
       )}
@@ -723,10 +1104,32 @@ function EmailManagementPanel({ defaultTestEmail }) {
       {status?.recentCampaigns?.length > 0 && (
         <div className="mt-6 space-y-2">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-xs font-black uppercase tracking-widest text-slate-400">Recent campaigns</p>
-            <button type="button" onClick={activateSignupCampaign} disabled={isBusy} className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-xs font-black text-emerald-200 disabled:opacity-40">Auto-send latest course campaign until course start</button>
+            <p className="text-xs font-black uppercase tracking-widest text-slate-400">
+              Recent campaigns
+            </p>
+            <button
+              type="button"
+              onClick={activateSignupCampaign}
+              disabled={isBusy}
+              className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-xs font-black text-emerald-200 disabled:opacity-40"
+            >
+              Auto-send latest course campaign until course start
+            </button>
           </div>
-          {status.recentCampaigns.map(campaign => <div key={campaign._id} className="flex flex-wrap justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300"><span>{campaign.subject} · {campaign.audience ?? 'legacy audience'}</span><span>{campaign.sentCount}/{campaign.recipientCount} sent · {campaign.status}</span></div>)}
+          {status.recentCampaigns.map((campaign) => (
+            <div
+              key={campaign._id}
+              className="flex flex-wrap justify-between gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300"
+            >
+              <span>
+                {campaign.subject} · {campaign.audience ?? "legacy audience"}
+              </span>
+              <span>
+                {campaign.sentCount}/{campaign.recipientCount} sent ·{" "}
+                {campaign.status}
+              </span>
+            </div>
+          ))}
         </div>
       )}
     </div>
@@ -735,18 +1138,20 @@ function EmailManagementPanel({ defaultTestEmail }) {
 
 export function DashboardPage() {
   const { state, actions, courseData } = useAppContext();
-  const enrolledPathways = state.enrolledPathways?.length ? state.enrolledPathways : [state.activePathway];
+  const enrolledPathways = state.enrolledPathways?.length
+    ? state.enrolledPathways
+    : [state.activePathway];
   const [selectedCourse, setSelectedCourse] = useState(state.activePathway);
   const [achievementSummary, setAchievementSummary] = useState(null);
   const [claimingAchievement, setClaimingAchievement] = useState(false);
-  const [achievementError, setAchievementError] = useState('');
+  const [achievementError, setAchievementError] = useState("");
   const courseIsLive = hasCourseStarted();
 
   const loadAchievements = async () => {
     try {
       const summary = await api.getAchievementSummary();
       setAchievementSummary(summary);
-      setAchievementError('');
+      setAchievementError("");
     } catch (error) {
       setAchievementError(error.message);
     }
@@ -764,9 +1169,24 @@ export function DashboardPage() {
 
   const badges = useMemo(
     () => [
-      { id: 'visionary-voice', label: 'Visionary Voice', description: 'Gain 500 XP to unlock visionary status.', unlocked: state.badges.includes('visionary-voice') },
-      { id: 'streak-warrior', label: 'Streak Warrior', description: 'Maintain a 7-day learning streak.', unlocked: state.streak >= 7 },
-      { id: 'rhetorical-elite', label: 'Rhetorical Elite', description: 'Surpass 1,500 total XP points.', unlocked: state.xp >= 1500 },
+      {
+        id: "visionary-voice",
+        label: "Visionary Voice",
+        description: "Gain 500 XP to unlock visionary status.",
+        unlocked: state.badges.includes("visionary-voice"),
+      },
+      {
+        id: "streak-warrior",
+        label: "Streak Warrior",
+        description: "Maintain a 7-day learning streak.",
+        unlocked: state.streak >= 7,
+      },
+      {
+        id: "rhetorical-elite",
+        label: "Rhetorical Elite",
+        description: "Surpass 1,500 total XP points.",
+        unlocked: state.xp >= 1500,
+      },
     ],
     [state.badges, state.streak, state.xp],
   );
@@ -774,57 +1194,76 @@ export function DashboardPage() {
   if (!state.isLoggedIn) {
     return <Navigate to="/login" replace />;
   }
-  const pathway = courseData[selectedCourse] ?? courseData.english;
+  const pathway = dashboardCourse(courseData, selectedCourse);
   const courseLessons = getCourseLessons(pathway);
-  const completedCourseLessons = courseLessons.filter(lesson => state.completedLessons.includes(lesson.id));
-  const nextLesson = courseLessons.find(lesson => !state.completedLessons.includes(lesson.id)) ?? courseLessons[courseLessons.length - 1];
-  const courseProgress = courseLessons.length ? Math.round((completedCourseLessons.length / courseLessons.length) * 100) : 0;
+  const completedCourseLessons = courseLessons.filter((lesson) =>
+    state.completedLessons.includes(lesson.id),
+  );
+  const nextLesson =
+    courseLessons.find(
+      (lesson) => !state.completedLessons.includes(lesson.id),
+    ) ?? courseLessons[courseLessons.length - 1];
+  const courseProgress = courseLessons.length
+    ? Math.round((completedCourseLessons.length / courseLessons.length) * 100)
+    : 0;
   const consistency = getCourseConsistency({
     courseActivity: state.courseActivity,
     courseStartedAt: state.courseStartedAt,
     selectedCourse,
   });
-  const completedDays = consistency.filter(item => item.status === 'completed').length;
-  const missedDays = consistency.filter(item => item.status === 'missed').length;
+  const completedDays = consistency.filter(
+    (item) => item.status === "completed",
+  ).length;
+  const missedDays = consistency.filter(
+    (item) => item.status === "missed",
+  ).length;
   const enrolledCount = enrolledPathways.length;
-  const displayName = state.userName || 'Lugaish Learner';
-  const initials = displayName
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(part => part[0]?.toUpperCase())
-    .join('') || 'LL';
+  const displayName = state.userName || "Lugaish Learner";
+  const initials =
+    displayName
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("") || "LL";
   const level = Math.floor(state.xp / XP_PER_LEVEL) + 1;
   const xpInLevel = state.xp % XP_PER_LEVEL;
   const remaining = XP_PER_LEVEL - xpInLevel;
   const levelProgress = Math.round((xpInLevel / XP_PER_LEVEL) * 100);
   const role = getViewedRole(state);
-  const isWebDeveloper = (!isStudentPreview(state) && role === ROLES.webDeveloper) || state.userEmail?.toLowerCase() === 'tahmadium@gmail.com';
+  const isWebDeveloper =
+    (!isStudentPreview(state) && role === ROLES.webDeveloper) ||
+    state.userEmail?.toLowerCase() === "tahmadium@gmail.com";
   const isStaff = role !== ROLES.learner;
-  const canManageRoles = hasPermission(role, 'manage_roles');
-  const canViewRoles = isStaff;
-  const canManageLessons = hasPermission(role, 'manage_lessons');
-  const canCreatePost = hasPermission(role, 'create_post');
-  const canPublish = hasPermission(role, 'publish_post');
-  const canManageEmail = hasPermission(role, 'manage_email')
-    && (role === ROLES.tester || state.userEmail?.toLowerCase() === EMAIL_MANAGER_EMAIL);
+  const canManageRoles = hasPermission(role, "manage_roles");
+  const canViewRoles =
+    hasPermission(role, "manage_users") && role !== ROLES.tester;
+  const canManageLessons = hasPermission(role, "manage_lessons");
+  const canCreatePost = hasPermission(role, "create_post");
+  const canPublish = hasPermission(role, "publish_post");
+  const canManageEmail =
+    hasPermission(role, "manage_email") &&
+    (role === ROLES.tester ||
+      state.userEmail?.toLowerCase() === EMAIL_MANAGER_EMAIL);
   // Milestone certificates
   const [viewedVersion, setViewedVersion] = useState(0);
 
   useEffect(() => {
-    const handleFocus = () => setViewedVersion(v => v + 1);
-    window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
+    const handleFocus = () => setViewedVersion((v) => v + 1);
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
   }, []);
 
-  const localMilestones = useMemo(() => (
-    getEligibleLocalMilestones(state.completedLessons, selectedCourse)
-  ), [state.completedLessons, selectedCourse]);
+  const localMilestones = useMemo(
+    () => getEligibleLocalMilestones(state.completedLessons, selectedCourse),
+    [state.completedLessons, selectedCourse],
+  );
 
   // A milestone is strictly eligible ONLY if the learner has completed all lessons up to that day (e.g. Day 16 unlocks Day 7 and Day 14, NEVER Day 21 or 30)
-  const eligibleMilestones = useMemo(() => (
-    [...localMilestones].sort((a, b) => a - b)
-  ), [localMilestones]);
+  const eligibleMilestones = useMemo(
+    () => [...localMilestones].sort((a, b) => a - b),
+    [localMilestones],
+  );
 
   // Auto-purge any mistakenly claimed premature certificates from localStorage (e.g. Day 21 or Day 30)
   useEffect(() => {
@@ -833,59 +1272,95 @@ export function DashboardPage() {
 
   const allCertificates = useMemo(() => {
     const serverCerts = achievementSummary?.certificates || [];
-    const localCerts = purgeInvalidLocalCertificates(eligibleMilestones, selectedCourse);
+    const localCerts = purgeInvalidLocalCertificates(
+      eligibleMilestones,
+      selectedCourse,
+    );
     const merged = [...serverCerts];
     for (const cert of localCerts) {
-      if (!merged.some(c => c.certificateCode === cert.certificateCode)) {
+      if (!merged.some((c) => c.certificateCode === cert.certificateCode)) {
         merged.push(cert);
       }
     }
     // Strictly filter out any certificates that the learner has not reached or unlocked
-    return merged.filter(c => c.language === selectedCourse && eligibleMilestones.includes(c.milestone));
-  }, [achievementSummary?.certificates, selectedCourse, viewedVersion, eligibleMilestones]);
+    return merged.filter(
+      (c) =>
+        c.language === selectedCourse &&
+        eligibleMilestones.includes(c.milestone),
+    );
+  }, [
+    achievementSummary?.certificates,
+    selectedCourse,
+    viewedVersion,
+    eligibleMilestones,
+  ]);
 
-  const viewedCodes = useMemo(() => new Set(getViewedCertificateCodes()), [achievementSummary, viewedVersion]);
+  const viewedCodes = useMemo(
+    () => new Set(getViewedCertificateCodes()),
+    [achievementSummary, viewedVersion],
+  );
 
   // Unviewed claimed certificates
-  const unviewedIssuedCerts = useMemo(() => (
-    allCertificates.filter(c => !viewedCodes.has(String(c.certificateCode).toUpperCase()))
-  ), [allCertificates, viewedCodes]);
+  const unviewedIssuedCerts = useMemo(
+    () =>
+      allCertificates.filter(
+        (c) => !viewedCodes.has(String(c.certificateCode).toUpperCase()),
+      ),
+    [allCertificates, viewedCodes],
+  );
 
   // Eligible milestones not yet claimed
-  const claimedMilestones = useMemo(() => new Set(allCertificates.map(c => c.milestone)), [allCertificates]);
-  const unclaimedMilestones = useMemo(() => (
-    eligibleMilestones.filter(m => !claimedMilestones.has(m))
-  ), [eligibleMilestones, claimedMilestones]);
+  const claimedMilestones = useMemo(
+    () => new Set(allCertificates.map((c) => c.milestone)),
+    [allCertificates],
+  );
+  const unclaimedMilestones = useMemo(
+    () => eligibleMilestones.filter((m) => !claimedMilestones.has(m)),
+    [eligibleMilestones, claimedMilestones],
+  );
 
-  const hasNewNotification = unviewedIssuedCerts.length > 0 || unclaimedMilestones.length > 0;
+  const hasNewNotification =
+    unviewedIssuedCerts.length > 0 || unclaimedMilestones.length > 0;
   // Banner offers the lowest unclaimed milestone first (e.g. Day 14)
-  const bannerUnclaimedMilestone = unclaimedMilestones.length > 0 ? unclaimedMilestones[0] : null;
-  const bannerUnviewedCert = unviewedIssuedCerts.length > 0 ? unviewedIssuedCerts[0] : null;
+  const bannerUnclaimedMilestone =
+    unclaimedMilestones.length > 0 ? unclaimedMilestones[0] : null;
+  const bannerUnviewedCert =
+    unviewedIssuedCerts.length > 0 ? unviewedIssuedCerts[0] : null;
 
   const claimMilestoneCertificate = async (milestone) => {
     if (!eligibleMilestones.includes(milestone)) {
-      setAchievementError(`Complete all lessons up to Day ${milestone} to unlock this certificate.`);
+      setAchievementError(
+        `Complete all lessons up to Day ${milestone} to unlock this certificate.`,
+      );
       return;
     }
     setClaimingAchievement(milestone);
-    setAchievementError('');
+    setAchievementError("");
     try {
       await api.claimCertificate(selectedCourse, milestone);
       await loadAchievements();
     } catch (error) {
-      console.warn('Remote certificate claim failed or restricted, issuing locally:', error);
+      console.warn(
+        "Remote certificate claim failed or restricted, issuing locally:",
+        error,
+      );
       const code = `LUG-${selectedCourse.slice(0, 2).toUpperCase()}-${milestone}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
       const localCert = {
         certificateCode: code,
-        recipientName: state.userName || 'Learner',
+        recipientName: state.userName || "Learner",
         language: selectedCourse,
         milestone,
         issuedAt: new Date().toISOString(),
       };
       saveLocalCertificate(localCert);
-      setAchievementSummary(prev => ({
+      setAchievementSummary((prev) => ({
         ...prev,
-        certificates: [...(prev?.certificates || []).filter(c => c.certificateCode !== code), localCert],
+        certificates: [
+          ...(prev?.certificates || []).filter(
+            (c) => c.certificateCode !== code,
+          ),
+          localCert,
+        ],
       }));
     } finally {
       setClaimingAchievement(null);
@@ -894,14 +1369,37 @@ export function DashboardPage() {
 
   return (
     <section className="space-y-10">
+      {!courseLessons.length && (
+        <div className="campus-card" role="status">
+          <h2>No published course data is available.</h2>
+          <p>
+            Your staff tools and historical account records remain available.
+          </p>
+          {canManageLessons && (
+            <Link
+              className="campus-button campus-button-primary"
+              to="/manage-courses"
+            >
+              Open course publication
+            </Link>
+          )}
+        </div>
+      )}
       <div>
-        <h1 className="text-3xl font-bold text-white">{role === ROLES.learner ? 'My Progress' : 'Staff Dashboard'}</h1>
-        <p className="mt-2 text-slate-400">View your completed lessons, attendance, and certificates. To study, open My Classes.</p>
+        <h1 className="text-3xl font-bold text-white">
+          {role === ROLES.learner ? "My Progress" : "Staff Dashboard"}
+        </h1>
+        <p className="mt-2 text-slate-400">
+          View your completed lessons, attendance, and certificates. To study,
+          open My Classes.
+        </p>
       </div>
       <div className="grid gap-6 xl:grid-cols-[340px_1fr]">
         <aside className="space-y-6">
           <div className="section-card p-8 text-center">
-            <div className="mx-auto mb-6 grid h-28 w-28 place-items-center rounded-full bg-gradient-to-br from-blue-500 to-green-500 text-4xl font-black text-white">{initials}</div>
+            <div className="mx-auto mb-6 grid h-28 w-28 place-items-center rounded-full bg-gradient-to-br from-blue-500 to-green-500 text-4xl font-black text-white">
+              {initials}
+            </div>
             <h2 className="text-2xl font-bold text-white">{displayName}</h2>
             <div className="mt-3 flex justify-center">
               <RoleBadge role={role} />
@@ -909,15 +1407,27 @@ export function DashboardPage() {
             <div className="mt-8 space-y-4 text-left">
               <div className="flex items-center justify-between text-sm text-slate-300">
                 <span>Learning streak</span>
-                <span className="font-semibold text-white">{courseIsLive ? `${state.streak} days` : 'Starts Aug 1'}</span>
+                <span className="font-semibold text-white">
+                  {courseIsLive ? `${state.streak} days` : "Starts Aug 1"}
+                </span>
               </div>
               <div className="flex items-center justify-between text-sm text-slate-300">
                 <span>Rank title</span>
-                <span className="font-semibold text-white">{level >= 4 ? 'Orator Elite' : level >= 3 ? 'Visionary' : level >= 2 ? 'Pathfinder' : 'Initiate'}</span>
+                <span className="font-semibold text-white">
+                  {level >= 4
+                    ? "Orator Elite"
+                    : level >= 3
+                      ? "Visionary"
+                      : level >= 2
+                        ? "Pathfinder"
+                        : "Initiate"}
+                </span>
               </div>
               <div className="flex items-center justify-between text-sm text-slate-300">
-                <span>{pathway.title.replace(' Pathway', '')} completed</span>
-                <span className="font-semibold text-white">{completedCourseLessons.length}/{courseLessons.length}</span>
+                <span>{pathway.title.replace(" Pathway", "")} completed</span>
+                <span className="font-semibold text-white">
+                  {completedCourseLessons.length}/{courseLessons.length}
+                </span>
               </div>
             </div>
           </div>
@@ -925,16 +1435,28 @@ export function DashboardPage() {
           <div className="section-card p-8">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-400">Learning level</p>
-                <h3 className="mt-2 text-lg font-black text-white">Level {level}</h3>
+                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-emerald-400">
+                  Learning level
+                </p>
+                <h3 className="mt-2 text-lg font-black text-white">
+                  Level {level}
+                </h3>
               </div>
               <div className="grid h-11 w-11 place-items-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-blue-200">
                 <GraduationCap size={21} />
               </div>
             </div>
             <div className="relative mx-auto mt-8 h-40 w-40">
-              <svg viewBox="0 0 130 130" className="h-full w-full rotate-[-90deg]">
-                <circle cx="65" cy="65" r="54" className="fill-none stroke-white/10 stroke-[10]" />
+              <svg
+                viewBox="0 0 130 130"
+                className="h-full w-full rotate-[-90deg]"
+              >
+                <circle
+                  cx="65"
+                  cy="65"
+                  r="54"
+                  className="fill-none stroke-white/10 stroke-[10]"
+                />
                 <circle
                   cx="65"
                   cy="65"
@@ -942,14 +1464,19 @@ export function DashboardPage() {
                   className="fill-none stroke-gradient stroke-[10]"
                   style={{
                     strokeDasharray: 339.292,
-                    strokeDashoffset: 339.292 - (xpInLevel / XP_PER_LEVEL) * 339.292,
+                    strokeDashoffset:
+                      339.292 - (xpInLevel / XP_PER_LEVEL) * 339.292,
                   }}
                 />
               </svg>
               <div className="absolute inset-0 grid place-items-center text-center">
                 <div>
-                  <p className="text-4xl font-black text-white">{levelProgress}%</p>
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Complete</p>
+                  <p className="text-4xl font-black text-white">
+                    {levelProgress}%
+                  </p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    Complete
+                  </p>
                 </div>
               </div>
             </div>
@@ -965,9 +1492,14 @@ export function DashboardPage() {
                 />
               </div>
               <div className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-                <TrendingUp size={18} className="mt-0.5 shrink-0 text-emerald-400" />
+                <TrendingUp
+                  size={18}
+                  className="mt-0.5 shrink-0 text-emerald-400"
+                />
                 <p>
-                  <span className="font-black text-white">{remaining} XP</span> until Level {level + 1}. Complete lessons and quizzes to move up.
+                  <span className="font-black text-white">{remaining} XP</span>{" "}
+                  until Level {level + 1}. Complete lessons and quizzes to move
+                  up.
                 </p>
               </div>
             </div>
@@ -992,18 +1524,20 @@ export function DashboardPage() {
                     <div className="flex items-center gap-2">
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/40 bg-amber-400/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest text-amber-300">
                         <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-ping" />
-                        {bannerUnclaimedMilestone ? 'New Milestone Ready' : 'Unopened Certificate'}
+                        {bannerUnclaimedMilestone
+                          ? "New Milestone Ready"
+                          : "Unopened Certificate"}
                       </span>
                     </div>
                     <h2 className="mt-2 text-2xl font-black text-white">
                       {bannerUnclaimedMilestone
-                        ? `You unlocked the ${bannerUnclaimedMilestone}-Day ${selectedCourse === 'arabic' ? 'Arabic' : 'English'} Milestone!`
-                        : `Your ${bannerUnviewedCert?.milestone}-Day ${selectedCourse === 'arabic' ? 'Arabic' : 'English'} Certificate is Ready!`}
+                        ? `You unlocked the ${bannerUnclaimedMilestone}-Day ${selectedCourse === "arabic" ? "Arabic" : "English"} Milestone!`
+                        : `Your ${bannerUnviewedCert?.milestone}-Day ${selectedCourse === "arabic" ? "Arabic" : "English"} Certificate is Ready!`}
                     </h2>
                     <p className="mt-2 text-sm leading-6 text-slate-300">
                       {bannerUnclaimedMilestone
-                        ? 'Congratulations! You have completed all required lessons. Claim your official verified certificate now.'
-                        : 'Congratulations! Your personalized verified certificate is ready. Open it now to view, print, or share.'}
+                        ? "Congratulations! You have completed all required lessons. Claim your official verified certificate now."
+                        : "Congratulations! Your personalized verified certificate is ready. Open it now to view, print, or share."}
                     </p>
                   </div>
                 </div>
@@ -1012,12 +1546,18 @@ export function DashboardPage() {
                   {bannerUnclaimedMilestone ? (
                     <button
                       type="button"
-                      onClick={() => claimMilestoneCertificate(bannerUnclaimedMilestone)}
-                      disabled={claimingAchievement === bannerUnclaimedMilestone}
+                      onClick={() =>
+                        claimMilestoneCertificate(bannerUnclaimedMilestone)
+                      }
+                      disabled={
+                        claimingAchievement === bannerUnclaimedMilestone
+                      }
                       className="glow-button glow-button-green justify-center text-sm py-3 px-6 shadow-xl disabled:cursor-wait disabled:opacity-60"
                     >
                       <Sparkles size={16} />
-                      {claimingAchievement === bannerUnclaimedMilestone ? 'Creating certificate...' : `Claim Day ${bannerUnclaimedMilestone} Certificate`}
+                      {claimingAchievement === bannerUnclaimedMilestone
+                        ? "Creating certificate..."
+                        : `Claim Day ${bannerUnclaimedMilestone} Certificate`}
                     </button>
                   ) : bannerUnviewedCert ? (
                     <Link
@@ -1030,39 +1570,52 @@ export function DashboardPage() {
                   ) : null}
                 </div>
               </div>
-              {achievementError && <p className="mt-4 text-sm font-semibold text-red-200">{achievementError}</p>}
+              {achievementError && (
+                <p className="mt-4 text-sm font-semibold text-red-200">
+                  {achievementError}
+                </p>
+              )}
             </div>
           )}
 
           {/* --- STUDENT TUITION & MANUAL PAYMENT CARD --- */}
-          {(!isStaff || isStudentPreview(state) || state.privateBatchAccess) && (
-            <StudentPaymentCard user={state} />
-          )}
+          {(!isStaff ||
+            isStudentPreview(state) ||
+            state.privateBatchAccess) && <StudentPaymentCard user={state} />}
 
           {isStaff && (
             <div className="section-card p-6 sm:p-8">
               <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-400">Staff workspace</p>
-                  <h2 className="mt-2 text-2xl font-black text-white">{ROLE_LABELS[role]} dashboard</h2>
+                  <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-400">
+                    Staff workspace
+                  </p>
+                  <h2 className="mt-2 text-2xl font-black text-white">
+                    {ROLE_LABELS[role]} dashboard
+                  </h2>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
                     {role === ROLES.tester
-                      ? 'Your course changes are isolated in a private tester sandbox and never alter learner-facing content.'
+                      ? "Your course changes are isolated in a private tester sandbox and never alter learner-facing content."
                       : role === ROLES.intern
-                        ? 'You can add, edit, upload, and publish website content. Existing content and accounts cannot be deleted from your Intern account.'
-                        : 'Your dashboard changes based on account role. Learners see progress, staff see publishing and lesson tools, and the web developer can manage roles.'}
+                        ? "You can add, edit, upload, and publish website content. Existing content and accounts cannot be deleted from your Intern account."
+                        : "Your dashboard changes based on account role. Learners see progress, staff see publishing and lesson tools, and the web developer can manage roles."}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {state.permissions.map(permission => (
-                    <span key={permission} className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-slate-300">
-                      {permission.replaceAll('_', ' ')}
+                  {state.permissions.map((permission) => (
+                    <span
+                      key={permission}
+                      className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-slate-300"
+                    >
+                      {permission.replaceAll("_", " ")}
                     </span>
                   ))}
                 </div>
               </div>
 
-              <div className={`mt-6 grid gap-4 md:grid-cols-2 ${(isWebDeveloper || canManageRoles) ? 'xl:grid-cols-6' : 'xl:grid-cols-4'}`}>
+              <div
+                className={`mt-6 grid gap-4 md:grid-cols-2 ${isWebDeveloper || canManageRoles ? "xl:grid-cols-6" : "xl:grid-cols-4"}`}
+              >
                 {isWebDeveloper && (
                   <StaffActionCard
                     icon={<GraduationCap size={21} />}
@@ -1082,28 +1635,44 @@ export function DashboardPage() {
                 <StaffActionCard
                   icon={<UsersRound size={21} />}
                   title="Users"
-                  description={canManageRoles ? 'Review learners and assign instructor or editor access.' : 'Only the web developer can change team roles.'}
+                  description={
+                    canManageRoles
+                      ? "Review learners and assign instructor or editor access."
+                      : "Only the web developer can change team roles."
+                  }
                   to="/dashboard"
                   disabled={!canManageRoles}
                 />
                 <StaffActionCard
                   icon={<BookOpenCheck size={21} />}
                   title="Lessons"
-                  description={canManageLessons ? 'Plan daily lessons, tasks, and learner materials.' : 'Lesson tools are for instructors and the web developer.'}
+                  description={
+                    canManageLessons
+                      ? "Plan daily lessons, tasks, and learner materials."
+                      : "Lesson tools are for instructors and the web developer."
+                  }
                   to="/daily-lessons"
                   disabled={!canManageLessons}
                 />
                 <StaffActionCard
                   icon={<FilePenLine size={21} />}
                   title="Posts"
-                  description={canCreatePost ? 'Draft course updates, announcements, and learning posts.' : 'Publishing access has not been assigned.'}
+                  description={
+                    canCreatePost
+                      ? "Draft course updates, announcements, and learning posts."
+                      : "Publishing access has not been assigned."
+                  }
                   to="/architects"
                   disabled={!canCreatePost}
                 />
                 <StaffActionCard
                   icon={<ShieldCheck size={21} />}
                   title="Publishing"
-                  description={canPublish ? 'Approve edited content before learners see it.' : 'Editors and the web developer can publish.'}
+                  description={
+                    canPublish
+                      ? "Approve edited content before learners see it."
+                      : "Editors and the web developer can publish."
+                  }
                   to="/dashboard"
                   disabled={!canPublish}
                 />
@@ -1115,19 +1684,28 @@ export function DashboardPage() {
 
           {(canManageRoles || isWebDeveloper) && <AdminPaymentManager />}
 
-          <RoleManagementPanel canManageRoles={canManageRoles} canViewRoles={canViewRoles} />
+          <RoleManagementPanel
+            canManageRoles={canManageRoles}
+            canViewRoles={canViewRoles}
+          />
 
-          {canManageEmail && <EmailManagementPanel defaultTestEmail={state.userEmail} />}
+          {canManageEmail && (
+            <EmailManagementPanel defaultTestEmail={state.userEmail} />
+          )}
 
           <div className="section-card p-6 sm:p-8">
             <div className="mb-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Course view</p>
-                <h2 className="mt-3 text-2xl font-bold text-white">{pathway.title}</h2>
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
+                  Course view
+                </p>
+                <h2 className="mt-3 text-2xl font-bold text-white">
+                  {pathway.title}
+                </h2>
               </div>
               <div className="grid gap-2 sm:flex">
-                {enrolledPathways.map(pathwayKey => {
-                  const course = courseData[pathwayKey];
+                {enrolledPathways.map((pathwayKey) => {
+                  const course = dashboardCourse(courseData, pathwayKey);
                   const isSelected = selectedCourse === pathwayKey;
 
                   return (
@@ -1137,11 +1715,11 @@ export function DashboardPage() {
                       onClick={() => setSelectedCourse(pathwayKey)}
                       className={`rounded-2xl border px-4 py-3 text-xs font-black uppercase tracking-widest transition ${
                         isSelected
-                          ? 'border-blue-400/30 bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                          : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
+                          ? "border-blue-400/30 bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                          : "border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
                       }`}
                     >
-                      {course.flag} {course.title.replace(' Pathway', '')}
+                      {course.flag} {course.title.replace(" Pathway", "")}
                     </button>
                   );
                 })}
@@ -1150,19 +1728,34 @@ export function DashboardPage() {
 
             <div className="grid gap-5 lg:grid-cols-[1fr_220px] lg:items-center">
               <div>
-                <p className="text-slate-400">{nextLesson?.description ?? 'Pick a pathway to begin your next lesson.'}</p>
+                <p className="text-slate-400">
+                  {nextLesson?.description ??
+                    "Pick a pathway to begin your next lesson."}
+                </p>
                 <div className="mt-5 grid gap-3 sm:grid-cols-3">
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Progress</p>
-                    <p className="mt-2 text-2xl font-black text-white">{courseProgress}%</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                      Progress
+                    </p>
+                    <p className="mt-2 text-2xl font-black text-white">
+                      {courseProgress}%
+                    </p>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Done</p>
-                    <p className="mt-2 text-2xl font-black text-emerald-300">{completedCourseLessons.length}/{courseLessons.length}</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                      Done
+                    </p>
+                    <p className="mt-2 text-2xl font-black text-emerald-300">
+                      {completedCourseLessons.length}/{courseLessons.length}
+                    </p>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Courses</p>
-                    <p className="mt-2 text-2xl font-black text-blue-200">{enrolledCount}</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                      Courses
+                    </p>
+                    <p className="mt-2 text-2xl font-black text-blue-200">
+                      {enrolledCount}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -1180,31 +1773,46 @@ export function DashboardPage() {
           <div className="section-card p-6 sm:p-8">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h3 className="text-xl font-bold text-white">{pathway.title.replace(' Pathway', '')} consistency</h3>
-                <p className="mt-2 text-sm text-slate-400">Green means class completed that day. Red means that course was missed.</p>
+                <h3 className="text-xl font-bold text-white">
+                  {pathway.title.replace(" Pathway", "")} consistency
+                </h3>
+                <p className="mt-2 text-sm text-slate-400">
+                  Green means class completed that day. Red means that course
+                  was missed.
+                </p>
               </div>
               <div className="flex flex-wrap gap-2 text-xs font-black uppercase tracking-widest">
-                <span className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-emerald-200">{completedDays} done</span>
-                <span className="rounded-full border border-red-400/20 bg-red-500/10 px-3 py-2 text-red-200">{missedDays} missed</span>
+                <span className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-emerald-200">
+                  {completedDays} done
+                </span>
+                <span className="rounded-full border border-red-400/20 bg-red-500/10 px-3 py-2 text-red-200">
+                  {missedDays} missed
+                </span>
               </div>
             </div>
             <div className="mt-6 grid grid-cols-7 gap-2 sm:grid-cols-[repeat(14,minmax(0,1fr))]">
-              {consistency.map(item => (
+              {consistency.map((item) => (
                 <div
                   key={item.dateKey}
                   className={`flex h-16 flex-col items-center justify-center rounded-2xl border text-[10px] font-black uppercase tracking-wider ${
-                    item.status === 'completed'
-                      ? 'border-emerald-400/30 bg-emerald-500/20 text-emerald-100'
-                      : item.status === 'missed'
-                        ? 'border-red-400/30 bg-red-500/20 text-red-100'
-                        : item.status === 'today'
-                          ? 'border-blue-400/30 bg-blue-500/15 text-blue-100'
-                          : 'border-white/10 bg-white/5 text-slate-500'
+                    item.status === "completed"
+                      ? "border-emerald-400/30 bg-emerald-500/20 text-emerald-100"
+                      : item.status === "missed"
+                        ? "border-red-400/30 bg-red-500/20 text-red-100"
+                        : item.status === "today"
+                          ? "border-blue-400/30 bg-blue-500/15 text-blue-100"
+                          : "border-white/10 bg-white/5 text-slate-500"
                   }`}
                   title={`${item.date.toLocaleDateString()} - ${item.status}`}
                 >
-                  <span>{item.date.toLocaleDateString(undefined, { weekday: 'short' })}</span>
-                  <span className="mt-1 text-sm text-white/90">{item.date.getDate()}</span>
+                  <span>
+                    {item.date.toLocaleDateString(undefined, {
+                      weekday: "short",
+                    })}
+                  </span>
+                  <span className="mt-1 text-sm text-white/90">
+                    {item.date.getDate()}
+                  </span>
                 </div>
               ))}
             </div>
@@ -1218,9 +1826,13 @@ export function DashboardPage() {
                   <Award size={22} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white">Course Milestone Certificates</h3>
+                  <h3 className="text-xl font-bold text-white">
+                    Course Milestone Certificates
+                  </h3>
                   <p className="mt-1 text-sm text-slate-400">
-                    Earn verified certificates for completing key learning milestones in {selectedCourse === 'arabic' ? 'Arabic' : 'English'}.
+                    Earn verified certificates for completing key learning
+                    milestones in{" "}
+                    {selectedCourse === "arabic" ? "Arabic" : "English"}.
                   </p>
                 </div>
               </div>
@@ -1229,7 +1841,8 @@ export function DashboardPage() {
                 {hasNewNotification && (
                   <span className="flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-500/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-amber-200">
                     <span className="h-2 w-2 rounded-full bg-amber-400 animate-ping" />
-                    {unviewedIssuedCerts.length + unclaimedMilestones.length} New
+                    {unviewedIssuedCerts.length + unclaimedMilestones.length}{" "}
+                    New
                   </span>
                 )}
                 <span className="badge-pill border-green-400/20 bg-green-500/10 text-green-100">
@@ -1239,10 +1852,14 @@ export function DashboardPage() {
             </div>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {COURSE_MILESTONES.map(item => {
-                const cert = allCertificates.find(c => c.milestone === item.num);
+              {COURSE_MILESTONES.map((item) => {
+                const cert = allCertificates.find(
+                  (c) => c.milestone === item.num,
+                );
                 const isClaimed = Boolean(cert);
-                const isViewed = cert ? viewedCodes.has(String(cert.certificateCode).toUpperCase()) : false;
+                const isViewed = cert
+                  ? viewedCodes.has(String(cert.certificateCode).toUpperCase())
+                  : false;
                 const isUnopened = isClaimed && !isViewed;
                 const isEligible = eligibleMilestones.includes(item.num);
                 const isReadyToClaim = isEligible && !isClaimed;
@@ -1252,12 +1869,12 @@ export function DashboardPage() {
                     key={item.num}
                     className={`relative flex flex-col justify-between rounded-2xl border p-5 transition ${
                       isUnopened
-                        ? 'border-amber-400/50 bg-gradient-to-b from-amber-500/20 via-amber-500/5 to-slate-900 shadow-xl shadow-amber-500/10 ring-1 ring-amber-400/30'
+                        ? "border-amber-400/50 bg-gradient-to-b from-amber-500/20 via-amber-500/5 to-slate-900 shadow-xl shadow-amber-500/10 ring-1 ring-amber-400/30"
                         : isClaimed
-                          ? 'border-emerald-400/30 bg-gradient-to-b from-emerald-500/10 to-slate-900/60'
+                          ? "border-emerald-400/30 bg-gradient-to-b from-emerald-500/10 to-slate-900/60"
                           : isReadyToClaim
-                            ? 'border-amber-400/30 bg-gradient-to-b from-amber-500/10 to-slate-900/60'
-                            : 'border-white/5 bg-white/5 opacity-70'
+                            ? "border-amber-400/30 bg-gradient-to-b from-amber-500/10 to-slate-900/60"
+                            : "border-white/5 bg-white/5 opacity-70"
                     }`}
                   >
                     <div>
@@ -1293,17 +1910,21 @@ export function DashboardPage() {
                         <div
                           className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl text-lg ${
                             isUnopened || isClaimed
-                              ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
+                              ? "bg-amber-400/20 text-amber-300 border border-amber-400/30"
                               : isReadyToClaim
-                                ? 'bg-amber-400/10 text-amber-300'
-                                : 'bg-white/5 text-slate-600'
+                                ? "bg-amber-400/10 text-amber-300"
+                                : "bg-white/5 text-slate-600"
                           }`}
                         >
-                          {isClaimed || isReadyToClaim ? '🏆' : '🔒'}
+                          {isClaimed || isReadyToClaim ? "🏆" : "🔒"}
                         </div>
                         <div>
-                          <h4 className="text-base font-black text-white">{item.title}</h4>
-                          <p className="text-xs text-slate-400">{item.subtitle}</p>
+                          <h4 className="text-base font-black text-white">
+                            {item.title}
+                          </h4>
+                          <p className="text-xs text-slate-400">
+                            {item.subtitle}
+                          </p>
                         </div>
                       </div>
 
@@ -1329,7 +1950,9 @@ export function DashboardPage() {
                           disabled={claimingAchievement === item.num}
                           className="glow-button glow-button-green w-full justify-center text-xs py-2.5 disabled:cursor-wait disabled:opacity-60"
                         >
-                          {claimingAchievement === item.num ? 'Claiming...' : 'Claim Certificate'}
+                          {claimingAchievement === item.num
+                            ? "Claiming..."
+                            : "Claim Certificate"}
                         </button>
                       ) : (
                         <div className="rounded-xl border border-white/5 bg-white/5 py-2 text-center text-xs font-semibold text-slate-500">
@@ -1347,17 +1970,26 @@ export function DashboardPage() {
             <div className="flex flex-wrap items-center justify-between gap-6">
               <div>
                 <h3 className="text-xl font-bold text-white">Achievements</h3>
-                <p className="mt-2 text-slate-400">Track earned badges and milestones for progress motivation.</p>
+                <p className="mt-2 text-slate-400">
+                  Track earned badges and milestones for progress motivation.
+                </p>
               </div>
-              <span className="badge-pill border-green-400/20 bg-green-500/10 text-green-100">{badges.filter(item => item.unlocked).length} unlocked</span>
+              <span className="badge-pill border-green-400/20 bg-green-500/10 text-green-100">
+                {badges.filter((item) => item.unlocked).length} unlocked
+              </span>
             </div>
 
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              {badges.map(badge => (
-                <div key={badge.id} className={`rounded-[1.5rem] border p-5 ${badge.unlocked ? 'border-green-400/20 bg-green-500/10 text-white' : 'border-white/10 bg-white/5 text-slate-300'}`}>
-                  <div className="text-2xl">{badge.unlocked ? '🏆' : '🔒'}</div>
+              {badges.map((badge) => (
+                <div
+                  key={badge.id}
+                  className={`rounded-[1.5rem] border p-5 ${badge.unlocked ? "border-green-400/20 bg-green-500/10 text-white" : "border-white/10 bg-white/5 text-slate-300"}`}
+                >
+                  <div className="text-2xl">{badge.unlocked ? "🏆" : "🔒"}</div>
                   <h4 className="mt-4 text-lg font-semibold">{badge.label}</h4>
-                  <p className="mt-2 text-sm leading-6 text-slate-400">{badge.description}</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-400">
+                    {badge.description}
+                  </p>
                 </div>
               ))}
             </div>

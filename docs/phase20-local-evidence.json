@@ -1,0 +1,48 @@
+{
+  "localReadOnlyInventory": {
+    "database": "lugaish",
+    "courses": {
+      "draft": 0,
+      "published": 0,
+      "archived": 0,
+      "missingMetadata": 0
+    },
+    "lessons": {
+      "draft": 0,
+      "published": 0,
+      "archived": 56,
+      "missingMetadata": 0
+    },
+    "activeLessons": 0
+  },
+  "compiledAssets": {
+    "count": 96,
+    "bytes": 2724192,
+    "gzipBytes": 766228,
+    "largest": [
+      {
+        "name": "characterController-BVRKmxXz.js",
+        "bytes": 735206,
+        "gzip": 191091
+      },
+      {
+        "name": "RiggedStudent-gRUhtKyk.js",
+        "bytes": 358010,
+        "gzip": 106094
+      },
+      {
+        "name": "index-CX0vbyGO.js",
+        "bytes": 295587,
+        "gzip": 94275
+      }
+    ]
+  },
+  "tests": {
+    "unit": 193,
+    "integration": 13,
+    "syntaxLint": "PASS",
+    "build": "PASS",
+    "buildSeconds": 22
+  },
+  "publicDeployment": false
+}

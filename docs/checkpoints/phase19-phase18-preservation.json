@@ -1,0 +1,27 @@
+{
+  "purpose": "Phase 18 preservation checkpoint before Phase 19 root frontend edits; no secrets, source code, commits or database snapshots",
+  "rootHead": "8227009505ab6ef32cf42caf87a31cf73264df40",
+  "serverHead": "1a1244b06c350411f21c695d6810e9d88148c84c",
+  "files": {
+    "src/pages/HomePage.jsx": "697a5984c6f72b045a63ee376bf2a906ef2184b76caf97da39d4fc54c050d210",
+    "src/pages/LearningSpacesPage.jsx": "21be7095ab40a9ffef7af3d6341f081c36ad025986cedd29b1ed53ef6fafa415",
+    "src/components/Header.jsx": "36dcfd9b3c0805d40ff0e39d6283faad9a722afc017f85861d6f3127084b52c0",
+    "src/styles/experience.css": "997867bad20f56f6f9b68ee0182293544b9853d1f791daf3a6357d417d4d4f58",
+    "src/components/CampusPreview.jsx": "b6be87a24bcbb89ed31808f9ae15f1f10176d498db519365b4ef2aaab33247c7",
+    "src/characters/QuaterniusStudent.jsx": "a1e84d3d9bd5e4db8ee9f66581b6a97fec4e84324067ffa6027df950ca4b3464",
+    "src/characters/nativeSeating.js": "a3551e5c533d50e7fbf1d70c1b115d663fac12706dd2e1162c70ddec45ce1ae9",
+    "src/characters/animations/quaternius-study.js": "87c2944fd724adfff284cabba77743bf1b8650613f8b10ad2642b16dbcc0b83f",
+    "src/study/shared/SharedScene.jsx": "3e4d1bc0f186e1e4da372c0ee01c2ed30dca06b9d003d06e391863b473b11883",
+    "public/models/student/quaternius/casual-character.glb": "fea7e71271203e7073f1a073fa1208de7402df276f87f80e149bf7589b5d46b4",
+    "public/images/campus/library-arrival.webp": "a2d3b52f278d599cda32cf8c15a0c9b5da0709e748767b424499fb427f127079",
+    "docs/PHASE-18-CAMPUS-EXPERIENCE.md": "bfa0a562b71ccd6f87d682286466d436b02f6ad55555bc65e3ec9ff4ed4768b6",
+    "docs/PHASE-18-CONSOLIDATED-VERIFICATION.md": "957db3fe4adfe7f963daf2ea382c0e5cdf29c511a10f6a87679b8b5f33fa0bb8"
+  },
+  "priorVerification": {
+    "unit": 176,
+    "integration": 10,
+    "visual": 33,
+    "protected": 12
+  },
+  "knownIssue": "Empty catalog crashes legacy /dashboard; primary /progress works."
+}

@@ -1,0 +1,154 @@
+{
+  "isolatedFixture": true,
+  "emptyAndStaleChecks": [
+    {
+      "width": 1440,
+      "path": "/pricing",
+      "crash": false,
+      "oldCourse": false,
+      "overflow": false,
+      "enrollButton": false
+    },
+    {
+      "width": 1440,
+      "path": "/daily-lessons",
+      "crash": false,
+      "oldCourse": false,
+      "overflow": false,
+      "enrollButton": false
+    },
+    {
+      "width": 1440,
+      "path": "/course/english",
+      "crash": false,
+      "oldCourse": false,
+      "overflow": false,
+      "enrollButton": false
+    },
+    {
+      "width": 1440,
+      "path": "/course/paid_batch",
+      "crash": false,
+      "oldCourse": false,
+      "overflow": false,
+      "enrollButton": false
+    },
+    {
+      "width": 1440,
+      "path": "/course/ielts-foundation",
+      "crash": false,
+      "oldCourse": false,
+      "overflow": false,
+      "enrollButton": false
+    },
+    {
+      "width": 1440,
+      "path": "/profile",
+      "crash": false,
+      "oldCourse": false,
+      "overflow": false,
+      "enrollButton": false
+    },
+    {
+      "width": 768,
+      "path": "/pricing",
+      "crash": false,
+      "oldCourse": false,
+      "overflow": false,
+      "enrollButton": false
+    },
+    {
+      "width": 768,
+      "path": "/daily-lessons",
+      "crash": false,
+      "oldCourse": false,
+      "overflow": false,
+      "enrollButton": false
+    },
+    {
+      "width": 768,
+      "path": "/course/english",
+      "crash": false,
+      "oldCourse": false,
+      "overflow": false,
+      "enrollButton": false
+    },
+    {
+      "width": 768,
+      "path": "/course/paid_batch",
+      "crash": false,
+      "oldCourse": false,
+      "overflow": false,
+      "enrollButton": false
+    },
+    {
+      "width": 768,
+      "path": "/course/ielts-foundation",
+      "crash": false,
+      "oldCourse": false,
+      "overflow": false,
+      "enrollButton": false
+    },
+    {
+      "width": 768,
+      "path": "/profile",
+      "crash": false,
+      "oldCourse": false,
+      "overflow": false,
+      "enrollButton": false
+    },
+    {
+      "width": 390,
+      "path": "/pricing",
+      "crash": false,
+      "oldCourse": false,
+      "overflow": false,
+      "enrollButton": false
+    },
+    {
+      "width": 390,
+      "path": "/daily-lessons",
+      "crash": false,
+      "oldCourse": false,
+      "overflow": false,
+      "enrollButton": false
+    },
+    {
+      "width": 390,
+      "path": "/course/english",
+      "crash": false,
+      "oldCourse": false,
+      "overflow": false,
+      "enrollButton": false
+    },
+    {
+      "width": 390,
+      "path": "/course/paid_batch",
+      "crash": false,
+      "oldCourse": false,
+      "overflow": false,
+      "enrollButton": false
+    },
+    {
+      "width": 390,
+      "path": "/course/ielts-foundation",
+      "crash": false,
+      "oldCourse": false,
+      "overflow": false,
+      "enrollButton": false
+    },
+    {
+      "width": 390,
+      "path": "/profile",
+      "crash": false,
+      "oldCourse": false,
+      "overflow": false,
+      "enrollButton": false
+    }
+  ],
+  "adminDraftViaUI": true,
+  "publishedViaAuthorizedApi": true,
+  "newlyPublishedVisible": true,
+  "archivedHidden": true,
+  "physicalDevicesTested": false
+}

@@ -1,0 +1,12 @@
+Library rain ambience — local derivative
+Original: Rain against the Window (2008-07-07)
+Artist: cori / Cori Samuel
+Source: https://commons.wikimedia.org/wiki/File:Rain_against_the_window.ogg
+Original download: https://upload.wikimedia.org/wikipedia/commons/4/41/Rain_against_the_window.ogg
+License verified 2026-10-10: released worldwide into the public domain by the author.
+Where such dedication is not possible, the author grants use for any purpose
+without conditions except those required by law (see original file description).
+Original SHA-1: 9d37ead83781913c95c026559a9ea3490c765d72
+Derivative: excerpt 8–38 seconds, 75 Hz high-pass / 1700 Hz low-pass,
+3× gain adjustment; 2-second linear end/start overlap, mono 44.1 kHz MP3 96 kbps, 28-second loop.
+This is an actual field recording, not generated noise. No microphone access.

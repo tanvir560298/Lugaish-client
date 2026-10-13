@@ -1,0 +1,18 @@
+Poly Haven assets — CC0 1.0 Universal
+Verified 2026-10-10 at https://polyhaven.com/license
+Commercial use and redistribution permitted. Attribution not required.
+
+Wood Floor — Dimitrios Savva
+https://polyhaven.com/a/wood_floor
+wood-color.jpg, wood-normal.jpg, wood-roughness.jpg
+Source 1K JPG maps, recompressed at 75% quality for the campus.
+
+Kloofendal 48d Partly Cloudy — Greg Zaal
+https://polyhaven.com/a/kloofendal_48d_partly_cloudy
+daylight-1k.hdr: original 1K HDR asset.
+garden-panorama.jpg: 8K tonemapped asset resized to 2048×1024, JPEG 75%.
+Source hashes/URLs recorded in polyhaven-source-metadata.json.
+The photographic garden view is a landscape capture, not a real Lugaish campus photograph.
+No Poly Haven webpage preview render/logo or other non-asset website content is included.
+
+License: https://creativecommons.org/publicdomain/zero/1.0/

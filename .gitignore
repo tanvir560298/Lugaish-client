@@ -1,5 +1,6 @@
 # Dependencies
 node_modules/
+node_modules
 
 # Build output
 dist/
@@ -37,3 +38,11 @@ IMPLEMENTATION_CHECKLIST.md
 __pycache__/
 *.py[cod]
 automation/cache/
+!.env.production.example
+!.env.staging.example
+release-artifacts/
+tmp/
+server.env.*
+# Browser evidence stays local; compact JSON summaries can be reviewed in Git.
+docs/visual-checks/*.png
+docs/visual-checks/*.webm

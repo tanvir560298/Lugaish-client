@@ -1,0 +1,4 @@
+import{useSearchParams}from'react-router-dom';
+import{SpeakingStudio}from'../speaking/SpeakingStudio.jsx';
+import{getLocalSpeakingQuestions}from'../data/speakingQuestions.ts';
+export function SpeakingPreviewPage(){const[params]=useSearchParams();const language=params.get('language')==='arabic'?'arabic':'english';return <div className="speaking-campus"><p className="voice-privacy">Developer voice UI preview · existing local prompts · no enrollment or course completion</p><SpeakingStudio key={language} language={language} questions={getLocalSpeakingQuestions(language)}><div className="voice-panel"><h3>Guided lesson controls appear here in the authenticated Speaking Practice page.</h3><p>This isolated preview tests local recording and Listen & Repeat. No scripted conversation results are submitted.</p></div></SpeakingStudio></div>;}

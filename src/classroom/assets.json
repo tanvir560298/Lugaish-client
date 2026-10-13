@@ -1,0 +1,40 @@
+{
+  "units": "metres; Y up; teaching wall at Z=-4",
+  "assets": [
+    {
+      "path": "src/classroom/Environment.jsx",
+      "kind": "procedural architecture, instanced furniture, generated sign and floor textures",
+      "provenance": "Original implementation in this repository; no external models or texture downloads",
+      "licensing": "Project source; no new third-party asset license",
+      "scale": 1,
+      "animations": ["hinged entrance door"],
+      "cost": "1280x720 screen card, 768x256 signs, repeating 256x256 floor; one shadow-casting light at standard quality"
+    },
+    {
+      "path": "src/classroom/Avatar.jsx",
+      "kind": "replaceable articulated humanoid placeholder",
+      "provenance": "Original procedural mesh implementation",
+      "licensing": "Project source; no downloaded character assets",
+      "scale": "approximately 1.77 metres tall",
+      "animations": ["idle", "walk", "run", "wave"],
+      "replacementBoundary": "entity ref: x, z, yaw, animation, visible, waveUntil; replace Avatar without changing controller or teacher path"
+    },
+    {
+      "path": "public/videos/day-speaking-self-intro-reel-{1..5}.mp4",
+      "kind": "existing Lugaish teaching videos",
+      "provenance": "Existing repository files referenced by src/data/tanvirIeltsFoundationBand6Data.js; no copies or new downloads",
+      "licensing": "Existing project content; upstream redistribution rights were not independently established by this change",
+      "scale": "aspect ratio derived from video metadata; letterboxed in a 3.74 x 2.104 metre screen",
+      "animations": [],
+      "verification": "First clip: H.264, 1280x720, 30.835 seconds; actual texture playback verified in local Chrome"
+    },
+    {
+      "path": "server-authorized lesson videos via existing api.getLesson",
+      "kind": "YouTube iframe or compatible MP4/WebM/OGV file",
+      "provenance": "Existing lesson records; URLs are never scraped, proxied, or copied to session messages",
+      "licensing": "Original provider and course permissions continue to apply",
+      "scale": "contained on projector screen",
+      "animations": []
+    }
+  ]
+}

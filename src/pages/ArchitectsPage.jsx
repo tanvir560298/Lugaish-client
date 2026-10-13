@@ -42,18 +42,18 @@ export function ArchitectsPage() {
   const filteredTeam = TEAM_DATA.filter(member => filter === "All" ? true : member.category === filter);
 
   return (
-    <div className="min-h-screen overflow-hidden bg-[#020617] pb-20 text-white sm:pb-32 lg:pb-40">
+    <div className="platform-page team-page min-h-screen overflow-hidden bg-[#020617] pb-20 text-white sm:pb-32 lg:pb-40">
       <section className="relative px-4 py-16 sm:px-6 sm:py-24 lg:py-32">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-gradient-to-b from-blue-600/10 via-transparent to-transparent pointer-events-none" />
         <div className="relative z-10 mx-auto max-w-5xl space-y-6 text-center sm:space-y-8">
           <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-black uppercase tracking-[0.16em] text-blue-400 sm:px-4 sm:text-xs sm:tracking-[0.3em]">
-            <Sparkles size={14} /> The Minds Behind Lugaish
+            <Sparkles size={14} /> People behind your learning
           </motion.div>
           <h1 className="text-5xl font-black italic leading-none tracking-tighter text-white sm:text-6xl md:text-8xl">
-            The Architects.
+            Meet our team.
           </h1>
           <p className="mx-auto max-w-2xl text-base font-medium leading-relaxed text-slate-400 sm:text-xl">
-            A collective of instructors, engineers, and creators dedicated to transforming how the world communicates.
+            Instructors, creators and developers working together to support your learning.
           </p>
           <p className="mx-auto max-w-2xl text-base font-medium leading-relaxed text-slate-300 sm:text-xl">
             Developed by Tanvir Ahmad. Arabic Instruction by Ishaat Alhumaidi.
@@ -64,7 +64,7 @@ export function ArchitectsPage() {
       <nav className="mb-12 flex justify-center px-4 sm:mb-20 sm:px-6">
         <div className="grid w-full grid-cols-2 gap-1 rounded-[1.5rem] border border-white/10 bg-white/5 p-1.5 backdrop-blur-xl sm:w-auto sm:flex sm:rounded-[2rem]">
           {CATEGORIES.map(cat => (
-            <button key={cat} onClick={() => setFilter(cat)} className={`rounded-[1rem] px-3 py-3 text-[10px] font-black uppercase tracking-widest transition-all sm:rounded-[1.5rem] sm:px-8 sm:text-xs ${filter === cat ? 'bg-white text-slate-900 shadow-xl' : 'text-slate-500 hover:text-white'}`}>
+            <button key={cat} aria-pressed={filter === cat} onClick={() => setFilter(cat)} className={`rounded-[1rem] px-3 py-3 text-[10px] font-black uppercase tracking-widest transition-all sm:rounded-[1.5rem] sm:px-8 sm:text-xs ${filter === cat ? 'bg-white text-slate-900 shadow-xl' : 'text-slate-500 hover:text-white'}`}>
               {cat}
             </button>
           ))}
@@ -86,7 +86,7 @@ export function ArchitectsPage() {
 
 function TeamCard({ member }) {
   return (
-    <motion.div layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} whileHover={{ y: -10 }} className="group relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/5 bg-slate-900/40 transition-all duration-500 hover:border-white/20 sm:min-h-[450px] sm:rounded-[3rem]">
+    <motion.div layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }}  className="group relative min-h-[360px] overflow-hidden rounded-[2rem] border border-white/5 bg-slate-900/40 transition-all duration-500 hover:border-white/20 sm:min-h-[450px] sm:rounded-[3rem]">
       <div className={`absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br ${member.color} blur-[80px] opacity-20 group-hover:opacity-40 transition-opacity`} />
       <div className="flex h-full flex-col p-6 sm:p-10">
         <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${member.color} flex items-center justify-center text-white mb-8 shadow-2xl`}>
@@ -97,11 +97,7 @@ function TeamCard({ member }) {
           <p className="text-blue-400 text-xs font-black uppercase tracking-widest">{member.role}</p>
           <p className="text-slate-400 text-sm leading-relaxed">{member.bio}</p>
         </div>
-        <div className="flex gap-4 pt-8 border-t border-white/5">
-          <SocialIcon icon={<TwitterIcon />} />
-          <SocialIcon icon={<LinkedinIcon />} />
-          <SocialIcon icon={<GithubIcon />} />
-        </div>
+
       </div>
       <div className="absolute bottom-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
         <User size={150} strokeWidth={1} color="white" />

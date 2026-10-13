@@ -1,3 +1,5 @@
+import {shouldClearSession} from '../state/identityPolicy.js';
+import {reportOperationalEvent} from '../utils/operations.js';
 const API_BASE_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:5000/api').replace(/\/$/, '');
 const TOKEN_KEY = 'lugaish_auth_token';
 const REQUEST_TIMEOUT_MS = Math.max(Number(import.meta.env.VITE_API_TIMEOUT_MS) || 15000, 1000);
@@ -49,6 +51,7 @@ async function fetchWithTimeout(url, options) {
       throw new Error('The server took too long to respond. Please try again.');
     }
 
+    reportOperationalEvent('api_failure');
     throw error;
   } finally {
     window.clearTimeout(timeout);
@@ -93,8 +96,12 @@ async function executeRequest(path, options = {}) {
 
   const data = response.status === 204 ? {} : await response.json().catch(() => ({}));
   if (!response.ok) {
-    if (response.status === 401 && token) setAuthToken(null);
+    if(response.status>=500)reportOperationalEvent('api_failure');
+    if(response.status===401)reportOperationalEvent('auth_failure');
+    if (response.status === 401 && shouldClearSession(token,getAuthToken())) setAuthToken(null);
     const error = new Error(data.error ?? 'Request failed');
+    error.requestId=response.headers.get('X-Request-Id');
+    if(response.status>=500&&error.requestId)error.message+=` Reference: ${error.requestId}`;
     error.status = response.status;
     error.code = data.code;
     error.data = data;
@@ -123,6 +130,15 @@ function request(path, options = {}) {
 }
 
 export const api = {
+  getLearningAnalytics(language, {range='7',zone='UTC',page=1}={}) { return request(`/analytics/${language}?${new URLSearchParams({range,zone,page})}`); },
+  getLearning(language) { return request(`/learning/${language}`); },
+  retryMistake(language, payload) { return request(`/learning/${language}/retry`, {method:'POST',body:JSON.stringify(payload)}); },
+  updatePublishedContent(language, day, payload) { return request(`/courses/manage/${language}/lessons/${day}/content`, {method:'PUT',body:JSON.stringify(payload)}); },
+  manageCourses() { return request('/courses/manage'); },
+  saveCourse(language, payload) { return request(`/courses/manage/${language}`, { method: 'PUT', body: JSON.stringify(payload) }); },
+  publishLesson(language, day, status) { return request(`/courses/manage/${language}/lessons/${day}/publication`, { method: 'PUT', body: JSON.stringify({status}) }); },
+  getCourses() { return request("/courses"); },
+  getCourse(language) { return request(`/courses/${language}`); },
   signup(payload) {
     return request('/auth/signup', {
       method: 'POST',
@@ -184,6 +200,12 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(payload),
     });
+  },
+  getQuizAccess(language, day) {
+    return request(`/quiz/access/${language}/${day}`);
+  },
+  getQuizResult(language, day) {
+    return request(`/quiz/result/${language}/${day}`);
   },
   getLesson(language, day) {
     return request(`/lessons/${language}/${day}`);

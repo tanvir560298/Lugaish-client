@@ -1,0 +1,98 @@
+[
+  {
+    "kind": "learner",
+    "width": 1440,
+    "path": "/progress",
+    "crash": false,
+    "overflow": false,
+    "emptyStaff": false,
+    "enrollments": [
+      "english",
+      "arabic"
+    ]
+  },
+  {
+    "kind": "learner",
+    "width": 768,
+    "path": "/progress",
+    "crash": false,
+    "overflow": false,
+    "emptyStaff": false,
+    "enrollments": [
+      "english",
+      "arabic"
+    ]
+  },
+  {
+    "kind": "learner",
+    "width": 390,
+    "path": "/progress",
+    "crash": false,
+    "overflow": false,
+    "emptyStaff": false,
+    "enrollments": [
+      "english",
+      "arabic"
+    ]
+  },
+  {
+    "kind": "staff",
+    "width": 1440,
+    "path": "/dashboard",
+    "crash": false,
+    "overflow": false,
+    "emptyStaff": true,
+    "enrollments": [
+      "paid_batch"
+    ]
+  },
+  {
+    "kind": "staff",
+    "width": 768,
+    "path": "/dashboard",
+    "crash": false,
+    "overflow": false,
+    "emptyStaff": true,
+    "enrollments": [
+      "paid_batch"
+    ]
+  },
+  {
+    "kind": "staff",
+    "width": 390,
+    "path": "/dashboard",
+    "crash": false,
+    "overflow": false,
+    "emptyStaff": true,
+    "enrollments": [
+      "paid_batch"
+    ]
+  },
+  {
+    "kind": "unenrolled",
+    "width": 1440,
+    "path": "/progress",
+    "crash": false,
+    "overflow": false,
+    "emptyStaff": false,
+    "enrollments": []
+  },
+  {
+    "kind": "unenrolled",
+    "width": 768,
+    "path": "/progress",
+    "crash": false,
+    "overflow": false,
+    "emptyStaff": false,
+    "enrollments": []
+  },
+  {
+    "kind": "unenrolled",
+    "width": 390,
+    "path": "/progress",
+    "crash": false,
+    "overflow": false,
+    "emptyStaff": false,
+    "enrollments": []
+  }
+]

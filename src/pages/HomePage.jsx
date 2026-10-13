@@ -1,567 +1,210 @@
-import React, { lazy, Suspense, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { useAppContext } from '../state/AppContext.jsx';
-import { COURSE_START_DATE } from '../utils/courseLaunch.js';
-import { 
-  CheckCircle2, 
+import { Link } from "react-router-dom";
+import {
+  ArrowRight,
   BookOpen,
   Languages,
-  Zap, 
-  Trophy, 
-  ArrowRight, 
-  Sparkles, 
-  Flame, 
-  Target,
-  ChevronDown,
-  CalendarDays,
-  BellRing,
-  Volume2
-} from 'lucide-react';
-import { InteractiveTrialWidget } from '../components/InteractiveTrialWidget.jsx';
-import { SocialProofSection } from '../components/SocialProofSection.jsx';
-
-const HeroScene = lazy(() => import('../components/HeroScene.jsx'));
-
-// Animation Constants
-const fadeInUp = {
-  initial: { opacity: 0, y: 30 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true },
-  transition: { duration: 0.6, ease: "easeOut" }
-};
-
-function getCourseCountdown() {
-  const remaining = Math.max(0, COURSE_START_DATE.getTime() - Date.now());
-  const days = Math.floor(remaining / 86400000);
-  const hours = Math.floor((remaining % 86400000) / 3600000);
-  const minutes = Math.floor((remaining % 3600000) / 60000);
-
-  return { days, hours, minutes, hasStarted: remaining === 0 };
-}
-
-function CourseLaunchNotice() {
-  const [countdown, setCountdown] = useState(getCourseCountdown);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => setCountdown(getCourseCountdown()), 60000);
-    return () => window.clearInterval(timer);
-  }, []);
-
-  return (
-    <motion.aside
-      initial={{ opacity: 0, y: -18 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2, duration: 0.6 }}
-      aria-label="Course launch announcement"
-      className="course-launch-notice relative overflow-hidden rounded-2xl border border-amber-300/25 bg-amber-300/[0.08] p-4 shadow-[0_18px_55px_rgba(245,158,11,0.10)] backdrop-blur-xl sm:p-5"
-    >
-      <div className="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-amber-300/15 blur-3xl" />
-      <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-300 to-orange-500 text-slate-950 shadow-lg shadow-amber-500/20">
-            <BellRing size={19} aria-hidden="true" />
-          </div>
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-300">
-              {countdown.hasStarted ? 'We are live' : 'Course launch announcement'}
-            </p>
-            <p className="mt-1 text-lg font-black leading-tight text-white sm:text-xl">
-              {countdown.hasStarted ? 'অপেক্ষার পালা শেষ—কোর্স এখন শুরু!' : 'অপেক্ষার পালা শেষ হতে চলেছে!'}
-            </p>
-            <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-slate-300 sm:text-sm">
-              <CalendarDays size={15} className="text-amber-300" aria-hidden="true" />
-              {countdown.hasStarted ? 'Your learning journey starts here.' : 'কোর্স শুরু হচ্ছে ১ আগস্ট ২০২৬'}
-            </p>
-          </div>
-        </div>
-
-        {!countdown.hasStarted && (
-          <div className="grid shrink-0 grid-cols-3 gap-2" aria-label={`${countdown.days} days, ${countdown.hours} hours and ${countdown.minutes} minutes remaining`}>
-            {[
-              [countdown.days, 'Days'],
-              [countdown.hours, 'Hours'],
-              [countdown.minutes, 'Min']
-            ].map(([value, label]) => (
-              <div key={label} className="min-w-14 rounded-xl border border-white/10 bg-slate-950/55 px-2 py-2 text-center">
-                <span className="block text-lg font-black tabular-nums text-white">{String(value).padStart(2, '0')}</span>
-                <span className="block text-[9px] font-bold uppercase tracking-wider text-slate-400">{label}</span>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </motion.aside>
-  );
-}
-
+  Monitor,
+  NotebookPen,
+} from "lucide-react";
+import { useAppContext } from "../state/AppContext.jsx";
+import { useCatalog } from "../courses/Catalog.jsx";
+import { LearningNext } from "../learning/review/LearningNext.jsx";
+import { CampusPreview } from "../components/CampusPreview.jsx";
 export function HomePage() {
-  const { state, actions } = useAppContext();
-  const navigate = useNavigate();
-  const isLoggedIn = state.isLoggedIn;
-  const [showHeroScene, setShowHeroScene] = useState(false);
-  const { scrollYProgress } = useScroll();
-  
-  const yOffset = useTransform(scrollYProgress, [0, 1], [0, -100]);
-
-  useEffect(() => {
-    const connection = navigator.connection ?? navigator.mozConnection ?? navigator.webkitConnection;
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const hasLargeViewport = window.matchMedia('(min-width: 1024px)').matches;
-    const hasConstrainedConnection = Boolean(
-      connection?.saveData || ['slow-2g', '2g'].includes(connection?.effectiveType),
-    );
-
-    // The WebGL scene is decorative. Keep it out of the download path for
-    // phones, reduced-motion users, and learners trying to conserve data.
-    if (!hasLargeViewport || prefersReducedMotion || hasConstrainedConnection) return undefined;
-
-    const scheduleHeroScene = window.requestIdleCallback ?? ((callback) => window.setTimeout(callback, 250));
-    const cancelHeroScene = window.cancelIdleCallback ?? window.clearTimeout;
-    const id = scheduleHeroScene(() => setShowHeroScene(true));
-
-    return () => cancelHeroScene(id);
-  }, []);
-
-  const handleStart = (path) => {
-    if (isLoggedIn) {
-      actions.enrollPathway(path);
-    } else {
-      actions.switchPathway(path);
-    }
-    navigate(isLoggedIn ? '/pathways' : '/login');
-  };
-
+  const { state } = useAppContext(),
+    catalog = useCatalog();
   return (
-    <div className="home-page bg-slate-950 text-slate-50 selection:bg-blue-500/30 overflow-x-hidden">
-      
-      {/* --- HERO: THE GRAND ENTRANCE --- */}
-      <section className="home-hero relative flex min-h-[calc(100svh-72px)] items-center overflow-hidden py-14 sm:py-20 lg:min-h-screen lg:py-0 lg:pt-20">
-        {showHeroScene && (
-          <Suspense fallback={<div className="absolute inset-0 bg-slate-950" />}>
-            <HeroScene />
-          </Suspense>
-        )}
-
-        <div className="app-shell relative z-10 grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          <motion.div 
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className="space-y-6 sm:space-y-8"
-          >
-            <CourseLaunchNotice />
-
-            {/* Mascot Welcome */}
-            <motion.div 
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.5, type: 'spring' }}
-              className="hero-kicker inline-flex max-w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 backdrop-blur-md sm:px-4"
+    <div className="platform-page home-page living-home campus-home-v18">
+      <section className="campus-home-hero" aria-labelledby="home-title">
+        <div className="campus-home-intro">
+          <p className="platform-eyebrow">
+            LUGAISH · THE LIVING LEARNING CAMPUS
+          </p>
+          <h1 id="home-title">
+            Learn a language.
+            <br />
+            <em>Find your place.</em>
+          </h1>
+          <p className="campus-home-lead">
+            A calm place for Arabic and English learning. Make room for your
+            next lesson, a little speaking practice, or time at your library
+            desk.
+          </p>
+          <div className="platform-actions">
+            <Link
+              className="campus-button campus-button-primary"
+              to="/learning-spaces"
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-emerald-400 rounded-lg flex items-center justify-center text-white shadow-lg">
-                <Sparkles size={16} />
-              </div>
-              <span className="text-xs font-bold text-blue-100 sm:text-sm">AI-powered English and Arabic learning.</span>
-            </motion.div>
-
-            <h1 className="text-5xl font-black leading-[0.9] tracking-tighter sm:text-6xl md:text-8xl lg:text-9xl">
-              Climb to <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-emerald-400 to-blue-500 italic">
-                Fluency.
-              </span>
-            </h1>
-
-            <p className="max-w-lg text-base font-medium leading-relaxed text-slate-400 sm:text-lg lg:text-xl">
-              Join <span className="text-white">1,200+ early adopters</span> mastering English and Arabic through AI-guided practice, daily 10-minute "ascents," and weekly interview preparation.
+              Discover your campus <ArrowRight size={18} />
+            </Link>
+            <Link
+              className="campus-link"
+              to={state.isLoggedIn ? "/daily-lessons" : "/pricing"}
+            >
+              {state.isLoggedIn ? "My Classes" : "Course availability"}{" "}
+              <ArrowRight size={16} />
+            </Link>
+          </div>
+          <div className="campus-language-line">
+            <span lang="ar" dir="rtl">
+              العربية
+            </span>
+            <span>English</span>
+            <span>One learning campus</span>
+          </div>
+        </div>
+        <figure className="campus-home-scene">
+          <CampusPreview kind="library" eager />
+          <figcaption>
+            <span>Inside the Study Library</span>
+            <Link to="/learning-spaces">
+              Find a place to focus <ArrowRight size={17} />
+            </Link>
+          </figcaption>
+        </figure>
+      </section>
+      <section className="campus-availability" aria-label="Course availability">
+        <BookOpen size={21} />
+        <div>
+          <strong>
+            {catalog.loading
+              ? "Checking course availability…"
+              : catalog.error
+                ? "Course availability could not be checked"
+                : catalog.courses.length
+                  ? "Explore published courses"
+                  : "New courses will appear here when published."}
+          </strong>
+          <p>
+            {catalog.error ||
+              (catalog.loading ? "Checking availability. You can explore the campus while we load the catalog." : !catalog.courses.length
+                ? "Enrollment is not open yet. You can explore the campus and use personal study tools."
+                : "Enrollment and lesson access are verified for your account.")}
+          </p>
+        </div>
+        {catalog.error ? (
+          <button className="campus-link" onClick={catalog.retry}>
+            Try again
+          </button>
+        ) : (
+          <Link className="campus-link" to="/pricing">
+            View Courses & Fees <ArrowRight size={16} />
+          </Link>
+        )}
+      </section>
+      {state.isLoggedIn && <LearningNext />}
+      <section
+        className="platform-section campus-home-destinations"
+        aria-labelledby="home-destinations"
+      >
+        <div className="platform-section-heading">
+          <div>
+            <p className="platform-eyebrow">
+              A PLACE FOR EVERY PART OF YOUR DAY
             </p>
-            <p className="max-w-lg text-sm font-medium leading-relaxed text-slate-500 sm:text-base lg:text-base">
-              Built and maintained by web developer Tanvir Ahmad. Arabic instruction by Ishaat Alhumaidi.
-            </p>
-
-            <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:flex-wrap sm:gap-5 sm:pt-4">
-              <motion.button
-                whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(59,130,246,0.4)" }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleStart('english')}
-                className="hero-primary-button group flex w-full items-center justify-center gap-3 rounded-2xl bg-blue-600 px-6 py-4 text-base font-black text-white transition-all sm:w-auto sm:px-10 sm:py-5 sm:text-xl"
-              >
-                Start English <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform" />
-              </motion.button>
-
-              <motion.button
-                whileHover={{ scale: 1.05, background: "rgba(255,255,255,0.1)" }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleStart('arabic')}
-                className="hero-secondary-button flex w-full items-center justify-center gap-3 rounded-2xl border border-slate-800 bg-slate-900 px-6 py-4 text-base font-black text-white transition-all sm:w-auto sm:px-10 sm:py-5 sm:text-xl"
-              >
-                Start Arabic
-              </motion.button>
-            </div>
-            
-            <div className="flex flex-col gap-3 pt-2 text-slate-500 sm:flex-row sm:items-center sm:gap-6 sm:pt-4">
-               <div className="flex items-center gap-2">
-                  <CheckCircle2 size={18} className="text-emerald-500" />
-                  <span className="text-xs font-bold uppercase tracking-widest">AI-Powered Practice</span>
-               </div>
-               <div className="flex items-center gap-2">
-                  <Flame size={18} className="text-orange-500" />
-                  <span className="text-xs font-bold uppercase tracking-widest">Weekly Interview Prep</span>
-               </div>
-            </div>
-          </motion.div>
-
-          {/* Interactive Preview Card */}
-          <motion.div
-            style={{ y: yOffset }}
-            className="hidden lg:block relative"
-          >
-             <div className="absolute -inset-10 bg-blue-500/10 blur-[100px] rounded-full" />
-             <div className="hero-preview relative glass-card p-2 rounded-[3rem] border border-white/10 shadow-2xl">
-                <div className="bg-slate-950 rounded-[2.8rem] overflow-hidden border border-white/5 p-8 space-y-8">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400">
-                        <Target size={20} />
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Current Mission</p>
-                        <p className="text-sm font-bold">Daily Greetings</p>
-                      </div>
-                    </div>
-                    <div className="h-10 w-10 rounded-full border-2 border-emerald-500/30 flex items-center justify-center text-emerald-400 font-black text-xs">
-                      10m
-                    </div>
-                  </div>
-                  
-                  {/* Visual Ladder Preview */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500 text-slate-950 font-bold">
-                          <CheckCircle2 size={15} />
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-white">5 Core Greetings</p>
-                          <p className="text-[10px] text-emerald-300 font-medium">Completed • Audio verified</p>
-                        </div>
-                      </div>
-                      <span className="rounded-full bg-emerald-400/20 px-2.5 py-0.5 text-[10px] font-black text-emerald-300">
-                        100%
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between rounded-2xl border border-blue-500/40 bg-blue-500/15 px-4 py-3 shadow-lg shadow-blue-500/10">
-                      <div className="flex items-center gap-3">
-                        <div className="relative flex h-7 w-7 items-center justify-center rounded-lg bg-blue-600 text-white font-bold">
-                          <Sparkles size={14} className="animate-pulse" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-white">AI Pronunciation Match</p>
-                          <p className="text-[10px] text-blue-300 font-medium">Speaking challenge active</p>
-                        </div>
-                      </div>
-                      <span className="flex items-center gap-1 rounded-full bg-blue-400/20 px-2.5 py-0.5 text-[10px] font-black text-blue-200">
-                        <span className="h-1.5 w-1.5 animate-ping rounded-full bg-blue-400" />
-                        96% Score
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/[0.03] px-4 py-3 opacity-80">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-800 text-slate-400 text-xs font-bold">
-                          <Flame size={14} className="text-orange-400" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-slate-300">Habit Streak Milestone</p>
-                          <p className="text-[10px] text-slate-400">Unlock Milestone Certificate</p>
-                        </div>
-                      </div>
-                      <span className="rounded-full bg-orange-400/10 px-2.5 py-0.5 text-[10px] font-black text-orange-300">
-                        +50 XP
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="pt-3">
-                    <button
-                      type="button"
-                      onClick={() => handleStart('english')}
-                      className="hero-preview-action group flex w-full h-14 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-emerald-500 font-black text-white gap-2 shadow-lg shadow-blue-500/20 transition-all hover:opacity-95 active:scale-95 cursor-pointer"
-                    >
-                      Continue Ascent <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-                    </button>
-                  </div>
-                </div>
-             </div>
-          </motion.div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <motion.div 
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-          className="absolute bottom-5 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 text-slate-500 opacity-50 sm:bottom-10"
-        >
-          <span className="text-[10px] font-black uppercase tracking-widest">Scroll to Explore</span>
-          <ChevronDown size={20} />
-        </motion.div>
-      </section>
-
-      {/* --- THE ASCENT PHILOSOPHY --- */}
-      <section className="home-features relative border-y border-white/5 bg-slate-900/30 py-16 sm:py-24 lg:py-32">
-        <div className="app-shell">
-          <div className="grid gap-5 sm:gap-8 lg:grid-cols-3 lg:gap-12">
-            {[
-              { icon: <Zap />, iconClass: "text-blue-500", title: "AI-Guided Practice", desc: "Use AI-assisted prompts and review to practice English and Arabic with more confidence between lessons." },
-              { icon: <Flame />, iconClass: "text-orange-500", title: "Daily Momentum", desc: "Build a habit that lasts. 10 minutes of focused lessons, practice, and progress tracking keeps you moving." },
-              { icon: <Trophy />, iconClass: "text-emerald-500", title: "Interview Readiness", desc: "Prepare for weekly output checks with guided speaking practice, progress milestones, and structured pathways." }
-            ].map((item, i) => (
-              <motion.div 
-                key={i}
-                {...fadeInUp}
-                className={`home-feature-card home-feature-card-${i + 1} rounded-[2rem] border border-white/5 bg-slate-950 p-6 transition-all hover:border-blue-500/20 sm:p-8 lg:p-10 group`}
-              >
-                <div className={`w-14 h-14 rounded-2xl bg-slate-900 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform ${item.iconClass}`}>
-                  {item.icon}
-                </div>
-                <h3 className="text-2xl font-black mb-4">{item.title}</h3>
-                <p className="text-slate-400 leading-relaxed font-medium">{item.desc}</p>
-              </motion.div>
-            ))}
+            <h2 id="home-destinations">What would you like to do?</h2>
           </div>
+          <Link className="campus-link" to="/learning-spaces">
+            Explore campus <ArrowRight size={16} />
+          </Link>
         </div>
-      </section>
-
-      {/* --- LIVE INTERACTIVE TRIAL: ZERO-LOGIN PLAYGROUND --- */}
-      <section className="home-trial py-12 sm:py-16 lg:py-24 border-t border-white/5 bg-slate-900/20">
-        <div className="app-shell">
-          <InteractiveTrialWidget onStartPathway={handleStart} />
-        </div>
-      </section>
-
-      {/* --- PATHWAY SELECTION --- */}
-      <section className="home-pathways overflow-hidden py-16 sm:py-24 lg:py-32">
-        <div className="app-shell">
-          <div className="mb-12 text-center sm:mb-16 lg:mb-20">
-            <h2 className="mb-4 text-4xl font-black leading-tight sm:text-5xl md:text-7xl">Choose your <br/>Learning Destination.</h2>
-            <p className="mx-auto max-w-2xl text-base italic text-slate-400 sm:text-xl">"A different language is a different vision of life."</p>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-2 lg:gap-10">
-            <PathCard 
-              keyName="english"
-              icon={<BookOpen size={34} />}
-              badge="English Speaking"
-              title="Speak Global English" 
-              desc="AI-supported English practice for business, travel, interviews, and confident daily communication."
-              color="blue"
-              features={["AI Practice Support", "Business Meetings", "Interview Readiness"]}
-              audioText="Welcome to Lugaish. Accelerate your career with natural, fluent spoken English."
-              audioLang="en-US"
-              onStart={() => handleStart('english')}
-            />
-            <PathCard 
-              keyName="arabic"
-              icon={<Languages size={34} />}
-              badge="Arabic Fluency"
-              title="Understand Arabic" 
-              desc="AI-assisted Arabic practice with cultural context, everyday phrases, and guided confidence-building."
-              color="emerald"
-              features={["AI Practice Support", "Cultural Context", "Daily Conversation"]}
-              audioText="مرحباً بكم في لغيش. انضم إلينا لتتقن اللغة العربية بكل ثقة وسهولة."
-              audioLang="ar-SA"
-              onStart={() => handleStart('arabic')}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* --- SOCIAL PROOF & MILESTONE CERTIFICATION --- */}
-      <SocialProofSection />
-
-      {/* --- THE "ESCAPE" PRICING TEASER --- */}
-      <section className="home-offer relative overflow-hidden bg-gradient-to-b from-transparent to-blue-900/10 py-16 sm:py-24 lg:py-32">
-        <div className="app-shell relative z-10">
-           <div className="home-offer-card glass-card relative overflow-hidden rounded-[2rem] border border-blue-500/20 p-6 text-center sm:rounded-[3rem] sm:p-12 md:p-20 lg:rounded-[4rem]">
-              <div className="absolute top-0 left-0 w-full h-full bg-blue-500/5 pointer-events-none" />
-              
-              {/* Mascot Cameo */}
-              <motion.div 
-                animate={{ y: [0, -10, 0] }}
-                transition={{ repeat: Infinity, duration: 3 }}
-                className="mb-8 inline-block rounded-2xl bg-white px-4 py-3 text-xs font-black text-slate-950 shadow-2xl sm:mb-10 sm:px-6 sm:text-sm"
-              >
-                🎉 PREMIUM IS FREE RIGHT NOW!
-              </motion.div>
-
-              <h2 className="mb-6 text-4xl font-black leading-none tracking-tighter sm:text-5xl md:text-8xl">
-                Become a <br/> Founding Member.
-              </h2>
-              
-              <p className="mx-auto mb-8 max-w-2xl text-base text-slate-300 sm:mb-12 sm:text-xl">
-                Join the launch phase and get <span className="text-white font-bold underline underline-offset-8 decoration-emerald-500">full premium access for free</span>, including AI-assisted practice support as the platform grows. 
-                Normally 299 BDT/mo — today, it's our gift to you.
-              </p>
-
-              <Link to="/pricing">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="w-full rounded-[1.5rem] bg-white px-6 py-4 text-base font-black text-slate-950 shadow-[0_0_50px_rgba(255,255,255,0.3)] transition-colors hover:bg-emerald-400 sm:w-auto sm:rounded-[2rem] sm:px-12 sm:py-6 sm:text-2xl"
-                >
-                  View Launch Offer
-                </motion.button>
+        <div className="campus-home-room-grid">
+          {[
+            {
+              kind: "classroom",
+              Icon: Monitor,
+              title: "Follow a lesson",
+              desc: "An immersive classroom for your authorized lessons and materials.",
+              href: "/classroom",
+              label: "Classroom",
+            },
+            {
+              kind: "library",
+              Icon: BookOpen,
+              title: "Find your focus",
+              desc: "A quiet desk for notes, a timer and your personal study goal.",
+              href: "/study-room",
+              label: "Study Library",
+            },
+          ].map(({ kind, Icon, title, desc, href, label }) => (
+            <article className="campus-home-room" key={kind}>
+              <Link to={href} aria-label={"Open " + label}>
+                <CampusPreview kind={kind} />
               </Link>
-
-              <div className="mt-8 flex flex-col justify-center gap-3 text-xs font-bold uppercase tracking-widest text-slate-500 sm:mt-12 sm:flex-row sm:gap-8">
-                <span>No Credit Card</span>
-                <span>•</span>
-                <span>Lifetime Founding Status</span>
-                <span>•</span>
-                <span>Limited Slots</span>
+              <div>
+                <p className="platform-eyebrow">
+                  <Icon size={16} />
+                  {label}
+                </p>
+                <h3>{title}</h3>
+                <p>{desc}</p>
+                <Link className="campus-link" to={href}>
+                  Enter {label} <ArrowRight size={16} />
+                </Link>
               </div>
-           </div>
+            </article>
+          ))}
+        </div>
+        <div className="campus-speaking-invitation">
+          <Languages size={26} />
+          <div>
+            <h3>Make a little room for your voice.</h3>
+            <p>
+              Record and replay your own reading. Published course conversations
+              appear when available.
+            </p>
+          </div>
+          <Link
+            className="campus-button campus-button-secondary"
+            to="/speaking-practice"
+          >
+            Open Speaking Practice <ArrowRight size={17} />
+          </Link>
         </div>
       </section>
-
-      {/* --- FINAL CTA --- */}
-      <footer className="home-final-section py-16 text-center sm:py-24 lg:py-32">
-         <div className="app-shell">
-            <div className="home-final-card mx-auto max-w-3xl rounded-[2rem] border border-blue-400/20 bg-slate-900/70 px-6 py-10 shadow-[0_30px_90px_rgba(37,99,235,0.18)] sm:rounded-[3rem] sm:px-10 sm:py-14">
-              <p className="mb-4 text-xs font-black uppercase tracking-[0.28em] text-emerald-300">Start your first lesson</p>
-              <h2 className="text-3xl font-black uppercase tracking-[0.12em] text-white sm:text-5xl">Ready to climb?</h2>
-              <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-slate-300 sm:text-base">
-                Sign in with Google and continue your English or Arabic pathway with AI-assisted practice support.
-              </p>
-              <div className="mt-8 flex justify-center">
-                 <button
-                   onClick={() => navigate('/login')}
-                   className="inline-flex w-full items-center justify-center gap-3 rounded-2xl bg-white px-6 py-4 text-base font-black text-slate-950 shadow-[0_18px_50px_rgba(255,255,255,0.18)] transition hover:bg-emerald-300 hover:shadow-[0_22px_60px_rgba(52,211,153,0.24)] sm:w-auto sm:px-10 sm:text-xl"
-                 >
-                   Continue with Google <ArrowRight size={22} />
-                 </button>
-              </div>
-            </div>
-         </div>
-      </footer>
-    </div>
-  );
-}
-
-// --- SUB-COMPONENT: PATH CARD ---
-const pathCardColors = {
-  blue: {
-    ghost: 'text-blue-500/5',
-    dot: 'bg-blue-500',
-    hover: 'group-hover:bg-blue-500',
-  },
-  emerald: {
-    ghost: 'text-emerald-500/5',
-    dot: 'bg-emerald-500',
-    hover: 'group-hover:bg-emerald-500',
-  },
-};
-
-function PathCard({ icon, badge, title, desc, color, features, onStart, audioText, audioLang }) {
-  const colorClasses = pathCardColors[color] ?? pathCardColors.blue;
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-
-  useEffect(() => {
-    return () => {
-      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, []);
-
-  const handleToggleAudio = (e) => {
-    e.stopPropagation();
-    if (typeof window === 'undefined' || !('speechSynthesis' in window) || !audioText) return;
-
-    if (isPlayingAudio) {
-      window.speechSynthesis.cancel();
-      setIsPlayingAudio(false);
-      return;
-    }
-
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(audioText);
-    utterance.lang = audioLang || 'en-US';
-    utterance.rate = 0.92;
-    utterance.pitch = 1.0;
-
-    const voices = window.speechSynthesis.getVoices();
-    const voice = voices.find(v => v.lang.toLowerCase().startsWith((audioLang || 'en').toLowerCase().slice(0, 2)));
-    if (voice) utterance.voice = voice;
-
-    utterance.onstart = () => setIsPlayingAudio(true);
-    utterance.onend = () => setIsPlayingAudio(false);
-    utterance.onerror = () => setIsPlayingAudio(false);
-
-    window.speechSynthesis.speak(utterance);
-  };
-
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -10 }}
-      className={`home-path-card home-path-card-${color} group relative overflow-hidden rounded-[2rem] border border-white/5 bg-slate-900/50 p-6 sm:rounded-[3rem] sm:p-10 lg:rounded-[3.5rem] lg:p-12`}
-    >
-      <div className={`pointer-events-none absolute right-0 top-0 p-8 text-[7rem] font-black ${colorClasses.ghost} transition-opacity group-hover:opacity-10 sm:p-12 sm:text-[12rem]`}>
-        {color === 'blue' ? 'EN' : 'AR'}
-      </div>
-      
-      <div className="relative z-10">
-        <div className={`home-path-icon mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 ${colorClasses.dot} text-white shadow-2xl sm:mb-8`}>
-          {icon}
+      <section
+        className="campus-learning-rhythm"
+        aria-labelledby="learning-rhythm"
+      >
+        <div>
+          <p className="platform-eyebrow">
+            SMALL STEPS, WITH A CLEAR DIRECTION
+          </p>
+          <h2 id="learning-rhythm">
+            A learning rhythm
+            <br />
+            that feels like yours.
+          </h2>
         </div>
-        <p className="mb-3 text-[10px] font-black uppercase tracking-[0.28em] text-slate-500">{badge}</p>
-        <h3 className="mb-4 text-3xl font-black sm:text-4xl">{title}</h3>
-        <p className="mb-6 max-w-xs text-base text-slate-400 sm:text-lg">{desc}</p>
-        
-        {audioText && (
-          <div className="mb-6 flex items-center">
-            <button
-              type="button"
-              onClick={handleToggleAudio}
-              className={`inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-bold transition-all ${
-                isPlayingAudio
-                  ? 'border-emerald-400 bg-emerald-500/20 text-emerald-300'
-                  : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
-              }`}
-              title="Listen to native sample audio"
-            >
-              <Volume2 size={15} />
-              <span>{isPlayingAudio ? 'Playing Sample...' : 'Sample Native Audio'}</span>
-              {isPlayingAudio && (
-                <span className="flex items-center gap-0.5 ml-1">
-                  <span className="h-2 w-0.5 animate-bounce bg-emerald-400" />
-                  <span className="h-3 w-0.5 animate-bounce bg-emerald-400 delay-100" />
-                  <span className="h-2 w-0.5 animate-bounce bg-emerald-400 delay-200" />
-                </span>
-              )}
-            </button>
-          </div>
-        )}
-
-        <ul className="mb-8 space-y-4 sm:mb-12">
-          {features.map((f, i) => (
-            <li key={i} className="flex items-center gap-3 font-bold text-sm text-slate-300">
-              <div className={`h-2 w-2 rounded-full ${colorClasses.dot}`} />
-              {f}
+        <ol>
+          {[
+            {
+              Icon: BookOpen,
+              title: "Learn when a lesson is available",
+              text: "Open published content from your enrolled course.",
+            },
+            {
+              Icon: NotebookPen,
+              title: "Try it, then review",
+              text: "Save checked answers and revisit questions that need another look.",
+            },
+            {
+              Icon: Languages,
+              title: "See your next step",
+              text: "Use your verified progress to decide what to practise next.",
+            },
+          ].map(({ Icon, title, text }, i) => (
+            <li key={title}>
+              <span>0{i + 1}</span>
+              <div>
+                <Icon size={20} />
+                <h3>{title}</h3>
+                <p>{text}</p>
+              </div>
             </li>
           ))}
-        </ul>
-
-        <button 
-          onClick={onStart}
-          className={`home-path-button w-full rounded-2xl bg-white py-4 text-base font-black text-slate-950 transition-all ${colorClasses.hover} group-hover:text-white sm:py-5 sm:text-lg`}
-        >
-          Launch Pathway
-        </button>
-      </div>
-    </motion.div>
+        </ol>
+      </section>
+    </div>
   );
 }

@@ -1,10 +1,11 @@
 import confetti from 'canvas-confetti';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle2, Loader2, LockKeyhole, ShieldCheck, Sparkles, Trophy } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { getGoogleRedirectLoginResult, isFirebaseConfigured, signInWithGoogle, signInWithGoogleRedirect, waitForFirebaseUser } from '../lib/firebase.js';
 import { useAppContext } from '../state/AppContext.jsx';
+import { loginDestination, loginReturnState } from '../utils/loginDestination.js';
 
 const GOOGLE_REDIRECT_CONTEXT_KEY = 'lugaish_google_redirect_context';
 const REFERRAL_CODE_KEY = 'lugaish_referral_code';
@@ -108,7 +109,8 @@ export function LoginPage({ mode = 'login' }) {
   const { state, actions } = useAppContext();
   const navigate = useNavigate();
   const location = useLocation();
-  const redirectTo = location.state?.from?.pathname ?? '/daily-lessons';
+  const redirectTo = loginDestination(location);
+  const completedLoginContext = useRef(null);
   const isSignup = SIGNUP_ENABLED && (mode === 'signup' || location.pathname === '/signup');
   const incomingReferralCode = new URLSearchParams(location.search).get('ref')?.trim().toUpperCase() || '';
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -146,6 +148,7 @@ export function LoginPage({ mode = 'login' }) {
   };
 
   const finishGoogleLogin = async ({ idToken, user }, context = {}) => {
+    completedLoginContext.current = context;
     await actions.authenticateWithFirebase({
       idToken,
       languageSelected: context.languageSelected ?? state.activePathway,
@@ -168,7 +171,7 @@ export function LoginPage({ mode = 'login' }) {
     localStorage.removeItem(REFERRAL_CODE_KEY);
     setIsSuccess(true);
     celebrate();
-    setTimeout(() => navigate(redirectTo, { replace: true }), 200);
+    setTimeout(() => navigate(loginDestination(location, context), { replace: true, state: loginReturnState(location, context) }), 200);
   };
 
   useEffect(() => {
@@ -214,6 +217,8 @@ export function LoginPage({ mode = 'login' }) {
     setError('');
     setIsSubmitting(true);
     const redirectContext = {
+      returnTo: redirectTo,
+      returnState: loginReturnState(location),
       isSignup,
       languageSelected: state.activePathway,
       displayName: form.displayName,
@@ -265,14 +270,14 @@ export function LoginPage({ mode = 'login' }) {
   const visualProgress = isSignup ? completedFields / 5 : 0.45;
 
   if (state.isLoggedIn) {
-    return <Navigate to={redirectTo} replace />;
+    return <Navigate to={loginDestination(location, completedLoginContext.current || {})} replace state={loginReturnState(location, completedLoginContext.current || {})} />;
   }
 
   return (
-    <section className="relative min-h-[calc(100svh-96px)]">
+    <section className="platform-auth relative min-h-[calc(100svh-96px)]">
       <div className="grid items-start gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-12">
         <div className="sticky top-12 hidden h-[650px] overflow-visible rounded-[3rem] border border-white/5 bg-slate-900/40 backdrop-blur-sm lg:block">
-          <LadderVisual progress={visualProgress} isSignup={isSignup} />
+          <div className="platform-auth-intro"><p className="platform-eyebrow">Your learning campus</p><h2>Make room for learning.</h2><p>One account for Arabic and English, your course materials and shared study spaces.</p><p>Your enrolled courses stay attached to your Google account.</p></div>
         </div>
 
         <motion.div
@@ -286,12 +291,12 @@ export function LoginPage({ mode = 'login' }) {
               {isSignup ? 'Google only signup' : 'Google only sign in'}
             </p>
             <h1 className="text-4xl font-black tracking-tighter text-white sm:text-5xl">
-              {isSignup ? 'Start your ascent.' : 'Continue your ascent.'}
+              {isSignup ? 'Start learning.' : 'Sign in to your campus.'}
             </h1>
             <p className="max-w-xl text-base leading-relaxed text-slate-400 sm:text-lg">
               {isSignup
                 ? 'Tell us a little about your goal, then create your account with Google.'
-                : 'Use your Google account to return to your lessons, progress, and enrolled courses.'}
+                : 'New or returning, use Google to access your lessons, saved progress, and enrolled courses.'}
             </p>
           </div>
 
@@ -384,9 +389,9 @@ export function LoginPage({ mode = 'login' }) {
                 <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-400/15 text-emerald-300">
                   <LockKeyhole size={22} />
                 </div>
-                <h2 className="text-xl font-black text-white">Welcome back</h2>
+                <h2 className="text-xl font-black text-white">One account for your learning</h2>
                 <p className="mt-2 text-sm font-semibold leading-relaxed text-slate-400">
-                  Sign in with the same Google account you used before. Your profile and courses stay attached.
+                  New here? Continue with Google to get started. Already learning? Use your previous Google account to keep your profile and courses.
                 </p>
               </div>
             )}
@@ -424,7 +429,7 @@ export function LoginPage({ mode = 'login' }) {
             )}
 
             {error && (
-              <p className="mt-5 rounded-2xl border border-red-400/30 bg-red-500/10 px-5 py-4 text-sm font-semibold text-red-100">
+              <p role="alert" className="mt-5 rounded-2xl border border-red-400/30 bg-red-500/10 px-5 py-4 text-sm font-semibold text-red-100">
                 {error}
               </p>
             )}

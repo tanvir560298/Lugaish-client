@@ -1,0 +1,492 @@
+/* Phase 18: an editorial campus identity, without changing scene rendering. */
+.campus-home-hero {
+  display: grid;
+  grid-template-columns: 0.95fr 1.2fr;
+  gap: 52px;
+  align-items: center;
+  padding: 38px 0 48px;
+}
+.campus-home-intro h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(42px, 4.8vw, 69px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+.campus-home-intro h1 em {
+  font-style: normal;
+  color: var(--campus-link);
+}
+.campus-home-lead {
+  font-size: 17px;
+  line-height: 1.85 !important;
+  max-width: 31rem;
+  margin-top: 24px !important;
+}
+.campus-home-intro .platform-actions {
+  align-items: center;
+  gap: 24px;
+}
+.campus-language-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  margin-top: 32px;
+  color: var(--campus-muted);
+  font-size: 12px;
+}
+.campus-language-line [lang="ar"] {
+  font-size: 23px;
+}
+.campus-language-line > span:last-child {
+  border-inline-start: 1px solid var(--campus-border);
+  padding-inline-start: 18px;
+}
+.campus-home-scene {
+  margin: 0;
+  min-width: 0;
+}
+.campus-home-scene img {
+  aspect-ratio: 1.28;
+  object-fit: cover;
+  border-radius: 3px;
+}
+.campus-home-scene figcaption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--campus-border);
+  font-size: 12px;
+  color: var(--campus-muted);
+}
+.campus-home-scene figcaption a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--campus-link);
+  font-weight: 600;
+}
+.campus-availability {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 22px 0;
+  border-block: 1px solid var(--campus-border);
+}
+.campus-availability > svg {
+  flex-shrink: 0;
+  color: var(--campus-link);
+}
+.campus-availability > div {
+  flex: 1;
+}
+.campus-availability strong {
+  font-size: 15px;
+  font-weight: 600;
+}
+.campus-availability p {
+  font-size: 13px;
+  margin-top: 6px !important;
+}
+.campus-availability > a {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.campus-home-v18 .platform-section {
+  border: 0;
+  padding-block: 48px;
+}
+.campus-home-v18 h2 {
+  font-size: clamp(28px, 3.2vw, 40px);
+  font-weight: 550;
+  line-height: 1.2;
+}
+.campus-home-room-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+}
+.campus-home-room {
+  min-width: 0;
+}
+.campus-home-room > a {
+  display: block;
+  overflow: hidden;
+}
+.campus-home-room img {
+  aspect-ratio: 1.85;
+  border-radius: 3px;
+}
+.campus-home-room > div {
+  padding: 22px 0;
+}
+.campus-home-room .platform-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px !important;
+}
+.campus-home-room h3 {
+  font-size: 25px;
+}
+.campus-home-room p {
+  margin-top: 12px !important;
+  font-size: 15px;
+}
+.campus-home-room .campus-link {
+  margin-top: 12px;
+  font-size: 14px;
+}
+.campus-speaking-invitation {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  border-block: 1px solid var(--campus-border);
+  padding: 26px 0;
+}
+.campus-speaking-invitation > svg {
+  flex-shrink: 0;
+  color: var(--campus-link);
+}
+.campus-speaking-invitation > div {
+  flex: 1;
+}
+.campus-speaking-invitation p {
+  font-size: 14px;
+  margin-top: 10px !important;
+}
+.campus-learning-rhythm {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 64px;
+  padding: 32px 0 64px;
+}
+.campus-learning-rhythm ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.campus-learning-rhythm li {
+  display: flex;
+  gap: 24px;
+  padding: 22px 0;
+  border-top: 1px solid var(--campus-border);
+}
+.campus-learning-rhythm li > span {
+  font-size: 12px;
+  color: var(--campus-muted);
+}
+.campus-learning-rhythm li svg {
+  display: none;
+}
+.campus-learning-rhythm h3 {
+  font-size: 18px;
+}
+.campus-learning-rhythm li p {
+  font-size: 14px;
+  margin-top: 8px !important;
+}
+.campus-destinations-v18 .campus-header {
+  border-bottom: 1px solid var(--campus-border);
+  padding-bottom: 30px;
+}
+.campus-destinations-v18 .campus-header h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(38px, 4.3vw, 60px);
+  font-weight: 400;
+  max-width: 42rem;
+}
+.campus-destinations-v18 .campus-header p {
+  max-width: 37rem;
+}
+.campus-destinations-v18 .campus-destinations {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+.campus-destinations-v18 .campus-place {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  border-radius: 3px;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--campus-border);
+  padding-bottom: 32px;
+  gap: 40px;
+}
+.campus-destinations-v18 .campus-place--study .campus-place-visual {
+  order: 2;
+}
+.campus-destinations-v18 .campus-place-visual img {
+  aspect-ratio: 1.7;
+  object-fit: cover;
+  border-radius: 3px;
+}
+.campus-destinations-v18 .campus-place-visual > span {
+  top: 16px;
+  left: 16px;
+  border-radius: 3px;
+  padding: 8px 12px;
+  font-weight: 600;
+}
+.campus-destinations-v18 .campus-place-body {
+  align-self: center;
+  padding: 0;
+  max-width: 29rem;
+}
+.campus-destinations-v18 .campus-place-body h2 {
+  font-size: 34px;
+  font-weight: 550;
+  margin-top: 12px;
+}
+.campus-destinations-v18 .campus-place-body .campus-button {
+  width: auto;
+  gap: 24px;
+}
+.campus-room-details {
+  font-size: 12px !important;
+  color: var(--campus-muted) !important;
+  border-top: 1px solid var(--campus-border);
+  padding-top: 16px;
+  margin-top: 20px !important;
+}
+.campus-destinations-v18 .campus-secondary-entry {
+  border: 0;
+  border-bottom: 1px solid var(--campus-border);
+  border-radius: 0;
+  background: none;
+  padding: 0 0 32px;
+  margin-top: 0;
+}
+.campus-destinations-v18 .campus-explore-entry {
+  padding-top: 8px;
+}
+.campus-lesson-notice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 10px 24px;
+  border-bottom: 1px solid var(--campus-border);
+  background: var(--campus-surface);
+  color: var(--campus-secondary);
+  font-size: 13px;
+}
+.campus-lesson-notice > svg {
+  color: var(--campus-link);
+  flex-shrink: 0;
+}
+.campus-lesson-notice a {
+  color: var(--campus-link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  margin-inline: 10px;
+}
+.campus-lesson-notice button {
+  min-width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+}
+.learning-route-trail {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  padding-top: 12px;
+  color: var(--campus-muted);
+}
+.learning-route-trail a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--campus-link);
+}
+.learning-route-trail [aria-current] {
+  font-weight: 600;
+  color: var(--campus-text);
+}
+.voice-language-note {
+  font-size: 13px;
+  margin-bottom: 18px !important;
+  max-width: 44rem;
+}
+.academic-mobile-nav {
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  background: var(--campus-bg);
+}
+.academic-mobile-nav a {
+  border-bottom: 1px solid var(--campus-border);
+  border-radius: 0;
+}
+.academic-account-panel a[aria-current="page"] {
+  background: var(--campus-surface-raised);
+  color: var(--campus-link);
+}
+@media (max-width: 900px) {
+  .campus-home-hero {
+    gap: 28px;
+    grid-template-columns: 1fr 1fr;
+  }
+  .campus-home-intro h1 {
+    font-size: 46px;
+  }
+  .campus-home-intro .platform-actions {
+    gap: 12px;
+  }
+  .campus-home-lead {
+    font-size: 15px;
+  }
+  .campus-destinations-v18 .campus-place {
+    gap: 24px;
+  }
+  .campus-learning-rhythm {
+    gap: 32px;
+  }
+}
+@media (max-width: 700px) {
+  .campus-home-hero {
+    grid-template-columns: 1fr;
+    padding: 20px 0 24px;
+    gap: 28px;
+  }
+  .campus-home-intro h1 {
+    font-size: clamp(38px, 10.5vw, 52px);
+  }
+  .campus-home-lead {
+    margin-top: 18px !important;
+  }
+  .campus-home-intro .platform-actions {
+    margin-top: 22px;
+    gap: 10px;
+    align-items: center;
+  }
+  .campus-home-intro .platform-actions > .campus-button {
+    width: auto;
+    flex-grow: 1;
+  }
+  .campus-home-intro .platform-actions > .campus-link {
+    padding: 8px 0;
+  }
+  .campus-language-line {
+    margin-top: 18px;
+    gap: 14px;
+    font-size: 11px;
+  }
+  .campus-home-scene img {
+    aspect-ratio: 1.7;
+  }
+  .campus-home-scene figcaption {
+    font-size: 11px;
+    gap: 8px;
+  }
+  .campus-availability {
+    align-items: start;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 18px 0;
+  }
+  .campus-availability > div {
+    flex-basis: calc(100% - 38px);
+  }
+  .campus-availability > a {
+    margin-inline-start: 33px;
+  }
+  .campus-home-room-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .campus-home-v18 .platform-section-heading {
+    display: block;
+  }
+  .campus-home-v18 .platform-section-heading > .campus-link {
+    margin-top: 12px;
+  }
+  .campus-home-v18 .platform-section {
+    padding-block: 28px;
+  }
+  .campus-speaking-invitation {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .campus-speaking-invitation > div {
+    flex-basis: calc(100% - 44px);
+  }
+  .campus-speaking-invitation > .campus-button {
+    width: 100%;
+  }
+  .campus-learning-rhythm {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 20px 0 40px;
+  }
+  .campus-destinations-v18 .campus-place {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding-bottom: 26px;
+  }
+  .campus-destinations-v18 .campus-place--study .campus-place-visual {
+    order: 0;
+  }
+  .campus-destinations-v18 .campus-place-body h2 {
+    font-size: 29px;
+  }
+  .campus-destinations-v18 .campus-header h1 {
+    font-size: 39px;
+  }
+  .campus-destinations-v18 .campus-place-body .campus-button {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .campus-lesson-notice {
+    padding: 8px 12px;
+    gap: 10px;
+  }
+  .campus-lesson-notice a {
+    margin-inline: 0;
+  }
+  .campus-lesson-notice > span {
+    flex: 1;
+  }
+  .learning-route-trail {
+    gap: 9px;
+  }
+  .review-page .platform-page-heading,
+  .learning-analytics .platform-page-heading {
+    padding-top: 16px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .academic-account-panel,
+  .academic-mobile-nav {
+    animation: campus-panel-in 140ms ease-out;
+  }
+  @keyframes campus-panel-in {
+    from {
+      opacity: 0.5;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .campus-home-v18 *,
+  .campus-destinations-v18 *,
+  .academic-account-panel,
+  .academic-mobile-nav {
+    animation: none !important;
+    transition: none !important;
+  }
+}

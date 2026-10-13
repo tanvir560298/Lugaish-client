@@ -1,0 +1,69 @@
+{
+  "phase": 19,
+  "scope": "local release and operations",
+  "verifiedAt": "2026-10-12T19:58:01.662Z",
+  "targetedUnitTests": {
+    "command": "node --test server/src/utils/operations.test.js server/src/utils/validateConfig.test.js scripts/release/*.test.js",
+    "passed": 28,
+    "failed": 0
+  },
+  "operationsIntegration": {
+    "command": "RUN_OPS_INTEGRATION=1 node --test server/scripts/operations.integration.test.mjs",
+    "passed": 1,
+    "failed": 0,
+    "isolatedChildApi": true
+  },
+  "backupRestore": {
+    "command": "node server/scripts/backup-rehearsal.mjs",
+    "status": "PASS",
+    "isolatedLocalOnly": true,
+    "collections": [
+      "users",
+      "lessons",
+      "studynotes",
+      "studytablemessages",
+      "quizzes",
+      "reviewattempts",
+      "progresses"
+    ],
+    "bsonPreserved": true,
+    "uniqueIndexesRestored": true,
+    "learningReferencesRestored": true,
+    "sha256Verified": true
+  },
+  "catalogInventory": {
+    "command": "node server/scripts/course-reset.mjs inventory --database lugaish",
+    "readOnly": true,
+    "scope": "local development database only",
+    "courses": 0,
+    "archivedLessons": 56,
+    "publishedLessons": 0,
+    "draftLessons": 0,
+    "activeLessons": 0
+  },
+  "templateValidation": {
+    "status": "EXPECTED FAIL",
+    "reason": "Unconfigured placeholders rejected without printing values"
+  },
+  "gitDiffWhitespace": {
+    "status": "PASS",
+    "repositories": [
+      "frontend",
+      "server"
+    ]
+  },
+  "hostedStaging": "BLOCKED",
+  "hostedRollback": "NOT TESTED",
+  "remoteCi": "NOT TESTED",
+  "providerAutoDeploy": "UNKNOWN",
+  "existingUserProcessesRestarted": false,
+  "productionDatabaseMutated": false,
+  "pushed": false,
+  "deployed": false,
+  "cleanReleaseSourceGuard": {
+    "focusedTestsPassed": 5,
+    "currentDirtyWorkspaceRejected": true,
+    "backendGitlinkValidated": true,
+    "statusContentsLogged": false
+  }
+}

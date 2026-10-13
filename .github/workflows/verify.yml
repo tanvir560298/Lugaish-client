@@ -1,0 +1,39 @@
+name: Verify Lugaish
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:7
+        ports: ['27017:27017']
+        options: --health-cmd "mongosh --quiet --eval 'db.adminCommand({ping:1})'" --health-interval 10s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            server/package-lock.json
+      - run: npm ci
+      - run: npm ci --prefix server
+      - run: npm run lint
+      - run: npm test
+      - run: npm run test:integration
+      - run: npm audit --omit=dev
+      - run: npm audit --omit=dev --prefix server
+      - run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verification-build-not-a-release
+          path: dist/
+          retention-days: 7

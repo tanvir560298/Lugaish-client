@@ -1,251 +1,203 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
-import { useAppContext } from '../state/AppContext.jsx';
-import { 
-  Menu, 
-  X, 
-  Hammer, 
-  LayoutDashboard, 
-  Gauge,
-  Sparkles,
-  CalendarDays,
-  CreditCard,
-  Sun,
-  Moon,
-  Activity,
-  Code2,
-  Eye,
-} from 'lucide-react';
-import { ROLES, getViewedRole } from '../utils/roles.js';
-import { getUnviewedCertificateCount } from '../utils/certificateStorage.js';
-
-const navLinks = [
-  { href: '/', label: 'Home', description: 'Explore our courses and how learning works', icon: <LayoutDashboard size={16} />, exact: true },
-  { href: '/daily-lessons', label: 'My Classes', description: 'Your lessons, videos, PDFs, and quizzes', icon: <CalendarDays size={16} /> },
-  { href: '/pricing', label: 'Courses & Fees', description: 'Explore courses and pricing', icon: <CreditCard size={16} /> },
-  { href: '/architects', label: 'Our Team', description: 'Meet the people behind your courses', icon: <Hammer size={16} /> },
+import { isStudentPreview } from "../utils/roles.js";
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Menu, X, Sun, Moon, ChevronDown, User, LogOut } from "lucide-react";
+import { useAppContext } from "../state/AppContext.jsx";
+import { ROLES, getViewedRole } from "../utils/roles.js";
+import { getUnviewedCertificateCount } from "../utils/certificateStorage.js";
+const links = [
+  ["/", "Home"],
+  ["/daily-lessons", "My Classes"],
+  ["/learning-spaces", "Campus"],
+  ["/speaking-practice", "Speaking"],
+  ["/pricing", "Courses & Fees"],
 ];
-
 export function Header() {
-  const { state, actions } = useAppContext();
-  const location = useLocation();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  useEffect(() => setMobileOpen(false), [location.pathname]);
-  const level = Math.floor(state.xp / 500) + 1;
-  const themeLabel = state.theme === 'dark' ? 'Light mode' : 'Dark mode';
-  const dashboardLink = { href: '/dashboard', label: getViewedRole(state) === ROLES.learner ? 'My Progress' : 'Staff Dashboard', description: 'View progress, attendance, and certificates', icon: <Gauge size={16} /> };
-  const visibleNavLinks = state.isLoggedIn ? [...navLinks, dashboardLink] : navLinks;
-  const canSwitchMode = state.userRole === ROLES.webDeveloper;
-  const isTesterMode = canSwitchMode && state.webDeveloperMode === 'tester';
-  const isLinkActive = (link) => (
-    link.exact
-      ? location.pathname === link.href
-      : location.pathname === link.href || location.pathname.startsWith(`${link.href}/`)
+  const { state, actions } = useAppContext(),
+    { pathname } = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false),
+    [accountOpen, setAccountOpen] = useState(false);
+  const menu = useRef(null),
+    account = useRef(null),
+    accountButton = useRef(null);
+  const themeLabel = state.theme === "dark" ? "Light mode" : "Dark mode";
+  const staff = getViewedRole(state) !== ROLES.learner,
+    developer = state.userRole === ROLES.webDeveloper;
+  const certificates = state.isLoggedIn
+    ? getUnviewedCertificateCount(state.completedLessons, state.activePathway)
+    : 0;
+  const active = (href) =>
+    href === "/"
+      ? pathname === "/"
+      : href === "/learning-spaces"
+        ? /^\/(learning-spaces|classroom|study-room)(-preview)?(\/|$)/.test(
+            pathname,
+          )
+        : href === "/daily-lessons"
+          ? /^\/(daily-lessons|lesson|quiz|course|pathways)(\/|$)/.test(
+              pathname,
+            )
+          : href === "/speaking-practice"
+            ? /^\/(speaking-practice|speaking-preview)(\/|$)/.test(pathname)
+            : pathname === href || pathname.startsWith(href + "/");
+  useEffect(() => {
+    setMobileOpen(false);
+    setAccountOpen(false);
+  }, [pathname]);
+  useEffect(() => {
+    if (!mobileOpen && !accountOpen) return;
+    const key = (e) => {
+      if (e.key === "Escape") {
+        if (accountOpen) {
+          setAccountOpen(false);
+          accountButton.current?.focus();
+        } else {
+          setMobileOpen(false);
+          menu.current?.focus();
+        }
+      }
+    };
+    const outside = (e) => {
+      if (accountOpen && !account.current?.contains(e.target))
+        setAccountOpen(false);
+    };
+    document.addEventListener("keydown", key);
+    document.addEventListener("pointerdown", outside);
+    return () => {
+      document.removeEventListener("keydown", key);
+      document.removeEventListener("pointerdown", outside);
+    };
+  }, [mobileOpen, accountOpen]);
+  const accountLinks = (
+    <>
+      {!isStudentPreview(state) &&
+        [ROLES.webDeveloper, ROLES.instructor, ROLES.editor].includes(
+          state.userRole,
+        ) && <Link to="/manage-courses">Course publication</Link>}
+      <Link to="/profile">My profile</Link>
+      <Link to="/review-mistakes">Review Mistakes</Link>
+      <Link to={staff ? "/dashboard" : "/progress"}>
+        {staff ? "Staff Dashboard" : "My Learning Progress"}
+        {certificates > 0 && (
+          <small>
+            {certificates} new certificate{certificates === 1 ? "" : "s"}
+          </small>
+        )}
+      </Link>
+      {developer && (
+        <button onClick={actions.toggleWebDeveloperMode}>
+          {state.webDeveloperMode === "tester"
+            ? "Switch to developer mode"
+            : "Preview as a student"}
+        </button>
+      )}
+      <button
+        onClick={() => {
+          setAccountOpen(false);
+          setMobileOpen(false);
+          actions.logout();
+        }}
+      >
+        <LogOut size={16} /> Sign out
+      </button>
+    </>
   );
-  const unviewedCertificateCount = React.useMemo(() => {
-    if (!state.isLoggedIn) return 0;
-    return getUnviewedCertificateCount(state.completedLessons, state.activePathway);
-  }, [state.isLoggedIn, state.completedLessons, state.activePathway, location.pathname]);
-
   return (
-    <header className="site-header sticky top-0 z-[100] border-b border-white/5 bg-[#020617]/80 backdrop-blur-2xl">
-      <div className="mx-auto flex max-w-[1760px] items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
-        
-        {/* --- 1. LUGAISH BRAND --- */}
-        <Link to="/" className="relative group flex shrink-0 items-center gap-4">
-          <motion.div
-            whileHover={{ scale: 1.06 }}
-            className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-lg shadow-blue-500/20 ring-1 ring-white/20"
-          >
-            <img src="/favicon.png" alt="Lugaish" className="h-full w-full object-cover" />
-          </motion.div>
-
-          <div className="hidden sm:block">
-            <h1 className="text-lg font-black tracking-tighter text-white leading-none">LUGAISH</h1>
-            <p className="text-[9px] font-bold tracking-[0.3em] text-emerald-400 uppercase mt-1">Founding Phase</p>
-          </div>
+    <header className="site-header academic-header">
+      <div className="academic-header-inner">
+        <Link to="/" className="academic-brand" aria-label="Lugaish home">
+          <img src="/favicon.png" alt="" />
+          <span>
+            LUGAISH<small>The learning campus</small>
+          </span>
         </Link>
-
-        {/* --- 2. DESKTOP NAV (Magnetic Style) --- */}
-        <nav className="header-nav hidden xl:flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/5">
-          <LayoutGroup>
-            {visibleNavLinks.map((link) => {
-              const isActive = isLinkActive(link);
-
-              return (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  aria-current={isActive ? 'page' : undefined}
-                  title={link.description}
-                  className={`
-                    nav-link header-nav-link
-                    relative flex items-center gap-1.5 px-3 py-2 text-xs font-semibold whitespace-nowrap transition-all 2xl:px-4
-                    ${isActive ? 'nav-link-active text-white' : 'text-slate-400 hover:text-slate-200'}
-                  `}
-                >
-                  {/* The Background Pill */}
-                  {isActive && (
-                    <motion.div
-                      layoutId="activePill"
-                      className="header-nav-active-pill absolute inset-0 bg-white/10 rounded-xl border border-white/10"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                    />
-                  )}
-                  
-                  <span className="relative z-10">{link.icon}</span>
-                  <span className="relative z-10">{link.label}</span>
-                  {link.href === '/dashboard' && unviewedCertificateCount > 0 && (
-                    <span className="relative z-10 ml-0.5 flex h-2 w-2" title={`${unviewedCertificateCount} new certificate available`}>
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]"></span>
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </LayoutGroup>
-        </nav>
-
-        {/* --- 3. ACTIONS & USER STATUS --- */}
-        <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-4">
-          {canSwitchMode && (
-            <button
-              type="button"
-              onClick={actions.toggleWebDeveloperMode}
-              className={`header-control hidden items-center gap-2 rounded-xl border px-3 py-2 text-[10px] font-black uppercase tracking-wider transition lg:inline-flex ${isTesterMode ? 'border-amber-400/30 bg-amber-500/10 text-amber-200' : 'border-violet-400/30 bg-violet-500/10 text-violet-200'}`}
-              aria-pressed={isTesterMode}
-              title={isTesterMode ? 'Switch to Web Developer mode' : 'Preview the website as a student'}
+        <nav className="header-nav academic-nav" aria-label="Main navigation">
+          {links.map(([href, label]) => (
+            <Link
+              className="header-nav-link"
+              key={href}
+              to={href}
+              aria-current={active(href) ? "page" : undefined}
             >
-              {isTesterMode ? <Eye size={16} /> : <Code2 size={16} />}
-              {isTesterMode ? 'Tester mode' : 'Developer mode'}
-            </button>
-          )}
-          
+              {label}
+            </Link>
+          ))}
+        </nav>
+        <div className="academic-header-actions">
           <button
-            type="button"
+            className="header-control academic-icon"
             onClick={actions.toggleTheme}
-            className="header-control header-icon-button hidden h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10 sm:inline-flex"
             aria-label={themeLabel}
             title={themeLabel}
           >
-            {state.theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            {state.theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
-
-          {/* User Progress Badge */}
-          {state.isLoggedIn && (
-            <div className="header-control header-progress hidden items-center gap-2 rounded-xl border border-white/5 bg-white/5 px-3 py-2 xl:flex">
-              <div className="flex items-center gap-3">
-                <Activity size={15} className="text-emerald-400" />
-                <div className="leading-none">
-                  <span className="block text-[10px] font-black text-white uppercase tracking-wider">{state.userName || 'Learner'}</span>
-                  <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider">{state.xp} XP earned</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Auth Button */}
           {state.isLoggedIn ? (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              onClick={actions.logout}
-              className="header-signout px-3 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all sm:px-4"
-            >
-              Sign Out
-            </motion.button>
-          ) : (
-            <Link to="/login">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                className="header-auth px-3 py-2.5 rounded-xl bg-white text-slate-950 text-[10px] font-black uppercase tracking-widest hover:bg-emerald-400 transition-colors sm:px-6"
+            <div className="academic-account" ref={account}>
+              <button
+                ref={accountButton}
+                className="academic-account-trigger"
+              aria-label={accountOpen?"Close account menu":"Open account menu"}
+                aria-expanded={accountOpen}
+                aria-controls="account-navigation"
+                onClick={() => {
+                  setAccountOpen((v) => !v);
+                  setMobileOpen(false);
+                }}
               >
-                Sign In <Sparkles size={12} className="inline ml-1" />
-              </motion.button>
+                <User size={17} />
+                <span>{state.userName || "My account"}</span>
+                <ChevronDown size={15} />
+              </button>
+              {accountOpen && (
+                <nav
+                  id="account-navigation"
+                  className="academic-account-panel"
+                  aria-label="Account navigation"
+                >
+                  {accountLinks}
+                </nav>
+              )}
+            </div>
+          ) : (
+            <Link className="header-auth campus-button" to="/login">
+              Sign in
             </Link>
           )}
-
-          {/* Mobile Menu Toggle */}
           <button
-            className="header-menu header-icon-button relative xl:hidden p-2 text-white bg-white/5 rounded-xl border border-white/10"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
+            ref={menu}
+            className="header-menu academic-icon"
+            aria-label={
+              mobileOpen ? "Close navigation menu" : "Open navigation menu"
+            }
             aria-expanded={mobileOpen}
             aria-controls="mobile-navigation"
+            onClick={() => {
+              setMobileOpen((v) => !v);
+              setAccountOpen(false);
+            }}
           >
-            {unviewedCertificateCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75"></span>
-                <span className="relative inline-flex h-3 w-3 rounded-full bg-amber-500 border-2 border-slate-950"></span>
-              </span>
-            )}
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+            {mobileOpen ? <X size={21} /> : <Menu size={21} />}
           </button>
         </div>
       </div>
-
-      {/* --- 4. MOBILE MENU (Animated Dropdown) --- */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            id="mobile-navigation"
-            className="mobile-nav max-h-[calc(100dvh-9rem)] overflow-y-auto xl:hidden border-t border-white/5 bg-[#020617]"
-          >
-            <div className="p-4 space-y-2 sm:p-6 sm:space-y-4">
-              <button
-                type="button"
-                onClick={actions.toggleTheme}
-                className="header-control header-mobile-theme mb-2 flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-left text-sm font-black uppercase tracking-widest text-white"
-              >
-                <span>{themeLabel}</span>
-                {state.theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-              </button>
-
-              {state.isLoggedIn && (
-                <div className="header-control rounded-2xl border border-white/10 bg-white/5 px-3 py-3">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Your progress</p>
-                  <p className="mt-1 text-base font-black text-white">{state.userName || 'Learner'} · Level {level} · {state.xp} XP</p>
-                </div>
-              )}
-
-              {canSwitchMode && (
-                <button
-                  type="button"
-                  onClick={actions.toggleWebDeveloperMode}
-                  className={`flex w-full items-center justify-between rounded-2xl border px-3 py-3 text-sm font-black uppercase tracking-wider ${isTesterMode ? 'border-amber-400/30 bg-amber-500/10 text-amber-100' : 'border-violet-400/30 bg-violet-500/10 text-violet-100'}`}
-                >
-                  <span>{isTesterMode ? 'Tester mode' : 'Developer mode'}</span>
-                  {isTesterMode ? <Eye size={18} /> : <Code2 size={18} />}
-                </button>
-              )}
-
-              {visibleNavLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  aria-current={isLinkActive(link) ? 'page' : undefined}
-                  className={`flex items-center justify-between rounded-2xl px-3 py-3 text-base font-semibold text-white ${isLinkActive(link) ? 'bg-white/10' : ''}`}
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-emerald-500">{link.icon}</span>
-                    <span>{link.label}<span className="mt-1 block text-xs font-normal text-slate-400">{link.description}</span></span>
-                  </div>
-                  {link.href === '/dashboard' && unviewedCertificateCount > 0 && (
-                    <span className="rounded-full bg-amber-400/20 border border-amber-400/40 px-2.5 py-0.5 text-xs font-black uppercase tracking-wider text-amber-300 not-italic">
-                      NEW
-                    </span>
-                  )}
-                </Link>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {mobileOpen && (
+        <nav
+          id="mobile-navigation"
+          className="mobile-nav academic-mobile-nav"
+          aria-label="Mobile navigation"
+        >
+          {links.map(([href, label]) => (
+            <Link
+              key={href}
+              to={href}
+              aria-current={active(href) ? "page" : undefined}
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
+      )}
     </header>
   );
 }

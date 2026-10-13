@@ -1,0 +1,313 @@
+{
+  "idle": {
+    "native": true,
+    "meshes": [
+      {
+        "name": "Casual2_Feet_1",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Feet_2",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Body_1",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Body_2",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_1",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_2",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_3",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_4",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_5",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Legs",
+        "bones": 62
+      }
+    ],
+    "animation": "idle",
+    "speeds": {
+      "walk": 1.2904407751271842,
+      "run": 2.799774329021051
+    },
+    "leg": [
+      -0.6808088032513048,
+      0.06818748646069506,
+      0.7258093598543054,
+      -0.07106766672392059
+    ],
+    "root": [
+      0,
+      0,
+      0
+    ]
+  },
+  "walk": {
+    "native": true,
+    "meshes": [
+      {
+        "name": "Casual2_Feet_1",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Feet_2",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Body_1",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Body_2",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_1",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_2",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_3",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_4",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_5",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Legs",
+        "bones": 62
+      }
+    ],
+    "animation": "walk",
+    "speeds": {
+      "walk": 1.2904407751271842,
+      "run": 2.799774329021051
+    },
+    "leg": [
+      -0.7051371311162042,
+      -0.056605274080331246,
+      0.7002595043351647,
+      0.09599008206981027
+    ],
+    "root": [
+      0,
+      0,
+      0
+    ],
+    "animated": true
+  },
+  "run": {
+    "native": true,
+    "meshes": [
+      {
+        "name": "Casual2_Feet_1",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Feet_2",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Body_1",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Body_2",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_1",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_2",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_3",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_4",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_5",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Legs",
+        "bones": 62
+      }
+    ],
+    "animation": "walk",
+    "speeds": {
+      "walk": 1.2904407751271842,
+      "run": 2.799774329021051
+    },
+    "leg": [
+      -0.6748718328394375,
+      -0.12845821588019565,
+      0.7097045548704178,
+      0.15609593463315172
+    ],
+    "root": [
+      0,
+      0,
+      0
+    ],
+    "animated": true
+  },
+  "wave": {
+    "native": true,
+    "meshes": [
+      {
+        "name": "Casual2_Feet_1",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Feet_2",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Body_1",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Body_2",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_1",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_2",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_3",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_4",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_5",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Legs",
+        "bones": 62
+      }
+    ],
+    "animation": "idle",
+    "speeds": {
+      "walk": 1.2904407751271842,
+      "run": 2.799774329021051
+    },
+    "leg": [
+      -0.6806171543285072,
+      0.07012315308256219,
+      0.7256199432404773,
+      -0.07292962777370275
+    ],
+    "root": [
+      0,
+      0,
+      0
+    ]
+  },
+  "seat": {
+    "native": true,
+    "notice": true
+  },
+  "returnToNative": {
+    "native": true,
+    "meshes": [
+      {
+        "name": "Casual2_Feet_1",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Feet_2",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Body_1",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Body_2",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_1",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_2",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_3",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_4",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Head_5",
+        "bones": 62
+      },
+      {
+        "name": "Casual2_Legs",
+        "bones": 62
+      }
+    ],
+    "animation": "standUp",
+    "speeds": {
+      "walk": 1.2904407751271842,
+      "run": 2.799774329021051
+    },
+    "leg": [
+      -0.559464801133497,
+      0.42112445825337386,
+      0.5936371597805562,
+      -0.39654539397687816
+    ],
+    "root": [
+      0,
+      0,
+      0
+    ]
+  }
+}

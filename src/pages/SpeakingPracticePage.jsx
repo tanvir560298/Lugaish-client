@@ -1,3 +1,6 @@
+import { DailyGoal } from '../learning/DailyGoal.jsx';
+import { confirmGuidedCompletion } from '../speaking/progress.js';
+import { SpeakingStudio } from '../speaking/SpeakingStudio.jsx';
 import { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft,
@@ -91,44 +94,13 @@ function buildEnglishMeetingReply(question, transcript) {
   return question?.aiResponse || 'Thanks for telling me. Let’s keep talking.';
 }
 
-function buildFirstMeetingReport(results, totalQuestions) {
-  const answered = results.length;
-  const conversationMarks = results.reduce((total, result) => total + result.marks, 0);
-  const flowMarks = Math.round((answered / Math.max(totalQuestions, 1)) * 10);
-  const confidenceValues = results
-    .map(result => result.recognitionConfidence)
-    .filter(value => Number.isFinite(value));
-  const confidenceMarks = confidenceValues.length
-    ? Math.round(confidenceValues.reduce((total, value) => total + value, 0) / confidenceValues.length / 10)
-    : Math.round((conversationMarks / Math.max(answered * 10, 1)) * 10);
-  const continuationMarks = Math.round((results.filter(result => result.marks >= 5).length / Math.max(totalQuestions, 1)) * 10);
-  const score = Math.min(100, conversationMarks + flowMarks + confidenceMarks + continuationMarks);
-  const level = score >= 85 ? 'Excellent' : score >= 70 ? 'Good' : score >= 50 ? 'Developing' : 'Needs Practice';
-  const strongAnswers = results.filter(result => result.marks >= 8).length;
-  const corrections = [];
-
-  for (const result of results) {
-    const answer = result.transcript.trim();
-    if (/\bi from\b/i.test(answer)) corrections.push(`Instead of “${answer}”, say “I am from …”`);
-    else if (/\bi am study\b/i.test(answer)) corrections.push(`Instead of “${answer}”, say “I study …” or “I am studying …”`);
-    else if (result.marks < 7 && answer.split(/\s+/).length <= 2) corrections.push(`Make “${answer}” a complete sentence with “I am …” or “I …”`);
-    if (corrections.length === 2) break;
-  }
-
-  return {
-    score,
-    level,
-    strengths: [
-      `${answered} of ${totalQuestions} conversation steps completed`,
-      `${strongAnswers} clear and detailed answer${strongAnswers === 1 ? '' : 's'}`,
-      continuationMarks >= 8 ? 'You kept the conversation moving naturally' : 'You communicated useful personal information',
-    ],
-    improvements: [
-      conversationMarks < 50 ? 'Use complete sentences more often' : 'Add one extra detail or reason to your shorter answers',
-      continuationMarks < 8 ? 'Practice asking a return question to continue the conversation' : 'Keep speaking clearly and at a steady pace',
-    ],
-    corrections,
-  };
+function buildFirstMeetingReport(results,totalQuestions,totalPossible=totalQuestions*10){
+ const earned=results.reduce((sum,r)=>sum+r.marks,0);
+ const matched=[...new Set(results.flatMap(r=>r.matchedKeywords??[]))];
+ const missing=[...new Set(results.flatMap(r=>r.missingKeywords??[]))];
+ return {score:totalPossible?Math.round(earned/totalPossible*100):0,
+  strengths:[`${results.length} of ${totalQuestions} supplied turns submitted.`,`${matched.length} expected keywords matched in your transcripts.`],
+  improvements:missing.length?[`Revisit these supplied keywords: ${missing.join(', ')}`]:['Compare your answers with the supplied samples and try again.'],corrections:[]};
 }
 
 function validateQuestionSet(questions) {
@@ -176,7 +148,7 @@ function buildModulePayload(module, language, day, questions, published) {
   return {
     moduleType: 'ai_practice',
     published,
-    title: module?.title || `Day ${day} AI speaking practice`,
+    title: module?.title || `Day ${day} guided speaking practice`,
     description: module?.description || 'Listen, speak, and receive instant feedback.',
     introTitle: module?.introTitle || '',
     introText: module?.introText || '',
@@ -187,7 +159,7 @@ function buildModulePayload(module, language, day, questions, published) {
 }
 
 export function SpeakingPracticePage() {
-  const { state } = useAppContext();
+  const { state, actions, courseData } = useAppContext();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const requestedLanguage = searchParams.get('language');
@@ -220,11 +192,15 @@ export function SpeakingPracticePage() {
   const [results, setResults] = useState([]);
   const [isFinished, setIsFinished] = useState(false);
   const [completionNotice, setCompletionNotice] = useState('');
+  const [confirmedActivity,setConfirmedActivity]=useState(null),[completionSaving,setCompletionSaving]=useState(false);
   const [voices, setVoices] = useState([]);
   const [selectedVoiceName, setSelectedVoiceName] = useState('');
   const [speechRate, setSpeechRate] = useState(0.92);
   const [isQuestionAudioPlaying, setIsQuestionAudioPlaying] = useState(false);
   const [conversationReply, setConversationReply] = useState('');
+  const completionScope=useRef(null);
+  completionScope.current=`${state.userEmail}:${language}:${day}`;
+  const voiceStudioRef = useRef(null);
   const recognitionRef = useRef(null);
   const recognitionConfidenceRef = useRef(null);
   const interimTranscriptRef = useRef('');
@@ -272,6 +248,8 @@ export function SpeakingPracticePage() {
     setResults([]);
     setIsFinished(false);
     setCompletionNotice('');
+    setConfirmedActivity(null);
+    setCompletionSaving(false);
     setAccessError(null);
     sessionStartedRef.current = false;
     completionSentRef.current = false;
@@ -311,7 +289,7 @@ export function SpeakingPracticePage() {
           || scheduledModule.moduleType !== 'ai_practice'
           || scheduledModule.published !== true
           || scheduledModule.available !== true) {
-          const error = new Error('Only the published AI practice assigned to your currently unlocked server-scheduled date can be opened.');
+          const error = new Error('Only the published speaking practice assigned to your currently unlocked server-scheduled date can be opened.');
           error.status = 403;
           throw error;
         }
@@ -331,7 +309,7 @@ export function SpeakingPracticePage() {
       };
 
       if (!isWebDeveloper && (savedModule.moduleType !== 'ai_practice' || !savedModule.published)) {
-        const error = new Error('This day is not a published AI speaking practice session.');
+        const error = new Error('This day is not a published guided speaking practice session.');
         error.status = 403;
         throw error;
       }
@@ -348,9 +326,9 @@ export function SpeakingPracticePage() {
       setLoadNotice(isWebDeveloper
         ? savedModule.moduleType === 'ai_practice'
           ? savedModule.published
-            ? 'This AI practice day is live for learners.'
-            : 'This AI practice draft is private until you publish it.'
-          : 'Configure this day as AI speaking practice before adding questions.'
+            ? 'This speaking practice day is live for learners.'
+            : 'This speaking practice draft is private until you publish it.'
+          : 'Configure this day as guided speaking practice before adding questions.'
         : 'Read the instructions, then begin the scheduled practice session.');
     }
 
@@ -360,12 +338,12 @@ export function SpeakingPracticePage() {
         if (!isWebDeveloper) {
           setAccessError({
             status: error.status,
-            message: error.message || 'This scheduled AI practice session is not available yet.',
+            message: error.message || 'This scheduled speaking practice session is not available yet.',
           });
         }
         setLoadNotice(error.message || (isWebDeveloper
           ? 'The day configuration could not be loaded. Try again before publishing.'
-          : 'This AI practice session is not available yet.'));
+          : 'This speaking practice session is not available yet.'));
       })
       .finally(() => {
         if (!ignore) setIsRemoteLoading(false);
@@ -395,7 +373,10 @@ export function SpeakingPracticePage() {
     return () => window.speechSynthesis.removeEventListener?.('voiceschanged', updateVoices);
   }, [locale]);
 
-  useEffect(() => () => {
+  useEffect(() => {
+    completionScope.current=`${state.userEmail}:${language}:${day}`;
+    return () => {
+    completionScope.current=null;
     const recognition = recognitionRef.current;
     recognitionRef.current = null;
     if (recognition) {
@@ -408,6 +389,7 @@ export function SpeakingPracticePage() {
     audioRef.current?.pause?.();
     utteranceRef.current = null;
     window.clearTimeout(conversationTimerRef.current);
+    };
   }, []);
 
   const abortRecognition = () => {
@@ -444,6 +426,7 @@ export function SpeakingPracticePage() {
   };
 
   const speakQuestion = () => {
+    voiceStudioRef.current?.reset();
     setSpeechError('');
     if (!currentQuestion) return;
     sessionStartedRef.current = true;
@@ -477,6 +460,7 @@ export function SpeakingPracticePage() {
   };
 
   const speakAiResponse = text => {
+    voiceStudioRef.current?.reset();
     if (!text || !('speechSynthesis' in window)) return;
     stopQuestionAudio();
     const utterance = new SpeechSynthesisUtterance(text);
@@ -529,6 +513,7 @@ export function SpeakingPracticePage() {
   };
 
   const playRecordedQuestion = () => {
+    voiceStudioRef.current?.reset();
     if (!currentQuestion?.audioUrl) return;
     sessionStartedRef.current = true;
     setSpeechError('');
@@ -566,6 +551,7 @@ export function SpeakingPracticePage() {
   };
 
   const startListening = () => {
+    voiceStudioRef.current?.reset();
     if (!RecognitionConstructor || !currentQuestion) return;
     sessionStartedRef.current = true;
     abortRecognition();
@@ -676,6 +662,7 @@ export function SpeakingPracticePage() {
   };
 
   const retryQuestion = () => {
+    voiceStudioRef.current?.reset();
     abortRecognition();
     stopQuestionAudio();
     setTranscript('');
@@ -687,12 +674,13 @@ export function SpeakingPracticePage() {
   };
 
   const finishTest = (completedResults = results) => {
+    voiceStudioRef.current?.reset();
     abortRecognition();
     stopQuestionAudio();
     const earnedMarks = completedResults.reduce((total, result) => total + result.marks, 0);
     const availableMarks = questions.reduce((total, question) => total + Number(question.maxMarks || 0), 0);
     const firstMeetingReport = language === 'english' && day === 2
-      ? buildFirstMeetingReport(completedResults, questions.length)
+      ? buildFirstMeetingReport(completedResults, questions.length, questions.reduce((sum,q)=>sum+q.maxMarks,0))
       : null;
     const totalOutOf100 = firstMeetingReport?.score ?? (availableMarks ? Math.round((earnedMarks / availableMarks) * 100) : 0);
     const savedResult = {
@@ -710,15 +698,25 @@ export function SpeakingPracticePage() {
 
     if (!isWebDeveloper && completedResults.length === questions.length && !completionSentRef.current) {
       completionSentRef.current = true;
-      api.completeLesson({ language, day })
-        .then(() => setCompletionNotice('Day complete — the next scheduled day is now unlocked.'))
-        .catch(() => setCompletionNotice('Your test result is saved here. The course progress will refresh when the connection is available.'));
+      const requestedScope=completionScope.current;
+      setCompletionSaving(true);
+      confirmGuidedCompletion(()=>api.completeLesson({language,day}))
+        .then(({result,activity})=>{
+          if(completionScope.current!==requestedScope)return;
+          const lesson=courseData[language]?.modules.flatMap(m=>m.lessons).find(l=>Number(l.id.split('-').at(-1))===day);
+          if(lesson)actions.recordServerQuizCompletion(lesson.id,result);
+          setConfirmedActivity(activity);
+          setCompletionNotice('Lugaish confirmed the course completion. This does not assess pronunciation.');
+        })
+        .catch(()=>{if(completionScope.current!==requestedScope)return;completionSentRef.current=false;setCompletionNotice('Your local result remains available. Course completion was not confirmed. Retry when connected.');})
+        .finally(()=>{if(completionScope.current===requestedScope)setCompletionSaving(false);});
     } else if (!isWebDeveloper && completedResults.length < questions.length) {
       setCompletionNotice('Your result is saved, but complete every question to unlock the next scheduled day.');
     }
   };
 
   const nextQuestion = () => {
+    voiceStudioRef.current?.reset();
     if (questionIndex >= questions.length - 1) {
       finishTest();
       return;
@@ -768,7 +766,7 @@ export function SpeakingPracticePage() {
       return;
     }
     if (!isPracticeDay) {
-      setManagerMessage('Choose AI speaking practice in the Day setup before adding questions.');
+      setManagerMessage('Choose guided speaking practice in the Day setup before adding questions.');
       return;
     }
     const validationMessage = validateQuestionSet(draftQuestions);
@@ -777,7 +775,7 @@ export function SpeakingPracticePage() {
       return;
     }
     if (publishForLearners && draftQuestions.length === 0) {
-      setManagerMessage('Add at least one question before publishing AI practice.');
+      setManagerMessage('Add at least one question before publishing speaking practice.');
       return;
     }
 
@@ -814,8 +812,8 @@ export function SpeakingPracticePage() {
       setDraftQuestions(savedQuestions);
       setPublishForLearners(Boolean(savedModule.published));
       setManagerMessage(savedModule.published
-        ? 'AI practice is live for learners on this day.'
-        : 'Private AI practice draft saved. Learners cannot see it yet.');
+        ? 'speaking practice is live for learners on this day.'
+        : 'Private speaking practice draft saved. Learners cannot see it yet.');
     } catch (error) {
       setQuestions(validQuestions);
       setDraftQuestions(validQuestions);
@@ -837,19 +835,19 @@ export function SpeakingPracticePage() {
   const availableMarks = questions.reduce((total, question) => total + Number(question.maxMarks || 0), 0);
   const totalOutOf100 = availableMarks ? Math.round((earnedMarks / availableMarks) * 100) : 0;
   const firstMeetingReport = language === 'english' && day === 2
-    ? buildFirstMeetingReport(results, questions.length)
+    ? buildFirstMeetingReport(results, questions.length, questions.reduce((sum,q)=>sum+q.maxMarks,0))
     : null;
   const displayedTotal = firstMeetingReport?.score ?? totalOutOf100;
   const languageVoices = voices.filter(voice => voice.lang?.toLowerCase().startsWith(locale.slice(0, 2).toLowerCase()));
 
   if (isFinished) {
     return (
-      <section className="mx-auto max-w-4xl space-y-6 pb-20">
+      <section className="speaking-campus mx-auto max-w-4xl space-y-6 pb-20">
         <div className="section-card overflow-hidden p-8 text-center sm:p-12">
           <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-emerald-500/15 text-emerald-300"><Sparkles size={36} /></div>
           <p className="mt-6 text-xs font-black uppercase tracking-[0.26em] text-emerald-400">Speaking test complete</p>
-          <h1 className="mt-3 text-5xl font-black text-white sm:text-7xl">{displayedTotal}/100</h1>
-          {firstMeetingReport && <p className="mt-3 text-xl font-black text-emerald-300">Level: {firstMeetingReport.level}</p>}
+          <h1 className="mt-3 text-3xl font-black text-white">Your guided practice review</h1><p className="mt-3 text-xl">Transcript rubric: {earnedMarks} / {availableMarks} supplied keyword marks</p>
+          {firstMeetingReport && <p className="mt-3 text-xl font-black text-emerald-300">Transcript keyword rubric · not proficiency or pronunciation</p>}
           <p className="mt-3 text-slate-400">You answered {results.length} of {questions.length} questions. Your latest result is saved on this device.</p>
           {firstMeetingReport && (
             <div className="mx-auto mt-7 grid max-w-3xl gap-4 text-left md:grid-cols-2">
@@ -862,10 +860,10 @@ export function SpeakingPracticePage() {
                 <ul className="mt-3 space-y-2 text-sm text-slate-300">{firstMeetingReport.improvements.map(item => <li key={item}>• {item}</li>)}</ul>
               </div>
               <div className="rounded-2xl border border-blue-400/20 bg-blue-500/[0.08] p-5 md:col-span-2">
-                <h2 className="font-black text-white">Better sentences</h2>
+                <h2 className="font-black text-white">Review supplied examples</h2>
                 {firstMeetingReport.corrections.length
                   ? <ul className="mt-3 space-y-2 text-sm text-slate-300">{firstMeetingReport.corrections.map(item => <li key={item}>• {item}</li>)}</ul>
-                  : <p className="mt-3 text-sm text-slate-300">Your answers were understandable. Keep using complete sentences and add small details.</p>}
+                  : <p className="mt-3 text-sm text-slate-300">Review the supplied sample answers in each activity. No automatic grammar assessment is available.</p>}
               </div>
               <div className="rounded-2xl border border-purple-400/20 bg-purple-500/[0.08] p-5 md:col-span-2">
                 <h2 className="font-black text-white">Speaking mission</h2>
@@ -873,10 +871,12 @@ export function SpeakingPracticePage() {
               </div>
             </div>
           )}
+          {confirmedActivity&&<DailyGoal scope={`${encodeURIComponent(state.userEmail||'learner')}:${language}`} confirmedLesson={confirmedActivity}/>}
           {completionNotice && <p className="mx-auto mt-4 max-w-xl rounded-2xl border border-emerald-400/20 bg-emerald-500/[0.08] px-4 py-3 text-sm text-emerald-100">{completionNotice}</p>}
+          {!isWebDeveloper&&results.length===questions.length&&!completionSentRef.current&&<button className="glow-button glow-button-green mt-4" disabled={completionSaving} onClick={()=>finishTest(results)}>Retry course completion</button>}
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
             <button type="button" onClick={() => navigate('/daily-lessons')} className="glow-button glow-button-muted py-4"><ArrowLeft size={18} /> Daily lessons</button>
-            <button type="button" onClick={() => { setQuestionIndex(0); setResults([]); setTranscript(''); setHasBegun(true); setIsFinished(false); lastAutoReadKeyRef.current = ''; }} className="glow-button glow-button-blue py-4"><RefreshCw size={18} /> Try the test again</button>
+            <button type="button" onClick={() => { setQuestionIndex(0); setResults([]); setTranscript(''); setHasBegun(true); setIsFinished(false); setConfirmedActivity(null); completionSentRef.current=false; lastAutoReadKeyRef.current = ''; }} className="glow-button glow-button-blue py-4"><RefreshCw size={18} /> Try the test again</button>
           </div>
         </div>
       </section>
@@ -890,7 +890,7 @@ export function SpeakingPracticePage() {
         <div className="section-card p-8 text-center sm:p-12">
           <Mic size={34} className="mx-auto text-amber-300" />
           <h1 className="mt-5 text-3xl font-black text-white">
-            {isScheduleRestriction ? 'This AI practice is not open yet' : 'This AI practice could not be opened'}
+            {isScheduleRestriction ? 'This speaking practice is not open yet' : 'This speaking practice could not be opened'}
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-slate-400">
             {isScheduleRestriction
@@ -913,8 +913,8 @@ export function SpeakingPracticePage() {
       <section className="mx-auto max-w-3xl space-y-6 pb-20">
         <div className="section-card p-8 text-center sm:p-12">
           <Settings2 size={34} className="mx-auto text-amber-300" />
-          <h1 className="mt-5 text-3xl font-black text-white">This day is not an open AI practice session</h1>
-          <p className="mt-3 text-slate-400">Only a published, server-scheduled AI practice date can be opened by a learner.</p>
+          <h1 className="mt-5 text-3xl font-black text-white">This day is not an open speaking practice session</h1>
+          <p className="mt-3 text-slate-400">Only a published, server-scheduled speaking practice date can be opened by a learner.</p>
           <button type="button" onClick={() => navigate('/daily-lessons')} className="glow-button glow-button-blue mt-7"><ArrowLeft size={18} /> Daily lessons</button>
         </div>
       </section>
@@ -923,11 +923,11 @@ export function SpeakingPracticePage() {
 
   if (!hasBegun && !isRemoteLoading && currentQuestion && (!isWebDeveloper || !managerOpen)) {
     return (
-      <section className="mx-auto max-w-4xl space-y-6 pb-20">
+      <section className="speaking-campus mx-auto max-w-4xl space-y-6 pb-20">
         <div className="section-card relative overflow-hidden p-8 sm:p-12">
           <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl" />
           <div className="relative max-w-2xl">
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Day {day} · AI speaking practice</p>
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Day {day} · guided speaking practice</p>
             <h1 className="mt-4 text-4xl font-black leading-tight text-white sm:text-5xl">{module?.introTitle || 'Ready to speak with confidence?'}</h1>
             <p className="mt-5 text-base leading-8 text-slate-300">{module?.introText || (practiceMode === 'ask' ? 'Read each question aloud. The assistant will recognize it and answer in English or Arabic.' : 'Listen to each question, answer by microphone, check your transcript, and receive instant feedback before continuing.')}</p>
             {practiceMode === 'ask' && (
@@ -951,12 +951,12 @@ export function SpeakingPracticePage() {
   }
 
   return (
-    <section className="speaking-practice-page space-y-6 pb-20">
+    <section className="speaking-campus speaking-practice-page space-y-6 pb-20">
       <div className="section-card relative overflow-hidden p-6 sm:p-8 lg:p-10">
         <div className="absolute right-0 top-0 h-56 w-56 rounded-full bg-blue-500/10 blur-3xl" />
         <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">AI Speaking Practice</p>
+            <p className="text-xs font-black uppercase tracking-[0.28em] text-emerald-400">Speaking Practice</p>
             <h1 className="mt-3 text-3xl font-black text-white sm:text-5xl">{language === 'arabic' ? 'Arabic' : 'English'} · Day {day}</h1>
             <p className="mt-3 max-w-2xl leading-7 text-slate-400">{module?.description || (practiceMode === 'ask' ? 'Read each question aloud and listen to the assistant’s response.' : 'Listen, answer naturally, review your transcript, and receive phrase-based feedback.')}</p>
           </div>
@@ -986,8 +986,8 @@ export function SpeakingPracticePage() {
         <div className="section-card p-5 sm:p-8">
           {!isPracticeDay ? (
             <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-5 text-amber-100">
-              <h2 className="text-xl font-black">Choose AI practice first</h2>
-              <p className="mt-2 text-sm leading-6">Configure Day {day} as an AI speaking practice session before adding its questions.</p>
+              <h2 className="text-xl font-black">Choose speaking practice first</h2>
+              <p className="mt-2 text-sm leading-6">Configure Day {day} as an guided speaking practice session before adding its questions.</p>
               <button type="button" onClick={() => navigate(`/lesson/${day}?configure=1`)} className="glow-button glow-button-muted mt-5"><Settings2 size={17} /> Configure day</button>
             </div>
           ) : (
@@ -995,7 +995,7 @@ export function SpeakingPracticePage() {
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.24em] text-blue-400">Web Developer question editor</p>
-                  <h2 className="mt-2 text-2xl font-black text-white">Day {day} AI question set</h2>
+                  <h2 className="mt-2 text-2xl font-black text-white">Day {day} speaking question set</h2>
                   <p className="mt-2 text-sm text-slate-400">Learners see these questions only when this day is published. Separate expected keywords with commas. A hosted audio URL is optional; browser text-to-speech is always available.</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -1021,10 +1021,10 @@ export function SpeakingPracticePage() {
               </div>
               <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/[0.06] p-4 text-sm text-slate-300">
                 <input type="checkbox" checked={publishForLearners} onChange={event => setPublishForLearners(event.target.checked)} className="mt-1 h-4 w-4 accent-emerald-400" />
-                <span><strong className="text-white">Publish this AI practice day</strong><br />Tester saves remain inside the tester sandbox and never become visible to learners.</span>
+                <span><strong className="text-white">Publish this speaking practice day</strong><br />Tester saves remain inside the tester sandbox and never become visible to learners.</span>
               </label>
               {managerMessage && <p role="status" aria-live="polite" className="mt-4 rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-slate-300">{managerMessage}</p>}
-              <button type="button" onClick={saveQuestionSet} disabled={isSaving} className="glow-button glow-button-blue mt-5 w-full py-4 disabled:opacity-50">{isSaving ? <LoaderCircle size={18} className="animate-spin" /> : <Save size={18} />}{isSaving ? 'Saving...' : 'Save AI practice day'}</button>
+              <button type="button" onClick={saveQuestionSet} disabled={isSaving} className="glow-button glow-button-blue mt-5 w-full py-4 disabled:opacity-50">{isSaving ? <LoaderCircle size={18} className="animate-spin" /> : <Save size={18} />}{isSaving ? 'Saving...' : 'Save speaking practice day'}</button>
             </>
           )}
         </div>
@@ -1039,6 +1039,7 @@ export function SpeakingPracticePage() {
           {isWebDeveloper && <button type="button" onClick={() => navigate(`/lesson/${day}?configure=1`)} className="glow-button glow-button-muted mt-6"><Settings2 size={17} /> Configure day</button>}
         </div>
       ) : (
+        <SpeakingStudio ref={voiceStudioRef} questions={questions} currentIndex={questionIndex} language={language} onBeforeAudio={()=>{abortRecognition();stopQuestionAudio();window.clearTimeout(conversationTimerRef.current);}}>
         <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
           <div className="section-card p-5 sm:p-8">
             <div className="flex flex-wrap items-center justify-between gap-3"><p className="text-xs font-black uppercase tracking-[0.22em] text-blue-400">Question {questionIndex + 1} of {questions.length}</p><span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-black text-slate-300">{currentQuestion.maxMarks} marks</span></div>
@@ -1082,18 +1083,18 @@ export function SpeakingPracticePage() {
             ) : isEnglishFirstMeeting ? (
               <div aria-live="polite" className="mt-6 rounded-2xl border border-emerald-400/25 bg-emerald-500/[0.08] p-5 text-center">
                 <Sparkles size={22} className="mx-auto text-emerald-300" />
-                <p className="mt-3 text-xs font-black uppercase tracking-wider text-emerald-300">Rafi replies</p>
+                <p className="mt-3 text-xs font-black uppercase tracking-wider text-emerald-300">Scripted partner reply</p>
                 <h2 className="mt-2 text-lg font-black leading-8 text-white">{conversationReply || 'Thanks for telling me. Let’s keep talking.'}</h2>
                 <p className="mt-2 text-sm text-slate-300">Listen to Rafi’s reply. The next part of the conversation will appear automatically, and your score stays private until the final report.</p>
               </div>
             ) : (
               <div aria-live="polite" className="mt-6 rounded-2xl border border-emerald-400/25 bg-emerald-500/[0.08] p-5 sm:p-6">
-                <div className="flex items-center justify-between gap-3"><h2 className="text-xl font-black text-white">Answer feedback</h2><p className="text-2xl font-black text-emerald-300">{currentResult.marks}/{currentResult.maxMarks}</p></div>
+                <div className="flex items-center justify-between gap-3"><h2 className="text-xl font-black text-white">Transcript keyword feedback</h2><p className="text-2xl font-black text-emerald-300">{currentResult.marks}/{currentResult.maxMarks}</p></div>
                 <p className="mt-3 text-sm leading-6 text-slate-300">{currentResult.feedback}</p>
-                {currentResult.recognitionConfidence !== null && <p className="mt-2 text-xs font-semibold text-slate-400">Browser recognition confidence: {currentResult.recognitionConfidence}%</p>}
+                {currentResult.recognitionConfidence !== null && <p className="mt-2 text-xs font-semibold text-slate-400">Browser transcript confidence: {currentResult.recognitionConfidence}% · not pronunciation accuracy</p>}
                 {practiceMode === 'ask' && currentQuestion.aiResponse && (
                   <div className="mt-5 rounded-xl border border-blue-400/20 bg-blue-500/10 p-4" dir={isRtl ? 'rtl' : 'ltr'}>
-                    <p className="text-xs font-black uppercase tracking-wider text-blue-300">{isEnglishClassmateConversation ? 'Sami · AI response' : 'إجابة المساعد · AI response'}</p>
+                    <p className="text-xs font-black uppercase tracking-wider text-blue-300">{isEnglishClassmateConversation ? 'Sami · Scripted response' : 'إجابة من النص · Scripted response'}</p>
                     <p className="mt-2 text-base leading-8 text-white">{currentQuestion.aiResponse}</p>
                     <button type="button" onClick={() => speakAiResponse(currentQuestion.aiResponse)} className="glow-button glow-button-muted mt-3 py-2.5"><Volume2 size={17} /> Hear answer</button>
                   </div>
@@ -1106,10 +1107,11 @@ export function SpeakingPracticePage() {
           </div>
 
           <aside className="space-y-4">
-            <div className="section-card p-5"><div className="flex items-center gap-3"><Headphones size={20} className="text-blue-300" /><h2 className="font-black text-white">Conversation progress</h2></div><div className="mt-5 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-emerald-400 transition-all" style={{ width: `${questions.length ? (results.length / questions.length) * 100 : 0}%` }} /></div><p className="mt-3 text-sm text-slate-400">{results.length}/{questions.length} answered{isEnglishFirstMeeting ? ' · score shown at the end' : ` · current score ${totalOutOf100}/100`}</p>{loadNotice && <p className="mt-4 border-t border-white/10 pt-4 text-xs leading-5 text-slate-500">{loadNotice}</p>}</div>
+            <div className="section-card p-5"><div className="flex items-center gap-3"><Headphones size={20} className="text-blue-300" /><h2 className="font-black text-white">Conversation progress</h2></div><div className="mt-5 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-emerald-400 transition-all" style={{ width: `${questions.length ? (results.length / questions.length) * 100 : 0}%` }} /></div><p className="mt-3 text-sm text-slate-400">{results.length}/{questions.length} answered{isEnglishFirstMeeting ? ' · score shown at the end' : ` · transcript rubric ${totalOutOf100}/100`}</p>{loadNotice && <p className="mt-4 border-t border-white/10 pt-4 text-xs leading-5 text-slate-500">{loadNotice}</p>}</div>
             {!isEnglishFirstMeeting && <button type="button" onClick={() => finishTest()} className="glow-button glow-button-muted w-full py-4">Finish test now</button>}
           </aside>
         </div>
+        </SpeakingStudio>
       )}
     </section>
   );

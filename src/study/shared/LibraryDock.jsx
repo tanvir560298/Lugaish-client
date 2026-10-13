@@ -1,0 +1,4 @@
+import { BookOpen, Armchair, MapPin, NotebookPen, MoreHorizontal } from 'lucide-react';
+export default function LibraryDock({view,seated,onLibrary,onDesk,onChoose,onTools,onMore,more}){
+ return <nav className="sr-floating-dock" aria-label="Library controls"><button className="ls-button" aria-pressed={view==='library'} onClick={onLibrary}><BookOpen size={17}/><span>Library</span></button><button className="ls-button" aria-pressed={seated&&view==='desk'} onClick={onDesk}><Armchair size={17}/><span>My Desk</span></button><button className="ls-button ls-primary sr-seat-action" onClick={onChoose}><MapPin size={17}/><span>{seated?'Change Seat':'Choose Seat'}</span></button><button className="ls-button" onClick={onTools}><NotebookPen size={17}/><span>Study Tools</span></button><button className="ls-button" aria-expanded={more} onClick={onMore}><MoreHorizontal size={17}/><span>More</span></button></nav>;
+}

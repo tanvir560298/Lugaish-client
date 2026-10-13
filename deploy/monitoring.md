@@ -1,0 +1,9 @@
+# Operational monitoring configuration
+
+Implemented: `/livez` is process liveness; `/readyz` is HTTP 503 until MongoDB is connected, and during shutdown. `/health` also returns 503 while unready. Configure deployment readiness against `/readyz`, not `/livez`. API and health responses use `Cache-Control: no-store` so intermediary caches cannot reuse a successful readiness result or a student's response. Mongo reconnect errors and API 5xx logs use categories/request IDs instead of raw database details. Security headers and request IDs now also cover CORS rejection and preflight responses. SIGTERM drains connections with a 10-second deadline. The isolated disconnected-database, redacted telemetry, CORS/header and shutdown checks passed locally in Phase 19.
+
+Optional first-party frontend reports: enable **both** `VITE_TELEMETRY_ENABLED=true` at build time and `TELEMETRY_ENABLED=true` on the API. Only fixed error-category names are accepted; notes, recordings, tokens, URLs and stacks are not included. Client sends at most ten reports per minute, API rate limits reports. These are untrusted diagnostic hints, not authenticated security evidence. Protect against log flooding at the host/network layer. The feature is off by default.
+
+Prepared, not configured: host log retention, restricted operator access, uptime checks every minute, alert on repeated readiness failure and increased 5xx/auth failure categories. Review and set a 14-day diagnostic retention target with the owner; this is not an implemented deletion policy. Configure an actual alert destination and test a controlled staging outage before calling monitoring active. No emails or external alerts have been sent.
+
+Single-instance process-local rate limits remain. If scaling beyond one API instance, use a shared rate-limit store after measuring need. Keep streaming Study SSE supported by proxy timeout settings. Do not run Express as a short-lived request-only serverless function.

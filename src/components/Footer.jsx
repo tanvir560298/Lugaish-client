@@ -1,8 +1,2 @@
-export function Footer() {
-  return (
-    <footer className="border-t border-white/10 bg-slate-950/60 py-8 text-center text-sm text-slate-500">
-      <p>© 2026 Lugaish. Modern AI-assisted bilingual learning for Arabic and English leaders.</p>
-      <p className="mt-2">Developed by Tanvir Ahmad. Arabic instruction by Ishaat Alhumaidi.</p>
-    </footer>
-  );
-}
+import { Link } from 'react-router-dom';
+export function Footer(){return <footer className="platform-footer"><div><Link to="/" className="platform-footer-brand">LUGAISH</Link><p>Arabic & English learning. A campus that grows with you.</p></div><nav aria-label="Footer navigation"><Link to="/pricing">Courses & Fees</Link><Link to="/learning-spaces">Learning Spaces</Link><Link to="/architects">Our Team</Link><Link to="/privacy">Privacy</Link><Link to="/terms">Platform use</Link><Link to="/support">Support</Link></nav><p className="platform-footer-credit">© 2026 Lugaish. Developed by Tanvir Ahmad. Arabic instruction by Ishaat Alhumaidi.</p></footer>;}

@@ -3,16 +3,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg: '#070b18',
-        surface: 'rgba(13, 18, 30, 0.7)',
-        surfaceSoft: 'rgba(13, 18, 30, 0.5)',
-        accentBlue: '#3b82f6',
-        accentGreen: '#10b981',
-        accentPurple: '#c084fc',
-        accentOrange: '#f59e0b',
+        bg: 'var(--campus-bg)',
+        surface: 'var(--campus-surface)',
+        surfaceSoft: 'var(--campus-surface-raised)',
+        accentBlue: '#245640',
+        accentGreen: '#245640',
+        accentPurple: '#c6a46c',
+        accentOrange: '#76571f',
       },
       boxShadow: {
-        soft: '0 25px 80px rgba(0,0,0,0.35)',
+        soft: 'var(--campus-shadow)',
       },
       borderRadius: {
         '2xl': '1.5rem',

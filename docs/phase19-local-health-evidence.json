@@ -1,0 +1,62 @@
+[
+  {
+    "path": "/health",
+    "status": 200,
+    "headers": {
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "referrer-policy": "strict-origin-when-cross-origin",
+      "x-request-id": "9ef8ec5f-e2d2-4f2e-8caf-ee4642caad15"
+    },
+    "body": {
+      "status": "Backend running",
+      "database": "connected",
+      "apiBase": "/api",
+      "scheduleVersion": "global-dhaka-day4-v4"
+    }
+  },
+  {
+    "path": "/livez",
+    "status": 200,
+    "headers": {
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "referrer-policy": "strict-origin-when-cross-origin",
+      "x-request-id": "0669d3a9-7ee2-4b20-82c1-fe8484b5a33e"
+    },
+    "body": {
+      "alive": true
+    }
+  },
+  {
+    "path": "/readyz",
+    "status": 200,
+    "headers": {
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "referrer-policy": "strict-origin-when-cross-origin",
+      "x-request-id": "ccc493c2-68be-4a1b-954a-31033c66d661"
+    },
+    "body": {
+      "ready": true
+    }
+  },
+  {
+    "path": "/api/courses",
+    "status": 200,
+    "headers": {
+      "cache-control": "no-store",
+      "x-content-type-options": "nosniff",
+      "referrer-policy": "strict-origin-when-cross-origin",
+      "x-request-id": "2e6e2706-f0db-4499-b3e1-3a5a92e96829"
+    },
+    "body": []
+  },
+  {
+    "deniedOriginStatus": 403,
+    "nosniff": "nosniff",
+    "body": {
+      "error": "Origin not allowed"
+    }
+  }
+]

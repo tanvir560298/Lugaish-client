@@ -1,295 +1,244 @@
-import { useMemo, useState } from 'react';
-import confetti from 'canvas-confetti';
-import { CheckCircle2, LoaderCircle, PartyPopper, RotateCcw, Sparkles, XCircle } from 'lucide-react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAppContext, getLessonFromState } from '../state/AppContext.jsx';
-import { isStudentPreview } from '../utils/roles.js';
-
+import { LearningTrail } from "../components/LearningTrail.jsx";
+import { useEffect, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { api } from "../api/client.js";
+import { useAppContext } from "../state/AppContext.jsx";
+import { DailyGoal } from "../learning/DailyGoal.jsx";
+import {
+  confirmedQuizResult,
+  contentVersion,
+} from "../learning/practice/engine.js";
 export function QuizPage() {
-  const { state, actions, courseData } = useAppContext();
-  const activeLesson = getLessonFromState(state, courseData);
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const isTesterMode = isStudentPreview(state);
-  const isStaffPreview = searchParams.get('preview') === '1' && !isTesterMode;
-  // Tester Mode follows the real learner flow and saves this developer
-  // account's quiz history. Only an explicit staff content preview is read-only.
-  const isPreview = isStaffPreview;
-  const previewDay = Math.max(Number(searchParams.get('day')) || 1, 1);
-  const [questionIndex, setQuestionIndex] = useState(0);
-  const [selectedIndex, setSelectedIndex] = useState(null);
-  const [answerChecked, setAnswerChecked] = useState(false);
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [responses, setResponses] = useState([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState('');
-  const [xpEarned, setXpEarned] = useState(0);
-  const [serverScore, setServerScore] = useState(null);
-  const [highScoreCelebration, setHighScoreCelebration] = useState(false);
-
-  const questions = activeLesson.quiz ?? [];
-  const question = questions[questionIndex];
-  const progress = useMemo(() => `${questionIndex + 1} / ${questions.length}`, [questionIndex, questions.length]);
-  const score = responses.reduce((total, response, index) => (
-    total + (response === questions[index]?.answer ? 1 : 0)
-  ), 0);
-
-  const celebrateHighScore = () => {
-    const colors = ['#34d399', '#60a5fa', '#fbbf24', '#c084fc', '#ffffff'];
-    confetti({ particleCount: 90, spread: 75, startVelocity: 45, origin: { x: 0.2, y: 0.72 }, colors });
-    confetti({ particleCount: 90, spread: 75, startVelocity: 45, origin: { x: 0.8, y: 0.72 }, colors });
-    window.setTimeout(() => {
-      confetti({ particleCount: 120, spread: 110, origin: { y: 0.55 }, colors });
-    }, 350);
-  };
-
-  if (!question) {
-    return (
-      <section className="section-card p-8 text-center">
-        <h1 className="text-2xl font-black text-white">Quiz is being prepared</h1>
-        <p className="mt-3 text-slate-400">Please return to today&apos;s lesson and try again later.</p>
-        <button type="button" className="glow-button glow-button-blue mt-6" onClick={() => navigate('/daily-lessons')}>Back to lessons</button>
-      </section>
-    );
-  }
-
-  const checkAnswer = () => {
-    if (selectedIndex === null || answerChecked) return;
-    setResponses(previous => {
-      const next = previous.slice(0, questionIndex);
-      next[questionIndex] = selectedIndex;
-      return next;
-    });
-    setAnswerChecked(true);
-    setSubmitError('');
-  };
-
-  const finishQuiz = async () => {
-    if (isPreview) {
-      setXpEarned(0);
-      setServerScore(score);
-      setHighScoreCelebration(true);
-      celebrateHighScore();
-      setIsCompleted(true);
-      return;
-    }
-
-    const baseResponses = [...responses];
-    if (selectedIndex !== null) {
-      baseResponses[questionIndex] = selectedIndex;
-    }
-    const finalResponses = Array.from({ length: questions.length }, (_, i) => (
-      Number.isSafeInteger(baseResponses[i]) ? baseResponses[i] : (i === questionIndex ? selectedIndex : null)
-    ));
-    if (finalResponses.length !== questions.length || finalResponses.some(answer => !Number.isSafeInteger(answer))) {
-      setSubmitError('Please answer every question before finishing the quiz.');
-      return;
-    }
-
-    setIsSubmitting(true);
-    setSubmitError('');
-
-    let result = null;
-    try {
-      const submitPromise = actions.submitQuiz(activeLesson.id, finalResponses);
-      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 4000));
-      result = await Promise.race([submitPromise, timeoutPromise]);
-    } catch (error) {
-      console.warn('Remote quiz submission failed or timed out, saving locally:', error);
-    }
-
-    try {
-      const localScore = finalResponses.reduce((total, response, index) => (
-        total + (response === questions[index]?.answer ? 1 : 0)
-      ), 0);
-      const correctAnswers = Number.isFinite(Number(result?.correctAnswers)) ? Number(result.correctAnswers) : localScore;
-      const percentage = Number.isFinite(Number(result?.score))
-        ? Number(result.score)
-        : Math.round((correctAnswers / questions.length) * 100);
-      const xpAwarded = result && typeof result.xpAwarded !== 'undefined'
-        ? Number(result.xpAwarded)
-        : (percentage >= 60 ? 500 : 0);
-
-      const completionResult = result || {
-        xpAwarded,
-        score: percentage,
-        correctAnswers,
-        alreadyCompleted: false,
-      };
-
-      try {
-        actions.recordServerQuizCompletion(activeLesson.id, completionResult);
-      } catch (recordError) {
-        console.warn('Failed recording quiz completion in state:', recordError);
-      }
-      setXpEarned(xpAwarded);
-      setServerScore(correctAnswers);
-      if (xpAwarded > 0 || percentage >= 60) {
-        setHighScoreCelebration(true);
-        celebrateHighScore();
-      }
-      setIsCompleted(true);
-    } catch (saveError) {
-      setSubmitError(saveError.message || 'Your result could not be saved. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const continueQuiz = () => {
-    if (!answerChecked) return;
-    if (questionIndex + 1 === questions.length) {
-      finishQuiz();
-      return;
-    }
-    setQuestionIndex(previous => previous + 1);
-    setSelectedIndex(null);
-    setAnswerChecked(false);
-  };
-
-  const restartMistakes = () => {
-    setQuestionIndex(0);
-    setSelectedIndex(null);
-    setAnswerChecked(false);
-    setIsCompleted(false);
+  const { state, actions } = useAppContext(),
+    [params] = useSearchParams(),
+    day = Number(
+      params.get("day") || state.activeLessonId?.split("-").at(-1) || 1,
+    ),
+    language = state.activePathway;
+  const submission = useRef(null);
+  const [lesson, setLesson] = useState(null),
+    [responses, setResponses] = useState([]),
+    [receipt, setReceipt] = useState(null),
+    [freshReceipt, setFreshReceipt] = useState(false),
+    [error, setError] = useState(""),
+    [busy, setBusy] = useState(false),
+    [retry, setRetry] = useState(0);
+  useEffect(() => {
+    let active = true;
+    setLesson(null);
+    setError("");
     setResponses([]);
-    setSubmitError('');
-    setXpEarned(0);
-    setServerScore(null);
-    setHighScoreCelebration(false);
-  };
-
-  const selectedIsCorrect = selectedIndex === question.answer;
-
+    setReceipt(null);
+    setFreshReceipt(false);
+    Promise.all([
+      api.getQuizAccess(language, day),
+      api.getLesson(language, day),
+    ])
+      .then(([, l]) => {
+        if (active) {
+          setLesson(l);
+          let saved;
+          try {
+            saved = JSON.parse(
+              localStorage.getItem(
+                `lugaish-practice-published-v1:${state.userEmail}:${language}:${day}:${contentVersion([l.courseGeneration, l.quiz])}`,
+              ) || "null",
+            );
+          } catch {}
+          setResponses(
+            Array.isArray(saved) &&
+              saved.length === l.quiz.length &&
+              saved.every(
+                (n, i) =>
+                  n === null ||
+                  (Number.isInteger(n) &&
+                    n >= 0 &&
+                    n < l.quiz[i].options.length),
+              )
+              ? saved
+              : l.quiz.map(() => null),
+          );
+          api
+            .getQuizResult(language, day)
+            .then((result) => {
+              if (active && confirmedQuizResult(result, l.quiz.length))
+                setReceipt(result);
+            })
+            .catch(() => {});
+        }
+      })
+      .catch((e) => {
+        if (active) setError(e.message);
+      });
+    return () => {
+      active = false;
+    };
+  }, [language, day, retry]);
+  useEffect(() => {
+    if (!lesson || receipt) return;
+    try {
+      localStorage.setItem(
+        `lugaish-practice-published-v1:${state.userEmail}:${language}:${day}:${contentVersion([lesson.courseGeneration, lesson.quiz])}`,
+        JSON.stringify(responses),
+      );
+    } catch {
+      setError(
+        "Answers are available in this visit but browser saving failed. Keep this page open while you submit.",
+      );
+    }
+  }, [lesson, responses, receipt, state.userEmail, language, day]);
+  async function submit(e) {
+    e.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    setError("");
+    const identity = JSON.stringify([
+      state.userEmail,
+      language,
+      day,
+      lesson.courseGeneration,
+      responses,
+    ]);
+    if (submission.current?.identity !== identity)
+      submission.current = { identity, requestId: crypto.randomUUID() };
+    try {
+      const result = await api.submitQuiz({
+        language,
+        day,
+        requestId: submission.current.requestId,
+        responses: responses.map((selectedAnswer) => ({ selectedAnswer })),
+      });
+      if (!confirmedQuizResult(result, lesson.quiz.length))
+        throw Error(
+          "The server could not confirm a saved result. Your answers are retained.",
+        );
+      setReceipt(result);
+      setFreshReceipt(result.alreadyCompleted === false);
+      actions.recordServerQuizCompletion(
+        `${lesson.courseGeneration}:${language}-les-${day}`,
+        result,
+      );
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
   return (
-    <section className="space-y-8">
-      <div className="section-card p-5 sm:p-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-slate-400">{isStaffPreview ? 'Staff MCQ preview' : 'Quiz challenge'}</p>
-            <h1 className="mt-2 text-2xl font-black text-white sm:text-3xl">{activeLesson.title}</h1>
-          </div>
-          {!isCompleted && <div className="rounded-[2rem] border border-white/10 bg-slate-900/80 px-4 py-3 text-sm text-slate-300">{progress}</div>}
+    <div className="platform-page">
+      <LearningTrail current="Practice" />
+      <header className="platform-page-heading">
+        <p className="platform-eyebrow">PUBLISHED PRACTICE</p>
+        <h1>{lesson?.title || "Practice availability"}</h1>
+        <p>
+          Answers and completion are checked by the server. Unpublished
+          activities stay unavailable.
+        </p>
+      </header>
+      {error && (
+        <div role="alert">
+          <p>{error}</p>
+          {!lesson && (
+            <button
+              className="campus-button"
+              onClick={() => setRetry((v) => v + 1)}
+            >
+              Retry availability
+            </button>
+          )}
         </div>
-
-        {isCompleted ? (
-          <div className="mt-10 grid gap-6 text-center">
-            <div className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-gradient-to-br from-green-500 to-blue-500 text-4xl">🏆</div>
-            <h2 className="text-3xl font-black text-white">Congratulations! Quiz completed!</h2>
-            <p className="text-slate-400">{isPreview ? 'This preview did not change XP, progress, or learner completion.' : 'Review every answer below and revisit the ones that need more practice.'}</p>
-            {highScoreCelebration && (
-              <div className="relative overflow-hidden rounded-[2rem] border border-amber-300/30 bg-gradient-to-br from-amber-500/20 via-violet-500/15 to-emerald-500/20 p-6 shadow-2xl shadow-amber-500/10">
-                <Sparkles className="absolute right-5 top-5 text-amber-300" size={24} />
-                <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-amber-300 text-slate-950 shadow-lg shadow-amber-400/30">
-                  <PartyPopper size={28} />
-                </div>
-                <p className="mt-4 text-xs font-black uppercase tracking-[0.3em] text-amber-200">Outstanding achievement</p>
-                <h3 className="mt-2 text-2xl font-black text-white">Brilliant work, {state.userName || 'Learner'}!</h3>
-                <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-200">
-                  {isPreview
-                    ? 'Quiz preview complete! Developer preview keeps learner XP and course progress unchanged.'
-                    : 'Quiz complete — you earned 500 XP! Your focus and consistency are turning today\'s lesson into real language confidence.'}
+      )}
+      {!lesson && !error && (
+        <p role="status">Checking your authorized activity…</p>
+      )}
+      {lesson && (
+        <form
+          onSubmit={submit}
+          className="campus-card"
+          dir={language === "arabic" ? "rtl" : "ltr"}
+        >
+          {lesson.quiz.map((q, i) => (
+            <fieldset key={i} disabled={busy || !!receipt}>
+              <legend>
+                {i + 1}. {q.question}
+              </legend>
+              {q.options.map((option, n) => (
+                <label key={n} style={{ display: "block", padding: "12px" }}>
+                  <input
+                    type="radio"
+                    name={"answer-" + i}
+                    checked={responses[i] === n}
+                    onChange={() =>
+                      setResponses((r) => r.map((v, j) => (j === i ? n : v)))
+                    }
+                  />
+                  {option}
+                </label>
+              ))}
+              {receipt && (
+                <p>
+                  {receipt.feedback?.[i]
+                    ? receipt.feedback[i].isCorrect
+                      ? "Correct answer verified."
+                      : "Needs review · Correct answer: " +
+                        q.options[receipt.feedback[i].correctAnswer]
+                    : "Saved quiz result available."}
+                  {receipt.feedback?.[i]?.explanation && (
+                    <span>
+                      {" "}
+                      Course-team explanation: {receipt.feedback[i].explanation}
+                    </span>
+                  )}
                 </p>
-              </div>
-            )}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/80 p-6">
-                <p className="text-sm uppercase tracking-[0.24em] text-slate-400">XP earned</p>
-                <p className="mt-3 text-3xl font-black text-green-300">+{xpEarned}</p>
-                {!xpEarned && <p className="mt-2 text-xs text-slate-500">{isPreview ? 'Preview mode does not award XP.' : 'XP was already earned for this lesson.'}</p>}
-              </div>
-              <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/80 p-6">
-                <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Accuracy</p>
-                <p className="mt-3 text-3xl font-black text-white">{serverScore ?? score} / {questions.length}</p>
-              </div>
-            </div>
-
-            <div className="space-y-3 text-left">
-              {questions.map((item, index) => {
-                const isCorrect = responses[index] === item.answer;
-                return (
-                  <div key={item.question} className={`rounded-2xl border p-4 ${isCorrect ? 'border-emerald-400/20 bg-emerald-500/10' : 'border-red-400/20 bg-red-500/10'}`}>
-                    <div className="flex items-start gap-3">
-                      {isCorrect ? <CheckCircle2 className="mt-0.5 shrink-0 text-emerald-300" size={20} /> : <XCircle className="mt-0.5 shrink-0 text-red-300" size={20} />}
-                      <div>
-                        <p className="font-bold text-white">{item.question}</p>
-                        {!isCorrect && <p className="mt-2 text-sm text-slate-300">Correct answer: {item.options[item.answer]}</p>}
-                        <p className="mt-2 text-sm leading-6 text-slate-400">{item.explanation}</p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="flex flex-col justify-center gap-3 sm:flex-row">
-              {(serverScore ?? score) < questions.length && <button type="button" className="glow-button glow-button-muted justify-center" onClick={restartMistakes}><RotateCcw size={18} /> Practise again</button>}
-              <button type="button" className="glow-button glow-button-blue justify-center" onClick={() => navigate(isStaffPreview ? `/lesson/${previewDay}` : '/daily-lessons')}>
-                {isStaffPreview ? 'Back to lesson' : 'Back to daily lessons'}
+              )}
+            </fieldset>
+          ))}
+          {!receipt && (
+            <button
+              className="campus-button campus-button-primary"
+              disabled={busy || responses.some((v) => v === null)}
+            >
+              {busy ? "Saving your result…" : "Submit complete activity"}
+            </button>
+          )}
+          {receipt && (
+            <section role="status">
+              <Link
+                className="campus-button campus-button-primary"
+                to="/review-mistakes"
+              >
+                Review saved mistakes
+              </Link>
+              <h2>Result saved</h2>
+              <p>
+                {receipt.correctAnswers} / {receipt.totalQuestions} correct ·{" "}
+                {receipt.score}%
+              </p>
+              <button
+                type="button"
+                className="campus-button"
+                onClick={() => {
+                  submission.current = null;
+                  setReceipt(null);
+                  setFreshReceipt(false);
+                }}
+              >
+                Try this activity again
               </button>
-            </div>
-          </div>
-        ) : (
-          <div className="mt-8 space-y-6 sm:mt-10">
-            <div className="rounded-[2rem] border border-white/10 bg-slate-950/85 p-5 sm:p-8">
-              <h2 className="text-xl font-bold text-white sm:text-2xl">{question.question}</h2>
-              <div className="mt-6 grid gap-3 sm:gap-4">
-                {question.options.map((option, index) => {
-                  const isCorrectOption = answerChecked && index === question.answer;
-                  const isWrongSelection = answerChecked && index === selectedIndex && index !== question.answer;
-                  const optionClass = isCorrectOption
-                    ? 'border-emerald-400/60 bg-emerald-500/15 text-emerald-50'
-                    : isWrongSelection
-                      ? 'border-red-400/60 bg-red-500/15 text-red-50'
-                      : selectedIndex === index
-                        ? 'border-blue-400/60 bg-blue-500/10 text-white'
-                        : 'border-white/10 bg-white/5 text-slate-200 hover:border-blue-400/30 hover:bg-white/10';
-                  return (
-                    <button key={option} type="button" disabled={answerChecked} className={`w-full rounded-3xl border px-5 py-4 text-left text-sm font-semibold transition ${optionClass} disabled:cursor-default disabled:opacity-100`} onClick={() => setSelectedIndex(index)}>
-                      <span className="mr-4 font-bold text-blue-300">{String.fromCharCode(65 + index)}</span>{option}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {answerChecked && (
-                <div role="status" className={`mt-6 rounded-2xl border p-4 ${selectedIsCorrect ? 'border-emerald-400/25 bg-emerald-500/10' : 'border-red-400/25 bg-red-500/10'}`}>
-                  <div className="flex items-center gap-2 font-black text-white">
-                    {selectedIsCorrect ? <CheckCircle2 size={20} className="text-emerald-300" /> : <XCircle size={20} className="text-red-300" />}
-                    {selectedIsCorrect ? 'Correct!' : 'Not quite—keep learning.'}
-                  </div>
-                  <p className="mt-2 text-sm leading-6 text-slate-300">{question.explanation}</p>
-                </div>
-              )}
-            </div>
-
-            {submitError && <p role="alert" className="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-100">{submitError}</p>}
-
-            <div className="flex justify-end">
-              {!answerChecked ? (
-                <button
-                  type="button"
-                  className="glow-button glow-button-green disabled:cursor-not-allowed disabled:opacity-50"
-                  onClick={checkAnswer}
-                  disabled={selectedIndex === null}
-                >
-                  {questionIndex + 1 === questions.length ? 'Check answer & finish' : 'Check answer'}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  className="glow-button glow-button-blue disabled:cursor-not-allowed disabled:opacity-50"
-                  onClick={continueQuiz}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting && <LoaderCircle size={18} className="animate-spin" />}
-                  {questionIndex + 1 === questions.length ? (submitError ? 'Try submitting again' : 'Submit Quiz') : 'Next question'}
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-    </section>
+              <DailyGoal
+                scope={`${encodeURIComponent(state.userEmail || "learner")}:${language}`}
+                confirmedLesson={freshReceipt ? receipt : null}
+              />
+            </section>
+          )}
+        </form>
+      )}
+      <Link
+        className="campus-button campus-button-secondary"
+        to="/daily-lessons"
+      >
+        Return to My Classes
+      </Link>
+    </div>
   );
 }

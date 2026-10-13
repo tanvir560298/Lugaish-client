@@ -1,0 +1,15 @@
+Casual Character — Quaternius
+Pack: Ultimate Modular Men Pack
+License: CC0 1.0 Universal (Public Domain Dedication)
+License terms: https://creativecommons.org/publicdomain/zero/1.0/
+Original creator/pack: https://quaternius.com/packs/ultimatemodularcharacters.html
+Collection identifying Casual Character as CC0:
+https://poly.pizza/bundle/Ultimate-Modular-Men-Pack-ZiH8muWqwQ
+Downloaded GLB mirror:
+https://raw.githubusercontent.com/euuuuuuan/fatal-funnel-public/main/packages/renderer/assets/models/quaternius-men/casual-character.glb
+Downloaded and source pages verified: 2026-10-11
+SHA-256: fea7e71271203e7073f1a073fa1208de7402df276f87f80e149bf7589b5d46b4
+File size: 1430660 bytes. Original GLB bytes unchanged.
+Runtime changes: scale to 1.7m, nonmetallic fabric/skin material finish, native gait calibration.
+The mirror is a distribution source, not a separate claim of authorship.
+The creator's pack page explicitly links CC0 and permits personal/commercial use.

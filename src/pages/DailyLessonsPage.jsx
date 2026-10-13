@@ -1,3 +1,5 @@
+import { LearningNext } from '../learning/review/LearningNext.jsx';
+import { DailyGoal } from '../learning/DailyGoal.jsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   BookOpen,
@@ -23,9 +25,10 @@ import {
   Video,
 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/client.js';
-import { getUnlinkedPrivateBatchEmails, isEmailLinkedWithPrivateBatch, useAppContext } from '../state/AppContext.jsx';
+import { useAppContext } from '../state/AppContext.jsx';
+import { serverLearningAccess } from '../state/identityPolicy.js';
 import { ROLES, isStudentPreview } from '../utils/roles.js';
 import { BankDetailsModal } from '../components/BankDetailsModal.jsx';
 import { TransferSubmissionModal } from '../components/TransferSubmissionModal.jsx';
@@ -290,19 +293,12 @@ export function DailyLessonsPage() {
     setTimeout(() => setSubmissionNotice(''), 6000);
   };
 
-  const emailLower = (state.userEmail || '').toLowerCase();
-  const unlinkedEmails = getUnlinkedPrivateBatchEmails().map(e => String(e).toLowerCase());
-  const isRevoked = Boolean(state.privateBatchExplicitlyRevoked || (emailLower && unlinkedEmails.includes(emailLower)));
   const isWebDeveloper = !isStudentPreview(state) && [ROLES.webDeveloper, ROLES.tester, ROLES.instructor, ROLES.editor, ROLES.intern].includes(state.userRole);
   const studentPaidMonths = Math.max(Number(state.paidBatchMonths) || 1, 1);
-  const canAccessPrivateBatch = isWebDeveloper
-    || (!isRevoked && (
-      Boolean(state.privateBatchAccess)
-      || isEmailLinkedWithPrivateBatch(state.userEmail)
-      || (isStudentPreview(state) && Boolean(state.privateBatchAccess || isEmailLinkedWithPrivateBatch(state.userEmail) || state.userEmail === 'tahmadium@gmail.com'))
-    ));
+  const learnerAccess = serverLearningAccess(state);
+  const canAccessPrivateBatch = isWebDeveloper || learnerAccess.privateBatchAccess;
   const baseEnrolled = [...new Set([
-    ...(state.enrolledPathways?.length ? state.enrolledPathways : ['arabic', 'english']),
+    ...(isWebDeveloper ? Object.keys(courseData) : learnerAccess.enrolledPathways),
     ...(canAccessPrivateBatch ? ['paid_batch'] : []),
   ])];
   const enrolledPathways = baseEnrolled.filter(pathwayKey => {
@@ -314,7 +310,7 @@ export function DailyLessonsPage() {
     if (courseData[pathway]?.isPrivate) return false;
     return true;
   });
-  const pathway = courseData[state.activePathway] ?? courseData.english;
+  const pathway = courseData[state.activePathway] ?? courseData.english ?? {title:'Published courses',modules:[]};
   const staticLessons = useMemo(() => getStaticLessons(pathway), [pathway]);
   const plannedDays = useMemo(
     () => buildDayCards(
@@ -439,20 +435,21 @@ export function DailyLessonsPage() {
   };
 
   return (
-    <section className="daily-lessons-page space-y-8 pb-20">
+    <section className="daily-lessons-page academic-learning space-y-8 pb-20">
+      <LearningNext/>
       <div className="section-card overflow-hidden p-0">
         <div className="relative p-6 sm:p-8 lg:p-10">
           <div className="absolute inset-y-0 right-0 hidden w-1/2 bg-gradient-to-l from-blue-500/10 to-transparent lg:block" />
           <div className="relative max-w-3xl">
             <p className="mb-3 text-xs font-black uppercase tracking-[0.28em] text-purple-300">
-              {state.activePathway === 'paid_batch' ? '💎 Level 6 Private Batch · 60 Classes IELTS Bridge' : 'Daily lessons'}
+              {state.activePathway === 'paid_batch' ? pathway.title : 'Your classes & materials'}
             </p>
             <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl">
-              My Classes
+              My Learning
             </h1>
             <p className="mt-4 text-base leading-relaxed text-slate-400 sm:text-lg">
               {state.activePathway === 'paid_batch'
-                ? 'Comprehensive 60-day IELTS bridge structured into 5 monthly phases (12 classes per month). Your unlocked months remain permanently preserved in your account.'
+                ? (pathway.description || 'Private lessons are available only with confirmed batch enrollment. Your historical learning records remain saved.')
                 : 'Find your lessons, videos, PDFs, and quizzes here. Choose your course below, then open an available class.'}
             </p>
           </div>
@@ -471,6 +468,7 @@ export function DailyLessonsPage() {
               <button
                 key={pathwayKey}
                 type="button"
+                aria-pressed={isActive}
                 onClick={() => actions.switchPathway(pathwayKey)}
                 className={`flex items-center gap-2 rounded-2xl border px-5 py-3 text-sm font-black uppercase tracking-widest transition ${
                   isActive
@@ -511,6 +509,10 @@ export function DailyLessonsPage() {
           </div>
         )}
       </div>
+
+      <section className="learning-next-action" aria-label="Your next learning action"><div><span className="platform-eyebrow">READY WHEN YOU ARE</span><h2>{days.length?'Choose your next small step.':'Your next class will appear here.'}</h2><p>{days.length?`${pathway.title} · ${days.length} class entries in the current view. Choose an available class below to begin.`:'We’ll show lessons when your course schedule and access can be verified. You can still make time for personal study.'}</p></div><div>{days.some(d=>d.available===true&&!d.premiumLocked&&d.configured&&d.published)&&<button className="campus-button campus-button-primary" onClick={()=>openDay(days.find(d=>d.available===true&&!d.premiumLocked&&d.configured&&d.published))}>Open an available class</button>}<Link className="campus-button campus-button-secondary" to="/classroom">Choose a classroom lesson</Link><Link className="campus-button campus-button-secondary" to="/study-room">Start a focus session</Link></div></section>
+      <DailyGoal key={`${state.userEmail}:${state.activePathway}`} scope={`${encodeURIComponent(state.userEmail||'learner')}:${state.activePathway}`}/>
+
 
       {state.activePathway === 'paid_batch' && (
         <div className="space-y-4">
