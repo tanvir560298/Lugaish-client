@@ -10,6 +10,7 @@ const links = [
   ["/daily-lessons", "My Classes"],
   ["/learning-spaces", "Campus"],
   ["/speaking-practice", "Speaking"],
+  ["/novyra", "Novyra AI"],
   ["/pricing", "Courses & Fees"],
 ];
 export function Header() {
@@ -29,7 +30,9 @@ export function Header() {
   const active = (href) =>
     href === "/"
       ? pathname === "/"
-      : href === "/learning-spaces"
+      : href === "/novyra"
+        ? /^\/novyra(\/|$)/.test(pathname)
+        : href === "/learning-spaces"
         ? /^\/(learning-spaces|classroom|study-room)(-preview)?(\/|$)/.test(
             pathname,
           )
@@ -75,6 +78,7 @@ export function Header() {
           state.userRole,
         ) && <Link to="/manage-courses">Course publication</Link>}
       <Link to="/profile">My profile</Link>
+      <Link to="/novyra">Novyra AI Companion</Link>
       <Link to="/review-mistakes">Review Mistakes</Link>
       <Link to={staff ? "/dashboard" : "/progress"}>
         {staff ? "Staff Dashboard" : "My Learning Progress"}

@@ -111,7 +111,7 @@ async function executeRequest(path, options = {}) {
   return data;
 }
 
-function request(path, options = {}) {
+export function request(path, options = {}) {
   const method = options.method ?? 'GET';
   if (method !== 'GET') return executeRequest(path, options);
 
