@@ -19,6 +19,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api/client.js";
+import { useCatalog } from "../courses/Catalog.jsx";
 import { useAppContext } from "../state/AppContext.jsx";
 import { serverLearningAccess } from "../state/identityPolicy.js";
 import {
@@ -208,11 +209,14 @@ export function DailyLessonsPage() {
     if (pathwayKey === "paid_batch") return canAccessPrivateBatch;
     return Boolean(courseData[pathwayKey]);
   });
-  const availableToEnroll = Object.keys(courseData).filter((pathway) => {
-    if (enrolledPathways.includes(pathway)) return false;
-    if (courseData[pathway]?.isPrivate) return false;
-    return true;
-  });
+  const catalog = useCatalog();
+  const availableToEnroll = (catalog.courses || [])
+    .map((c) => c.language)
+    .filter((pathway) => {
+      if (enrolledPathways.includes(pathway)) return false;
+      if (courseData[pathway]?.isPrivate) return false;
+      return true;
+    });
   const pathway = courseData[state.activePathway] ?? {
     title: "Published courses",
     modules: [],

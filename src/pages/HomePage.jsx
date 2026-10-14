@@ -73,12 +73,12 @@ export function HomePage() {
                 ? "Course availability could not be checked"
                 : catalog.courses.length
                   ? "Explore published courses"
-                  : "New courses will appear here when published."}
+                  : "No courses are available yet."}
           </strong>
           <p>
             {catalog.error ||
               (catalog.loading ? "Checking availability. You can explore the campus while we load the catalog." : !catalog.courses.length
-                ? "Enrollment is not open yet. You can explore the campus and use personal study tools."
+                ? "No courses are available yet. New courses will be announced soon."
                 : "Enrollment and lesson access are verified for your account.")}
           </p>
         </div>
