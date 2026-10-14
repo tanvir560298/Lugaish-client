@@ -95,7 +95,7 @@ export function PracticeQuizCard({ initialSubject = "english", initialTopic = "C
           </div>
           <h4 className="font-bold text-sm text-slate-900 dark:text-white">Ready for a quick 3-question challenge?</h4>
           <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-            Choose a topic or click Start Quiz to generate verified practice questions tailored to your pathway.
+            Choose a topic to request practice questions. Generated answers may contain mistakes and are not verified course assessments.
           </p>
           <div className="flex justify-center gap-2 pt-2">
             <button

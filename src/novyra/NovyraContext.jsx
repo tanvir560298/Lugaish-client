@@ -1,10 +1,19 @@
 import { createContext, useContext, useState, useEffect, useRef, useCallback } from "react";
 import { novyraClient } from "./novyraClient.js";
 import { getAuthToken } from "../api/client.js";
+import { useAppContext } from "../state/AppContext.jsx";
 
 const NovyraContext = createContext(null);
 
 export function NovyraProvider({ children }) {
+  const {state} = useAppContext();
+  // Remount private context on login, logout and account changes. Late requests
+  // belong to an unmounted provider and cannot expose the previous student's state.
+  const identity = state.isLoggedIn ? `${state.userEmail}:${getAuthToken() || ''}` : 'anonymous';
+  return <NovyraSessionProvider key={identity} authenticated={state.isLoggedIn}>{children}</NovyraSessionProvider>;
+}
+
+function NovyraSessionProvider({ children, authenticated }) {
   const [profile, setProfile] = useState(null);
   const [fullProfile, setFullProfile] = useState(null);
   const [activePlan, setActivePlan] = useState(null);
@@ -91,10 +100,11 @@ export function NovyraProvider({ children }) {
 
   // Initial load
   useEffect(() => {
+    if (!authenticated) return;
     loadProfile();
     loadActivePlan();
     loadUsage();
-  }, [loadProfile, loadActivePlan, loadUsage]);
+  }, [authenticated, loadProfile, loadActivePlan, loadUsage]);
 
   // Timer actions
   const startTimer = (blockIndex, durationMinutes, title = "") => {

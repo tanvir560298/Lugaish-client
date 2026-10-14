@@ -120,6 +120,7 @@ export function NovyraWorkspace() {
 
       {/* Main Content Area */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-8">
+        <p role="note" className="mb-5 text-sm text-slate-600 dark:text-slate-300">Without an enabled online provider, Novyra uses limited offline templates. These are not personalized AI answers or verified mastery assessments.</p>
         {activeTab === "planner" && <StudyPlannerCard />}
         {activeTab === "chat" && <NovyraChatView />}
         {activeTab === "code" && <CodeMentorView />}
