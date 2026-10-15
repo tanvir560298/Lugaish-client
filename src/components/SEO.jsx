@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 const SITE_URL = (import.meta.env.VITE_SITE_URL || 'https://lugaish.vercel.app').replace(/\/$/, '');
 
 const DEFAULT_SEO = {
-  title: 'Lugaish | AI-Powered Arabic & English Learning Platform',
+  title: 'Lugaish | Languages, Programming & Your Learning Campus',
   description: 'Learn English and Arabic with AI-powered language learning, daily lessons, guided practice, progress tracking, and weekly interview preparation.',
   keywords: 'AI-powered language learning, AI English learning, AI Arabic learning, learn English, learn Arabic, English speaking course, Arabic course, Lugaish',
   image: `${SITE_URL}/og-image.svg`,
@@ -12,6 +12,14 @@ const DEFAULT_SEO = {
 
 const ROUTE_SEO = {
   '/': DEFAULT_SEO,
+  '/learn': {
+    title: 'Learning Paths | Lugaish',
+    description: 'Explore Java self-study, published Arabic and English courses, and the Lugaish learning roadmap.',
+  },
+  '/learn/java': {
+    title: 'Java Foundations — Free Self-Study | Lugaish',
+    description: 'Three introductory Java code-reading lessons with guided practice and knowledge checks.',
+  },
   '/signup': {
     title: 'Sign Up for Lugaish | Start AI-Powered English and Arabic Learning',
     description: 'Create your Lugaish account with Google and start AI-assisted daily English or Arabic lessons.',

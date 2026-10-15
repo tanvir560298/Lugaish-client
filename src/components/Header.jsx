@@ -7,10 +7,10 @@ import { ROLES, getViewedRole } from "../utils/roles.js";
 import { getUnviewedCertificateCount } from "../utils/certificateStorage.js";
 const links = [
   ["/", "Home"],
-  ["/daily-lessons", "My Classes"],
+  ["/learn", "Learn"],
+  ["/progress", "My Learning"],
   ["/learning-spaces", "Campus"],
-  ["/speaking-practice", "Speaking"],
-  ["/novyra", "Novyra AI"],
+  ["/novyra", "NOVYRA"],
   ["/pricing", "Courses & Fees"],
 ];
 export function Header() {
@@ -78,6 +78,8 @@ export function Header() {
           state.userRole,
         ) && <Link to="/manage-courses">Course publication</Link>}
       <Link to="/profile">My profile</Link>
+      <Link to="/daily-lessons">My Classes</Link>
+      <Link to="/speaking-practice">Speaking practice</Link>
       <Link to="/novyra">Novyra AI Companion</Link>
       <Link to="/review-mistakes">Review Mistakes</Link>
       <Link to={staff ? "/dashboard" : "/progress"}>

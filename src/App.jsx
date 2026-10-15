@@ -35,6 +35,9 @@ const ArchitectsPage = lazy(() => import('./pages/ArchitectsPage.jsx').then(modu
 const InterviewPage = lazy(() => import('./pages/InterviewPage.jsx').then(module => ({ default: module.InterviewPage })));
 const SpeakingPracticePage = lazy(() => import('./pages/SpeakingPracticePage.jsx').then(module => ({ default: module.SpeakingPracticePage })));
 const CertificatePage = lazy(() => import('./pages/CertificatePage.jsx').then(module => ({ default: module.CertificatePage })));
+const LearnPage = lazy(() => import('./learn/LearnPages.jsx').then(m => ({default:m.LearnPage})));
+const JavaPathPage = lazy(() => import('./learn/LearnPages.jsx').then(m => ({default:m.JavaPathPage})));
+const JavaLessonPage = lazy(() => import('./learn/LearnPages.jsx').then(m => ({default:m.JavaLessonPage})));
 const NovyraWorkspace = lazy(() => import('./novyra/NovyraWorkspace.jsx').then(module => ({ default: module.NovyraWorkspace })));
 import { NovyraProvider } from './novyra/NovyraContext.jsx';
 import { NovyraPanel } from './novyra/NovyraPanel.jsx';
@@ -175,6 +178,9 @@ export default function App() {
               <Route path='/signup' element={<Navigate to="/login" replace />} />
               <Route path='/auth' element={<Navigate to="/login" replace />} />
               <Route path='/manage-courses' element={<ProtectedRoute><ManageCourses /></ProtectedRoute>} />
+              <Route path='/learn' element={<LearnPage />} />
+              <Route path='/learn/java' element={<JavaPathPage />} />
+              <Route path='/learn/java/:lessonId' element={<JavaLessonPage />} />
               <Route path='/novyra' element={<ProtectedRoute><NovyraWorkspace /></ProtectedRoute>} />
               <Route path='/pricing' element={<PricingPage />} />
               <Route path='/course/:language' element={<ProtectedRoute><CatalogGuard><CoursePage /></CatalogGuard></ProtectedRoute>} />
