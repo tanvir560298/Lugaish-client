@@ -35,6 +35,12 @@ const ArchitectsPage = lazy(() => import('./pages/ArchitectsPage.jsx').then(modu
 const InterviewPage = lazy(() => import('./pages/InterviewPage.jsx').then(module => ({ default: module.InterviewPage })));
 const SpeakingPracticePage = lazy(() => import('./pages/SpeakingPracticePage.jsx').then(module => ({ default: module.SpeakingPracticePage })));
 const CertificatePage = lazy(() => import('./pages/CertificatePage.jsx').then(module => ({ default: module.CertificatePage })));
+const LearnPage = lazy(() => import('./learn/LearnPages.jsx').then(m => ({default:m.LearnPage})));
+const JavaPathPage = lazy(() => import('./learn/LearnPages.jsx').then(m => ({default:m.JavaPathPage})));
+const JavaLessonPage = lazy(() => import('./learn/LearnPages.jsx').then(m => ({default:m.JavaLessonPage})));
+const NovyraWorkspace = lazy(() => import('./novyra/NovyraWorkspace.jsx').then(module => ({ default: module.NovyraWorkspace })));
+import { NovyraProvider } from './novyra/NovyraContext.jsx';
+import { NovyraPanel } from './novyra/NovyraPanel.jsx';
 
 function PageFallback() {
   return (
@@ -158,48 +164,55 @@ function ProtectedCourseRoute({ children }) {
 export default function App() {
   return (
     <AppProvider>
-      <SEO />
-      <ScrollToTop />
-      <Layout>
-        <Suspense fallback={<PageFallback />}>
-          <Routes>
-            <Route path='/' element={<HomePage />} />
-            <Route path='/privacy' element={<InformationPage kind="privacy"/>}/>
-            <Route path='/terms' element={<InformationPage kind="terms"/>}/>
-            <Route path='/support' element={<InformationPage kind="support"/>}/>
-            <Route path='/login' element={<LoginPage />} />
-            <Route path='/signup' element={<Navigate to="/login" replace />} />
-            <Route path='/auth' element={<Navigate to="/login" replace />} />
-            <Route path='/manage-courses' element={<ProtectedRoute><ManageCourses /></ProtectedRoute>} />
-            <Route path='/pricing' element={<PricingPage />} />
-            <Route path='/course/:language' element={<ProtectedRoute><CatalogGuard><CoursePage /></CatalogGuard></ProtectedRoute>} />
-            <Route path='/learning-spaces' element={<LearningSpacesPage />} />
-            <Route path='/study-room' element={<ProtectedRoute><StudyRoomPage /></ProtectedRoute>} />
-            {import.meta.env.DEV && <Route path='/learning-spaces-preview' element={<LearningSpacesPage devPreview />} />}
-            {import.meta.env.DEV && <Route path='/study-room-preview' element={<StudyRoomPage devPreview />} />}
-            <Route path='/classroom' element={<ProtectedRoute><ClassroomPage /></ProtectedRoute>} />
-            {import.meta.env.DEV && <Route path='/speaking-preview' element={<IndependentSpeaking/>} />}
-            {import.meta.env.DEV && <Route path='/practice-preview' element={<CatalogGuard><PracticePreviewPage /></CatalogGuard>} />}
-            {import.meta.env.DEV && <Route path='/classroom-preview' element={<ClassroomPage devPreview />} />}
-            <Route path='/today' element={<ProtectedCourseRoute><StudentLesson /></ProtectedCourseRoute>} />
-            <Route path='/lesson' element={<ProtectedCourseRoute><StudentLesson /></ProtectedCourseRoute>} />
-            <Route path='/lesson/:day' element={<ProtectedCourseRoute><StudentLesson /></ProtectedCourseRoute>} />
-            <Route path='/review-mistakes' element={<ProtectedRoute><ReviewPage /></ProtectedRoute>} />
-            <Route path='/quiz' element={<ProtectedCourseRoute><QuizPage /></ProtectedCourseRoute>} />
-            <Route path='/dashboard' element={<ProtectedRoute><DashboardEntry /></ProtectedRoute>} />
-            <Route path='/profile' element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-            <Route path='/certificate/:code' element={<CertificatePage />} />
-            <Route path='/progress' element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
-            <Route path='/pathways' element={<ProtectedRoute><CatalogGuard><PathwaysPage /></CatalogGuard></ProtectedRoute>} />
-            <Route path='/daily-lessons' element={<ProtectedCourseRoute><DailyLessonsPage /></ProtectedCourseRoute>} />
-            <Route path='/interview' element={<ProtectedCourseRoute><InterviewPage /></ProtectedCourseRoute>} />
-            <Route path='/speaking-practice' element={<ProtectedRoute><CatalogGuard staff fallback={<IndependentSpeaking/>}><CourseLaunchGuard><SpeakingPracticePage /></CourseLaunchGuard></CatalogGuard></ProtectedRoute>} />
-            <Route path='/leaderboard' element={<Navigate to="/daily-lessons" replace />} />
-            <Route path="/architects" element={<ArchitectsPage />} />
-            <Route path='*' element={<Navigate to='/' replace />} />
-          </Routes>
-        </Suspense>
-      </Layout>
+      <NovyraProvider>
+        <SEO />
+        <ScrollToTop />
+        <Layout>
+          <Suspense fallback={<PageFallback />}>
+            <Routes>
+              <Route path='/' element={<HomePage />} />
+              <Route path='/privacy' element={<InformationPage kind="privacy"/>}/>
+              <Route path='/terms' element={<InformationPage kind="terms"/>}/>
+              <Route path='/support' element={<InformationPage kind="support"/>}/>
+              <Route path='/login' element={<LoginPage />} />
+              <Route path='/signup' element={<Navigate to="/login" replace />} />
+              <Route path='/auth' element={<Navigate to="/login" replace />} />
+              <Route path='/manage-courses' element={<ProtectedRoute><ManageCourses /></ProtectedRoute>} />
+              <Route path='/learn' element={<LearnPage />} />
+              <Route path='/learn/java' element={<JavaPathPage />} />
+              <Route path='/learn/java/:lessonId' element={<JavaLessonPage />} />
+              <Route path='/novyra' element={<ProtectedRoute><NovyraWorkspace /></ProtectedRoute>} />
+              <Route path='/pricing' element={<PricingPage />} />
+              <Route path='/course/:language' element={<ProtectedRoute><CatalogGuard><CoursePage /></CatalogGuard></ProtectedRoute>} />
+              <Route path='/learning-spaces' element={<LearningSpacesPage />} />
+              <Route path='/study-room' element={<ProtectedRoute><StudyRoomPage /></ProtectedRoute>} />
+              {import.meta.env.DEV && <Route path='/learning-spaces-preview' element={<LearningSpacesPage devPreview />} />}
+              {import.meta.env.DEV && <Route path='/study-room-preview' element={<StudyRoomPage devPreview />} />}
+              <Route path='/classroom' element={<ProtectedRoute><ClassroomPage /></ProtectedRoute>} />
+              {import.meta.env.DEV && <Route path='/speaking-preview' element={<IndependentSpeaking/>} />}
+              {import.meta.env.DEV && <Route path='/practice-preview' element={<CatalogGuard><PracticePreviewPage /></CatalogGuard>} />}
+              {import.meta.env.DEV && <Route path='/classroom-preview' element={<ClassroomPage devPreview />} />}
+              <Route path='/today' element={<ProtectedCourseRoute><StudentLesson /></ProtectedCourseRoute>} />
+              <Route path='/lesson' element={<ProtectedCourseRoute><StudentLesson /></ProtectedCourseRoute>} />
+              <Route path='/lesson/:day' element={<ProtectedCourseRoute><StudentLesson /></ProtectedCourseRoute>} />
+              <Route path='/review-mistakes' element={<ProtectedRoute><ReviewPage /></ProtectedRoute>} />
+              <Route path='/quiz' element={<ProtectedCourseRoute><QuizPage /></ProtectedCourseRoute>} />
+              <Route path='/dashboard' element={<ProtectedRoute><DashboardEntry /></ProtectedRoute>} />
+              <Route path='/profile' element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+              <Route path='/certificate/:code' element={<CertificatePage />} />
+              <Route path='/progress' element={<ProtectedRoute><ProgressPage /></ProtectedRoute>} />
+              <Route path='/pathways' element={<ProtectedRoute><CatalogGuard><PathwaysPage /></CatalogGuard></ProtectedRoute>} />
+              <Route path='/daily-lessons' element={<ProtectedCourseRoute><DailyLessonsPage /></ProtectedCourseRoute>} />
+              <Route path='/interview' element={<ProtectedCourseRoute><InterviewPage /></ProtectedCourseRoute>} />
+              <Route path='/speaking-practice' element={<ProtectedRoute><CatalogGuard staff fallback={<IndependentSpeaking/>}><CourseLaunchGuard><SpeakingPracticePage /></CourseLaunchGuard></CatalogGuard></ProtectedRoute>} />
+              <Route path='/leaderboard' element={<Navigate to="/daily-lessons" replace />} />
+              <Route path="/architects" element={<ArchitectsPage />} />
+              <Route path='*' element={<Navigate to='/' replace />} />
+            </Routes>
+          </Suspense>
+          <NovyraPanel />
+        </Layout>
+      </NovyraProvider>
     </AppProvider>
   );
 }

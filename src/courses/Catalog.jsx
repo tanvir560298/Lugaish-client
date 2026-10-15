@@ -42,7 +42,7 @@ export function useCatalog() {
 export function EmptyCatalog({
   error = "",
   retry,
-  title = "No classes available yet.",
+  title = "No courses are available yet.",
 }) {
   return (
     <section className="platform-page">
@@ -54,7 +54,7 @@ export function EmptyCatalog({
           </h1>
           <p>
             {error ||
-              "New learning opportunities will appear here when courses are published."}
+              "No courses are available yet. New courses will be announced soon."}
           </p>
           <p>Your saved study tools and account remain available.</p>
           {error && (
@@ -117,12 +117,12 @@ export function CatalogNotice() {
           ? "Checking course availability…"
           : catalog.courses.length
             ? "Published courses"
-            : "New learning opportunities are on their way."}
+            : "No courses are available yet."}
       </h2>
       <p>
         {catalog.error ||
           (!catalog.courses.length
-            ? "No courses are available for enrollment yet. Explore the campus and use your personal study tools."
+            ? "No courses are available yet. New courses will be announced soon."
             : "Explore currently published courses. Enrollment and lesson access are verified separately.")}
       </p>
       {catalog.error && (
