@@ -67,7 +67,7 @@ export function NovyraOnboardingModal() {
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Meet NOVYRA</h2>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Meet Tanu AI</h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">Your Personal AI Learning Companion on Lugaish</p>
             </div>
           </div>
@@ -102,7 +102,7 @@ export function NovyraOnboardingModal() {
               <div>
                 <h3 className="text-base font-semibold text-slate-900 dark:text-white">What would you like to master first?</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Select your primary focus. Novyra adapts study plans, practice exercises, and code reviews accordingly.
+                  Select your primary focus. Tanu AI adapts study plans, practice exercises, and code reviews accordingly.
                 </p>
               </div>
 
@@ -194,7 +194,7 @@ export function NovyraOnboardingModal() {
               <div>
                 <h3 className="text-base font-semibold text-slate-900 dark:text-white">Set your learning goal and daily routine</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Novyra structures your daily sessions into timed blocks with built-in breaks to prevent cognitive fatigue.
+                  Tanu AI structures your daily sessions into timed blocks with built-in breaks to prevent cognitive fatigue.
                 </p>
               </div>
 

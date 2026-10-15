@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useRef, useCallback } f
 import { novyraClient } from "./novyraClient.js";
 import { getAuthToken } from "../api/client.js";
 import { useAppContext } from "../state/AppContext.jsx";
+import {parseGuidedRequest} from '../tanu/session.js';
 
 const NovyraContext = createContext(null);
 
@@ -53,7 +54,7 @@ function NovyraSessionProvider({ children, authenticated }) {
         }
       }
     } catch (err) {
-      console.warn("Could not load Novyra profile:", err?.message);
+      console.warn("Could not load Tanu AI profile:", err?.message);
     }
   }, []);
 
@@ -140,6 +141,15 @@ function NovyraSessionProvider({ children, authenticated }) {
   // Chat actions
   const sendMessage = async (text, options = {}) => {
     if (!text || !text.trim()) return null;
+    const timeRequest = parseGuidedRequest(text,activeSubject);
+    if(timeRequest) {
+      const {minutes,topic}=timeRequest;
+      const reply={id:crypto.randomUUID(),sender:'novyra',timestamp:new Date().toISOString(),
+        content:minutes>=10&&minutes<=120?`Let's prepare a ${minutes}-minute session. Open Guided Study below, choose a real available lesson and approve the plan. No timer has started yet.`:'Choose between 10 and 120 minutes for a guided session.',
+        ...(minutes>=10&&minutes<=120?{actionUrl:`/tanu?minutes=${minutes}&study=${topic==='java'?'java':'course'}&topic=${encodeURIComponent(topic)}`}:{})};
+      setMessages(previous=>[...previous,{id:crypto.randomUUID(),sender:'student',content:text,timestamp:new Date().toISOString()},reply]);
+      return {message:reply,provider:'guided-session-tool'};
+    }
     const studentMsg = {
       id: `msg-${Date.now()}`,
       sender: "student",

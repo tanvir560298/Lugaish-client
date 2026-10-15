@@ -1,3 +1,4 @@
+import {Link} from 'react-router-dom';
 import { useState, useRef, useEffect } from "react";
 import { Send, Sparkles, Bot, User, Trash2, ArrowRight } from "lucide-react";
 import { useNovyra } from "./NovyraContext.jsx";
@@ -51,7 +52,7 @@ export function NovyraChatView({ compact = false }) {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-sm text-slate-900 dark:text-white">Novyra Tutor</span>
+              <span className="font-bold text-sm text-slate-900 dark:text-white">Tanu AI Tutor</span>
               <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
                 {activeSubject}
               </span>
@@ -84,6 +85,7 @@ export function NovyraChatView({ compact = false }) {
               ? 'Learning engine unavailable. Check the backend connection and sign-in.'
               : 'Checking learning engine connection…'}
       </p>
+      <Link to="/tanu" className="px-5 py-3 text-sm font-bold text-indigo-700 dark:text-indigo-300">Have 10–120 minutes? Start a guided study session →</Link>
       {/* Messages Scroll Area */}
       <div className="flex-1 p-5 overflow-y-auto space-y-4">
         {messages.length === 0 ? (
@@ -137,7 +139,8 @@ export function NovyraChatView({ compact = false }) {
                       : "bg-slate-100 dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 rounded-tl-none border border-slate-200/60 dark:border-slate-700/60"
                   }`}
                 >
-                  <div className="whitespace-pre-wrap">{msg.content}</div>
+                  <div className="whitespace-pre-wrap">{msg.content}
+                    {msg.actionUrl?.startsWith("/tanu?") && <Link to={msg.actionUrl} className="block mt-3 underline font-bold">Open guided study →</Link>}</div>
 
                   {/* Tool Call Context Card if available */}
                   {msg.toolCalls?.length > 0 && (
@@ -193,7 +196,7 @@ export function NovyraChatView({ compact = false }) {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder={`Ask Novyra about ${activeSubject}...`}
+          placeholder={`Ask Tanu AI about ${activeSubject}...`}
           className="flex-1 px-4 py-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         <button

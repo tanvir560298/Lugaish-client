@@ -1,3 +1,4 @@
+import {TanuSessionProvider,TanuCoach} from './tanu/GuidedSession.jsx';
 import {InformationPage} from './pages/InformationPage.jsx';
 
 import { CatalogGuard } from './courses/Catalog.jsx';
@@ -35,6 +36,7 @@ const ArchitectsPage = lazy(() => import('./pages/ArchitectsPage.jsx').then(modu
 const InterviewPage = lazy(() => import('./pages/InterviewPage.jsx').then(module => ({ default: module.InterviewPage })));
 const SpeakingPracticePage = lazy(() => import('./pages/SpeakingPracticePage.jsx').then(module => ({ default: module.SpeakingPracticePage })));
 const CertificatePage = lazy(() => import('./pages/CertificatePage.jsx').then(module => ({ default: module.CertificatePage })));
+const HtmlCoursePage = lazy(() => import('./learn/HtmlCoursePage.jsx').then(m=>({default:m.HtmlCoursePage})));
 const LearnPage = lazy(() => import('./learn/LearnPages.jsx').then(m => ({default:m.LearnPage})));
 const JavaPathPage = lazy(() => import('./learn/LearnPages.jsx').then(m => ({default:m.JavaPathPage})));
 const JavaLessonPage = lazy(() => import('./learn/LearnPages.jsx').then(m => ({default:m.JavaLessonPage})));
@@ -165,6 +167,7 @@ export default function App() {
   return (
     <AppProvider>
       <NovyraProvider>
+      <TanuSessionProvider>
         <SEO />
         <ScrollToTop />
         <Layout>
@@ -179,8 +182,11 @@ export default function App() {
               <Route path='/auth' element={<Navigate to="/login" replace />} />
               <Route path='/manage-courses' element={<ProtectedRoute><ManageCourses /></ProtectedRoute>} />
               <Route path='/learn' element={<LearnPage />} />
+              <Route path='/learn/web-development/html' element={<HtmlCoursePage />} />
+              <Route path='/learn/web-development/html/:videoId' element={<HtmlCoursePage />} />
               <Route path='/learn/java' element={<JavaPathPage />} />
               <Route path='/learn/java/:lessonId' element={<JavaLessonPage />} />
+              <Route path='/tanu' element={<NovyraWorkspace />} />
               <Route path='/novyra' element={<NovyraWorkspace />} />
               <Route path='/pricing' element={<PricingPage />} />
               <Route path='/course/:language' element={<ProtectedRoute><CatalogGuard><CoursePage /></CatalogGuard></ProtectedRoute>} />
@@ -211,7 +217,9 @@ export default function App() {
             </Routes>
           </Suspense>
           <NovyraPanel />
+          <TanuCoach />
         </Layout>
+      </TanuSessionProvider>
       </NovyraProvider>
     </AppProvider>
   );

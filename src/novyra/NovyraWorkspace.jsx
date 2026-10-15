@@ -1,3 +1,4 @@
+import {TanuGuideSetup} from '../tanu/GuidedSession.jsx';
 import { useState } from "react";
 import {
   Calendar,
@@ -35,6 +36,7 @@ export function NovyraWorkspace() {
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16">
       {/* Onboarding Dialog */}
       <NovyraOnboardingModal />
+      <TanuGuideSetup />
 
       {/* Top Banner / Hero */}
       <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
@@ -48,7 +50,7 @@ export function NovyraWorkspace() {
                 <div>
                   <div className="flex items-center gap-2">
                     <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
-                      NOVYRA AI
+                      Tanu AI
                     </h1>
                     <NovyraAvatarBadge state={avatarState} size="md" />
                   </div>
@@ -120,7 +122,7 @@ export function NovyraWorkspace() {
 
       {/* Main Content Area */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-8">
-        <p role="note" className="mb-5 text-sm text-slate-600 dark:text-slate-300">Without an enabled online provider, Novyra uses limited offline templates. These are not personalized AI answers or verified mastery assessments.</p>
+        <p role="note" className="mb-5 text-sm text-slate-600 dark:text-slate-300">Without an enabled online provider, Tanu AI uses limited offline templates. These are not personalized AI answers or verified mastery assessments.</p>
         {activeTab === "planner" && <StudyPlannerCard />}
         {activeTab === "chat" && <NovyraChatView />}
         {activeTab === "code" && <CodeMentorView />}

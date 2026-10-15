@@ -17,7 +17,7 @@ export function NovyraPanel() {
           type="button"
           onClick={togglePanel}
           className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 px-4 py-3 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white shadow-xl shadow-indigo-600/30 transition-all hover:scale-105 group"
-          title="Open Novyra AI Companion"
+          title="Open Tanu AI Companion"
         >
           <div className="relative flex items-center justify-center">
             <Sparkles className="w-5 h-5 transition-transform group-hover:rotate-12" />
@@ -26,7 +26,7 @@ export function NovyraPanel() {
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
             </span>
           </div>
-          <span className="text-xs font-bold tracking-wide pr-1">Novyra AI</span>
+          <span className="text-xs font-bold tracking-wide pr-1">Tanu AI</span>
         </button>
       )}
 
@@ -49,7 +49,7 @@ export function NovyraPanel() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm text-slate-900 dark:text-white">Novyra Companion</span>
+                    <span className="font-bold text-sm text-slate-900 dark:text-white">Tanu AI Companion</span>
                     <NovyraAvatarBadge state={avatarState} size="sm" showLabel={false} />
                   </div>
                   <div className="text-[10px] text-slate-500 dark:text-slate-400">Contextual Learning Assistant</div>

@@ -124,7 +124,7 @@ export function CodeMentorView() {
           </div>
           <h3 className="text-lg font-bold text-slate-900 dark:text-white">Guided Code Mentorship</h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Novyra inspects syntax, logic traps, and algorithmic complexity, providing pedagogical hints before giving solutions.
+            Tanu AI inspects syntax, logic traps, and algorithmic complexity, providing pedagogical hints before giving solutions.
           </p>
         </div>
 
@@ -195,7 +195,7 @@ export function CodeMentorView() {
           {isAnalyzing ? (
             <>
               <Sparkles className="w-4 h-4 animate-spin" />
-              <span>Novyra is Diagnosing Your Code...</span>
+              <span>Tanu AI is Diagnosing Your Code...</span>
             </>
           ) : (
             <>
@@ -212,7 +212,7 @@ export function CodeMentorView() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-indigo-700 dark:text-indigo-300 font-bold text-sm">
               <Sparkles className="w-4 h-4" />
-              <span>Novyra Mentorship Analysis</span>
+              <span>Tanu AI Mentorship Analysis</span>
             </div>
             <button
               type="button"

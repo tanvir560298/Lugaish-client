@@ -219,7 +219,7 @@ export function PracticeQuizCard({ initialSubject = "english", initialTopic = "C
                   <div className="mt-3 p-3 rounded-lg bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 text-xs text-indigo-900 dark:text-indigo-300 space-y-1">
                     <div className="font-bold flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
-                      <span>Novyra Pedagogical Insight:</span>
+                      <span>Tanu AI Pedagogical Insight:</span>
                     </div>
                     <div className="text-slate-700 dark:text-slate-300">{q.explanation}</div>
                   </div>

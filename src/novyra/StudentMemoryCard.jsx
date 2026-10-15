@@ -42,7 +42,7 @@ export function StudentMemoryCard() {
           </div>
           <h3 className="text-lg font-bold text-slate-900 dark:text-white">Learning Profile & Goals</h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Novyra retains your discipline, targeted weaknesses, and daily study budget to continuously calibrate instruction.
+            Tanu AI retains your discipline, targeted weaknesses, and daily study budget to continuously calibrate instruction.
           </p>
         </div>
 

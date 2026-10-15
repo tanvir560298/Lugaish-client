@@ -10,7 +10,7 @@ const links = [
   ["/learn", "Learn"],
   ["/progress", "My Learning"],
   ["/learning-spaces", "Campus"],
-  ["/novyra", "NOVYRA"],
+  ["/tanu", "Tanu AI"],
   ["/pricing", "Courses & Fees"],
 ];
 export function Header() {
@@ -30,8 +30,8 @@ export function Header() {
   const active = (href) =>
     href === "/"
       ? pathname === "/"
-      : href === "/novyra"
-        ? /^\/novyra(\/|$)/.test(pathname)
+      : href === "/tanu"
+        ? /^\/(tanu|novyra)(\/|$)/.test(pathname)
         : href === "/learning-spaces"
         ? /^\/(learning-spaces|classroom|study-room)(-preview)?(\/|$)/.test(
             pathname,
@@ -80,7 +80,7 @@ export function Header() {
       <Link to="/profile">My profile</Link>
       <Link to="/daily-lessons">My Classes</Link>
       <Link to="/speaking-practice">Speaking practice</Link>
-      <Link to="/novyra">Novyra AI Companion</Link>
+      <Link to="/tanu">Tanu AI Companion</Link>
       <Link to="/review-mistakes">Review Mistakes</Link>
       <Link to={staff ? "/dashboard" : "/progress"}>
         {staff ? "Staff Dashboard" : "My Learning Progress"}

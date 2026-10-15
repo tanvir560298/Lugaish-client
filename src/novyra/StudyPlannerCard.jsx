@@ -85,7 +85,7 @@ export function StudyPlannerCard() {
             </div>
             <h3 className="text-lg font-bold text-slate-900 dark:text-white">Design Today's Study Routine</h3>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Novyra crafts an adaptive, timed schedule structured into concept mastery, interactive practice, restorative breaks, and quick knowledge checks.
+              Tanu AI crafts an adaptive, timed schedule structured into concept mastery, interactive practice, restorative breaks, and quick knowledge checks.
             </p>
           </div>
         </div>

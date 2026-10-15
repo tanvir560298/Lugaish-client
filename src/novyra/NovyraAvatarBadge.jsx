@@ -46,7 +46,7 @@ export function NovyraAvatarBadge({ state = "idle", size = "md", showLabel = tru
   return (
     <div
       className={`inline-flex items-center rounded-full border transition-all duration-300 shadow-sm ${current.color} ${sizeClasses[size] || sizeClasses.md}`}
-      title={`Novyra State: ${current.label}`}
+      title={`Tanu AI State: ${current.label}`}
     >
       <span className="relative flex h-2 w-2">
         <span className={`absolute inline-flex h-full w-full rounded-full opacity-75 ${current.dot}`} />
