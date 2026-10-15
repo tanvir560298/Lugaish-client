@@ -941,24 +941,6 @@ function EmailManagementPanel({ defaultTestEmail }) {
     }
   };
 
-  const activateSignupCampaign = async () => {
-    if (
-      !window.confirm(
-        "Automatically send the latest course campaign once to each matching new student until the course starts?",
-      )
-    )
-      return;
-    setIsBusy(true);
-    setNotice("");
-    try {
-      const response = await api.activateLatestSignupCampaign();
-      setNotice(response.message);
-    } catch (error) {
-      setNotice(error.message || "Could not enable automatic delivery.");
-    } finally {
-      setIsBusy(false);
-    }
-  };
 
   return (
     <div className="section-card p-6 sm:p-8">
@@ -1107,14 +1089,7 @@ function EmailManagementPanel({ defaultTestEmail }) {
             <p className="text-xs font-black uppercase tracking-widest text-slate-400">
               Recent campaigns
             </p>
-            <button
-              type="button"
-              onClick={activateSignupCampaign}
-              disabled={isBusy}
-              className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-2 text-xs font-black text-emerald-200 disabled:opacity-40"
-            >
-              Auto-send latest course campaign until course start
-            </button>
+
           </div>
           {status.recentCampaigns.map((campaign) => (
             <div

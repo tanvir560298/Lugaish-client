@@ -242,7 +242,7 @@ export const api = {
     return request(`/lessons/${language}/${day}/speaking-practice`);
   },
   updateSpeakingPractice(language, day, payload) {
-    return request(`/lessons/${language}/${day}/speaking-practice`, {
+    return request(`/lessons/${language}/${day}/module`, {
       method: 'PUT',
       body: JSON.stringify(payload),
     });
@@ -307,9 +307,6 @@ export const api = {
       body: JSON.stringify(payload),
       timeoutMs: 120000,
     });
-  },
-  activateLatestSignupCampaign() {
-    return request('/email/campaigns/latest/activate-signup', { method: 'POST' });
   },
   getBankDetails() {
     return request('/payment/bank-details');
