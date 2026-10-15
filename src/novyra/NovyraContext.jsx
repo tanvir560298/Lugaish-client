@@ -74,6 +74,7 @@ function NovyraSessionProvider({ children, authenticated }) {
       setUsage(u);
     } catch (err) {
       console.warn("Could not load usage data:", err?.message);
+      setUsage({engineMode:'unavailable'});
     }
   }, []);
 

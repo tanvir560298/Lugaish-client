@@ -181,7 +181,7 @@ export default function App() {
               <Route path='/learn' element={<LearnPage />} />
               <Route path='/learn/java' element={<JavaPathPage />} />
               <Route path='/learn/java/:lessonId' element={<JavaLessonPage />} />
-              <Route path='/novyra' element={<ProtectedRoute><NovyraWorkspace /></ProtectedRoute>} />
+              <Route path='/novyra' element={<NovyraWorkspace />} />
               <Route path='/pricing' element={<PricingPage />} />
               <Route path='/course/:language' element={<ProtectedRoute><CatalogGuard><CoursePage /></CatalogGuard></ProtectedRoute>} />
               <Route path='/learning-spaces' element={<LearningSpacesPage />} />

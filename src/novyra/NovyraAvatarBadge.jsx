@@ -6,7 +6,7 @@ export function NovyraAvatarBadge({ state = "idle", size = "md", showLabel = tru
       color: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400",
       dot: "bg-emerald-500",
       icon: Compass,
-      label: "Ready to assist",
+      label: "Idle",
     },
     listening: {
       color: "bg-sky-500/10 text-sky-600 border-sky-500/20 dark:bg-sky-500/20 dark:text-sky-400",

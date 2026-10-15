@@ -19,6 +19,7 @@ export function NovyraChatView({ compact = false }) {
     avatarState,
     clearChat,
     activeSubject,
+    usage,
   } = useNovyra();
 
   const [input, setInput] = useState("");
@@ -74,6 +75,15 @@ export function NovyraChatView({ compact = false }) {
         </div>
       </div>
 
+      <p role="status" className="px-5 py-3 text-xs text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800">
+        {usage?.engineMode === 'offline-template'
+          ? 'Offline template mode. A real AI provider is not enabled; replies are limited preset material.'
+          : usage?.engineMode === 'online-configured'
+            ? 'Online provider configured. Generated answers may contain mistakes.'
+            : usage?.engineMode === 'unavailable'
+              ? 'Learning engine unavailable. Check the backend connection and sign-in.'
+              : 'Checking learning engine connection…'}
+      </p>
       {/* Messages Scroll Area */}
       <div className="flex-1 p-5 overflow-y-auto space-y-4">
         {messages.length === 0 ? (
@@ -82,9 +92,9 @@ export function NovyraChatView({ compact = false }) {
               <Sparkles className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="font-bold text-sm text-slate-900 dark:text-white">Ask Novyra Anything</h4>
+              <h4 className="font-bold text-sm text-slate-900 dark:text-white">Start a learning conversation</h4>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm">
-                Get guided walkthroughs, debug tricky exceptions, or request a structured breakdown of any subject.
+                Check the engine status above. Offline mode offers limited preset examples, not general AI tutoring or arbitrary code analysis.
               </p>
             </div>
 
