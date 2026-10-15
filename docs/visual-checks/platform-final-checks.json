@@ -1,0 +1,406 @@
+{
+  "layouts": [
+    {
+      "width": 360,
+      "theme": "dark",
+      "route": "/",
+      "overflow": false,
+      "h1": "Learn with purpose.\nGrow together.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 360,
+      "theme": "dark",
+      "route": "/pricing",
+      "overflow": false,
+      "h1": "Courses & Fees",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 360,
+      "theme": "dark",
+      "route": "/architects",
+      "overflow": false,
+      "h1": "Meet our team.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 360,
+      "theme": "dark",
+      "route": "/login",
+      "overflow": false,
+      "h1": "Welcome back.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 360,
+      "theme": "dark",
+      "route": "/learning-spaces",
+      "overflow": false,
+      "h1": "Lugaish University\nLearn. Connect. Grow.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "route": "/",
+      "overflow": false,
+      "h1": "Learn with purpose.\nGrow together.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "route": "/pricing",
+      "overflow": false,
+      "h1": "Courses & Fees",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "route": "/architects",
+      "overflow": false,
+      "h1": "Meet our team.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "route": "/login",
+      "overflow": false,
+      "h1": "Welcome back.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 390,
+      "theme": "dark",
+      "route": "/learning-spaces",
+      "overflow": false,
+      "h1": "Lugaish University\nLearn. Connect. Grow.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "route": "/",
+      "overflow": false,
+      "h1": "Learn with purpose.\nGrow together.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "route": "/pricing",
+      "overflow": false,
+      "h1": "Courses & Fees",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "route": "/architects",
+      "overflow": false,
+      "h1": "Meet our team.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "route": "/login",
+      "overflow": false,
+      "h1": "Welcome back.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "route": "/learning-spaces",
+      "overflow": false,
+      "h1": "Lugaish University\nLearn. Connect. Grow.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1280,
+      "theme": "dark",
+      "route": "/",
+      "overflow": false,
+      "h1": "Learn with purpose.\nGrow together.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1280,
+      "theme": "dark",
+      "route": "/pricing",
+      "overflow": false,
+      "h1": "Courses & Fees",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1280,
+      "theme": "dark",
+      "route": "/architects",
+      "overflow": false,
+      "h1": "Meet our team.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1280,
+      "theme": "dark",
+      "route": "/login",
+      "overflow": false,
+      "h1": "Welcome back.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1280,
+      "theme": "dark",
+      "route": "/learning-spaces",
+      "overflow": false,
+      "h1": "Lugaish University\nLearn. Connect. Grow.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "route": "/",
+      "overflow": false,
+      "h1": "Learn with purpose.\nGrow together.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "route": "/pricing",
+      "overflow": false,
+      "h1": "Courses & Fees",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "route": "/architects",
+      "overflow": false,
+      "h1": "Meet our team.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "route": "/login",
+      "overflow": false,
+      "h1": "Welcome back.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "route": "/learning-spaces",
+      "overflow": false,
+      "h1": "Lugaish University\nLearn. Connect. Grow.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 360,
+      "theme": "light",
+      "route": "/",
+      "overflow": false,
+      "h1": "Learn with purpose.\nGrow together.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 360,
+      "theme": "light",
+      "route": "/pricing",
+      "overflow": false,
+      "h1": "Courses & Fees",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 360,
+      "theme": "light",
+      "route": "/architects",
+      "overflow": false,
+      "h1": "Meet our team.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 360,
+      "theme": "light",
+      "route": "/login",
+      "overflow": false,
+      "h1": "Welcome back.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 360,
+      "theme": "light",
+      "route": "/learning-spaces",
+      "overflow": false,
+      "h1": "Lugaish University\nLearn. Connect. Grow.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "route": "/",
+      "overflow": false,
+      "h1": "Learn with purpose.\nGrow together.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "route": "/pricing",
+      "overflow": false,
+      "h1": "Courses & Fees",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "route": "/architects",
+      "overflow": false,
+      "h1": "Meet our team.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "route": "/login",
+      "overflow": false,
+      "h1": "Welcome back.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 390,
+      "theme": "light",
+      "route": "/learning-spaces",
+      "overflow": false,
+      "h1": "Lugaish University\nLearn. Connect. Grow.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "route": "/",
+      "overflow": false,
+      "h1": "Learn with purpose.\nGrow together.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "route": "/pricing",
+      "overflow": false,
+      "h1": "Courses & Fees",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "route": "/architects",
+      "overflow": false,
+      "h1": "Meet our team.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "route": "/login",
+      "overflow": false,
+      "h1": "Welcome back.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "route": "/learning-spaces",
+      "overflow": false,
+      "h1": "Lugaish University\nLearn. Connect. Grow.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1280,
+      "theme": "light",
+      "route": "/",
+      "overflow": false,
+      "h1": "Learn with purpose.\nGrow together.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1280,
+      "theme": "light",
+      "route": "/pricing",
+      "overflow": false,
+      "h1": "Courses & Fees",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1280,
+      "theme": "light",
+      "route": "/architects",
+      "overflow": false,
+      "h1": "Meet our team.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1280,
+      "theme": "light",
+      "route": "/login",
+      "overflow": false,
+      "h1": "Welcome back.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1280,
+      "theme": "light",
+      "route": "/learning-spaces",
+      "overflow": false,
+      "h1": "Lugaish University\nLearn. Connect. Grow.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "route": "/",
+      "overflow": false,
+      "h1": "Learn with purpose.\nGrow together.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "route": "/pricing",
+      "overflow": false,
+      "h1": "Courses & Fees",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "route": "/architects",
+      "overflow": false,
+      "h1": "Meet our team.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "route": "/login",
+      "overflow": false,
+      "h1": "Welcome back.",
+      "heavyHomepageCanvas": false
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "route": "/learning-spaces",
+      "overflow": false,
+      "h1": "Lugaish University\nLearn. Connect. Grow.",
+      "heavyHomepageCanvas": false
+    }
+  ],
+  "courseRedirect": "/login",
+  "protectedRedirect": "/login"
+}

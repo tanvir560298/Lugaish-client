@@ -1,0 +1,29 @@
+{
+  "fixture": true,
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 900,
+      "overflow": false,
+      "question": "You meet a new classmate. Choose a greeting."
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "overflow": false,
+      "question": "You meet a new classmate. Choose a greeting."
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "overflow": false,
+      "question": "You meet a new classmate. Choose a greeting."
+    }
+  ],
+  "verifiedFeedback": true,
+  "correctRetry": true,
+  "persisted": true,
+  "nextAction": true,
+  "arabicRTL": true,
+  "unauthorizedRedirect": true
+}

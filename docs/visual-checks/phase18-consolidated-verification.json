@@ -1,0 +1,53 @@
+{
+  "visualChecks": 33,
+  "visualOverflow": false,
+  "protectedChecks": 12,
+  "protectedOverflow": false,
+  "nativePreviewContinuity": true,
+  "nativeLibraryContinuity": true,
+  "mobileLibrary2D": {
+    "canvas": false,
+    "overflow": false
+  },
+  "interactionChecks": {
+    "isolatedEmptyCatalog": true,
+    "progressCorrect": true,
+    "reviewDiscoverable": true,
+    "accountEscape": true,
+    "mobileMenuClear": true,
+    "mobileEscape": true,
+    "noFalseUpload": true,
+    "reviewReturn": true,
+    "microphoneFailureClear": true,
+    "reducedMotion": true
+  },
+  "studyTools": [
+    {
+      "width": 390,
+      "persistedAcrossViews": true,
+      "persistedAfterNavigation": true,
+      "timerRunningAfterNavigation": true,
+      "preservedAfterFailure": true,
+      "retryExists": true,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "persistedAcrossViews": true,
+      "persistedAfterNavigation": true,
+      "timerRunningAfterNavigation": true,
+      "preservedAfterFailure": true,
+      "retryExists": true,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "persistedAcrossViews": true,
+      "persistedAfterNavigation": true,
+      "timerRunningAfterNavigation": true,
+      "preservedAfterFailure": true,
+      "retryExists": true,
+      "overflow": false
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+[
+  {
+    "width": 1440,
+    "stats": "1 FPS · 86 draw calls · 103,932 triangles",
+    "assets": [
+      {
+        "file": "daylight-1k.hdr",
+        "bytes": 300,
+        "durationMs": 5
+      },
+      {
+        "file": "wood-color.jpg",
+        "bytes": 300,
+        "durationMs": 6
+      },
+      {
+        "file": "wood-normal.jpg",
+        "bytes": 300,
+        "durationMs": 2
+      },
+      {
+        "file": "wood-roughness.jpg",
+        "bytes": 300,
+        "durationMs": 12
+      },
+      {
+        "file": "garden-panorama.jpg",
+        "bytes": 300,
+        "durationMs": 10
+      }
+    ],
+    "webgl": {
+      "lost": false,
+      "error": 0
+    }
+  },
+  {
+    "width": 390,
+    "stats": "10 FPS · 28 draw calls · 102,882 triangles",
+    "assets": [
+      {
+        "file": "wood-color.jpg",
+        "bytes": 300,
+        "durationMs": 1
+      },
+      {
+        "file": "garden-panorama.jpg",
+        "bytes": 300,
+        "durationMs": 1
+      }
+    ],
+    "webgl": {
+      "lost": false,
+      "error": 0
+    }
+  }
+]

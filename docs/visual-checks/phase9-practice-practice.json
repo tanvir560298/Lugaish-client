@@ -1,0 +1,34 @@
+{
+  "rows": [
+    {
+      "width": 1440,
+      "wrong": true,
+      "correct": true,
+      "restored": true,
+      "finished": true,
+      "noSave": true,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "wrong": true,
+      "correct": true,
+      "restored": true,
+      "finished": true,
+      "noSave": true,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "wrong": true,
+      "correct": true,
+      "restored": true,
+      "finished": true,
+      "noSave": true,
+      "overflow": false
+    }
+  ],
+  "arabicWrong": true,
+  "arabicCorrect": true,
+  "protectedRoute": true
+}

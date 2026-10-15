@@ -1,0 +1,12 @@
+{
+  "failedLoad": {
+    "native": false,
+    "fallback": true,
+    "savedZain": true
+  },
+  "restoredNative": true,
+  "reducedMotion": {
+    "stablePose": true,
+    "walkRunDisabled": true
+  }
+}

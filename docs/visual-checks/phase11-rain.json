@@ -1,0 +1,9 @@
+{
+  "decodedLicensedAsset": true,
+  "loop": true,
+  "volume": true,
+  "playPause": true,
+  "toolsDoNotDuplicateContext": true,
+  "navigationClosesContext": true,
+  "physicalAudioDeviceTested": false
+}

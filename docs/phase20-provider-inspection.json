@@ -1,0 +1,113 @@
+{
+  "inspectedAt": "2026-10-13T16:58:54.443Z",
+  "scope": "Read-only paired provider checkpoint; no pushes, merges, deployments or setting changes",
+  "canonicalFrontend": "https://lugaish.vercel.app",
+  "frontend": {
+    "repository": "https://github.com/tanvir560298/Lugaish-client",
+    "targetBranch": "main",
+    "remoteMain": "ef1f67db32dbe0195046ec79f27db52f03a7ccc9",
+    "candidateBranch": "release/phase20-review-20261013",
+    "candidateCommit": "23ea310c942b8248ec810bcc17b8e857ccea199c",
+    "candidateAhead": 5,
+    "candidateBehind": 0,
+    "mainIsAncestorOfCandidate": true,
+    "temporaryMergeTreeExitCode": 0,
+    "temporaryMergeTreeConflicts": [],
+    "branchProtected": false,
+    "rulesets": [],
+    "provider": "Vercel",
+    "productionLinked": true,
+    "latestProductionDeployment": {
+      "creator": "vercel[bot]",
+      "commit": "ef1f67db32dbe0195046ec79f27db52f03a7ccc9",
+      "status": "success"
+    },
+    "providerAutoDeployToggleInspected": false,
+    "canonicalFrontendHttpStatus": 200,
+    "inspectedPublicEntryAsset": "/assets/index-DOE-hGxb.js"
+  },
+  "backend": {
+    "repository": "https://github.com/tanvir560298/Lugaish-server",
+    "remoteMain": "1a1244b06c350411f21c695d6810e9d88148c84c",
+    "candidateBranch": "release/phase20-review-20261013",
+    "candidateCommit": "088094144e19221dbff7b3e7f09977251795901a",
+    "candidateAhead": 1,
+    "candidateBehind": 0,
+    "mainIsAncestorOfCandidate": true,
+    "temporaryMergeTreeExitCode": 0,
+    "temporaryMergeTreeConflicts": [],
+    "branchProtected": false,
+    "rulesets": [],
+    "provider": "Render",
+    "publicOrigin": "https://lugaish-server.onrender.com",
+    "originSource": "Embedded API origin in canonical public frontend entry module",
+    "renderCliInstalled": true,
+    "renderCliAuthenticated": false,
+    "renderServiceId": null,
+    "renderProductionBranch": null,
+    "renderAutoDeploySetting": null,
+    "health": {
+      "status": 200,
+      "databaseConnected": true,
+      "corsAllowsCanonicalFrontend": true,
+      "hasRequestCorrelationHeader": false,
+      "boundedRetryAfterInitialRequestUnavailable": true
+    },
+    "operationalEndpoints": [
+      {
+        "path": "/readyz",
+        "status": 404,
+        "hasRequestCorrelationHeader": false
+      },
+      {
+        "path": "/livez",
+        "status": 404,
+        "hasRequestCorrelationHeader": false
+      }
+    ]
+  },
+  "remoteCi": {
+    "clientWorkflows": [
+      "Daily Facebook AI Quiz & MCQ Poster"
+    ],
+    "backendWorkflows": [],
+    "preparedVerificationWorkflowRemoteExecution": "NOT TESTED"
+  },
+  "originalRepositoryRefsModified": false,
+  "temporaryGitMetadataDeleted": true,
+  "pushed": false,
+  "merged": false,
+  "deployed": false,
+  "providerSettingsModified": false,
+  "blockers": [
+    "Render CLI/provider access is unavailable: service ID, linked repository branch, auto-deploy policy and required startup configuration cannot be verified. Do not assume Render targets main.",
+    "Vercel client main is demonstrably production-linked. Its provider-level deployment toggle and canonical-domain promotion policy were not inspected. Treat a main push as a production-impacting action.",
+    "Both main branches report unprotected with no rulesets. Any required release review/status policy must be configured by an authorized owner.",
+    "Prepared verification/release GitHub workflows are not present remotely; local tests are not remote CI execution proof.",
+    "Refresh remote main ancestry immediately before any approved publish/merge because the existing scheduled quiz workflow pushes state commits.",
+    "Current public Render API answers health but readyz/livez return404 and correlation headers are absent; local candidate operational endpoints are not verified on the hosted service."
+  ],
+  "sources": [
+    "https://api.github.com/repos/tanvir560298/Lugaish-client/branches/main",
+    "https://api.github.com/repos/tanvir560298/Lugaish-client/deployments/7042937505/statuses",
+    "https://api.github.com/repos/tanvir560298/Lugaish-server/branches/main",
+    "https://lugaish.vercel.app",
+    "https://lugaish-server.onrender.com/health"
+  ],
+  "releaseWorktreesCleanAtAncestryInspection": true,
+  "finalWorkingTreeRecheck": {
+    "frontendClean": false,
+    "backendClean": false,
+    "observedChanges": [
+      "frontend backend gitlink marked modified",
+      "backend README.md modified"
+    ],
+    "note": "Ongoing team edits observed after clean ancestry inspection; recheck after those are committed."
+  },
+  "ownerActions": [
+    "Authenticate Render CLI or authorize read-only provider access; confirm the canonical backend service ID, Git repository, branch, auto-deploy policy and service type.",
+    "Before any backend publication, validate its private production environment against the candidate startup requirements, especially APP_ENV=production, explicit MongoDB database, unique JWT secret, Firebase Admin credentials, public FRONTEND_URL/CORS and actual proxy topology. Do not share secret values in chat.",
+    "Confirm Vercel canonical-domain/production-branch linkage and approve the exact coordinated frontend/backend commits before any production-impacting main push.",
+    "Finish and commit the ongoing reviewed README/gitlink edits; refresh GitHub refs, clean-source validation and ancestry checks immediately before an approved publication."
+  ]
+}

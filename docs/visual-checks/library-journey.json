@@ -1,0 +1,22 @@
+[
+  {
+    "width": 1280,
+    "previewBeforeConfirm": true,
+    "timerStarted": true,
+    "keptSeat": true,
+    "keptNotes": true,
+    "keptTimer": true,
+    "arrivalRestored": true,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "previewBeforeConfirm": true,
+    "timerStarted": true,
+    "keptSeat": true,
+    "keptNotes": true,
+    "keptTimer": true,
+    "arrivalRestored": true,
+    "overflow": false
+  }
+]

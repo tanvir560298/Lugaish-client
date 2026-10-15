@@ -1,0 +1,83 @@
+{
+  "environment": "Local production preview, Chrome headless, 4x CPU slowdown, 80ms latency, 10Mbps download, cold cache; not field Core Web Vitals",
+  "rows": [
+    {
+      "width": 390,
+      "run": 1,
+      "lcp": 940,
+      "longTasks": 0,
+      "longTaskMs": 0,
+      "domContentLoaded": 339.39999997615814,
+      "jsBytes": 468562,
+      "jsRequests": 8,
+      "threeLoaded": false,
+      "heroLoaded": true,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "run": 2,
+      "lcp": 892,
+      "longTasks": 0,
+      "longTaskMs": 0,
+      "domContentLoaded": 333.2999999523163,
+      "jsBytes": 468562,
+      "jsRequests": 8,
+      "threeLoaded": false,
+      "heroLoaded": true,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "run": 3,
+      "lcp": 884,
+      "longTasks": 0,
+      "longTaskMs": 0,
+      "domContentLoaded": 328.7999999523163,
+      "jsBytes": 468562,
+      "jsRequests": 8,
+      "threeLoaded": false,
+      "heroLoaded": true,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "run": 1,
+      "lcp": 1056,
+      "longTasks": 0,
+      "longTaskMs": 0,
+      "domContentLoaded": 326.89999997615814,
+      "jsBytes": 468562,
+      "jsRequests": 8,
+      "threeLoaded": false,
+      "heroLoaded": true,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "run": 2,
+      "lcp": 856,
+      "longTasks": 0,
+      "longTaskMs": 0,
+      "domContentLoaded": 333,
+      "jsBytes": 468562,
+      "jsRequests": 8,
+      "threeLoaded": false,
+      "heroLoaded": true,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "run": 3,
+      "lcp": 852,
+      "longTasks": 0,
+      "longTaskMs": 0,
+      "domContentLoaded": 334.8000000715256,
+      "jsBytes": 468562,
+      "jsRequests": 8,
+      "threeLoaded": false,
+      "heroLoaded": true,
+      "overflow": false
+    }
+  ]
+}

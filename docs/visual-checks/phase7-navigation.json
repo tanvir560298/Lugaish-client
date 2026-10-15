@@ -1,0 +1,42 @@
+[
+  {
+    "check": "Home uses static, loaded actual previews",
+    "pass": true
+  },
+  {
+    "check": "Mobile menu opens",
+    "pass": true
+  },
+  {
+    "check": "Escape closes menu and returns focus",
+    "pass": true
+  },
+  {
+    "check": "Mobile navigation follows destination and closes",
+    "pass": true
+  },
+  {
+    "check": "Skip link reaches main content",
+    "pass": true
+  },
+  {
+    "check": "Explore Courses opens real fees page",
+    "pass": true
+  },
+  {
+    "check": "Light theme switches",
+    "pass": true
+  },
+  {
+    "check": "Theme survives route navigation",
+    "pass": true
+  },
+  {
+    "check": "Signed-out speaking stays protected",
+    "pass": true
+  },
+  {
+    "check": "Google sign-in button visible",
+    "pass": true
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "width": 1440,
+    "draft": true,
+    "canvasRetained": true,
+    "cancel": true,
+    "save": true,
+    "keyboard": true,
+    "overflow": false
+  },
+  {
+    "width": 768,
+    "draft": true,
+    "canvasRetained": true,
+    "cancel": true,
+    "save": true,
+    "keyboard": true,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "draft": true,
+    "canvasRetained": true,
+    "cancel": true,
+    "save": true,
+    "keyboard": true,
+    "overflow": false
+  }
+]

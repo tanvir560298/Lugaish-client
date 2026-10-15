@@ -1,0 +1,8 @@
+{
+  "syntheticMicrophone": true,
+  "physicalDeviceTested": false,
+  "record": true,
+  "play": true,
+  "delete": true,
+  "navigationStopsTracks": true
+}

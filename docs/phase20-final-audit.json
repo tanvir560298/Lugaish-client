@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "checkedAt": "2026-10-13T16:56:39.629Z",
+  "candidate": "/Users/tanvir/Desktop/lugaish-phase20-review",
+  "frontendRevision": "23ea310c942b8248ec810bcc17b8e857ccea199c",
+  "backendRevision": "088094144e19221dbff7b3e7f09977251795901a",
+  "audit": {
+    "root-full": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 5,
+      "critical": 0,
+      "total": 5
+    },
+    "server-full": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 3,
+      "critical": 0,
+      "total": 3
+    },
+    "root-runtime": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "server-runtime": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    }
+  },
+  "advisory": {
+    "package": "braces",
+    "range": "<=3.0.3",
+    "severity": "high",
+    "patchedVersions": [],
+    "source": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
+    "scope": "Frontend Tailwind/chokidar/micromatch and backend nodemon development paths; no runtime audit findings. No forced major migration or insecure downgrade."
+  },
+  "installConsistency": {
+    "frontend": {
+      "npmCiDryRunExit": 0,
+      "npmLsExit": 0,
+      "note": "Dry-run reification output proposes 10 additions and 280 same-version topology changes against installed dependencies; command accepted lock. No actual install performed."
+    },
+    "backend": {
+      "npmCiDryRunExit": 0,
+      "npmLsExit": 0
+    },
+    "flags": "npm ci --ignore-scripts --dry-run --no-audit --no-fund"
+  },
+  "avatar": {
+    "path": "public/models/student/quaternius/casual-character.glb",
+    "bytes": 1430660,
+    "sha256": "fea7e71271203e7073f1a073fa1208de7402df276f87f80e149bf7589b5d46b4",
+    "expectedSha256": "fea7e71271203e7073f1a073fa1208de7402df276f87f80e149bf7589b5d46b4",
+    "validGLB": true,
+    "skins": [
+      62,
+      62,
+      62,
+      62
+    ],
+    "embeddedClips": 24,
+    "nativeLocomotion": true,
+    "materials": 9,
+    "textures": 0,
+    "creator": "Quaternius",
+    "license": "CC0-1.0",
+    "licenseSource": "https://quaternius.com/packs/ultimatemodularcharacters.html",
+    "authoredStudyClips": [
+      {
+        "name": "zainSitDown",
+        "duration": 1.291667,
+        "uuid": "lugaish-zainSitDown-v1"
+      },
+      {
+        "name": "zainSeatedIdle",
+        "duration": 4,
+        "uuid": "lugaish-zainSeatedIdle-v1"
+      },
+      {
+        "name": "zainStandUp",
+        "duration": 1,
+        "uuid": "lugaish-zainStandUp-v1"
+      }
+    ],
+    "studySourceShaMatches": true,
+    "sittingEmbeddedInOriginalGLB": false,
+    "newBrowserVerificationPerformed": false
+  },
+  "preservation": {
+    "checkpoint": "docs/checkpoints/phase19-phase18-preservation.json",
+    "filesChecked": 13,
+    "changes": []
+  },
+  "privateFileExclusion": {
+    "method": "Tracked filename/extension inspection plus git check-ignore checks; no private file content read or printed",
+    "trackedSuspiciousPaths": [
+      {
+        "repository": "frontend",
+        "suspiciousPaths": []
+      },
+      {
+        "repository": "backend",
+        "suspiciousPaths": []
+      }
+    ],
+    "ignoreChecksPassed": [
+      "frontend .env",
+      "frontend dist/index.html",
+      "frontend release-artifacts/example.tgz",
+      "frontend tmp/example.json",
+      "backend .env",
+      "backend .private-archive/example.json"
+    ],
+    "publicLegacyMediaRequiringClassification": [
+      "public/audio/day1-ielts-listening-audio-2.mp3",
+      "public/audio/day1-ielts-listening-audio.mp3",
+      "public/images/day1-listening-question-sheet.jpg"
+    ],
+    "note": "These existing three public day1 assets are tracked; public paths are copied by Vite. Their privacy/license/retirement classification is not asserted by this audit. Root informed for review."
+  },
+  "limitations": [
+    "Fresh audit and lock/tree checks are not exhaustive security certification.",
+    "GLB and native rig preservation verified from bytes/metadata; no new visual, animation, protected media, OAuth, hosting or deployment claim.",
+    "No source or manifest edits, installs, builds, Git pushes or deployment performed. Evidence written only into owner workspace, not the clean paired candidate."
+  ]
+}

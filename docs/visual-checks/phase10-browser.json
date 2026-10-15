@@ -1,0 +1,110 @@
+[
+  {
+    "width": 390,
+    "path": "/",
+    "legacyAbsent": true,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "path": "/pricing",
+    "legacyAbsent": true,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "path": "/practice-preview",
+    "legacyAbsent": true,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "path": "/classroom-preview",
+    "legacyAbsent": true,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "path": "/study-room-preview",
+    "legacyAbsent": true,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "path": "/speaking-preview",
+    "legacyAbsent": true,
+    "overflow": false
+  },
+  {
+    "width": 768,
+    "path": "/",
+    "legacyAbsent": true,
+    "overflow": false
+  },
+  {
+    "width": 768,
+    "path": "/pricing",
+    "legacyAbsent": true,
+    "overflow": false
+  },
+  {
+    "width": 768,
+    "path": "/practice-preview",
+    "legacyAbsent": true,
+    "overflow": false
+  },
+  {
+    "width": 768,
+    "path": "/classroom-preview",
+    "legacyAbsent": true,
+    "overflow": false
+  },
+  {
+    "width": 768,
+    "path": "/study-room-preview",
+    "legacyAbsent": true,
+    "overflow": false
+  },
+  {
+    "width": 768,
+    "path": "/speaking-preview",
+    "legacyAbsent": true,
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "path": "/",
+    "legacyAbsent": true,
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "path": "/pricing",
+    "legacyAbsent": true,
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "path": "/practice-preview",
+    "legacyAbsent": true,
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "path": "/classroom-preview",
+    "legacyAbsent": true,
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "path": "/study-room-preview",
+    "legacyAbsent": true,
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "path": "/speaking-preview",
+    "legacyAbsent": true,
+    "overflow": false
+  }
+]

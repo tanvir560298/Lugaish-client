@@ -1,0 +1,16 @@
+[
+  {
+    "stage": "before",
+    "file": "index-Q0UUUa3X.js",
+    "bytes": 598584,
+    "gzipBytes": 177744,
+    "cssBytes": 266147
+  },
+  {
+    "stage": "after",
+    "file": "index-CtthuRnO.js",
+    "bytes": 456544,
+    "gzipBytes": 131909,
+    "cssBytes": 266191
+  }
+]

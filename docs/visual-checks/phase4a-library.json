@@ -1,0 +1,16 @@
+[
+  {
+    "width": 1440,
+    "notes": true,
+    "timer": true,
+    "seatLeft": true,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "notes": true,
+    "timer": true,
+    "seatLeft": true,
+    "overflow": false
+  }
+]

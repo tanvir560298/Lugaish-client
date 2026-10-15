@@ -1,0 +1,74 @@
+[
+  {
+    "width": 390,
+    "path": "/login",
+    "current": "/login",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "path": "/learning-spaces",
+    "current": "/learning-spaces",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "path": "/dashboard",
+    "current": "/login",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "path": "/manage-courses",
+    "current": "/login",
+    "overflow": false
+  },
+  {
+    "width": 768,
+    "path": "/login",
+    "current": "/login",
+    "overflow": false
+  },
+  {
+    "width": 768,
+    "path": "/learning-spaces",
+    "current": "/learning-spaces",
+    "overflow": false
+  },
+  {
+    "width": 768,
+    "path": "/dashboard",
+    "current": "/login",
+    "overflow": false
+  },
+  {
+    "width": 768,
+    "path": "/manage-courses",
+    "current": "/login",
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "path": "/login",
+    "current": "/login",
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "path": "/learning-spaces",
+    "current": "/learning-spaces",
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "path": "/dashboard",
+    "current": "/login",
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "path": "/manage-courses",
+    "current": "/login",
+    "overflow": false
+  }
+]

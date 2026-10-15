@@ -1,0 +1,188 @@
+[
+  {
+    "width": 1440,
+    "name": "home",
+    "url": "/",
+    "overflow": false,
+    "title": "Your language journeystarts here."
+  },
+  {
+    "width": 1440,
+    "name": "classes",
+    "url": "/login",
+    "overflow": false,
+    "title": "Welcome back."
+  },
+  {
+    "width": 1440,
+    "name": "spaces",
+    "url": "/learning-spaces-preview",
+    "overflow": false,
+    "title": "Find your space."
+  },
+  {
+    "width": 1440,
+    "name": "classroom",
+    "url": "/classroom-preview",
+    "overflow": false,
+    "title": "Ready for your next session?"
+  },
+  {
+    "width": 1440,
+    "name": "library",
+    "url": "/study-room-preview",
+    "overflow": false,
+    "title": "Study Library"
+  },
+  {
+    "width": 1440,
+    "name": "speaking",
+    "url": "/speaking-preview",
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "name": "fees",
+    "url": "/pricing",
+    "overflow": false,
+    "title": "Courses & Fees"
+  },
+  {
+    "width": 1440,
+    "name": "login",
+    "url": "/login",
+    "overflow": false,
+    "title": "Welcome back."
+  },
+  {
+    "width": 1440,
+    "name": "team",
+    "url": "/architects",
+    "overflow": false,
+    "title": "Meet our team."
+  },
+  {
+    "width": 768,
+    "name": "home",
+    "url": "/",
+    "overflow": false,
+    "title": "Your language journeystarts here."
+  },
+  {
+    "width": 768,
+    "name": "classes",
+    "url": "/login",
+    "overflow": false,
+    "title": "Welcome back."
+  },
+  {
+    "width": 768,
+    "name": "spaces",
+    "url": "/learning-spaces-preview",
+    "overflow": false,
+    "title": "Find your space."
+  },
+  {
+    "width": 768,
+    "name": "classroom",
+    "url": "/classroom-preview",
+    "overflow": false,
+    "title": "Ready for your next session?"
+  },
+  {
+    "width": 768,
+    "name": "library",
+    "url": "/study-room-preview",
+    "overflow": false,
+    "title": "Study Library"
+  },
+  {
+    "width": 768,
+    "name": "speaking",
+    "url": "/speaking-preview",
+    "overflow": false
+  },
+  {
+    "width": 768,
+    "name": "fees",
+    "url": "/pricing",
+    "overflow": false,
+    "title": "Courses & Fees"
+  },
+  {
+    "width": 768,
+    "name": "login",
+    "url": "/login",
+    "overflow": false,
+    "title": "Welcome back."
+  },
+  {
+    "width": 768,
+    "name": "team",
+    "url": "/architects",
+    "overflow": false,
+    "title": "Meet our team."
+  },
+  {
+    "width": 390,
+    "name": "home",
+    "url": "/",
+    "overflow": false,
+    "title": "Your language journeystarts here."
+  },
+  {
+    "width": 390,
+    "name": "classes",
+    "url": "/login",
+    "overflow": false,
+    "title": "Welcome back."
+  },
+  {
+    "width": 390,
+    "name": "spaces",
+    "url": "/learning-spaces-preview",
+    "overflow": false,
+    "title": "Find your space."
+  },
+  {
+    "width": 390,
+    "name": "classroom",
+    "url": "/classroom-preview",
+    "overflow": false,
+    "title": "Ready for your next session?"
+  },
+  {
+    "width": 390,
+    "name": "library",
+    "url": "/study-room-preview",
+    "overflow": false,
+    "title": "Study Library"
+  },
+  {
+    "width": 390,
+    "name": "speaking",
+    "url": "/speaking-preview",
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "name": "fees",
+    "url": "/pricing",
+    "overflow": false,
+    "title": "Courses & Fees"
+  },
+  {
+    "width": 390,
+    "name": "login",
+    "url": "/login",
+    "overflow": false,
+    "title": "Welcome back."
+  },
+  {
+    "width": 390,
+    "name": "team",
+    "url": "/architects",
+    "overflow": false,
+    "title": "Meet our team."
+  }
+]

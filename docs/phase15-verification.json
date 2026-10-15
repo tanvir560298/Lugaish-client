@@ -1,0 +1,23 @@
+{
+  "phase": 15,
+  "status": "BLOCKED_LICENSED_STUDENT_ASSET_DELIVERY",
+  "integratedNewModels": 0,
+  "runtimeCodeChanged": false,
+  "proceduralPolish": false,
+  "productionBuild": "PASS",
+  "unitTests": {
+    "pass": 159,
+    "fail": 0,
+    "skipped": 0
+  },
+  "isolatedIntegrationTests": {
+    "pass": 8,
+    "fail": 0,
+    "skipped": 0
+  },
+  "newBrowserComparison": "NOT_PRODUCED_NO_REPLACEMENT",
+  "newMobileAvatarJourney": "NOT_TESTED",
+  "physicalDeviceTesting": false,
+  "publicDeployment": false,
+  "phase14ReleaseRecommendation": "NO_GO"
+}

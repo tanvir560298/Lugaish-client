@@ -1,0 +1,40 @@
+{
+  "syntheticMicrophone": true,
+  "physicalMicrophoneTested": false,
+  "rows": [
+    {
+      "width": 1440,
+      "optIn": true,
+      "activeLevel": true,
+      "tracksEnded": true,
+      "comparisonPreservesRecording": true,
+      "deleted": true,
+      "freeHonest": true,
+      "switchCleanup": true,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "optIn": true,
+      "activeLevel": true,
+      "tracksEnded": true,
+      "comparisonPreservesRecording": true,
+      "deleted": true,
+      "freeHonest": true,
+      "switchCleanup": true,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "optIn": true,
+      "activeLevel": true,
+      "tracksEnded": true,
+      "comparisonPreservesRecording": true,
+      "deleted": true,
+      "freeHonest": true,
+      "switchCleanup": true,
+      "overflow": false
+    }
+  ],
+  "arabic": true
+}

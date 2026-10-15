@@ -1,0 +1,488 @@
+{
+  "screens": [
+    {
+      "route": "/",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "title": "Learn a language.\nFind your place\nto grow.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/learning-spaces-preview",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "title": "Your campus.\nYour way to learn.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/pricing",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "title": "Courses & Fees",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/architects",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "title": "Meet our team.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/login",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "title": "Welcome back.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "title": "Learn a language.\nFind your place\nto grow.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/learning-spaces-preview",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "title": "Your campus.\nYour way to learn.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/pricing",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "title": "Courses & Fees",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/architects",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "title": "Meet our team.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/login",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "title": "Welcome back.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/",
+      "width": 768,
+      "theme": "dark",
+      "overflow": false,
+      "title": "Learn a language.\nFind your place\nto grow.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/learning-spaces-preview",
+      "width": 768,
+      "theme": "dark",
+      "overflow": false,
+      "title": "Your campus.\nYour way to learn.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/pricing",
+      "width": 768,
+      "theme": "dark",
+      "overflow": false,
+      "title": "Courses & Fees",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/architects",
+      "width": 768,
+      "theme": "dark",
+      "overflow": false,
+      "title": "Meet our team.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/login",
+      "width": 768,
+      "theme": "dark",
+      "overflow": false,
+      "title": "Welcome back.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/",
+      "width": 768,
+      "theme": "light",
+      "overflow": false,
+      "title": "Learn a language.\nFind your place\nto grow.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/learning-spaces-preview",
+      "width": 768,
+      "theme": "light",
+      "overflow": false,
+      "title": "Your campus.\nYour way to learn.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/pricing",
+      "width": 768,
+      "theme": "light",
+      "overflow": false,
+      "title": "Courses & Fees",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/architects",
+      "width": 768,
+      "theme": "light",
+      "overflow": false,
+      "title": "Meet our team.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/login",
+      "width": 768,
+      "theme": "light",
+      "overflow": false,
+      "title": "Welcome back.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "title": "Learn a language.\nFind your place\nto grow.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/learning-spaces-preview",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "title": "Your campus.\nYour way to learn.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/pricing",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "title": "Courses & Fees",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/architects",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "title": "Meet our team.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/login",
+      "width": 390,
+      "theme": "dark",
+      "overflow": false,
+      "title": "Welcome back.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "title": "Learn a language.\nFind your place\nto grow.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/learning-spaces-preview",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "title": "Your campus.\nYour way to learn.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/pricing",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "title": "Courses & Fees",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/architects",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "title": "Meet our team.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    },
+    {
+      "route": "/login",
+      "width": 390,
+      "theme": "light",
+      "overflow": false,
+      "title": "Welcome back.",
+      "canvas": 0,
+      "nav": [
+        "Home",
+        "My Classes",
+        "Learning Spaces",
+        "Courses & Fees",
+        "Our Team"
+      ],
+      "brokenImages": 0
+    }
+  ],
+  "menuOpen": true,
+  "menuEscape": true,
+  "avatarOpen": true,
+  "directLibrary": true
+}

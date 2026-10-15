@@ -1,0 +1,18 @@
+[
+  {
+    "width": 390,
+    "honestCatalog": true,
+    "escapeCloses": true,
+    "cameraToggle": true,
+    "seats": true,
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "honestCatalog": true,
+    "escapeCloses": true,
+    "cameraToggle": true,
+    "seats": true,
+    "overflow": false
+  }
+]

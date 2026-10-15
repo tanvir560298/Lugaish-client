@@ -1,0 +1,14 @@
+{
+  "files": [
+    "/assets/LoginPage-BT-c1SvF.js",
+    "/assets/firebase-BxlHQCO-.js"
+  ],
+  "identities": [
+    {
+      "file": "/assets/firebase-BxlHQCO-.js",
+      "projectId": "lugaish",
+      "authDomain": "lugaish.vercel.app"
+    }
+  ],
+  "privateCredentialsRead": false
+}

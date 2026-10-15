@@ -1,0 +1,29 @@
+{
+  "productionBuild": "passed",
+  "regression": {
+    "passed": 121,
+    "failed": 0,
+    "skipped": 0
+  },
+  "isolatedIntegration": {
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0
+  },
+  "responsiveRouteChecks": 30,
+  "studyJourneyWidths": [
+    390,
+    768,
+    1440
+  ],
+  "independentVoice": "synthetic microphone passed",
+  "productionDependencyAudit": {
+    "frontend": 0,
+    "backend": 0
+  },
+  "realGoogleProviderTested": false,
+  "productionDeploymentPerformed": false,
+  "permanentDeletionPerformed": false,
+  "activePublishedCourses": 0,
+  "archivedLessons": 56
+}

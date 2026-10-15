@@ -1,0 +1,65 @@
+[
+  {
+    "width": 390,
+    "english": {
+      "correctInstructions": true,
+      "noMisleadingReference": true,
+      "languageLabel": true,
+      "targetHeight": 49,
+      "overflow": false
+    },
+    "arabic": {
+      "language": "ar",
+      "direction": "auto",
+      "text": "اقرأ فقرة من ملاحظاتك بصوت واضح.",
+      "focusRetained": true,
+      "overflow": false
+    },
+    "reducedMotion": true,
+    "minimumTextContrast": 5.291001124089843,
+    "physicalDevice": false,
+    "screenReaderTested": false
+  },
+  {
+    "width": 768,
+    "english": {
+      "correctInstructions": true,
+      "noMisleadingReference": true,
+      "languageLabel": true,
+      "targetHeight": 49,
+      "overflow": false
+    },
+    "arabic": {
+      "language": "ar",
+      "direction": "auto",
+      "text": "اقرأ فقرة من ملاحظاتك بصوت واضح.",
+      "focusRetained": true,
+      "overflow": false
+    },
+    "reducedMotion": true,
+    "minimumTextContrast": 5.291001124089843,
+    "physicalDevice": false,
+    "screenReaderTested": false
+  },
+  {
+    "width": 1440,
+    "english": {
+      "correctInstructions": true,
+      "noMisleadingReference": true,
+      "languageLabel": true,
+      "targetHeight": 49,
+      "overflow": false
+    },
+    "arabic": {
+      "language": "ar",
+      "direction": "auto",
+      "text": "اقرأ فقرة من ملاحظاتك بصوت واضح.",
+      "focusRetained": true,
+      "overflow": false
+    },
+    "reducedMotion": true,
+    "minimumTextContrast": 5.291001124089843,
+    "physicalDevice": false,
+    "screenReaderTested": false
+  }
+]

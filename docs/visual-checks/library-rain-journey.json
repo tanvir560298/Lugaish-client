@@ -1,0 +1,21 @@
+{
+  "viewport": {
+    "study": true,
+    "ambience": true,
+    "width": 390,
+    "overflow": false
+  },
+  "volumeChanged": true,
+  "toolsAndCameraKeptPlayback": {
+    "contexts": 1,
+    "sources": 1,
+    "stops": 0,
+    "closed": 0
+  },
+  "afterPauseResumeAndRouteExit": {
+    "contexts": 1,
+    "sources": 2,
+    "stops": 2,
+    "closed": 1
+  }
+}

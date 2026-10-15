@@ -1,0 +1,74 @@
+[
+  {
+    "width": 1440,
+    "path": "/daily-lessons",
+    "emptyCatalogFixture": true,
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "path": "/review-mistakes",
+    "emptyCatalogFixture": true,
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "path": "/progress",
+    "emptyCatalogFixture": true,
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "path": "/speaking-practice",
+    "emptyCatalogFixture": true,
+    "overflow": false
+  },
+  {
+    "width": 768,
+    "path": "/daily-lessons",
+    "emptyCatalogFixture": true,
+    "overflow": false
+  },
+  {
+    "width": 768,
+    "path": "/review-mistakes",
+    "emptyCatalogFixture": true,
+    "overflow": false
+  },
+  {
+    "width": 768,
+    "path": "/progress",
+    "emptyCatalogFixture": true,
+    "overflow": false
+  },
+  {
+    "width": 768,
+    "path": "/speaking-practice",
+    "emptyCatalogFixture": true,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "path": "/daily-lessons",
+    "emptyCatalogFixture": true,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "path": "/review-mistakes",
+    "emptyCatalogFixture": true,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "path": "/progress",
+    "emptyCatalogFixture": true,
+    "overflow": false
+  },
+  {
+    "width": 390,
+    "path": "/speaking-practice",
+    "emptyCatalogFixture": true,
+    "overflow": false
+  }
+]

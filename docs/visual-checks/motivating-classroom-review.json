@@ -1,0 +1,42 @@
+{
+  "rows": [
+    {
+      "width": 1440,
+      "overflow": false,
+      "title": "Ready for your next session?",
+      "canvas": true,
+      "error": "",
+      "bottom": 882,
+      "height": 900
+    },
+    {
+      "width": 768,
+      "overflow": false,
+      "title": "Ready for your next session?",
+      "canvas": true,
+      "error": "",
+      "bottom": 882,
+      "height": 900
+    },
+    {
+      "width": 390,
+      "overflow": false,
+      "title": "Ready for your next session?",
+      "canvas": true,
+      "error": "",
+      "bottom": 834,
+      "height": 844
+    }
+  ],
+  "media": {
+    "state": {
+      "status": "playing",
+      "ready": true,
+      "error": "",
+      "nativeOnly": true
+    },
+    "video": true,
+    "playing": true,
+    "cors": null
+  }
+}

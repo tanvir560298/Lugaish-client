@@ -1,0 +1,65 @@
+{
+  "syntheticFailures": true,
+  "rows": [
+    {
+      "check": "Public Home fits 320",
+      "pass": true
+    },
+    {
+      "check": "Public Home fits 390",
+      "pass": true
+    },
+    {
+      "check": "Public Home fits 768",
+      "pass": true
+    },
+    {
+      "check": "Public Home fits 1440",
+      "pass": true
+    },
+    {
+      "check": "Signed-out route stays protected /daily-lessons",
+      "pass": true
+    },
+    {
+      "check": "Signed-out route stays protected /classroom",
+      "pass": true
+    },
+    {
+      "check": "Signed-out route stays protected /study-room",
+      "pass": true
+    },
+    {
+      "check": "Signed-out route stays protected /speaking-practice",
+      "pass": true
+    },
+    {
+      "check": "Signed-out route stays protected /quiz",
+      "pass": true
+    },
+    {
+      "check": "Injected microphone denial has honest error and retry",
+      "pass": true
+    },
+    {
+      "check": "Native download preserves unsaved multilingual notes",
+      "pass": true
+    },
+    {
+      "check": "Retry clears failure only after saving current work",
+      "pass": true
+    },
+    {
+      "check": "Injected rain failure shows recovery instead of playing state",
+      "pass": true
+    },
+    {
+      "check": "Mobile ambience popup remains on screen",
+      "pass": true
+    },
+    {
+      "check": "Unavailable WebGL recovers to usable 2D library",
+      "pass": true
+    }
+  ]
+}

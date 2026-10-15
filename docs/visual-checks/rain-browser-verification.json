@@ -1,0 +1,14 @@
+{
+  "states": [
+    "loading",
+    "playing",
+    "paused",
+    "loading",
+    "playing"
+  ],
+  "looping": true,
+  "duration": 28,
+  "sources": 2,
+  "duplicates": false,
+  "closed": true
+}

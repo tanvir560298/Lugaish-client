@@ -1,0 +1,12 @@
+{
+  "isolatedEmptyCatalog": true,
+  "progressCorrect": true,
+  "reviewDiscoverable": true,
+  "accountEscape": true,
+  "mobileMenuClear": true,
+  "mobileEscape": true,
+  "noFalseUpload": true,
+  "reviewReturn": true,
+  "microphoneFailureClear": true,
+  "reducedMotion": true
+}

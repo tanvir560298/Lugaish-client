@@ -1,0 +1,43 @@
+{
+  "phase": 13,
+  "publicDeployment": false,
+  "releaseRecommendation": "NO_GO",
+  "unitTests": {
+    "pass": 151,
+    "fail": 0,
+    "skipped": 0
+  },
+  "isolatedIntegrationTests": {
+    "pass": 8,
+    "fail": 0,
+    "skipped": 0
+  },
+  "productionBuild": "PASS",
+  "syntaxLint": "PASS",
+  "responsiveRouteChecks": 33,
+  "physicalDevicesTested": false,
+  "googleProviderFlow": "BLOCKED",
+  "authorizedLecturePlayback": "BLOCKED",
+  "hostedStaging": "NOT_DEPLOYED",
+  "frontendProductionAuditFindings": 0,
+  "backendProductionAuditFindings": 0,
+  "frontendFullAudit": {
+    "high": 6,
+    "moderate": 3,
+    "total": 9
+  },
+  "localApi": {
+    "readyz": 200,
+    "activeCourses": 0,
+    "unauthenticatedLessons": 401
+  },
+  "releaseReceiptFixture": "PASS_NOT_REAL_CONFIGURATION",
+  "dirtyTreeReleaseGuard": "PASS_REJECTED",
+  "reviewArtifactDeployable": false,
+  "reviewArtifactChecksums": "PASS",
+  "productionTemplate": "PASS_REJECTED_PLACEHOLDERS",
+  "humanBetaParticipants": 0,
+  "phase12FeatureJourneys": "PRIOR_EVIDENCE_NOT_RERUN",
+  "productionRollback": "NOT_TESTED",
+  "productionMonitoring": "NOT_TESTED"
+}

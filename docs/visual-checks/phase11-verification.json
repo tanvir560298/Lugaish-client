@@ -1,0 +1,39 @@
+{
+  "unitRegression": {
+    "passed": 147,
+    "failed": 0,
+    "skipped": 0
+  },
+  "isolatedIntegration": {
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0
+  },
+  "operationalCorsRetest": "PASS",
+  "syntaxLint": "PASS",
+  "productionBuild": "PASS",
+  "renderedRouteViewportChecks": 33,
+  "cameraViewportChecks": 3,
+  "studyPersistence": "PASS",
+  "syntheticRecording": "PASS",
+  "rainDecodeLoopVolumeCleanup": "PASS",
+  "recoveryFailures": "PASS",
+  "nativeBsonRestoreIncludingIndexes": "PASS",
+  "activePublishedCatalog": 0,
+  "productionDependencyFindings": {
+    "frontend": 0,
+    "backend": 0
+  },
+  "frontendDevelopmentFindings": {
+    "high": 6,
+    "moderate": 3
+  },
+  "hostedStaging": "NOT DEPLOYED",
+  "realGoogleProvider": "BLOCKED",
+  "authenticatedStagingVideo": "BLOCKED",
+  "dockerImage": "NOT TESTED",
+  "remoteGitHubWorkflows": "NOT TESTED",
+  "physicalDevice": "NOT TESTED",
+  "liveAlerts": "NOT CONFIGURED",
+  "permanentStudentDataDeletion": false
+}

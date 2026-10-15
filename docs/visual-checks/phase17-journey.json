@@ -1,0 +1,30 @@
+{
+  "fixture": true,
+  "viewports": [
+    {
+      "width": 1440,
+      "height": 900,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "height": 900,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "overflow": false
+    }
+  ],
+  "noFakeCharts": true,
+  "initialVsRepeat": true,
+  "goalNotPremature": true,
+  "goalVerified": true,
+  "reviewImprovement": true,
+  "keyboardFilter": true,
+  "errorShown": true,
+  "errorRecovered": true,
+  "savedProgress": true,
+  "unauthorizedRedirect": true
+}

@@ -1,0 +1,355 @@
+{
+  "layouts": [
+    {
+      "width": 360,
+      "route": "/",
+      "overflow": false,
+      "h1": "Learn with purpose.\nGrow together.",
+      "buttons": [
+        "View access & fees",
+        "Explore Courses",
+        "Explore Learning Spaces",
+        "Courses & Fees",
+        "Explore English",
+        "Explore Arabic",
+        "Explore Learning Spaces",
+        "English Prep"
+      ],
+      "errors": false
+    },
+    {
+      "width": 360,
+      "route": "/pricing",
+      "overflow": false,
+      "h1": "Courses & Fees",
+      "buttons": [
+        "Get Started Free",
+        "Not available yet",
+        "Go to My Classes"
+      ],
+      "errors": false
+    },
+    {
+      "width": 360,
+      "route": "/architects",
+      "overflow": false,
+      "h1": "Meet our team.",
+      "buttons": [
+        "ALL",
+        "INSTRUCTION",
+        "TECHNOLOGY",
+        "CREATIVE",
+        "INTERNS"
+      ],
+      "errors": false
+    },
+    {
+      "width": 360,
+      "route": "/login",
+      "overflow": false,
+      "h1": "Continue your ascent.",
+      "buttons": [
+        "CONTINUE WITH GOOGLE"
+      ],
+      "errors": false
+    },
+    {
+      "width": 360,
+      "route": "/learning-spaces",
+      "overflow": false,
+      "h1": "Lugaish University\nLearn. Connect. Grow.",
+      "buttons": [
+        "My Avatar\nAmina",
+        "Enter Classroom\nLessons, teachers & your seat",
+        "Enter Study Room\nYour desk, your friends & shared tables",
+        "Explore in 3D",
+        "Classroom",
+        "Study Room",
+        "Try the campus without signing in →"
+      ],
+      "errors": false
+    },
+    {
+      "width": 390,
+      "route": "/",
+      "overflow": false,
+      "h1": "Learn with purpose.\nGrow together.",
+      "buttons": [
+        "View access & fees",
+        "Explore Courses",
+        "Explore Learning Spaces",
+        "Courses & Fees",
+        "Explore English",
+        "Explore Arabic",
+        "Explore Learning Spaces",
+        "English Prep"
+      ],
+      "errors": false
+    },
+    {
+      "width": 390,
+      "route": "/pricing",
+      "overflow": false,
+      "h1": "Courses & Fees",
+      "buttons": [
+        "Get Started Free",
+        "Not available yet",
+        "Go to My Classes"
+      ],
+      "errors": false
+    },
+    {
+      "width": 390,
+      "route": "/architects",
+      "overflow": false,
+      "h1": "Meet our team.",
+      "buttons": [
+        "ALL",
+        "INSTRUCTION",
+        "TECHNOLOGY",
+        "CREATIVE",
+        "INTERNS"
+      ],
+      "errors": false
+    },
+    {
+      "width": 390,
+      "route": "/login",
+      "overflow": false,
+      "h1": "Continue your ascent.",
+      "buttons": [
+        "CONTINUE WITH GOOGLE"
+      ],
+      "errors": false
+    },
+    {
+      "width": 390,
+      "route": "/learning-spaces",
+      "overflow": false,
+      "h1": "Lugaish University\nLearn. Connect. Grow.",
+      "buttons": [
+        "My Avatar\nAmina",
+        "Enter Classroom\nLessons, teachers & your seat",
+        "Enter Study Room\nYour desk, your friends & shared tables",
+        "Explore in 3D",
+        "Classroom",
+        "Study Room",
+        "Try the campus without signing in →"
+      ],
+      "errors": false
+    },
+    {
+      "width": 768,
+      "route": "/",
+      "overflow": false,
+      "h1": "Learn with purpose.\nGrow together.",
+      "buttons": [
+        "View access & fees",
+        "Explore Courses",
+        "Explore Learning Spaces",
+        "Courses & Fees",
+        "Explore English",
+        "Explore Arabic",
+        "Explore Learning Spaces",
+        "English Prep"
+      ],
+      "errors": false
+    },
+    {
+      "width": 768,
+      "route": "/pricing",
+      "overflow": false,
+      "h1": "Courses & Fees",
+      "buttons": [
+        "Get Started Free",
+        "Not available yet",
+        "Go to My Classes"
+      ],
+      "errors": false
+    },
+    {
+      "width": 768,
+      "route": "/architects",
+      "overflow": false,
+      "h1": "Meet our team.",
+      "buttons": [
+        "ALL",
+        "INSTRUCTION",
+        "TECHNOLOGY",
+        "CREATIVE",
+        "INTERNS"
+      ],
+      "errors": false
+    },
+    {
+      "width": 768,
+      "route": "/login",
+      "overflow": false,
+      "h1": "Continue your ascent.",
+      "buttons": [
+        "CONTINUE WITH GOOGLE"
+      ],
+      "errors": false
+    },
+    {
+      "width": 768,
+      "route": "/learning-spaces",
+      "overflow": false,
+      "h1": "Lugaish University\nLearn. Connect. Grow.",
+      "buttons": [
+        "My Avatar\nAmina",
+        "Enter Classroom\nLessons, teachers & your seat",
+        "Enter Study Room\nYour desk, your friends & shared tables",
+        "Use simple view",
+        "Classroom ↗",
+        "Study Room ↗",
+        "Try the campus without signing in →"
+      ],
+      "errors": false
+    },
+    {
+      "width": 1280,
+      "route": "/",
+      "overflow": false,
+      "h1": "Learn with purpose.\nGrow together.",
+      "buttons": [
+        "View access & fees",
+        "Explore Courses",
+        "Explore Learning Spaces",
+        "Courses & Fees",
+        "Explore English",
+        "Explore Arabic",
+        "Explore Learning Spaces",
+        "English Prep"
+      ],
+      "errors": false
+    },
+    {
+      "width": 1280,
+      "route": "/pricing",
+      "overflow": false,
+      "h1": "Courses & Fees",
+      "buttons": [
+        "Get Started Free",
+        "Not available yet",
+        "Go to My Classes"
+      ],
+      "errors": false
+    },
+    {
+      "width": 1280,
+      "route": "/architects",
+      "overflow": false,
+      "h1": "Meet our team.",
+      "buttons": [
+        "ALL",
+        "INSTRUCTION",
+        "TECHNOLOGY",
+        "CREATIVE",
+        "INTERNS"
+      ],
+      "errors": false
+    },
+    {
+      "width": 1280,
+      "route": "/login",
+      "overflow": false,
+      "h1": "Continue your ascent.",
+      "buttons": [
+        "CONTINUE WITH GOOGLE"
+      ],
+      "errors": false
+    },
+    {
+      "width": 1280,
+      "route": "/learning-spaces",
+      "overflow": false,
+      "h1": "Lugaish University\nLearn. Connect. Grow.",
+      "buttons": [
+        "My Avatar\nAmina",
+        "Enter Classroom\nLessons, teachers & your seat",
+        "Enter Study Room\nYour desk, your friends & shared tables",
+        "Use simple view",
+        "Classroom ↗",
+        "Study Room ↗",
+        "Try the campus without signing in →"
+      ],
+      "errors": false
+    },
+    {
+      "width": 1440,
+      "route": "/",
+      "overflow": false,
+      "h1": "Learn with purpose.\nGrow together.",
+      "buttons": [
+        "View access & fees",
+        "Explore Courses",
+        "Explore Learning Spaces",
+        "Courses & Fees",
+        "Explore English",
+        "Explore Arabic",
+        "Explore Learning Spaces",
+        "English Prep"
+      ],
+      "errors": false
+    },
+    {
+      "width": 1440,
+      "route": "/pricing",
+      "overflow": false,
+      "h1": "Courses & Fees",
+      "buttons": [
+        "Get Started Free",
+        "Not available yet",
+        "Go to My Classes"
+      ],
+      "errors": false
+    },
+    {
+      "width": 1440,
+      "route": "/architects",
+      "overflow": false,
+      "h1": "Meet our team.",
+      "buttons": [
+        "ALL",
+        "INSTRUCTION",
+        "TECHNOLOGY",
+        "CREATIVE",
+        "INTERNS"
+      ],
+      "errors": false
+    },
+    {
+      "width": 1440,
+      "route": "/login",
+      "overflow": false,
+      "h1": "Continue your ascent.",
+      "buttons": [
+        "CONTINUE WITH GOOGLE"
+      ],
+      "errors": false
+    },
+    {
+      "width": 1440,
+      "route": "/learning-spaces",
+      "overflow": false,
+      "h1": "Lugaish University\nLearn. Connect. Grow.",
+      "buttons": [
+        "My Avatar\nAmina",
+        "Enter Classroom\nLessons, teachers & your seat",
+        "Enter Study Room\nYour desk, your friends & shared tables",
+        "Use simple view",
+        "Classroom ↗",
+        "Study Room ↗",
+        "Try the campus without signing in →"
+      ],
+      "errors": false
+    }
+  ],
+  "mobileMenu": {
+    "opened": "true",
+    "escaped": true,
+    "navigation": true
+  },
+  "theme": "dark"
+}

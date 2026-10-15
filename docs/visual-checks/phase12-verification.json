@@ -1,0 +1,37 @@
+{
+  "phase": 12,
+  "status": "BETA_PREPARATION_ONLY",
+  "humanParticipants": 0,
+  "publicDeployments": 0,
+  "productionBuild": "PASS",
+  "syntaxLint": "PASS",
+  "unitTests": {
+    "pass": 147,
+    "fail": 0,
+    "skipped": 0
+  },
+  "isolatedIntegrationTests": {
+    "pass": 8,
+    "fail": 0,
+    "skipped": 0
+  },
+  "renderedRouteViewportChecks": 33,
+  "viewports": [
+    "390x844",
+    "768px",
+    "1440x900"
+  ],
+  "personalSpeakingUxChecks": 3,
+  "minimumStudioParagraphContrast": 5.291001124089843,
+  "syntheticMicrophone": true,
+  "physicalDeviceTesting": false,
+  "apiReadiness": 200,
+  "realPublishedCourses": 0,
+  "unauthenticatedLessonsStatus": 401,
+  "humanFeedback": null,
+  "longSessionBenchmark": "NOT_TESTED",
+  "googleProviderFlow": "BLOCKED",
+  "authorizedLecturePlayback": "BLOCKED",
+  "hostedStaging": "NOT_DEPLOYED",
+  "releaseRecommendation": "NO_GO"
+}

@@ -1,0 +1,38 @@
+{
+  "readOnly": true,
+  "canonical": "https://lugaish.vercel.app",
+  "status": 200,
+  "https": true,
+  "bundles": [
+    {
+      "path": "/assets/index-DOE-hGxb.js",
+      "apiUrls": [
+        "https://lugaish-server.onrender.com/api"
+      ]
+    }
+  ],
+  "backendOrigin": "https://lugaish-server.onrender.com",
+  "endpoints": [
+    {
+      "path": "/health",
+      "status": 200,
+      "cache": null,
+      "health": {
+        "status": "Backend running",
+        "database": "connected"
+      }
+    },
+    {
+      "path": "/readyz",
+      "status": 404,
+      "cache": null
+    },
+    {
+      "path": "/api/courses",
+      "status": 200,
+      "cache": null,
+      "courses": 2
+    }
+  ],
+  "releaseDeployed": false
+}
