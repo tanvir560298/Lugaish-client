@@ -14,3 +14,6 @@
 
 :root[data-theme=light] .site-header.studio-header{--campus-text:#182c37;--campus-secondary:#425b60;--campus-muted:#526760;--campus-link:#246c59}
 :root[data-theme=light] .studio-header .academic-brand{color:#182c37}
+:root[data-theme=light] .site-header.studio-header .academic-brand>span{color:#182c37!important}
+:root[data-theme=light] .site-header.studio-header .academic-nav .header-nav-link,:root[data-theme=light] .site-header.studio-header .header-signin{color:#425b60!important}
+:root[data-theme=light] .site-header.studio-header .academic-nav .header-nav-link[aria-current=page],:root[data-theme=light] .site-header.studio-header .header-control{color:#182c37!important}
