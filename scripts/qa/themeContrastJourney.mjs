@@ -37,16 +37,18 @@ try {
     }
     await visit(base + '/tanu');
     await setTheme(theme);
-    for (const tab of ['Tutor Chat', 'Code Mentor', 'Practice Quizzes', 'My Memory & Goals']) {
-      await evaluate(`Array.from(document.querySelectorAll('button')).find(button => button.textContent.trim() === ${JSON.stringify(tab)}).click()`);
-      await pause(350);
-      await check(`Tanu / ${tab}`, theme, 1280);
-    }
+    assert.equal(await evaluate("!!document.querySelector('.tanu-coming-card')"), true);
+    assert.equal(await evaluate("document.querySelectorAll('textarea').length"), 0, 'AI chat is unavailable');
     await screenshot(`tanu-${theme}`);
     await evaluate("document.querySelector('[title=\"Open Tanu AI Companion\"]').click()");
     await pause(350);
-    await check('Tanu drawer', theme, 1280);
+    assert.equal(await evaluate("document.querySelector('#tanu-coming-dialog').open"), true);
+    await check('Tanu coming-soon dialog', theme, 1280);
     await screenshot(`drawer-${theme}`);
+    await send('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape' });
+    await pause(200);
+    assert.equal(await evaluate("document.querySelector('#tanu-coming-dialog').open"), false);
+    assert.equal(await evaluate("document.activeElement.title"), 'Open Tanu AI Companion');
     for (const path of ['/', '/learn', '/tanu', '/login']) {
       await visit(base + path, 390);
       await setTheme(theme);

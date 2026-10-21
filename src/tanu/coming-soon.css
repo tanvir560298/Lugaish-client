@@ -1,0 +1,12 @@
+.tanu-coming-dialog,.tanu-coming-card{color:var(--campus-text);background:var(--campus-surface);border:1px solid var(--campus-border);border-radius:22px;padding:42px 34px 30px;box-shadow:0 20px 80px #0003;text-align:center;overflow-wrap:anywhere}
+.tanu-coming-dialog{position:fixed;inset:0;margin:auto;width:min(510px,calc(100vw - 32px));max-height:calc(100dvh - 40px);overflow-y:auto}
+.tanu-coming-dialog::backdrop{background:#07111bb3;backdrop-filter:blur(5px)}
+.tanu-coming-close{position:absolute;top:12px;right:12px;display:grid;place-items:center;min-width:44px;min-height:44px;border:1px solid var(--campus-border);border-radius:12px;color:var(--campus-secondary);background:var(--campus-surface-raised);cursor:pointer}
+.tanu-coming-avatar{display:grid;place-items:center;width:72px;height:72px;margin:0 auto 23px;border:1px solid var(--campus-border);border-radius:22px;color:var(--campus-link);background:var(--campus-surface-raised)}
+.tanu-coming-message .tanu-coming-eyebrow{font-size:9px;letter-spacing:.16em;font-weight:650;color:var(--campus-link);margin-bottom:14px}
+.tanu-coming-message :is(h1,h2),:root[data-theme=light] .tanu-coming-message :is(h1,h2){font-family:var(--campus-font);font-size:32px;line-height:1.5;letter-spacing:-.02em;color:var(--campus-text);font-weight:700;margin:0 0 17px}
+.tanu-coming-copy p{font-family:var(--campus-font);font-size:15px;line-height:1.95;color:var(--campus-secondary);margin:0 0 13px}
+.tanu-coming-message .tanu-coming-thanks{font-size:11px;line-height:1.7;color:var(--campus-muted);margin-top:23px;padding-top:18px;border-top:1px solid var(--campus-border)}
+.tanu-coming-dialog .tanu-coming-dismiss{display:flex;align-items:center;justify-content:center;gap:15px;min-height:46px;width:100%;margin-top:25px;padding:12px;border-radius:10px;background:var(--campus-action);color:var(--campus-on-action);border:1px solid var(--campus-action);font-size:13px;cursor:pointer}
+.tanu-coming-page{max-width:620px;margin:45px auto 65px;padding:0 20px}.tanu-coming-card{padding:45px 35px 32px}.tanu-coming-return{display:inline-flex;align-items:center;gap:10px;margin-top:25px;padding:12px 18px;font-size:12px}
+@media(max-width:560px){.tanu-coming-dialog{padding:45px 24px 25px}.tanu-coming-copy p{font-size:14px}.tanu-coming-message :is(h1,h2){font-size:28px}.tanu-coming-page{margin:22px auto 35px;padding:0 12px}.tanu-coming-card{padding:30px 23px}.tanu-coming-avatar{width:62px;height:62px;border-radius:18px}}

@@ -4,6 +4,8 @@ import { getAuthToken } from "../api/client.js";
 import { useAppContext } from "../state/AppContext.jsx";
 import {parseGuidedRequest} from '../tanu/session.js';
 
+import { TANU_AI_AVAILABLE } from '../tanu/availability.js';
+
 const NovyraContext = createContext(null);
 
 export function NovyraProvider({ children }) {
@@ -11,7 +13,7 @@ export function NovyraProvider({ children }) {
   // Remount private context on login, logout and account changes. Late requests
   // belong to an unmounted provider and cannot expose the previous student's state.
   const identity = state.isLoggedIn ? `${state.userEmail}:${getAuthToken() || ''}` : 'anonymous';
-  return <NovyraSessionProvider key={identity} authenticated={state.isLoggedIn}>{children}</NovyraSessionProvider>;
+  return <NovyraSessionProvider key={identity} authenticated={state.isLoggedIn && TANU_AI_AVAILABLE}>{children}</NovyraSessionProvider>;
 }
 
 function NovyraSessionProvider({ children, authenticated }) {

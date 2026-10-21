@@ -17,7 +17,7 @@ export function Layout({ children }) {
   const previewing = isStudentPreview(state);
   const constructionSubject = /^\/(learning-spaces|study-room)(-preview)?$/.test(pathname)
     ? 'আমাদের learning campus-এর design ও অভিজ্ঞতা'
-    : /^\/(tanu|novyra)$/.test(pathname) ? 'Tanu AI-এর নতুন feature ও design' : null;
+    : null;
   if(isClassroom)return <main id="main-content" tabIndex={-1} className="classroom-route-shell">{children}</main>;
   return (
     <div className={`main-container bg-bg text-slate-100 ${isStudyRoom ? 'has-study-library' : ''}`}>

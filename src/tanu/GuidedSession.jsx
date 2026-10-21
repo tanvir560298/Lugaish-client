@@ -6,12 +6,14 @@ import {lessons} from '../learn/content.js';
 import {htmlVideos} from '../learn/htmlContent.js';
 import {makeSession,tickSession,advanceSession,encouragement,restoreSession,sessionRoute} from './session.js';
 import './tanu.css';
+import { TANU_AI_AVAILABLE } from './availability.js';
 const SessionContext=createContext(null),PlaybackContext=createContext(null);
 export const useTanuPlayback=()=>useContext(PlaybackContext);
 const clock=value=>`${Math.floor(value/60)}:${String(Math.floor(value%60)).padStart(2,'0')}`;
 const lessonRoute=sessionRoute;
 export function TanuSessionProvider({children}) {
   const {state}=useAppContext(); const owner=state.isLoggedIn?state.userEmail:'guest';
+  if (!TANU_AI_AVAILABLE) return children;
   return <SessionOwner key={owner} owner={owner}>{children}</SessionOwner>;
 }
 function SessionOwner({children,owner}) {

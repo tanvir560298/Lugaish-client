@@ -1,4 +1,6 @@
 import {TanuSessionProvider,TanuCoach} from './tanu/GuidedSession.jsx';
+import { TanuComingSoonPage } from './tanu/TanuComingSoon.jsx';
+import { TANU_AI_AVAILABLE } from './tanu/availability.js';
 import {InformationPage} from './pages/InformationPage.jsx';
 
 import { CatalogGuard } from './courses/Catalog.jsx';
@@ -198,8 +200,8 @@ export default function App() {
               <Route path='/learn/web-development/html/:videoId' element={<HtmlCoursePage />} />
               <Route path='/learn/java' element={<Navigate to="/learn" replace />} />
               <Route path='/learn/java/:lessonId' element={<Navigate to="/learn" replace />} />
-              <Route path='/tanu' element={<NovyraWorkspace />} />
-              <Route path='/novyra' element={<NovyraWorkspace />} />
+              <Route path='/tanu' element={TANU_AI_AVAILABLE ? <NovyraWorkspace /> : <TanuComingSoonPage />} />
+              <Route path='/novyra' element={TANU_AI_AVAILABLE ? <NovyraWorkspace /> : <TanuComingSoonPage />} />
               <Route path='/pricing' element={<Navigate to="/learn" replace />} />
               <Route path='/course/:language' element={<Navigate to="/learn" replace />} />
               <Route path='/learning-spaces' element={<LearningSpacesPage />} />
