@@ -3,19 +3,19 @@ import { Sparkles, Brain, MessageSquare, Heart, Compass } from "lucide-react";
 export function NovyraAvatarBadge({ state = "idle", size = "md", showLabel = true }) {
   const configs = {
     idle: {
-      color: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400",
+      color: "bg-emerald-500/10 text-emerald-700 border-emerald-500/20 dark:bg-emerald-500/20 dark:text-emerald-400",
       dot: "bg-emerald-500",
       icon: Compass,
       label: "Idle",
     },
     listening: {
-      color: "bg-sky-500/10 text-sky-600 border-sky-500/20 dark:bg-sky-500/20 dark:text-sky-400",
+      color: "bg-sky-500/10 text-sky-700 border-sky-500/20 dark:bg-sky-500/20 dark:text-sky-400",
       dot: "bg-sky-500 animate-pulse",
       icon: MessageSquare,
       label: "Listening...",
     },
     thinking: {
-      color: "bg-amber-500/10 text-amber-600 border-amber-500/20 dark:bg-amber-500/20 dark:text-amber-400",
+      color: "bg-amber-500/10 text-amber-800 border-amber-500/20 dark:bg-amber-500/20 dark:text-amber-400",
       dot: "bg-amber-500 animate-ping",
       icon: Brain,
       label: "Thinking...",
@@ -27,7 +27,7 @@ export function NovyraAvatarBadge({ state = "idle", size = "md", showLabel = tru
       label: "Responding...",
     },
     encouraging: {
-      color: "bg-rose-500/10 text-rose-600 border-rose-500/20 dark:bg-rose-500/20 dark:text-rose-400",
+      color: "bg-rose-500/10 text-rose-700 border-rose-500/20 dark:bg-rose-500/20 dark:text-rose-400",
       dot: "bg-rose-500 animate-bounce",
       icon: Heart,
       label: "Keep it up!",

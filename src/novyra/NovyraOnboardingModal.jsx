@@ -63,7 +63,7 @@ export function NovyraOnboardingModal() {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-indigo-600 text-white shadow-md shadow-indigo-500/20">
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl on-solid bg-indigo-600 text-white shadow-md shadow-indigo-500/20">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
@@ -88,7 +88,7 @@ export function NovyraOnboardingModal() {
               <span
                 key={s}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
-                  s === step ? "w-6 bg-indigo-600" : s < step ? "w-3 bg-indigo-400" : "w-3 bg-slate-300 dark:bg-slate-700"
+                  s === step ? "w-6 on-solid bg-indigo-600" : s < step ? "w-3 bg-indigo-400" : "w-3 bg-slate-300 dark:bg-slate-700"
                 }`}
               />
             ))}
@@ -124,7 +124,7 @@ export function NovyraOnboardingModal() {
                       <div
                         className={`p-2 rounded-lg ${
                           isSelected
-                            ? "bg-indigo-600 text-white"
+                            ? "on-solid bg-indigo-600 text-white"
                             : "bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
                         }`}
                       >
@@ -176,7 +176,7 @@ export function NovyraOnboardingModal() {
                       <div
                         className={`w-5 h-5 rounded-full border flex items-center justify-center ${
                           isSelected
-                            ? "border-indigo-600 bg-indigo-600 text-white"
+                            ? "border-indigo-600 on-solid bg-indigo-600 text-white"
                             : "border-slate-300 dark:border-slate-700"
                         }`}
                       >
@@ -238,7 +238,7 @@ export function NovyraOnboardingModal() {
                       onClick={() => setDailyMinutes(mins)}
                       className={`px-4 py-2 rounded-xl text-xs font-semibold border transition-all ${
                         dailyMinutes === mins
-                          ? "bg-indigo-600 border-indigo-600 text-white shadow-sm"
+                          ? "on-solid bg-indigo-600 border-indigo-600 text-white shadow-sm"
                           : "border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:border-slate-300"
                       }`}
                     >
@@ -265,7 +265,7 @@ export function NovyraOnboardingModal() {
                       onClick={() => setExplanationLanguage(lang.id)}
                       className={`py-2 px-3 rounded-xl text-xs font-semibold border text-center transition-all ${
                         explanationLanguage === lang.id
-                          ? "bg-indigo-600 border-indigo-600 text-white"
+                          ? "on-solid bg-indigo-600 border-indigo-600 text-white"
                           : "border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300"
                       }`}
                     >
@@ -296,7 +296,7 @@ export function NovyraOnboardingModal() {
             <button
               type="button"
               onClick={() => setStep((s) => s + 1)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-600/20 transition-all hover:translate-x-0.5"
+              className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white on-solid bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-600/20 transition-all hover:translate-x-0.5"
             >
               Next <ArrowRight className="w-4 h-4" />
             </button>
@@ -305,7 +305,7 @@ export function NovyraOnboardingModal() {
               type="button"
               disabled={isSubmitting}
               onClick={handleFinish}
-              className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-600/20 transition-all disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white on-solid bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-600/20 transition-all disabled:opacity-50"
             >
               {isSubmitting ? "Setting Up..." : "Launch My Companion"} <Sparkles className="w-4 h-4" />
             </button>

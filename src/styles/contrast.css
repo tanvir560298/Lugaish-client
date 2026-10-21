@@ -1,0 +1,33 @@
+/* Foreground belongs to the surface, even when legacy utility rules use !important. */
+.on-solid,
+:root[data-theme='light'] .on-solid {
+  color: #fff !important;
+}
+.on-solid :is(span, p, strong, small, svg),
+:root[data-theme='light'] .on-solid :is(span, p, strong, small, svg) {
+  color: inherit !important;
+}
+.on-solid.bg-indigo-600:hover { background-color: #4338ca; }
+.on-solid.bg-emerald-500 { background-color: #047857; }
+
+/* A pale placeholder still has to be readable on a white field. */
+:root[data-theme='light'] :is(input, textarea)::placeholder {
+  color: var(--campus-muted) !important;
+  opacity: 1;
+}
+
+/* These are labels on the campus page rather than muted scene decoration. */
+.uni-page .ls-eyebrow { color: var(--campus-link); }
+
+/* Muted links keep the same foreground when hovered or keyboard focused. */
+.campus-button:not(.campus-button-primary):not(.campus-button-secondary) {
+  color: var(--campus-text);
+}
+
+:root[data-theme='light'] .platform-auth .google-login-shell,
+:root[data-theme='light'] .platform-auth .google-login-shell :is(span, svg) {
+  color: var(--campus-on-action) !important;
+}
+:root[data-theme='light'] .team-page nav button[aria-pressed='true'] {
+  color: var(--campus-on-action) !important;
+}

@@ -34,3 +34,17 @@ RUN_QUIZ_INTEGRATION=1 RUN_PAID_ACCESS_TEST=1 RUN_STUDY_INTEGRATION=1 RUN_PUBLIC
 ```
 
 Stop only the Chrome process you started. Provider authentication, enrolled frontend lessons, physical microphone, external media and human participant sessions are separate launch checks; these scripts do not substitute for them.
+
+Theme and text contrast checks (use the same isolated Chrome profile):
+
+```sh
+node scripts/qa/themeContrastJourney.mjs
+```
+
+This checks 17 public routes in both themes, Tanu workspace tabs and drawer,
+mobile navigation, input placeholders, opposite operating-system colour preferences,
+and saved theme restoration. Ordinary text needs 4.5:1 and large text 3:1 against
+composited CSS background colours. Disabled controls, decorative text and canvas
+content are excluded. Gradient/image backgrounds and authenticated course screens
+still require visual review. Results go to `docs/visual-checks/theme-contrast.json`;
+PNG screenshots stay local.

@@ -1,0 +1,326 @@
+[
+  {
+    "label": "/",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/learn",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/learn/java",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/learn/java/first-program",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/learn/web-development/html",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/pricing",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/login",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/learning-spaces",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/tanu",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/architects",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/support",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/privacy",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/terms",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/upcoming/c-programming",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/upcoming/arabic-learning",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/upcoming/video-editing",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/upcoming/english-masterclass",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "Tanu / Tutor Chat",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "Tanu / Code Mentor",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "Tanu / Practice Quizzes",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "Tanu / My Memory & Goals",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "Tanu drawer",
+    "theme": "dark",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/",
+    "theme": "dark",
+    "width": 390,
+    "failures": []
+  },
+  {
+    "label": "Mobile navigation",
+    "theme": "dark",
+    "width": 390,
+    "failures": []
+  },
+  {
+    "label": "/learn",
+    "theme": "dark",
+    "width": 390,
+    "failures": []
+  },
+  {
+    "label": "/tanu",
+    "theme": "dark",
+    "width": 390,
+    "failures": []
+  },
+  {
+    "label": "/login",
+    "theme": "dark",
+    "width": 390,
+    "failures": []
+  },
+  {
+    "label": "/",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/learn",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/learn/java",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/learn/java/first-program",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/learn/web-development/html",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/pricing",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/login",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/learning-spaces",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/tanu",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/architects",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/support",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/privacy",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/terms",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/upcoming/c-programming",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/upcoming/arabic-learning",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/upcoming/video-editing",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/upcoming/english-masterclass",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "Tanu / Tutor Chat",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "Tanu / Code Mentor",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "Tanu / Practice Quizzes",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "Tanu / My Memory & Goals",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "Tanu drawer",
+    "theme": "light",
+    "width": 1280,
+    "failures": []
+  },
+  {
+    "label": "/",
+    "theme": "light",
+    "width": 390,
+    "failures": []
+  },
+  {
+    "label": "Mobile navigation",
+    "theme": "light",
+    "width": 390,
+    "failures": []
+  },
+  {
+    "label": "/learn",
+    "theme": "light",
+    "width": 390,
+    "failures": []
+  },
+  {
+    "label": "/tanu",
+    "theme": "light",
+    "width": 390,
+    "failures": []
+  },
+  {
+    "label": "/login",
+    "theme": "light",
+    "width": 390,
+    "failures": []
+  }
+]

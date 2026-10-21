@@ -190,7 +190,7 @@ export function CodeMentorView() {
         <button
           type="submit"
           disabled={isAnalyzing || !code.trim()}
-          className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 transition-all disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm text-white on-solid bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 transition-all disabled:opacity-50"
         >
           {isAnalyzing ? (
             <>

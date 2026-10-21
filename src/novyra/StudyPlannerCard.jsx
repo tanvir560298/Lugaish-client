@@ -132,7 +132,7 @@ export function StudyPlannerCard() {
           <button
             type="submit"
             disabled={isGenerating}
-            className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 transition-all disabled:opacity-50"
+            className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold text-sm text-white on-solid bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/20 transition-all disabled:opacity-50"
           >
             {isGenerating ? (
               <>
@@ -196,7 +196,7 @@ export function StudyPlannerCard() {
                 <button
                   type="button"
                   onClick={resumeTimer}
-                  className="p-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
+                  className="p-1.5 rounded-lg on-solid bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
                   title="Resume"
                 >
                   <Play className="w-4 h-4" />
@@ -233,7 +233,7 @@ export function StudyPlannerCard() {
 
       {isAllComplete && (
         <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-emerald-500 text-white">
+          <div className="p-2 rounded-lg on-solid bg-emerald-500 text-white">
             <Check className="w-5 h-5" />
           </div>
           <div>
@@ -268,7 +268,7 @@ export function StudyPlannerCard() {
                     onClick={() => handleToggleBlock(idx, block.completed)}
                     className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${
                       block.completed
-                        ? "border-emerald-500 bg-emerald-500 text-white"
+                        ? "border-emerald-500 on-solid bg-emerald-500 text-white"
                         : "border-slate-300 dark:border-slate-700 hover:border-slate-400"
                     }`}
                     title={block.completed ? "Completed" : "Mark block completed"}
@@ -326,7 +326,7 @@ export function StudyPlannerCard() {
                       <button
                         type="button"
                         onClick={activeTimer.isRunning ? pauseTimer : resumeTimer}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-500 shadow-sm"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold on-solid bg-indigo-600 text-white hover:bg-indigo-500 shadow-sm"
                       >
                         {activeTimer.isRunning ? (
                           <>

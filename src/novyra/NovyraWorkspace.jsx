@@ -44,7 +44,7 @@ export function NovyraWorkspace() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
+                <div className="flex items-center justify-center w-11 h-11 rounded-2xl on-solid bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
                   <Sparkles className="w-6 h-6" />
                 </div>
                 <div>
@@ -107,7 +107,7 @@ export function NovyraWorkspace() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                     isActive
-                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
+                      ? "on-solid bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
                       : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60"
                   }`}
                 >

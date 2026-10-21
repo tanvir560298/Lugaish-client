@@ -9,6 +9,7 @@ import "./styles/campus.css";
 import "./styles/platform.css";
 import "./styles/journey.css";
 import "./styles/experience.css";
+import "./styles/contrast.css";
 
 installOperationalMonitoring();
 

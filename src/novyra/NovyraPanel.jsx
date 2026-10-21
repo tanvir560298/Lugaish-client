@@ -16,7 +16,7 @@ export function NovyraPanel() {
         <button
           type="button"
           onClick={togglePanel}
-          className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 px-4 py-3 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white shadow-xl shadow-indigo-600/30 transition-all hover:scale-105 group"
+          className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 px-4 py-3 rounded-full on-solid bg-indigo-600 hover:bg-indigo-500 text-white shadow-xl shadow-indigo-600/30 transition-all hover:scale-105 group"
           title="Open Tanu AI Companion"
         >
           <div className="relative flex items-center justify-center">
@@ -44,7 +44,7 @@ export function NovyraPanel() {
             {/* Drawer Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60">
               <div className="flex items-center gap-2.5">
-                <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-indigo-600 text-white shadow-sm">
+                <div className="flex items-center justify-center w-8 h-8 rounded-xl on-solid bg-indigo-600 text-white shadow-sm">
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>

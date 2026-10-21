@@ -36,7 +36,7 @@ export function StudentMemoryCard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 mb-2">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 mb-2">
             <Brain className="w-3.5 h-3.5" />
             <span>Persistent Student Memory</span>
           </div>
@@ -138,7 +138,7 @@ export function StudentMemoryCard() {
           <button
             type="submit"
             disabled={!newWeakArea.trim() || isUpdating}
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50 transition-colors"
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold on-solid bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50 transition-colors"
           >
             <Plus className="w-3.5 h-3.5" />
           </button>
@@ -156,7 +156,7 @@ export function StudentMemoryCard() {
           </div>
           <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
             <div
-              className="h-full bg-indigo-600 rounded-full transition-all"
+              className="h-full on-solid bg-indigo-600 rounded-full transition-all"
               style={{
                 width: `${Math.min(100, Math.round((usage.requestsToday / usage.dailyRequestLimit) * 100))}%`,
               }}
