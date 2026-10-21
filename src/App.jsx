@@ -16,6 +16,7 @@ const LearningSpacesPage = lazy(() => import('./pages/LearningSpacesPage.jsx').t
 const StudyRoomPage = lazy(() => import('./pages/StudyRoomPage.jsx').then(module => ({ default: module.StudyRoomPage })));
 const ClassroomPage = lazy(() => import('./pages/ClassroomPage.jsx').then(module => ({ default: module.ClassroomPage })));
 
+const UpcomingCoursePage = lazy(() => import('./components/UpcomingCourses.jsx').then(module => ({ default: module.UpcomingCoursePage })));
 const HomePage = lazy(() => import('./pages/HomePage.jsx').then(module => ({ default: module.HomePage })));
 const DashboardPage = lazy(() => import('./pages/DashboardPage.jsx').then(module => ({ default: module.DashboardPage })));
 const PathwaysPage = lazy(() => import('./pages/PathwaysPage.jsx').then(module => ({ default: module.PathwaysPage })));
@@ -53,11 +54,25 @@ function PageFallback() {
 }
 
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
+    if (hash) {
+      const scrollToAnchor = () => {
+        const target = document.getElementById(hash.slice(1));
+        if (!target) return false;
+        target.scrollIntoView();
+        return true;
+      };
+      if (scrollToAnchor()) return undefined;
+      const observer = new MutationObserver(() => {
+        if (scrollToAnchor()) observer.disconnect();
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+      return () => observer.disconnect();
+    }
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  }, [pathname]);
+  }, [pathname, hash]);
 
   return null;
 }
@@ -182,6 +197,7 @@ export default function App() {
               <Route path='/auth' element={<Navigate to="/login" replace />} />
               <Route path='/manage-courses' element={<ProtectedRoute><ManageCourses /></ProtectedRoute>} />
               <Route path='/learn' element={<LearnPage />} />
+              <Route path='/upcoming/:courseId' element={<UpcomingCoursePage />} />
               <Route path='/learn/web-development/html' element={<HtmlCoursePage />} />
               <Route path='/learn/web-development/html/:videoId' element={<HtmlCoursePage />} />
               <Route path='/learn/java' element={<JavaPathPage />} />
@@ -189,7 +205,7 @@ export default function App() {
               <Route path='/tanu' element={<NovyraWorkspace />} />
               <Route path='/novyra' element={<NovyraWorkspace />} />
               <Route path='/pricing' element={<PricingPage />} />
-              <Route path='/course/:language' element={<ProtectedRoute><CatalogGuard><CoursePage /></CatalogGuard></ProtectedRoute>} />
+              <Route path='/course/:language' element={<CoursePage />} />
               <Route path='/learning-spaces' element={<LearningSpacesPage />} />
               <Route path='/study-room' element={<ProtectedRoute><StudyRoomPage /></ProtectedRoute>} />
               {import.meta.env.DEV && <Route path='/learning-spaces-preview' element={<LearningSpacesPage devPreview />} />}

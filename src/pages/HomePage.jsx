@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, Code2, BookOpen, MessageCircle, Sparkles, Headphones, Check, Compass } from 'lucide-react';
-import { ConstructionBanner } from '../components/ConstructionBanner.jsx';
+import { UpcomingCourses } from '../components/UpcomingCourses.jsx';
 import { CampusPreview } from '../components/CampusPreview.jsx';
 import { useAppContext } from '../state/AppContext.jsx';
 import '../learn/learn.css';
@@ -45,7 +45,7 @@ export function HomePage() {
 
     <section className="home-practice" aria-labelledby="practice-title"><div><p className="home-kicker">MORE THAN A LESSON</p><h2 id="practice-title">Make learning a daily habit.</h2></div><div className="home-practice-items"><Link to="/speaking-practice"><Headphones size={23} /><span><strong>Hear yourself improve</strong><small>Record, replay and practise speaking.</small></span><ArrowUpRight size={17} /></Link><Link to="/tanu"><Sparkles size={23} /><span><strong>Make a little study plan</strong><small>Set aside 10–120 minutes with Tanu AI.</small></span><ArrowUpRight size={17} /></Link></div></section>
 
-    <ConstructionBanner compact subject="আমাদের campus-এর নতুন feature ও design" />
+    <UpcomingCourses />
     <section className="lx-campus home-campus"><div className="lx-campus-image"><CampusPreview kind="library" /></div><div><p className="home-kicker">A PLACE FOR YOUR NEXT CHAPTER</p><h2>A quiet corner.<br />A fresh start.</h2><p>Bring your English notes, your Arabic practice or your next coding idea. Settle into the Study Library with a personal desk, notes and a focus timer.</p><Link className="lx-primary" to="/study-room">Explore the study library <ArrowRight size={18} /></Link><Link className="lx-text-link" to="/classroom">Step into the Classroom ↗</Link></div></section>
     {state.isLoggedIn && <div className="lx-return"><span>Welcome back. Keep your momentum.</span><Link to="/learn">Continue learning →</Link><Link to="/progress">View your language progress →</Link></div>}
   </div>;

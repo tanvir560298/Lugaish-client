@@ -4,18 +4,26 @@ import { api } from "../api/client.js";
 import { useAppContext } from "../state/AppContext.jsx";
 export function CoursePage() {
   const { language } = useParams(),
-    { actions } = useAppContext();
+    { actions, state } = useAppContext();
   const [course, setCourse] = useState(null),
     [error, setError] = useState(""),
-    [busy, setBusy] = useState(false);
+    [busy, setBusy] = useState(false),
+    [success, setSuccess] = useState("");
   useEffect(() => {
     let active = true;
     setCourse(null);
     setError("");
-    api
-      .getCourse(language)
+    setSuccess("");
+    const pending = state.isLoggedIn ? api.getCourse(language) : api.getCourses();
+    pending
       .then((c) => {
-        if (active) setCourse(c);
+        if (!active) return;
+        if (state.isLoggedIn) setCourse(c);
+        else {
+          const preview = Array.isArray(c) ? c.find(item => item.language === language) : null;
+          if (preview) setCourse(preview);
+          else setError('No published course is available yet. Explore our upcoming courses or try a free HTML lesson.');
+        }
       })
       .catch((e) => {
         if (active) setError(e.message);
@@ -23,12 +31,13 @@ export function CoursePage() {
     return () => {
       active = false;
     };
-  }, [language]);
+  }, [language, state.isLoggedIn]);
   async function enroll() {
     setBusy(true);
     setError("");
     try {
       await actions.enrollPathway(language);
+      setSuccess("Enrollment confirmed. Open My Classes to see your available lessons.");
     } catch (e) {
       setError(e.message);
     } finally {
@@ -42,22 +51,23 @@ export function CoursePage() {
         <h1>{course?.title || "Course availability"}</h1>
         <p>{course?.description}</p>
       </header>
-      {error && <p role="alert">{error}</p>}
+      {error && <div role="alert"><p>{error}</p><Link className="campus-button campus-button-secondary" to="/learn">Explore learning paths →</Link></div>}
+      {success && <p role="status">{success}</p>}
       {!course && !error && <p role="status">Loading published course…</p>}
       {course && (
         <section className="campus-card">
-          <h2>{course.totalDays} published lessons</h2>
+          <h2>{Number.isInteger(course.totalDays) ? `${course.totalDays} published lessons` : "Course overview"}</h2>
           <p>
             Lesson access depends on enrollment, schedule and your account
             permissions.
           </p>
-          {language !== "paid_batch" ? (
+          {!state.isLoggedIn ? <Link className="campus-button campus-button-primary" to="/login" state={{ from: { pathname: `/course/${language}` } }}>Sign in to enroll</Link> : language !== "paid_batch" ? (
             <button
               className="campus-button campus-button-primary"
-              disabled={busy}
+              disabled={busy || state.enrolledPathways?.includes(language)}
               onClick={enroll}
             >
-              {busy ? "Checking enrollment…" : "Request enrollment"}
+              {busy ? "Checking enrollment…" : state.enrolledPathways?.includes(language) ? "Enrolled ✓" : "Request enrollment"}
             </button>
           ) : (
             <p>Private Batch access must be granted by authorized staff.</p>
@@ -69,7 +79,7 @@ export function CoursePage() {
             My Classes
           </Link>
           <ul>
-            {course.lessons.map((l) => (
+            {(course.lessons ?? []).map((l) => (
               <li key={l.day}>{l.title}</li>
             ))}
           </ul>

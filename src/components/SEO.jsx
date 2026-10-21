@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { upcomingCourses } from '../data/upcomingCourses.js';
 
 const SITE_URL = (import.meta.env.VITE_SITE_URL || 'https://lugaish.vercel.app').replace(/\/$/, '');
 
@@ -80,6 +81,10 @@ function setStructuredData(data) {
 }
 
 function getSeoForPath(pathname) {
+  if (pathname.startsWith('/upcoming/')) {
+    const course = upcomingCourses.find(item => pathname === `/upcoming/${item.id}`);
+    if (course) return { title: `${course.title} — Coming Soon | Lugaish`, description: course.description };
+  }
   if (pathname.startsWith('/course/english')) {
     return {
       title: 'AI English Speaking Course | Lugaish',

@@ -154,10 +154,9 @@ function normalizeFreshProgress(state) {
 }
 
 function loadState() {
-  const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-  if (!raw) return { ...defaultState, activityData: generateActivityData() };
-
   try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!raw) return { ...defaultState, activityData: generateActivityData() };
     const parsed = JSON.parse(raw);
     return normalizeFreshProgress({
       ...defaultState,
@@ -168,7 +167,7 @@ function loadState() {
       },
     });
   } catch (error) {
-    localStorage.removeItem(LOCAL_STORAGE_KEY);
+    try { localStorage.removeItem(LOCAL_STORAGE_KEY); } catch { /* Storage may be disabled. */ }
     return { ...defaultState, activityData: generateActivityData() };
   }
 }

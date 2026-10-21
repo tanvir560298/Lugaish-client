@@ -1,11 +1,11 @@
 import {shouldClearSession} from '../state/identityPolicy.js';
 import {reportOperationalEvent} from '../utils/operations.js';
-const API_BASE_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:5000/api').replace(/\/$/, '');
+const API_BASE_URL = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api')).replace(/\/$/, '');
 const TOKEN_KEY = 'lugaish_auth_token';
 const REQUEST_TIMEOUT_MS = Math.max(Number(import.meta.env.VITE_API_TIMEOUT_MS) || 15000, 1000);
 
 export function getAuthToken() {
-  return localStorage.getItem(TOKEN_KEY);
+  try { return localStorage.getItem(TOKEN_KEY); } catch { return null; }
 }
 
 export function setAuthToken(token) {
@@ -94,7 +94,14 @@ async function executeRequest(path, options = {}) {
     }
   }
 
-  const data = response.status === 204 ? {} : await response.json().catch(() => ({}));
+  let data = {};
+  if (response.status !== 204) {
+    try {
+      data = await response.json();
+    } catch {
+      throw new Error('The server returned an invalid response. Please retry or contact support.');
+    }
+  }
   if (!response.ok) {
     if(response.status>=500)reportOperationalEvent('api_failure');
     if(response.status===401)reportOperationalEvent('auth_failure');
