@@ -13,6 +13,14 @@ const DEFAULT_SEO = {
 
 const ROUTE_SEO = {
   '/': DEFAULT_SEO,
+  '/study-room': {
+    title: 'Study Room | Lugaish',
+    description: 'Your free personal study desk with a focus timer, private notebook, PDF reader and study checklist. No course enrollment needed.',
+  },
+  '/classroom': {
+    title: 'Classroom | Lugaish',
+    description: 'Watch free lessons or bring your own YouTube learning video. Take notes and make time to learn, without course enrollment.',
+  },
   '/learn': {
     title: 'Courses | Lugaish',
     description: 'Start our free Web Development course in Bangla and preview four upcoming courses.',

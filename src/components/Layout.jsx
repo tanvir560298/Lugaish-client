@@ -2,7 +2,6 @@ import { useLocation } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { Header } from './Header.jsx';
 import { Footer } from './Footer.jsx';
-import { ConstructionBanner } from './ConstructionBanner.jsx';
 import { NewTaskNotification } from './NewTaskNotification.jsx';
 import { useAppContext } from '../state/AppContext.jsx';
 import { isStudentPreview } from '../utils/roles.js';
@@ -12,12 +11,10 @@ const LearningResourceNotification = lazy(() => import('./LearningResourceNotifi
 export function Layout({ children }) {
   const { state, actions } = useAppContext();
   const { pathname } = useLocation();
-  const isClassroom = /^\/classroom(-preview)?$/.test(pathname);
-  const isStudyRoom = /^\/study-room(-preview)?$/.test(pathname);
+  const isClassroom = /^\/classroom(\/immersive|-preview)$/.test(pathname);
+  const isStudyRoom = /^\/study-room(\/library|-preview)$/.test(pathname);
+  const isIndependentRoom = ['/study-room', '/classroom'].includes(pathname);
   const previewing = isStudentPreview(state);
-  const constructionSubject = /^\/(learning-spaces|study-room)(-preview)?$/.test(pathname)
-    ? 'আমাদের learning campus-এর design ও অভিজ্ঞতা'
-    : null;
   if(isClassroom)return <main id="main-content" tabIndex={-1} className="classroom-route-shell">{children}</main>;
   return (
     <div className={`main-container bg-bg text-slate-100 ${isStudyRoom ? 'has-study-library' : ''}`}>
@@ -30,10 +27,10 @@ export function Layout({ children }) {
           <button type="button" onClick={actions.toggleWebDeveloperMode} className="ml-2 underline underline-offset-2">Exit preview</button>
         </div>
       )}
-      {!isStudyRoom && <NewTaskNotification />}
-      <main id="main-content" tabIndex={-1} className={isStudyRoom?'study-library-route-shell':'app-shell py-4 sm:py-6 lg:py-8'}>{constructionSubject && <ConstructionBanner subject={constructionSubject} />}{children}</main>
+      {!isStudyRoom && !isIndependentRoom && <NewTaskNotification />}
+      <main id="main-content" tabIndex={-1} className={isStudyRoom?'study-library-route-shell':'app-shell py-4 sm:py-6 lg:py-8'}>{children}</main>
       {!isStudyRoom&&<Footer />}
-      {!isStudyRoom && state.isLoggedIn && <Suspense fallback={null}><LearningResourceNotification /></Suspense>}
+      {!isStudyRoom && !isIndependentRoom && state.isLoggedIn && <Suspense fallback={null}><LearningResourceNotification /></Suspense>}
 
     </div>
   );

@@ -41,14 +41,14 @@ export function LearningSpacesPage({ devPreview = false }) {
       id: "classroom",
       title: "Classroom",
       description:
-        "Follow authorized lessons in a modern university classroom.",
+        "Watch free HTML lessons or bring your own YouTube video. Keep notes and a focus timer beside your learning.",
       href: preview ? "/classroom-preview" : "/classroom",
     },
     {
       id: "study",
       title: "Study Library",
       description:
-        "Settle into your own desk, or study with an eligible private group.",
+        "Your notebook, a focus timer, a study checklist and your own PDFs. Ready to use, with or without a course.",
       href: preview ? "/study-room-preview" : "/study-room",
     },
   ];
@@ -119,7 +119,7 @@ export function LearningSpacesPage({ devPreview = false }) {
       </header>
       {preview && (
         <p className="campus-preview">
-          Campus preview · Sign in for shared tables and chat.
+          Try your workspace freely. Sign in for immersive rooms and shared study features.
         </p>
       )}
       <div className="campus-destinations">
@@ -151,8 +151,8 @@ export function LearningSpacesPage({ devPreview = false }) {
               <p>{space.description}</p>
               <p className="campus-room-details">
                 {space.id === "study"
-                  ? "Four study zones · Notes, timer & rain ambience"
-                  : "Lesson screen · Materials & published practice"}
+                  ? "Free workspace · No enrollment required · Optional 3D library"
+                  : "Free lesson player · Your own videos · Optional 3D classroom"}
               </p>
               <Link
                 className="campus-button campus-button-primary"

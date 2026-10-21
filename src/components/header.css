@@ -11,3 +11,6 @@
 @media(min-width:1001px){.studio-header .academic-mobile-nav{display:none}.site-header.studio-header .header-menu{display:none}}
 @media(max-width:1000px){.site-header.studio-header .academic-nav,:root[data-theme=light] .site-header.studio-header .academic-nav{display:none}.site-header.studio-header .header-menu{display:grid;border-radius:12px}.site-header.studio-header .academic-header-inner{min-height:76px}.studio-header .header-signin{display:none}}
 @media(max-width:560px){.site-header.studio-header .academic-header-inner{min-height:72px;padding:10px 18px}.studio-header .academic-brand img{width:37px;height:37px;border-radius:10px}.studio-header .academic-brand>span{font-size:23px}.studio-header .academic-brand small{display:block;font-size:7px;letter-spacing:.12em;margin-top:5px}.site-header.studio-header .header-start{display:none}.studio-header .academic-header-actions{gap:5px}.studio-header .academic-account-trigger>span{display:none}.studio-header .academic-mobile-nav{left:10px;right:10px;padding:18px!important}.studio-header .academic-mobile-nav>a{font-size:16px}}
+
+:root[data-theme=light] .site-header.studio-header{--campus-text:#182c37;--campus-secondary:#425b60;--campus-muted:#526760;--campus-link:#246c59}
+:root[data-theme=light] .studio-header .academic-brand{color:#182c37}

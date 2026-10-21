@@ -15,6 +15,7 @@ import { ROLES, isStudentPreview, getViewedRole } from './utils/roles.js';
 const IndependentSpeaking = lazy(() => import('./courses/IndependentSpeaking.jsx').then(m => ({default:m.IndependentSpeaking})));
 const ManageCourses = lazy(() => import('./courses/ManageCourses.jsx').then(m => ({default:m.ManageCourses})));
 const LearningSpacesPage = lazy(() => import('./pages/LearningSpacesPage.jsx').then(module => ({ default: module.LearningSpacesPage })));
+const LearningRoom = lazy(() => import('./workspace/LearningRoom.jsx').then(module => ({ default: module.LearningRoom })));
 const StudyRoomPage = lazy(() => import('./pages/StudyRoomPage.jsx').then(module => ({ default: module.StudyRoomPage })));
 const ClassroomPage = lazy(() => import('./pages/ClassroomPage.jsx').then(module => ({ default: module.ClassroomPage })));
 
@@ -205,10 +206,12 @@ export default function App() {
               <Route path='/pricing' element={<Navigate to="/learn" replace />} />
               <Route path='/course/:language' element={<Navigate to="/learn" replace />} />
               <Route path='/learning-spaces' element={<LearningSpacesPage />} />
-              <Route path='/study-room' element={<ProtectedRoute><StudyRoomPage /></ProtectedRoute>} />
+              <Route path='/study-room' element={<LearningRoom />} />
+              <Route path='/study-room/library' element={<ProtectedRoute><StudyRoomPage /></ProtectedRoute>} />
               {import.meta.env.DEV && <Route path='/learning-spaces-preview' element={<LearningSpacesPage devPreview />} />}
               {import.meta.env.DEV && <Route path='/study-room-preview' element={<StudyRoomPage devPreview />} />}
-              <Route path='/classroom' element={<ProtectedRoute><ClassroomPage /></ProtectedRoute>} />
+              <Route path='/classroom' element={<LearningRoom kind="classroom" />} />
+              <Route path='/classroom/immersive' element={<ProtectedRoute><ClassroomPage /></ProtectedRoute>} />
               {import.meta.env.DEV && <Route path='/speaking-preview' element={<IndependentSpeaking/>} />}
               {import.meta.env.DEV && <Route path='/practice-preview' element={<CatalogGuard><PracticePreviewPage /></CatalogGuard>} />}
               {import.meta.env.DEV && <Route path='/classroom-preview' element={<ClassroomPage devPreview />} />}
