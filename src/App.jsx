@@ -28,9 +28,7 @@ const ReviewPage = lazy(() => import('./learning/review/ReviewPage.jsx').then(m=
 const QuizPage = lazy(() => import('./pages/QuizPage.jsx').then(module => ({ default: module.QuizPage })));
 const DailyLessonsPage = lazy(() => import('./pages/DailyLessonsPage.jsx').then(module => ({ default: module.DailyLessonsPage })));
 const LoginPage = lazy(() => import('./pages/LoginPage.jsx').then(module => ({ default: module.LoginPage })));
-const CoursePage = lazy(() => import('./pages/CoursePage.jsx').then(module => ({ default: module.CoursePage })));
 const TodayPage = lazy(() => import('./pages/TodayPage.jsx').then(module => ({ default: module.TodayPage })));
-const PricingPage = lazy(() => import('./pages/PricingPage.jsx').then(module => ({ default: module.PricingPage })));
 const ProgressPage = lazy(() => import('./pages/ProgressPage.jsx').then(module => ({ default: module.ProgressPage })));
 const ProfilePage = lazy(() => import('./pages/ProfilePage.jsx').then(module => ({ default: module.ProfilePage })));
 const ArchitectsPage = lazy(() => import('./pages/ArchitectsPage.jsx').then(module => ({ default: module.ArchitectsPage })));
@@ -39,8 +37,6 @@ const SpeakingPracticePage = lazy(() => import('./pages/SpeakingPracticePage.jsx
 const CertificatePage = lazy(() => import('./pages/CertificatePage.jsx').then(module => ({ default: module.CertificatePage })));
 const HtmlCoursePage = lazy(() => import('./learn/HtmlCoursePage.jsx').then(m=>({default:m.HtmlCoursePage})));
 const LearnPage = lazy(() => import('./learn/LearnPages.jsx').then(m => ({default:m.LearnPage})));
-const JavaPathPage = lazy(() => import('./learn/LearnPages.jsx').then(m => ({default:m.JavaPathPage})));
-const JavaLessonPage = lazy(() => import('./learn/LearnPages.jsx').then(m => ({default:m.JavaLessonPage})));
 const NovyraWorkspace = lazy(() => import('./novyra/NovyraWorkspace.jsx').then(module => ({ default: module.NovyraWorkspace })));
 import { NovyraProvider } from './novyra/NovyraContext.jsx';
 import { NovyraPanel } from './novyra/NovyraPanel.jsx';
@@ -200,12 +196,12 @@ export default function App() {
               <Route path='/upcoming/:courseId' element={<UpcomingCoursePage />} />
               <Route path='/learn/web-development/html' element={<HtmlCoursePage />} />
               <Route path='/learn/web-development/html/:videoId' element={<HtmlCoursePage />} />
-              <Route path='/learn/java' element={<JavaPathPage />} />
-              <Route path='/learn/java/:lessonId' element={<JavaLessonPage />} />
+              <Route path='/learn/java' element={<Navigate to="/learn" replace />} />
+              <Route path='/learn/java/:lessonId' element={<Navigate to="/learn" replace />} />
               <Route path='/tanu' element={<NovyraWorkspace />} />
               <Route path='/novyra' element={<NovyraWorkspace />} />
-              <Route path='/pricing' element={<PricingPage />} />
-              <Route path='/course/:language' element={<CoursePage />} />
+              <Route path='/pricing' element={<Navigate to="/learn" replace />} />
+              <Route path='/course/:language' element={<Navigate to="/learn" replace />} />
               <Route path='/learning-spaces' element={<LearningSpacesPage />} />
               <Route path='/study-room' element={<ProtectedRoute><StudyRoomPage /></ProtectedRoute>} />
               {import.meta.env.DEV && <Route path='/learning-spaces-preview' element={<LearningSpacesPage devPreview />} />}

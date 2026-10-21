@@ -41,7 +41,7 @@ Theme and text contrast checks (use the same isolated Chrome profile):
 node scripts/qa/themeContrastJourney.mjs
 ```
 
-This checks 17 public routes in both themes, Tanu workspace tabs and drawer,
+This checks 15 public routes in both themes, Tanu workspace tabs and drawer,
 mobile navigation, input placeholders, opposite operating-system colour preferences,
 and saved theme restoration. Ordinary text needs 4.5:1 and large text 3:1 against
 composited CSS background colours. Disabled controls, decorative text and canvas

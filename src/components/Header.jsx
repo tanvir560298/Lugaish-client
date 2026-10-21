@@ -1,24 +1,25 @@
 import { isStudentPreview } from "../utils/roles.js";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Sun, Moon, ChevronDown, User, LogOut } from "lucide-react";
+import { Menu, X, Sun, Moon, ChevronDown, User, LogOut, ArrowUpRight, ArrowRight, Code2 } from "lucide-react";
 import { useAppContext } from "../state/AppContext.jsx";
 import { ROLES, getViewedRole } from "../utils/roles.js";
+import "./header.css";
 import { getUnviewedCertificateCount } from "../utils/certificateStorage.js";
 const links = [
   ["/", "Home"],
-  ["/learn", "Learn"],
-  ["/progress", "My Learning"],
+  ["/learn", "Courses"],
   ["/learning-spaces", "Campus"],
   ["/tanu", "Tanu AI"],
-  ["/pricing", "Courses & Fees"],
+  ["/architects", "About"],
 ];
 export function Header() {
   const { state, actions } = useAppContext(),
-    { pathname } = useLocation();
+    { pathname, hash } = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false),
     [accountOpen, setAccountOpen] = useState(false);
-  const menu = useRef(null),
+  const header = useRef(null),
+    menu = useRef(null),
     account = useRef(null),
     accountButton = useRef(null);
   const themeLabel = state.theme === "dark" ? "Light mode" : "Dark mode";
@@ -30,6 +31,8 @@ export function Header() {
   const active = (href) =>
     href === "/"
       ? pathname === "/"
+      : href === "/learn"
+        ? /^\/(learn|upcoming|course|pricing)(\/|$)/.test(pathname)
       : href === "/tanu"
         ? /^\/(tanu|novyra)(\/|$)/.test(pathname)
         : href === "/learning-spaces"
@@ -46,7 +49,7 @@ export function Header() {
   useEffect(() => {
     setMobileOpen(false);
     setAccountOpen(false);
-  }, [pathname]);
+  }, [pathname, hash]);
   useEffect(() => {
     if (!mobileOpen && !accountOpen) return;
     const key = (e) => {
@@ -61,6 +64,7 @@ export function Header() {
       }
     };
     const outside = (e) => {
+      if (mobileOpen && !header.current?.contains(e.target)) setMobileOpen(false);
       if (accountOpen && !account.current?.contains(e.target))
         setAccountOpen(false);
     };
@@ -109,12 +113,12 @@ export function Header() {
     </>
   );
   return (
-    <header className="site-header academic-header">
+    <header className="site-header academic-header studio-header" ref={header}>
       <div className="academic-header-inner">
         <Link to="/" className="academic-brand" aria-label="Lugaish home">
           <img src="/favicon.png" alt="" />
           <span>
-            LUGAISH<small>The learning campus</small>
+            Lugaish<span className="brand-period">.</span><small>LEARN. BUILD. GROW.</small>
           </span>
         </Link>
         <nav className="header-nav academic-nav" aria-label="Main navigation">
@@ -125,7 +129,7 @@ export function Header() {
               to={href}
               aria-current={active(href) ? "page" : undefined}
             >
-              {label}
+              {label}{href === "/tanu" && <span className="nav-ai-mark" aria-hidden="true">✦</span>}
             </Link>
           ))}
         </nav>
@@ -166,9 +170,7 @@ export function Header() {
               )}
             </div>
           ) : (
-            <Link className="header-auth campus-button" to="/login">
-              Sign in
-            </Link>
+            <><Link className="header-signin" to="/login">Sign in</Link><Link className="header-auth header-start campus-button" to="/learn/web-development/html">Start learning <ArrowUpRight size={16}/></Link></>
           )}
           <button
             ref={menu}
@@ -193,15 +195,14 @@ export function Header() {
           className="mobile-nav academic-mobile-nav"
           aria-label="Mobile navigation"
         >
-          {links.map(([href, label]) => (
-            <Link
-              key={href}
-              to={href}
-              aria-current={active(href) ? "page" : undefined}
-            >
-              {label}
+          <div className="mobile-nav-caption">EXPLORE LUGAISH</div>
+          {links.map(([href, label], index) => (
+            <Link key={href} to={href} aria-current={active(href) ? "page" : undefined}>
+              <span className="mobile-nav-number">0{index + 1}</span><span>{label}</span><ArrowUpRight size={17}/>
             </Link>
           ))}
+          <Link className="mobile-course-highlight" to="/learn/web-development/html"><Code2 size={20}/><span>Web Development<small>Free · 7 Bangla video lessons</small></span><ArrowRight size={17}/></Link>
+          {!state.isLoggedIn && <Link className="mobile-signin" to="/login">Already learning? <strong>Sign in <ArrowUpRight size={14}/></strong></Link>}
         </nav>
       )}
     </header>

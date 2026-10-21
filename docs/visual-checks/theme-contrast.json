@@ -12,25 +12,13 @@
     "failures": []
   },
   {
-    "label": "/learn/java",
-    "theme": "dark",
-    "width": 1280,
-    "failures": []
-  },
-  {
-    "label": "/learn/java/first-program",
+    "label": "/learn/web-development/html/01",
     "theme": "dark",
     "width": 1280,
     "failures": []
   },
   {
     "label": "/learn/web-development/html",
-    "theme": "dark",
-    "width": 1280,
-    "failures": []
-  },
-  {
-    "label": "/pricing",
     "theme": "dark",
     "width": 1280,
     "failures": []
@@ -174,25 +162,13 @@
     "failures": []
   },
   {
-    "label": "/learn/java",
-    "theme": "light",
-    "width": 1280,
-    "failures": []
-  },
-  {
-    "label": "/learn/java/first-program",
+    "label": "/learn/web-development/html/01",
     "theme": "light",
     "width": 1280,
     "failures": []
   },
   {
     "label": "/learn/web-development/html",
-    "theme": "light",
-    "width": 1280,
-    "failures": []
-  },
-  {
-    "label": "/pricing",
     "theme": "light",
     "width": 1280,
     "failures": []

@@ -29,7 +29,7 @@ try {
       { name: 'prefers-color-scheme', value: theme === 'dark' ? 'light' : 'dark' },
       { name: 'prefers-reduced-motion', value: 'reduce' },
     ] });
-    for (const path of ['/', '/learn', '/learn/java', '/learn/java/first-program', '/learn/web-development/html', '/pricing', '/login', '/learning-spaces', '/tanu', '/architects', '/support', '/privacy', '/terms', '/upcoming/c-programming', '/upcoming/arabic-learning', '/upcoming/video-editing', '/upcoming/english-masterclass']) {
+    for (const path of ['/', '/learn', '/learn/web-development/html/01', '/learn/web-development/html', '/login', '/learning-spaces', '/tanu', '/architects', '/support', '/privacy', '/terms', '/upcoming/c-programming', '/upcoming/arabic-learning', '/upcoming/video-editing', '/upcoming/english-masterclass']) {
       await visit(base + path);
       await setTheme(theme);
       await pause(200);

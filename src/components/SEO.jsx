@@ -5,30 +5,30 @@ import { upcomingCourses } from '../data/upcomingCourses.js';
 const SITE_URL = (import.meta.env.VITE_SITE_URL || 'https://lugaish.vercel.app').replace(/\/$/, '');
 
 const DEFAULT_SEO = {
-  title: 'Lugaish | Languages, Programming & Your Learning Campus',
-  description: 'Learn English and Arabic with AI-powered language learning, daily lessons, guided practice, progress tracking, and weekly interview preparation.',
-  keywords: 'AI-powered language learning, AI English learning, AI Arabic learning, learn English, learn Arabic, English speaking course, Arabic course, Lugaish',
+  title: 'Lugaish | Learn Web Development. Build Your Next Chapter.',
+  description: 'Learn web development in Bangla with free HTML video lessons. Build your first website and explore upcoming C programming, Arabic, video editing and English courses.',
+  keywords: 'web development Bangla, HTML course, free web development course, learn HTML, Lugaish',
   image: `${SITE_URL}/og-image.svg`,
 };
 
 const ROUTE_SEO = {
   '/': DEFAULT_SEO,
   '/learn': {
-    title: 'Learning Paths | Lugaish',
-    description: 'Explore Java self-study, published Arabic and English courses, and the Lugaish learning roadmap.',
+    title: 'Courses | Lugaish',
+    description: 'Start our free Web Development course in Bangla and preview four upcoming courses.',
   },
-  '/learn/java': {
-    title: 'Java Foundations — Free Self-Study | Lugaish',
-    description: 'Three introductory Java code-reading lessons with guided practice and knowledge checks.',
+  '/learn/web-development/html': {
+    title: 'Web Development — HTML in Bangla | Lugaish',
+    description: 'Seven beginner HTML video lessons in Bangla, from your first tag to a portfolio website.',
   },
   '/signup': {
-    title: 'Sign Up for Lugaish | Start AI-Powered English and Arabic Learning',
-    description: 'Create your Lugaish account with Google and start AI-assisted daily English or Arabic lessons.',
+    title: 'Join Lugaish | Your Learning Campus',
+    description: 'Create your Lugaish account with Google for your learning profile and study tools.',
     keywords: 'Lugaish signup, AI English learning signup, AI Arabic learning signup',
   },
   '/login': {
-    title: 'Sign In to Lugaish | Continue Your Language Lessons',
-    description: 'Sign in to Lugaish and continue your AI-assisted English or Arabic learning progress.',
+    title: 'Sign In to Lugaish | Your Learning Campus',
+    description: 'Sign in to Lugaish and return to your learning profile, study plans and campus.',
     keywords: 'Lugaish login, AI language learning login',
   },
   '/pricing': {
@@ -149,10 +149,10 @@ export function SEO() {
       sameAs: [],
       offers: {
         '@type': 'Offer',
-        category: 'Language learning',
+        category: 'Web development',
         availability: 'https://schema.org/InStock',
       },
-      teaches: ['AI-assisted English speaking', 'AI-assisted Arabic language'],
+      teaches: ['Web development', 'HTML'],
     });
   }, [pathname]);
 

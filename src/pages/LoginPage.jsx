@@ -277,7 +277,7 @@ export function LoginPage({ mode = 'login' }) {
     <section className="platform-auth relative min-h-[calc(100svh-96px)]">
       <div className="grid items-start gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-12">
         <div className="sticky top-12 hidden h-[650px] overflow-visible rounded-[3rem] border border-white/5 bg-slate-900/40 backdrop-blur-sm lg:block">
-          <div className="platform-auth-intro"><p className="platform-eyebrow">Your learning campus</p><h2>Make room for learning.</h2><p>One account for Arabic and English, your course materials and shared study spaces.</p><p>Your enrolled courses stay attached to your Google account.</p></div>
+          <div className="platform-auth-intro"><p className="platform-eyebrow">Your learning campus</p><h2>Make room for learning.</h2><p>Your study plans, learning profile and shared study spaces, together in one place.</p><p>Your enrolled courses stay attached to your Google account.</p></div>
         </div>
 
         <motion.div
@@ -399,7 +399,7 @@ export function LoginPage({ mode = 'login' }) {
             <div className="mb-6 grid gap-3">
               {[
                 'No password to remember',
-                'One account for English and Arabic courses',
+                'One account for your learning campus',
                 'Course enrollment stays attached to your Google account',
               ].map(item => (
                 <div key={item} className="flex items-center gap-3 text-sm font-semibold text-slate-300">
