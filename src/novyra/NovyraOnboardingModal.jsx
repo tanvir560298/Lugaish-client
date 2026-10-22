@@ -9,7 +9,7 @@ const SUBJECTS = [
   { id: "java", name: "Java", category: "Programming", icon: Code, desc: "Object-oriented design, collections, and algorithms" },
   { id: "c", name: "C Language", category: "Programming", icon: Code, desc: "Pointers, memory allocation, and system basics" },
   { id: "javascript", name: "JavaScript", category: "Programming", icon: Code, desc: "Modern ES6+, async programming, and web APIs" },
-  { id: "web_dev", name: "Web Development", category: "Programming", icon: Code, desc: "Full-stack HTML, CSS, React, and REST APIs" },
+  { id: "web_dev", name: "Web Development", category: "Programming", icon: Code, desc: "HTML basics and building your first web page" },
   { id: "computer_science", name: "Computer Science", category: "Academic", icon: BookOpen, desc: "Algorithms, complexity, databases, and OS" },
 ];
 
@@ -21,9 +21,9 @@ const LEVELS = [
 
 const GOALS = [
   { id: "general_mastery", label: "General Mastery", desc: "Build durable lifelong competence at a steady pace" },
-  { id: "exam_preparation", label: "Exam Preparation", desc: "Focused revision on high-yield curriculum topics" },
-  { id: "interview_prep", label: "Technical Interview Prep", desc: "Targeted problem solving, code tracing, and live debugging" },
-  { id: "skill_transition", label: "Career Transition", desc: "Practical hands-on projects and industry-ready best practices" },
+  { id: "exam", label: "Exam Preparation", desc: "Focused revision on high-yield curriculum topics" },
+  { id: "job_prep", label: "Interview Preparation", desc: "Targeted problem solving, code tracing, and live debugging" },
+  { id: "project", label: "Build a Project", desc: "Learn by making a practical project, one step at a time" },
 ];
 
 const TIME_OPTIONS = [15, 30, 45, 60, 90];
@@ -257,7 +257,7 @@ export function NovyraOnboardingModal() {
                   {[
                     { id: "english", label: "English" },
                     { id: "arabic", label: "العربية (Arabic)" },
-                    { id: "bilingual", label: "Bilingual" },
+                    { id: "bengali", label: "বাংলা (Bengali)" },
                   ].map((lang) => (
                     <button
                       key={lang.id}

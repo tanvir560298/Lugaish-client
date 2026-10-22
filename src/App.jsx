@@ -201,8 +201,8 @@ export default function App() {
               <Route path='/learn/web-development/html/:videoId' element={<HtmlCoursePage />} />
               <Route path='/learn/java' element={<Navigate to="/learn" replace />} />
               <Route path='/learn/java/:lessonId' element={<Navigate to="/learn" replace />} />
-              <Route path='/tanu' element={TANU_AI_AVAILABLE ? <NovyraWorkspace /> : <TanuComingSoonPage />} />
-              <Route path='/novyra' element={TANU_AI_AVAILABLE ? <NovyraWorkspace /> : <TanuComingSoonPage />} />
+              <Route path='/tanu' element={TANU_AI_AVAILABLE ? <ProtectedRoute><NovyraWorkspace /></ProtectedRoute> : <TanuComingSoonPage />} />
+              <Route path='/novyra' element={TANU_AI_AVAILABLE ? <ProtectedRoute><NovyraWorkspace /></ProtectedRoute> : <TanuComingSoonPage />} />
               <Route path='/pricing' element={<Navigate to="/learn" replace />} />
               <Route path='/course/:language' element={<Navigate to="/learn" replace />} />
               <Route path='/learning-spaces' element={<LearningSpacesPage />} />

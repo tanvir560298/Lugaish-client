@@ -4,13 +4,22 @@ import { Send, Sparkles, Bot, User, Trash2, ArrowRight } from "lucide-react";
 import { useNovyra } from "./NovyraContext.jsx";
 import { NovyraAvatarBadge } from "./NovyraAvatarBadge.jsx";
 
-const SUGGESTIONS = [
-  "Explain Java loops with code syntax",
-  "How do C pointers and malloc work?",
-  "How am I doing on my learning progress?",
-  "Recommend my next study activity",
-  "What is the difference between let and var in JavaScript?",
-];
+const SUGGESTIONS = {
+  web_dev: [
+    "What is HTML, and how do I start my first page?",
+    "When should I use headings and paragraphs?",
+    "How do links and images work in HTML?",
+    "What is the difference between a div and a span?",
+    "Make me a study routine for my next HTML class",
+  ],
+  default: [
+    "Explain this topic one step at a time",
+    "Give me a small practice question",
+    "How am I doing on my learning progress?",
+    "Recommend my next study activity",
+    "Make me a study routine for today",
+  ],
+};
 
 export function NovyraChatView({ compact = false }) {
   const {
@@ -25,6 +34,7 @@ export function NovyraChatView({ compact = false }) {
 
   const [input, setInput] = useState("");
   const endRef = useRef(null);
+  const suggestions = SUGGESTIONS[activeSubject] || SUGGESTIONS.default;
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -78,7 +88,7 @@ export function NovyraChatView({ compact = false }) {
 
       <p role="status" className="px-5 py-3 text-xs text-slate-600 dark:text-slate-300 border-b border-slate-200 dark:border-slate-800">
         {usage?.engineMode === 'offline-template'
-          ? 'Offline template mode. A real AI provider is not enabled; replies are limited preset material.'
+          ? 'Offline guide mode. Built-in course help is available; broader AI answers need an online provider.'
           : usage?.engineMode === 'online-configured'
             ? 'Online provider configured. Generated answers may contain mistakes.'
             : usage?.engineMode === 'unavailable'
@@ -96,13 +106,13 @@ export function NovyraChatView({ compact = false }) {
             <div>
               <h4 className="font-bold text-sm text-slate-900 dark:text-white">Start a learning conversation</h4>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm">
-                Check the engine status above. Offline mode offers limited preset examples, not general AI tutoring or arbitrary code analysis.
+                Ask about your course, request a simpler explanation, or try one of these questions to get started.
               </p>
             </div>
 
             {/* Prompt Chips */}
             <div className="flex flex-col gap-1.5 w-full max-w-md pt-2">
-              {SUGGESTIONS.map((s, idx) => (
+                {suggestions.map((s, idx) => (
                 <button
                   key={idx}
                   type="button"
@@ -140,7 +150,7 @@ export function NovyraChatView({ compact = false }) {
                   }`}
                 >
                   <div className="whitespace-pre-wrap">{msg.content}
-                    {msg.actionUrl?.startsWith("/tanu?") && <Link to={msg.actionUrl} className="block mt-3 underline font-bold">Open guided study →</Link>}</div>
+                    {msg.actionUrl?.startsWith("/tanu?") && <Link to={msg.actionUrl} className="block mt-3 underline font-bold">{msg.actionUrl.includes("tab=planner") ? "Make this study routine →" : "Open guided study →"}</Link>}</div>
 
                   {/* Tool Call Context Card if available */}
                   {msg.toolCalls?.length > 0 && (

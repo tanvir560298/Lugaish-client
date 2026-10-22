@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, useRef, useCallback } f
 import { novyraClient } from "./novyraClient.js";
 import { getAuthToken } from "../api/client.js";
 import { useAppContext } from "../state/AppContext.jsx";
+import { useLocation } from "react-router-dom";
 import {parseGuidedRequest} from '../tanu/session.js';
 
 import { TANU_AI_AVAILABLE } from '../tanu/availability.js';
@@ -10,10 +11,12 @@ const NovyraContext = createContext(null);
 
 export function NovyraProvider({ children }) {
   const {state} = useAppContext();
+  const {pathname} = useLocation();
+  const tanuRouteOpen = pathname === "/tanu" || pathname.startsWith("/tanu/") || pathname === "/novyra" || pathname.startsWith("/novyra/");
   // Remount private context on login, logout and account changes. Late requests
   // belong to an unmounted provider and cannot expose the previous student's state.
   const identity = state.isLoggedIn ? `${state.userEmail}:${getAuthToken() || ''}` : 'anonymous';
-  return <NovyraSessionProvider key={identity} authenticated={state.isLoggedIn && TANU_AI_AVAILABLE}>{children}</NovyraSessionProvider>;
+  return <NovyraSessionProvider key={identity} authenticated={state.isLoggedIn && TANU_AI_AVAILABLE && tanuRouteOpen}>{children}</NovyraSessionProvider>;
 }
 
 function NovyraSessionProvider({ children, authenticated }) {
@@ -143,7 +146,8 @@ function NovyraSessionProvider({ children, authenticated }) {
   // Chat actions
   const sendMessage = async (text, options = {}) => {
     if (!text || !text.trim()) return null;
-    const timeRequest = parseGuidedRequest(text,activeSubject);
+    const isRoutineRequest = /\b(study routine|study plan|study schedule|daily routine|routine)\b|পড়ার রুটিন|পড়ার পরিকল্পনা|স্টাডি রুটিন/i.test(text);
+    const timeRequest = isRoutineRequest ? null : parseGuidedRequest(text,activeSubject);
     if(timeRequest) {
       const {minutes,topic}=timeRequest;
       const reply={id:crypto.randomUUID(),sender:'novyra',timestamp:new Date().toISOString(),

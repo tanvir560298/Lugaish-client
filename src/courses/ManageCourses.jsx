@@ -3,6 +3,7 @@ import { ROLES, isStudentPreview } from "../utils/roles.js";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../api/client.js";
+import { CourseAnnouncementPreview } from "./CourseAnnouncementPreview.jsx";
 function CourseEditor() {
   const [courses, setCourses] = useState([]),
     [form, setForm] = useState({
@@ -75,6 +76,10 @@ function CourseEditor() {
           hidden from students. Review lesson content before publishing.
         </p>
       </header>
+      <div className="platform-announcement" role="note">
+        <span>Catalog setup</span>
+        <span>This publisher currently supports English, Arabic, and Paid Batch pathways. C Programming and Video Editing need their own course catalog entries before they can be published here.</span>
+      </div>
       <p role="status">{message}</p>
       <div className="platform-grid two">
         <form className="campus-card course-editor" onSubmit={save}>
@@ -204,6 +209,7 @@ function CourseEditor() {
           ))}
         </section>
       </div>
+      <CourseAnnouncementPreview course={form} />
     </div>
   );
 }

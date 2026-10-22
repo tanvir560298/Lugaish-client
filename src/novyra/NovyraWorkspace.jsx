@@ -1,5 +1,6 @@
 import {TanuGuideSetup} from '../tanu/GuidedSession.jsx';
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Calendar,
   MessageSquare,
@@ -29,8 +30,16 @@ const TABS = [
 ];
 
 export function NovyraWorkspace() {
-  const [activeTab, setActiveTab] = useState("planner");
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(() => TABS.some((tab) => tab.id === searchParams.get("tab")) ? searchParams.get("tab") : "planner");
   const { profile, fullProfile, avatarState, activeSubject } = useNovyra();
+  const requestedTopic = searchParams.get("topic") || "";
+  const requestedDuration = Number(searchParams.get("duration")) || null;
+
+  useEffect(() => {
+    const requestedTab = searchParams.get("tab");
+    if (TABS.some((tab) => tab.id === requestedTab)) setActiveTab(requestedTab);
+  }, [searchParams]);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16">
@@ -55,7 +64,7 @@ export function NovyraWorkspace() {
                     <NovyraAvatarBadge state={avatarState} size="md" />
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Intelligent learning companion for Languages & Software Engineering
+                    Your course-aware study companion
                   </p>
                 </div>
               </div>
@@ -122,8 +131,8 @@ export function NovyraWorkspace() {
 
       {/* Main Content Area */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-8">
-        <p role="note" className="mb-5 text-sm text-slate-600 dark:text-slate-300">Without an enabled online provider, Tanu AI uses limited offline templates. These are not personalized AI answers or verified mastery assessments.</p>
-        {activeTab === "planner" && <StudyPlannerCard />}
+        <p role="note" className="mb-5 text-sm text-slate-600 dark:text-slate-300">Tanu can answer from built-in learning guides and help plan your study. General AI answers are available only when Lugaish’s online provider is enabled; check the status in Tutor Chat.</p>
+        {activeTab === "planner" && <StudyPlannerCard initialTopic={requestedTopic} initialDuration={requestedDuration} />}
         {activeTab === "chat" && <NovyraChatView />}
         {activeTab === "code" && <CodeMentorView />}
         {activeTab === "practice" && (

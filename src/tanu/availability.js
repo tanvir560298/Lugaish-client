@@ -1,2 +1,3 @@
-// Keep the assistant's entry points visible while its features are being built.
-export const TANU_AI_AVAILABLE = false;
+// The workspace is available; paid AI providers remain controlled separately
+// by the server's explicit NOVYRA_PAID_ENABLED and budget settings.
+export const TANU_AI_AVAILABLE = true;

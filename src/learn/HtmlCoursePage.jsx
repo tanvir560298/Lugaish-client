@@ -3,7 +3,7 @@ import {Link,useParams} from 'react-router-dom';
 import {useAppContext} from '../state/AppContext.jsx';
 import {useTanuPlayback} from '../tanu/GuidedSession.jsx';
 import {createYouTubeLoader} from '../classroom/youtubeApi.js';
-import {htmlVideos,cleanHtmlProgress} from './htmlContent.js';
+import {htmlVideos,htmlExercises,cleanHtmlProgress} from './htmlContent.js';
 import './learn.css';
 const loadYouTube=createYouTubeLoader({window,document,setTimeout,clearTimeout});
 
@@ -27,6 +27,17 @@ function HtmlPlayer({video}){
  },[video.id,video.youtubeId,video.course,enabled,version,report]);
  return <section aria-label="HTML video player"><div className="html-video-frame" ref={host}/>{!enabled&&<button className="lx-primary" onClick={()=>setEnabled(true)}>Load YouTube player</button>}{enabled&&<p role="status">{status==='playing'?'Playing':status==='ready'?'Ready — press Play in the video to begin.':status==='ended'?'Video ended. Review and mark watched when you are ready.':status==='loading'?'Loading YouTube…':status==='paused'?'Paused':status==='error'?'Playback unavailable':'Waiting for playback'}</p>}{error&&<p role="alert">{error} <button className="lx-secondary" onClick={()=>setVersion(v=>v+1)}>Retry player</button></p>}<p className="lx-fine">Playback is hosted by YouTube. Loading the player connects to YouTube; its availability and privacy policies apply. No autoplay.</p></section>;
 }
+function HtmlPracticeLab({video}){
+ const exercise=htmlExercises[video.id],storageKey=`lugaish_html_draft_v1:${video.id}`;
+ const [code,setCode]=useState(()=>{try{return localStorage.getItem(storageKey)??exercise.starter;}catch{return exercise.starter;}}),[saved,setSaved]=useState(true);
+ useEffect(()=>{try{localStorage.setItem(storageKey,code);setSaved(true);}catch{setSaved(false);}},[code,storageKey]);
+ const reset=()=>{setCode(exercise.starter);try{localStorage.removeItem(storageKey);}catch{setSaved(false);}};
+ return <section className="html-practice" aria-labelledby="html-practice-title">
+  <div className="html-practice-heading"><div><span className="html-start-kicker">A SMALL HANDS-ON EXERCISE</span><h2 id="html-practice-title">Try it in your browser</h2><p>{exercise.prompt}</p></div><button type="button" className="lx-secondary" onClick={reset}>Reset starter code</button></div>
+  <div className="html-practice-grid"><label className="html-code-editor"><span>YOUR HTML <small>{saved?'Draft saved in this browser':'Draft could not be saved'}</small></span><textarea aria-label="Edit HTML code" spellCheck="false" value={code} onChange={event=>setCode(event.target.value)}/></label><div className="html-live-preview"><div className="html-preview-toolbar"><span>LIVE PREVIEW</span><span aria-live="polite">Updates as you type</span></div><iframe title={`Live preview: ${video.title}`} sandbox="" srcDoc={code}/></div></div>
+  <p className="lx-fine">Your draft stays in this browser. The preview is sandboxed and does not run scripts.</p>
+ </section>;
+}
 export function HtmlCoursePage(){const {videoId}=useParams();return <HtmlCourse key={videoId||'overview'} videoId={videoId}/>;}
 function HtmlCourse({videoId}){
  const {state}=useAppContext(),key=`lugaish_html_watched_v1:${state.isLoggedIn?state.userEmail:'guest'}`;
@@ -43,7 +54,7 @@ function HtmlCourse({videoId}){
    </>:<>
    <div className="html-lesson-top"><div><span className="html-start-kicker">CLASS {video.id} OF 07</span><h1>{video.title}</h1></div><Link className="lx-secondary" to="/learn/web-development/html">Course roadmap</Link></div><div className="html-lesson-progress"><span>{completed.length} of 7 classes marked watched</span><div className="html-progress-track" role="progressbar" aria-label="Course progress" aria-valuemin={0} aria-valuemax={7} aria-valuenow={completed.length}><span style={{width:`${completed.length/7*100}%`}}/></div></div>
    </>}
-   {video&&<><HtmlPlayer video={video}/><div className="html-after-lesson"><div><span className="html-start-kicker">AFTER YOU WATCH</span><h2>Try it yourself</h2><p>Pause the video and recreate the example in your own file. When you’re done, mark this class watched and keep going.</p></div><button className="lx-primary" onClick={mark} disabled={completed.includes(video.id)}>{completed.includes(video.id)?'Class marked complete ✓':'I watched this class'}</button></div><div className="html-lesson-navigation">{previous?<Link className="lx-secondary" to={previous.path}>← Previous class<span>{previous.title}</span></Link>:<span/>}{following?<Link className="lx-primary" to={following.path}>Next class →<span>{following.title}</span></Link>:<Link className="lx-primary" to="/learn/web-development/html">Finish course →<span>Review your learning path</span></Link>}</div></>}
+   {video&&<><HtmlPlayer video={video}/><HtmlPracticeLab video={video}/><div className="html-after-lesson"><div><span className="html-start-kicker">AFTER YOU WATCH</span><h2>Keep your momentum</h2><p>Try the exercise above, then mark this class watched when you’re ready to continue.</p></div><button className="lx-primary" onClick={mark} disabled={completed.includes(video.id)}>{completed.includes(video.id)?'Class marked complete ✓':'I watched this class'}</button></div><div className="html-lesson-navigation">{previous?<Link className="lx-secondary" to={previous.path}>← Previous class<span>{previous.title}</span></Link>:<span/>}{following?<Link className="lx-primary" to={following.path}>Next class →<span>{following.title}</span></Link>:<Link className="lx-primary" to="/learn/web-development/html">Finish course →<span>Review your learning path</span></Link>}</div></>}
    <ol className="lx-syllabus html-roadmap">{htmlVideos.map((item,index)=>{const done=completed.includes(item.id);return <li key={item.id} className={`${done?'is-complete':''} ${video?.id===item.id?'is-current':''}`}><span className="html-roadmap-index">{done?'✓':item.id}</span><Link to={item.path} aria-current={video?.id===item.id?'page':undefined}><span className="html-roadmap-phase">{index<2?'GETTING STARTED':index<5?'BUILDING BLOCKS':'PUT IT TOGETHER'}</span><h2>{item.title}</h2><p>Class {item.id} · Video lesson · Bangla</p></Link><Link className="html-roadmap-open" to={item.path} aria-label={`${video?.id===item.id?'Continue':'Open'} class ${item.id}`}>{video?.id===item.id?'Continue →':done?'Review ↗':'Open class →'}</Link></li>})}</ol>
    <div className="lx-actions"><Link className="lx-secondary" to={`/classroom${video ? `?lesson=${video.id}` : ''}`}>Study in Classroom →</Link><Link className="lx-secondary" to="/study-room">Open my study desk →</Link></div>{error&&<p role="alert">{error}</p>}<p className="lx-notice">Your watched progress is saved in this browser. Mark a lesson watched after you finish it, and return to any lesson whenever you need a refresher.</p></div>;
 }

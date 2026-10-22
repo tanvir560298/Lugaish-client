@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   Calendar,
   Clock,
@@ -32,7 +33,7 @@ function formatTimer(seconds) {
   return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 }
 
-export function StudyPlannerCard() {
+export function StudyPlannerCard({ initialTopic = "", initialDuration = null }) {
   const {
     activePlan,
     createPlan,
@@ -46,14 +47,30 @@ export function StudyPlannerCard() {
   } = useNovyra();
 
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(() => Boolean(initialTopic));
   const [topicInput, setTopicInput] = useState("");
   const [durationInput, setDurationInput] = useState(profile?.dailyTimeMinutes || 45);
+  const [planError, setPlanError] = useState("");
   const [notesByBlock, setNotesByBlock] = useState({});
   const [expandedNotes, setExpandedNotes] = useState(null);
+
+  useEffect(() => {
+    if (profile?.dailyTimeMinutes) setDurationInput(profile.dailyTimeMinutes);
+  }, [profile?.dailyTimeMinutes]);
+  useEffect(() => {
+    if (initialTopic) {
+      setTopicInput(initialTopic);
+      setShowCreateForm(true);
+    }
+  }, [initialTopic]);
+  useEffect(() => {
+    if (Number.isInteger(initialDuration) && initialDuration >= 15 && initialDuration <= 120) setDurationInput(initialDuration);
+  }, [initialDuration]);
 
   const handleCreatePlan = async (e) => {
     e.preventDefault();
     setIsGenerating(true);
+    setPlanError("");
     try {
       await createPlan({
         subject: profile?.targetSubject || "english",
@@ -61,8 +78,9 @@ export function StudyPlannerCard() {
         durationMinutes: Number(durationInput) || 45,
       });
       setTopicInput("");
+      setShowCreateForm(false);
     } catch (err) {
-      console.error("Failed to create study plan:", err);
+      setPlanError(err.message || "I could not make the routine right now. Please try again.");
     } finally {
       setIsGenerating(false);
     }
@@ -74,20 +92,21 @@ export function StudyPlannerCard() {
     await completeBlock(idx, note);
   };
 
-  if (!activePlan) {
+  if (!activePlan || showCreateForm) {
     return (
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 mb-2">
               <Calendar className="w-3.5 h-3.5" />
-              <span>Intelligent Study Planner</span>
+              <span>Tanu Study Planner</span>
             </div>
             <h3 className="text-lg font-bold text-slate-900 dark:text-white">Design Today's Study Routine</h3>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              Tanu AI crafts an adaptive, timed schedule structured into concept mastery, interactive practice, restorative breaks, and quick knowledge checks.
+              Tell Tanu what you want to learn and how much time you have. It will make a timed routine with a short lesson, hands-on practice, a break, and a review.
             </p>
           </div>
+          {activePlan && <button type="button" onClick={() => setShowCreateForm(false)} className="text-xs font-semibold text-slate-600 dark:text-slate-300">Cancel</button>}
         </div>
 
         <form onSubmit={handleCreatePlan} className="space-y-4 pt-2">
@@ -99,7 +118,7 @@ export function StudyPlannerCard() {
               type="text"
               value={topicInput}
               onChange={(e) => setTopicInput(e.target.value)}
-              placeholder="e.g. Java Loops, Python OOP, English Phrasal Verbs, C Pointers..."
+              placeholder={profile?.targetSubject === "web_dev" ? "e.g. HTML class 03: headings" : "e.g. Java loops, Python functions, English vocabulary..."}
               className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
             />
           </div>
@@ -146,6 +165,7 @@ export function StudyPlannerCard() {
               </>
             )}
           </button>
+          {planError && <p role="alert" className="text-sm text-rose-600 dark:text-rose-400">{planError}</p>}
         </form>
       </div>
     );
@@ -174,6 +194,7 @@ export function StudyPlannerCard() {
           <h3 className="text-lg font-bold text-slate-900 dark:text-white">{activePlan.title}</h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Topic: {activePlan.topic}</p>
         </div>
+        <button type="button" onClick={() => { setPlanError(""); setShowCreateForm(true); }} className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:border-indigo-400"><PlusCircle className="w-4 h-4"/> Make another routine</button>
 
         {/* Global Timer Banner if Active */}
         {activeTimer.blockIndex !== null && (
@@ -237,8 +258,8 @@ export function StudyPlannerCard() {
             <Check className="w-5 h-5" />
           </div>
           <div>
-            <div className="font-bold text-sm">Study Session Complete!</div>
-            <div className="text-xs opacity-90">All blocks achieved. Your streak and focus minutes have been recorded.</div>
+            <div className="font-bold text-sm">Study routine complete!</div>
+            <div className="text-xs opacity-90">You finished every block. Take a moment to note what you learned and what to revisit.</div>
           </div>
         </div>
       )}
@@ -315,6 +336,17 @@ export function StudyPlannerCard() {
                           </li>
                         ))}
                       </ul>
+                    )}
+
+                    {block.materials?.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {block.materials.map((material, materialIndex) => {
+                          const lessonPath = material.match(/^Course lesson path: (\/learn\/web-development\/html(?:\/\d{2})?)$/)?.[1];
+                          return lessonPath
+                            ? <Link key={materialIndex} to={lessonPath} className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 underline">Open the HTML class →</Link>
+                            : <span key={materialIndex} className="text-[11px] text-slate-500 dark:text-slate-400">{material}</span>;
+                        })}
+                      </div>
                     )}
                   </div>
                 </div>
