@@ -24,10 +24,10 @@ export function HomePage() {
   return <div className="lx-home home-redesign home-focused">
     <section className="masterclass-hero" aria-labelledby="masterclass-title">
       <div className="masterclass-hero-copy">
-        <p className="masterclass-eyebrow"><span className="masterclass-live-dot"/> LPC · LIVE LEARNING</p>
+        <p className="masterclass-eyebrow"><span className="masterclass-live-dot"/> LUGAISH · FIRST AI MASTERCLASS</p>
         <p className="masterclass-overline"><Sparkles size={15}/> YOUR NEXT SKILL STARTS HERE</p>
-        <h2 id="masterclass-title">Create more<br/><em>with AI.</em></h2>
-        <p className="masterclass-lead">A practical, beginner-friendly masterclass to help you use AI for everyday work and creative projects.</p>
+        <h2 id="masterclass-title">Want to learn<br/><em>about AI?</em></h2>
+        <p className="masterclass-lead">Join Lugaish’s first AI Masterclass and learn practical ways to use AI for everyday work and creative projects.</p>
         <div className="masterclass-schedule">
           <div><CalendarDays size={17}/><span><strong>Every Saturday</strong><small>Live online class</small></span></div>
           <div><Clock3 size={17}/><span><strong>6:30–7:45 PM</strong><small>Saudi Arabia · 9:30–10:45 PM Bangladesh</small></span></div>
