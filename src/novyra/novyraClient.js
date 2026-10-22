@@ -1,4 +1,5 @@
-import { request } from "../api/client.js";
+import {consumeChatStream} from './chatStream.js';
+import {request,API_BASE_URL,getAuthToken} from "../api/client.js";
 
 export const novyraClient = {
   // Student Profile & Memory
@@ -14,7 +15,9 @@ export const novyraClient = {
   },
 
   // Conversational Tutor
-  async sendMessage({ sessionId = "default", contextType = "general", subject = "general", message }) {
+  async sendMessage({ sessionId = "default", contextType = "general", subject = "general", message, onDelta, signal }) {
+    if(onDelta){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),45000);try{const response=await fetch(`${API_BASE_URL}/novyra/chat`,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${getAuthToken()||''}`},body:JSON.stringify({sessionId,contextType,subject,message,stream:true}),signal:signal?AbortSignal.any([signal,controller.signal]):controller.signal});return await consumeChatStream(response,onDelta);}catch(error){if(signal?.aborted)throw Error('Reply stopped. You can send another question when ready.');if(error.name==='AbortError'||error.name==='TimeoutError')throw Error('Tanu took too long. Please try your question again.');throw error;}finally{clearTimeout(timer);}}
+
     return request("/novyra/chat", {
       method: "POST",
       body: JSON.stringify({

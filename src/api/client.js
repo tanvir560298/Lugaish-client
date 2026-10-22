@@ -1,6 +1,6 @@
 import {shouldClearSession} from '../state/identityPolicy.js';
 import {reportOperationalEvent} from '../utils/operations.js';
-const API_BASE_URL = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api')).replace(/\/$/, '');
+export const API_BASE_URL = (import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api')).replace(/\/$/, '');
 const TOKEN_KEY = 'lugaish_auth_token';
 const REQUEST_TIMEOUT_MS = Math.max(Number(import.meta.env.VITE_API_TIMEOUT_MS) || 15000, 1000);
 

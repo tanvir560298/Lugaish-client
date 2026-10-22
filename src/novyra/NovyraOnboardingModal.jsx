@@ -29,13 +29,13 @@ const GOALS = [
 const TIME_OPTIONS = [15, 30, 45, 60, 90];
 
 export function NovyraOnboardingModal() {
-  const { isOnboardingOpen, closeOnboarding, completeOnboarding } = useNovyra();
+  const { isOnboardingOpen, closeOnboarding, completeOnboarding, activeSubject, profile } = useNovyra();
   const [step, setStep] = useState(1);
-  const [selectedSubject, setSelectedSubject] = useState("english");
+  const [selectedSubject, setSelectedSubject] = useState(activeSubject || "web_dev");
   const [selectedLevel, setSelectedLevel] = useState("beginner");
   const [selectedGoal, setSelectedGoal] = useState("general_mastery");
   const [dailyMinutes, setDailyMinutes] = useState(45);
-  const [explanationLanguage, setExplanationLanguage] = useState("english");
+  const [explanationLanguage, setExplanationLanguage] = useState(profile?.explanationLanguage || "english");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOnboardingOpen) return null;

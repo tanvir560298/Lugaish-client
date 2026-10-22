@@ -25,12 +25,13 @@ function NovyraSessionProvider({ children, authenticated }) {
   const [activePlan, setActivePlan] = useState(null);
   const [plans, setPlans] = useState([]);
   const [messages, setMessages] = useState([]);
-  const [sessionId] = useState(() => `novyra-session-${Date.now()}`);
+  const [sessionId,setSessionId] = useState(() => `novyra-${crypto.randomUUID()}`);
+  const requestRef=useRef(0),sendingRef=useRef(false),abortRef=useRef(null);
   const [isChatLoading, setIsChatLoading] = useState(false);
   const [avatarState, setAvatarState] = useState("idle");
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
-  const [activeSubject, setActiveSubject] = useState("english");
+  const [activeSubject, setActiveSubject] = useState("web_dev");
   const [usage, setUsage] = useState(null);
   const [activeTimer, setActiveTimer] = useState({
     blockIndex: null,
@@ -52,10 +53,6 @@ function NovyraSessionProvider({ children, authenticated }) {
         setFullProfile(data.fullProfile);
         if (data.profile.targetSubject) {
           setActiveSubject(data.profile.targetSubject);
-        }
-        if (!data.profile.onboardingCompleted) {
-          // Open onboarding for new students
-          setIsOnboardingOpen(true);
         }
       }
     } catch (err) {
@@ -143,9 +140,11 @@ function NovyraSessionProvider({ children, authenticated }) {
     });
   };
 
+  useEffect(()=>()=>{requestRef.current++;abortRef.current?.abort();},[]);
+
   // Chat actions
   const sendMessage = async (text, options = {}) => {
-    if (!text || !text.trim()) return null;
+    if (!text || !text.trim() || sendingRef.current) return null;
     const isRoutineRequest = /\b(study routine|study plan|study schedule|daily routine|routine)\b|পড়ার রুটিন|পড়ার পরিকল্পনা|স্টাডি রুটিন/i.test(text);
     const timeRequest = isRoutineRequest ? null : parseGuidedRequest(text,activeSubject);
     if(timeRequest) {
@@ -156,6 +155,11 @@ function NovyraSessionProvider({ children, authenticated }) {
       setMessages(previous=>[...previous,{id:crypto.randomUUID(),sender:'student',content:text,timestamp:new Date().toISOString()},reply]);
       return {message:reply,provider:'guided-session-tool'};
     }
+    const request=++requestRef.current;
+    sendingRef.current=true;
+    const controller=new AbortController();abortRef.current=controller;
+    const streamingId=crypto.randomUUID();let streamed='';let frame;
+    const flush=()=>{frame=null;if(request!==requestRef.current)return;setMessages(previous=>previous.some(m=>m.id===streamingId)?previous.map(m=>m.id===streamingId?{...m,content:streamed}:m):[...previous,{id:streamingId,sender:'novyra',content:streamed,isStreaming:true}]);};
     const studentMsg = {
       id: `msg-${Date.now()}`,
       sender: "student",
@@ -173,15 +177,20 @@ function NovyraSessionProvider({ children, authenticated }) {
         contextType: options.contextType || "workspace",
         subject: options.subject || activeSubject,
         message: text.trim(),
+        signal:controller.signal,
+        onDelta:delta=>{streamed+=delta;if(!frame)frame=requestAnimationFrame(flush);},
       });
 
+      if(request!==requestRef.current)return null;
       if (resp?.message) {
-        setMessages((prev) => [...prev, resp.message]);
+        if(frame)cancelAnimationFrame(frame);
+        setMessages((prev) => [...prev.filter(m=>m.id!==streamingId), resp.message]);
         setAvatarState(resp.avatarState || "responding");
       }
       loadUsage();
       return resp;
     } catch (err) {
+      if(request!==requestRef.current)return null;
       const errMsg = {
         id: `err-${Date.now()}`,
         sender: "novyra",
@@ -189,19 +198,30 @@ function NovyraSessionProvider({ children, authenticated }) {
         timestamp: new Date().toISOString(),
         isError: true,
       };
-      setMessages((prev) => [...prev, errMsg]);
+      if(frame)cancelAnimationFrame(frame);
+      setMessages((prev) => [...prev.filter(m=>m.id!==streamingId), errMsg]);
       setAvatarState("idle");
       return null;
     } finally {
+      if(frame)cancelAnimationFrame(frame);
+      if(request===requestRef.current){
+      abortRef.current=null;
+      sendingRef.current=false;
       setIsChatLoading(false);
       // Return avatar to idle after 4 seconds if responding
       setTimeout(() => {
         setAvatarState((curr) => (curr === "responding" ? "idle" : curr));
       }, 4000);
+      }
     }
   };
 
   const clearChat = () => {
+    abortRef.current?.abort();
+    requestRef.current++;
+    sendingRef.current=false;
+    setIsChatLoading(false);
+    setSessionId(`novyra-${crypto.randomUUID()}`);
     setMessages([]);
     setAvatarState("idle");
   };
@@ -281,6 +301,7 @@ function NovyraSessionProvider({ children, authenticated }) {
     completeOnboarding,
     sendMessage,
     clearChat,
+    stopReply:()=>abortRef.current?.abort(),
     loadActivePlan,
     createPlan,
     completeBlock,
