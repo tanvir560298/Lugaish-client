@@ -18,6 +18,9 @@ export function timerReducer(timer, action) {
   switch (action.type) {
     case 'RESTORE': return restoreTimer(action.timer, now);
     case 'NEW': return createTimer(action.minutes, action.goal);
+    case 'DISCARD':
+      if (!['running', 'paused'].includes(timer.phase)) return timer;
+      return createTimer(action.minutes, action.goal);
     case 'START':
       if (!['idle', 'paused'].includes(timer.phase)) return timer;
       return { ...timer, phase: 'running', startedAt: timer.startedAt ?? now, endsAt: now + timer.remainingMs };

@@ -190,3 +190,5 @@
 /* Keep the ambience menu inside narrow viewports instead of aligning a
    280px popup to the right edge of a half-width mobile summary. */
 @media(max-width:760px){.has-study-library .ls-ambience>div{inset-inline-start:0;inset-inline-end:auto;width:min(280px,calc(100vw - 24px))}}
+
+.ls-discard{grid-column:1/-1;color:#7d3030!important;border-color:#c78989!important}

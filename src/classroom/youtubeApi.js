@@ -59,6 +59,19 @@ export function createYouTubeLoader({
     return pending;
   };
 }
+
+export function youtubePlayerErrorMessage(code) {
+  switch (code) {
+    case 2: return 'This YouTube video link is invalid. Choose another video or open the source on YouTube.';
+    case 5: return 'YouTube could not play this video in the embedded player. Open it on YouTube instead.';
+    case 100: return 'This video is unavailable or private. Open it on YouTube or choose another video.';
+    case 101:
+    case 150: return 'The video owner does not allow embedded playback. Open it on YouTube instead.';
+    case 153: return 'YouTube could not verify this embedded player. Open the source on YouTube or retry.';
+    default: return 'The YouTube player could not start. Check your connection, retry, or open the source on YouTube.';
+  }
+}
+
 export function placeReadyYouTubeFrame(player, destination) {
   const iframe = player?.getIframe();
   if (
