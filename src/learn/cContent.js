@@ -1,6 +1,6 @@
 // C Programming Course Content & Curriculum
 // Class 01 video: Owner-supplied YouTube video (https://youtu.be/r8hVKDRUGLQ)
-// Programming Hero style progression: Students must finish previous class to unlock the next.
+// Sequential progression: Students must finish previous class to unlock the next.
 
 export const cVideos = [
   {
@@ -157,7 +157,7 @@ export function cleanCProgress(value) {
   return [...new Set((Array.isArray(value) ? value : []).filter(id => cVideos.some(v => v.id === id)))];
 }
 
-// Programming Hero progression policy:
+// Sequential progression policy:
 // Class 01 is always unlocked.
 // Subsequent classes unlock ONLY if the immediate prior class is completed.
 export function isClassUnlocked(videoId, completedIds = []) {

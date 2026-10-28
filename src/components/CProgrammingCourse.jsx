@@ -25,13 +25,13 @@ export function CProgrammingCourse() {
           </span>
           <span className="web-course-free">Free course</span>
         </div>
-        <h3>C Programming: Zero to Hero</h3>
+        <h3>C Programming: Beginner to Advanced</h3>
         <p>
-          Master the language behind operating systems and computer fundamentals. Built with a <strong>Programming Hero style sequential unlocking system</strong>—complete video 1 to unlock video 2, and solve interactive practice problems along the way.
+          Master the language behind operating systems and computer fundamentals. Built with a <strong>step-by-step sequential unlocking system</strong>—complete video 1 to unlock video 2, and solve interactive practice problems along the way.
         </p>
         <div className="web-course-meta">
           <span><Play size={15} />{cVideos.length} structured classes</span>
-          <span><Globe2 size={15} />Taught in Bangla</span>
+          <span><Globe2 size={15} />Taught in English</span>
           <span><Code2 size={15} />Interactive Practice Lab</span>
           <span><Lock size={15} />Sequential Unlocking</span>
         </div>

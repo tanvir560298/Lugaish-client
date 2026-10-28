@@ -13,7 +13,7 @@ test('C Programming course has Class 01 with uploaded YouTube video r8hVKDRUGLQ'
   assert.equal(class01.path, '/learn/c-programming/01');
 });
 
-test('Programming Hero unlocking rule: Class 01 is unlocked; subsequent classes require completing previous class', () => {
+test('Sequential unlocking rule: Class 01 is unlocked; subsequent classes require completing previous class', () => {
   // Class 01 is always unlocked
   assert.equal(isClassUnlocked('01', []), true);
 

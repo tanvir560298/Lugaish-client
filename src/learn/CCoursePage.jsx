@@ -388,7 +388,7 @@ function CCourse({ videoId }) {
     );
   }
 
-  // PROGRAMMING HERO LOCKED SCREEN: If student navigates to a locked class without finishing prior ones
+  // SEQUENTIAL LOCKED SCREEN: If student navigates to a locked class without finishing prior ones
   if (video && isLocked) {
     const priorClass = previous || cVideos[0];
     return (
@@ -398,7 +398,7 @@ function CCourse({ videoId }) {
           <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
             <Lock size={32} />
           </div>
-          <span className="text-xs font-bold tracking-widest uppercase text-amber-400">Programming Hero Progression Rule</span>
+          <span className="text-xs font-bold tracking-widest uppercase text-amber-400">Sequential Progression Rule</span>
           <h1 className="text-3xl font-black text-white mt-2 mb-4">Class {video.id} is Locked 🔒</h1>
           <p className="text-slate-300 leading-relaxed mb-6">
             In our curriculum, you must finish <strong>Class {priorClass.id}: {priorClass.title}</strong> before moving forward to this video.
@@ -419,7 +419,7 @@ function CCourse({ videoId }) {
   return (
     <div className="lx-learn lx-html-course">
       <Link className="lx-back" to="/learn">← All courses</Link>
-      <p className="lx-eyebrow"><span className="lx-dot" /> PROGRAMMING FUNDAMENTALS / C LANGUAGE · BANGLA</p>
+      <p className="lx-eyebrow"><span className="lx-dot" /> PROGRAMMING FUNDAMENTALS / C LANGUAGE · ENGLISH</p>
 
       {!video ? (
         <>
@@ -427,7 +427,7 @@ function CCourse({ videoId }) {
             <div>
               <h1>Master C Programming,<br /><em>from the ground up.</em></h1>
               <p className="lx-lead">
-                Built with a strict step-by-step progression inspired by Programming Hero. Finish each class to unlock the next, complete interactive coding challenges, and build solid foundations.
+                Built with a step-by-step progression system. Finish each class to unlock the next, complete interactive coding challenges, and build solid foundations.
               </p>
             </div>
             <aside className="html-progress-card">
@@ -462,7 +462,7 @@ function CCourse({ videoId }) {
 
           <div className="html-roadmap-heading">
             <div>
-              <span className="lx-eyebrow">PROGRAMMING HERO SEQUENTIAL PATH</span>
+              <span className="lx-eyebrow">SEQUENTIAL LEARNING PATH</span>
               <h2>Your Learning Roadmap</h2>
             </div>
             <p>{cVideos.length} classes · Complete in order to unlock</p>
@@ -597,7 +597,7 @@ function CCourse({ videoId }) {
               <span aria-hidden="true">🎉</span>
               <div>
                 <strong>Class {video.id} Finished! Next Class Unlocked!</strong>
-                <p>According to the Programming Hero rule, the next module is now unlocked and ready for you.</p>
+                <p>The next module is now unlocked and ready for you.</p>
               </div>
               {following && (
                 <Link className="lx-primary" to={following.path}>

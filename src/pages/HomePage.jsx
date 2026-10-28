@@ -29,9 +29,9 @@ export function HomePage() {
         <div className="c-launch-badge">
           <span className="c-launch-pulse" /> NEW COURSE LAUNCH EVENT · LUGAISH CODE
         </div>
-        <h2>Lugaish-এ এখন শুরু হলো <em>C Programming!</em> 🚀</h2>
+        <h2>Learn <em>C Programming</em> on Lugaish! 🚀</h2>
         <p className="c-launch-lead">
-          কম্পিউটার ফান্ডামেন্টালস ও প্রোগ্রামিংয়ের গোড়াপত্তন এবার বাংলায়। প্রোগ্রামিং হিরো স্টাইলের স্টেপ-বাই-স্টেপ সিকোয়েনশিয়াল আনলকিং এবং ইন্টারেক্টিভ প্র্যাকটিস ল্যাব সহ ক্লাস ০১ এখন লাইভ!
+          Master the fundamentals of computer science and systems programming in English. Step-by-step sequential unlocking and hands-on practice lab are now live with Class 01!
         </p>
         <div className="c-launch-actions">
           <Link to="/learn/c-programming/01" className="lx-primary">

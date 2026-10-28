@@ -6,8 +6,8 @@ const SITE_URL = (import.meta.env.VITE_SITE_URL || 'https://lugaish.vercel.app')
 
 const DEFAULT_SEO = {
   title: 'Lugaish | Learn C Programming & Web Development. Build Your Next Chapter.',
-  description: 'Learn C programming and web development in Bangla with free structured video lessons, sequential unlocking, and interactive coding practice.',
-  keywords: 'C programming Bangla, web development Bangla, HTML course, free programming course, learn C, Lugaish',
+  description: 'Learn C programming and web development with free structured video lessons, sequential unlocking, and interactive coding practice.',
+  keywords: 'C programming, web development, HTML course, free programming course, learn C, Lugaish',
   image: `${SITE_URL}/og-image.svg`,
 };
 
@@ -23,16 +23,16 @@ const ROUTE_SEO = {
   },
   '/learn': {
     title: 'Courses | Lugaish',
-    description: 'Explore free C Programming and Web Development courses in Bangla with sequential class progression and hands-on practice.',
+    description: 'Explore free C Programming and Web Development courses with sequential class progression and hands-on practice.',
   },
   '/learn/c-programming': {
-    title: 'C Programming in Bangla | Lugaish',
-    description: 'Master C programming from scratch in Bangla with Programming Hero style sequential unlocking and interactive practice problems.',
-    keywords: 'C programming Bangla, learn C, C language, Programming Hero style, Lugaish',
+    title: 'C Programming Course | Lugaish',
+    description: 'Master C programming from scratch in English with step-by-step sequential unlocking and interactive practice problems.',
+    keywords: 'C programming, learn C, C language, C programming English, coding for beginners, Lugaish',
   },
   '/learn/c-programming/01': {
     title: 'Class 01: Welcome to C Programming | Lugaish',
-    description: 'Discover why C is the foundation of computing, learn about Dennis Ritchie and Bell Labs, and run your first C program.',
+    description: 'Discover why C is the foundation of computing, learn about Dennis Ritchie and Bell Labs, and run your first C program in English.',
   },
   '/learn/web-development/html': {
     title: 'Web Development — HTML in Bangla | Lugaish',

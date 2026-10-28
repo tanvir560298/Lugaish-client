@@ -10,7 +10,7 @@ export function LearnPage() {
         <p className="lx-eyebrow">A CLEAR PLACE TO START</p>
         <h1>Build a skill.<br/>Make it yours.</h1>
         <p className="lx-lead">
-          Start with our ongoing programming and web development courses. Learn the fundamentals, follow along in Bangla, and build real projects.
+          Start with our ongoing programming and web development courses. Learn the fundamentals, follow structured step-by-step lessons, and build real projects.
         </p>
       </header>
       <section className="catalog-ongoing" aria-labelledby="ongoing-title">
