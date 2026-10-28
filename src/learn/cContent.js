@@ -17,9 +17,9 @@ export const cVideos = [
   {
     id: '02',
     youtubeId: '',
-    title: 'Variables, Data Types & Input / Output (printf & scanf)',
-    summary: 'Learn int, float, char, format specifiers, and getting user input with scanf.',
-    duration: 'Coming soon',
+    title: 'How a C Program Works: Source Code, Compiler & Execution',
+    summary: 'Understand how source code is written, translated by a compiler, and how computers process inputs (e.g. 2 + 3) into outputs (5).',
+    duration: '1 min',
     course: 'c-programming',
     kind: 'video',
     path: '/learn/c-programming/02',
@@ -119,13 +119,23 @@ export const cPracticeProblems = {
   '02': [
     {
       id: 'c02-p1',
-      title: 'Problem 1: Declaring Variables',
+      title: 'Problem 1: Process Input & Add Two Numbers',
       level: 'Easy',
-      prompt: 'Declare an integer variable age with value 20 and print it.',
-      starter: '#include <stdio.h>\n\nint main() {\n    int age = 20;\n    printf("Age: %d\\n", age);\n    return 0;\n}',
-      expectedKeywords: ['int', 'printf', '%d'],
-      sampleOutput: 'Age: 20',
-      hint: 'Use %d format specifier for integers.'
+      prompt: 'In the video example, the program receives 2 and 3 and calculates 5. Write a C program to add 2 and 3 and print 5.',
+      starter: '#include <stdio.h>\n\nint main() {\n    int a = 2;\n    int b = 3;\n    int sum = a + b;\n    printf("%d\\n", sum);\n    return 0;\n}',
+      expectedKeywords: ['int', 'printf', '%d', 'sum'],
+      sampleOutput: '5',
+      hint: 'Declare integer variables for 2 and 3, compute their sum, and print using %d.'
+    },
+    {
+      id: 'c02-p2',
+      title: 'Problem 2: Print Formatted Calculation',
+      level: 'Easy',
+      prompt: 'Print the complete calculation: "2 + 3 = 5" using printf.',
+      starter: '#include <stdio.h>\n\nint main() {\n    printf("2 + 3 = 5\\n");\n    return 0;\n}',
+      expectedKeywords: ['printf'],
+      sampleOutput: '2 + 3 = 5',
+      hint: 'Use printf to output "2 + 3 = 5".'
     }
   ],
   '03': [
