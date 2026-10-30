@@ -4,16 +4,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg: 'var(--campus-bg)',
-        surface: 'var(--campus-surface)',
-        surfaceSoft: 'var(--campus-surface-raised)',
-        accentBlue: '#245640',
-        accentGreen: '#245640',
-        accentPurple: '#c6a46c',
-        accentOrange: '#76571f',
+        bg: '#070b18',
+        surface: 'rgba(15, 23, 42, 0.82)',
+        surfaceSoft: 'rgba(13, 18, 30, 0.7)',
+        accentBlue: '#3b82f6',
+        accentGreen: '#10b981',
+        accentPurple: '#c084fc',
+        accentOrange: '#f59e0b',
       },
       boxShadow: {
-        soft: 'var(--campus-shadow)',
+        soft: '0 25px 80px rgba(0,0,0,0.35)',
       },
       borderRadius: {
         '2xl': '1.5rem',

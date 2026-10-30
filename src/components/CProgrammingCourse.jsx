@@ -5,23 +5,23 @@ import './course-showcase.css';
 
 export function CProgrammingCourse() {
   return (
-    <article className="web-course-card" data-course="c-programming" style={{ borderColor: 'rgba(132, 228, 214, 0.3)' }}>
-      <div className="web-course-visual" style={{ background: 'linear-gradient(135deg, #0b2628 0%, #0d1627 100%)' }}>
-        <span className="web-course-visual-label" style={{ color: '#84e4d6' }}>NEW RELEASE · CLASS 01 READY</span>
-        <span className="web-course-glyph" aria-hidden="true" style={{ color: '#84e4d6', fontFamily: 'monospace' }}>
+    <article className="web-course-card" data-course="c-programming" style={{ borderColor: 'rgba(56, 189, 248, 0.3)' }}>
+      <div className="web-course-visual" style={{ background: 'linear-gradient(135deg, #0b172a 0%, #172554 100%)' }}>
+        <span className="web-course-visual-label" style={{ color: '#38bdf8' }}>NEW RELEASE · CLASS 01 READY</span>
+        <span className="web-course-glyph" aria-hidden="true" style={{ color: '#38bdf8', fontFamily: 'monospace' }}>
           {'{ C }'}
         </span>
         <div className="web-course-visual-bottom">
-          <span style={{ color: '#84e4d6' }}>PROGRAMMING FUNDAMENTALS</span>
-          <span>01 / C LANGUAGE</span>
+          <span style={{ color: '#38bdf8' }}>PROGRAMMING FUNDAMENTALS</span>
+          <span style={{ color: '#94a3b8' }}>01 / C LANGUAGE</span>
         </div>
         <span className="web-course-orbit" aria-hidden="true" />
       </div>
 
       <div className="web-course-copy">
         <div className="web-course-topline">
-          <span className="web-open-label" style={{ background: '#0a3532', color: '#84e4d6' }}>
-            <span style={{ background: '#84e4d6' }} /> AVAILABLE NOW · CLASS 01 LIVE
+          <span className="web-open-label" style={{ background: 'rgba(56, 189, 248, 0.12)', color: '#38bdf8', padding: '4px 10px', borderRadius: '20px' }}>
+            <span style={{ background: '#38bdf8' }} /> AVAILABLE NOW · CLASS 01 LIVE
           </span>
           <span className="web-course-free">Free course</span>
         </div>
