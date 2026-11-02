@@ -95,3 +95,28 @@ public class Test {
   assert.equal(checkResult.ok, true);
   assert.ok(checkResult.message.includes('compiled and executed perfectly'));
 });
+
+test('Java Programming course has Class 02 connected to YouTube video rEH2VixyswE', () => {
+  const class02 = javaVideos.find(v => v.id === '02');
+  assert.ok(class02, 'Class 02 must exist');
+  assert.equal(class02.youtubeId, 'rEH2VixyswE');
+  assert.equal(class02.url, 'https://www.youtube.com/watch?v=rEH2VixyswE');
+  assert.ok(class02.title.includes('Operators') || class02.title.includes('Pattern'));
+  assert.equal(class02.path, '/learn/java-programming/02');
+
+  const pList = javaPracticeProblems['02'];
+  assert.ok(Array.isArray(pList) && pList.length >= 3, 'Class 02 should have 3 practice exercises');
+});
+
+test('Class 02 simulator evaluates integer precedence 5 * 6 / 7 % 3 to 1', () => {
+  const code = `
+public class Test {
+    public static void main(String[] args) {
+        System.out.println(5 * 6 / 7 % 3);
+    }
+}
+  `;
+  const sim = runJavaSimulation(code);
+  assert.equal(sim.success, true);
+  assert.equal(sim.output.trim(), '1');
+});

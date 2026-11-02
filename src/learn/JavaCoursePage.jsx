@@ -375,66 +375,146 @@ function JavaPracticeLab({ video, onPassed, scope }) {
 
       {activeTab === 'notes' ? (
         <div style={{ padding: '8px 4px' }}>
-          <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)', borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
-            <h3 style={{ color: '#fbbf24', fontSize: '18px', marginTop: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Sparkles size={18} /> The Golden Rule of Java Printing
-            </h3>
-            <p style={{ fontSize: '14px', lineHeight: 1.8, color: '#fef3c7', margin: '8px 0 0' }}>
-              In Class 01, instructor Tanvir Ahmad focuses on the essential behavior of printing in Java:
-              <strong> Whatever you write inside double quotes <code style={{ background: 'rgba(0,0,0,0.4)', padding: '2px 6px', borderRadius: '4px', color: '#6ee7b7' }}>"..."</code> in <code style={{ background: 'rgba(0,0,0,0.4)', padding: '2px 6px', borderRadius: '4px', color: '#93c5fd' }}>System.out.println()</code> is printed directly to the output screen!</strong>
-            </p>
-          </div>
+          {video.id === '02' ? (
+            <>
+              <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)', borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
+                <h3 style={{ color: '#fbbf24', fontSize: '18px', marginTop: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Sparkles size={18} /> Class 02 Key Concepts: Operators, Precedence & Patterns
+                </h3>
+                <p style={{ fontSize: '14px', lineHeight: 1.8, color: '#fef3c7', margin: '8px 0 0' }}>
+                  In Class 02, instructor Tanvir Ahmad teaches operator precedence rules, left-to-right evaluation, the difference between <code style={{ background: 'rgba(0,0,0,0.4)', padding: '2px 6px', borderRadius: '4px', color: '#6ee7b7' }}>print()</code> and <code style={{ background: 'rgba(0,0,0,0.4)', padding: '2px 6px', borderRadius: '4px', color: '#93c5fd' }}>println()</code>, and how to draw asterisk pattern shapes.
+                </p>
+              </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '24px' }}>
-            <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
-              <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
-                1. Class Structure
-              </strong>
-              <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
-                Every piece of runnable Java code lives inside a class: <code style={{ color: '#fed7aa' }}>public class Test {'{ ... }'}</code>.
-              </p>
-            </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+                <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
+                  <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
+                    1. Operator Precedence
+                  </strong>
+                  <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
+                    Hierarchy: <strong>( )</strong> &gt; <strong>* / %</strong> &gt; <strong>+ -</strong>. Parentheses are calculated first. Multiplicative operators have equal precedence and run left-to-right before addition and subtraction.
+                  </p>
+                </div>
 
-            <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
-              <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
-                2. The Main Method
-              </strong>
-              <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
-                Execution begins at: <code style={{ color: '#fed7aa' }}>public static void main(String[] args)</code>. It is the entry gate for Java applications.
-              </p>
-            </div>
+                <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
+                  <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
+                    2. Integer Tracing: 5 * 6 / 7 % 3
+                  </strong>
+                  <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
+                    5 * 6 = 30 &rarr; 30 / 7 = 4 (integer division drops decimals) &rarr; 4 % 3 = 1 (remainder). Final answer is <strong>1</strong>.
+                  </p>
+                </div>
 
-            <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
-              <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
-                3. Newlines with println
-              </strong>
-              <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
-                <code style={{ color: '#fed7aa' }}>println</code> stands for "print line". It prints the text inside double quotes and moves the cursor to a brand new line.
-              </p>
-            </div>
+                <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
+                  <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
+                    3. print() vs println()
+                  </strong>
+                  <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
+                    <code style={{ color: '#fed7aa' }}>System.out.print()</code> writes text and keeps the cursor on the same line. <code style={{ color: '#fed7aa' }}>System.out.println()</code> writes and then creates a new line.
+                  </p>
+                </div>
 
-            <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
-              <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
-                4. Semicolon Rule
-              </strong>
-              <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
-                Every single instruction/statement in Java must terminate with a semicolon (<code style={{ color: '#fed7aa' }}>;</code>).
-              </p>
-            </div>
-          </div>
+                <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
+                  <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
+                    4. Visual Pattern Printing
+                  </strong>
+                  <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
+                    By strategically aligning spaces and asterisks, you can print triangles, diamonds, and boxes directly to the terminal.
+                  </p>
+                </div>
+              </div>
 
-          <div style={{ background: '#0a0f1d', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '12px', overflow: 'hidden' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255, 255, 255, 0.05)', padding: '10px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
-              <span style={{ fontSize: '11px', fontFamily: 'monospace', color: '#fed7aa' }}>Test.java (Source Code from Class 01)</span>
-              <button
-                type="button"
-                onClick={() => copyNotesCode(`public class Test {\n    public static void main(String[] args)\n    {\n        System.out.println("My name is Tanvir Ahmad");\n        System.out.println("My age is 22");\n        System.out.println("I am from Bangladesh");\n    }\n}`)}
-                style={{ background: 'rgba(245, 158, 11, 0.2)', border: '1px solid #f59e0b', borderRadius: '6px', color: '#fbbf24', padding: '3px 10px', fontSize: '11px', cursor: 'pointer', fontWeight: 600 }}
-              >
-                Copy to Practice Lab →
-              </button>
-            </div>
-            <pre style={{ margin: 0, padding: '16px', font: '13px/1.8 monospace', color: '#e2e8f0', overflowX: 'auto' }}>
+              <div style={{ background: '#0a0f1d', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '12px', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255, 255, 255, 0.05)', padding: '10px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  <span style={{ fontSize: '11px', fontFamily: 'monospace', color: '#fed7aa' }}>Test.java (Source Code from Class 02)</span>
+                  <button
+                    type="button"
+                    onClick={() => copyNotesCode(`public class Test {\n    public static void main(String[] args)\n    {\n        System.out.println("  *  ");\n        System.out.println(" * * ");\n        System.out.println("* * *");\n        System.out.println(" * * ");\n        System.out.println("  *  ");\n    }\n}`)}
+                    style={{ background: 'rgba(245, 158, 11, 0.2)', border: '1px solid #f59e0b', borderRadius: '6px', color: '#fbbf24', padding: '3px 10px', fontSize: '11px', cursor: 'pointer', fontWeight: 600 }}
+                  >
+                    Copy to Practice Lab &rarr;
+                  </button>
+                </div>
+                <pre style={{ margin: 0, padding: '16px', font: '13px/1.8 monospace', color: '#e2e8f0', overflowX: 'auto' }}>
+{`public class Test {
+    public static void main(String[] args)
+    {
+        // Diamond Pattern from Class 02
+        System.out.println("  *  ");
+        System.out.println(" * * ");
+        System.out.println("* * *");
+        System.out.println(" * * ");
+        System.out.println("  *  ");
+
+        // Operator Precedence: 5 * 6 / 7 % 3 evaluates to 1
+        System.out.println("The output is = " + (5 * 6 / 7 % 3));
+    }
+}`}
+                </pre>
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)', borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
+                <h3 style={{ color: '#fbbf24', fontSize: '18px', marginTop: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Sparkles size={18} /> The Golden Rule of Java Printing
+                </h3>
+                <p style={{ fontSize: '14px', lineHeight: 1.8, color: '#fef3c7', margin: '8px 0 0' }}>
+                  In Class 01, instructor Tanvir Ahmad focuses on the essential behavior of printing in Java:
+                  <strong> Whatever you write inside double quotes <code style={{ background: 'rgba(0,0,0,0.4)', padding: '2px 6px', borderRadius: '4px', color: '#6ee7b7' }}>"..."</code> in <code style={{ background: 'rgba(0,0,0,0.4)', padding: '2px 6px', borderRadius: '4px', color: '#93c5fd' }}>System.out.println()</code> is printed directly to the output screen!</strong>
+                </p>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+                <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
+                  <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
+                    1. Class Structure
+                  </strong>
+                  <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
+                    Every piece of runnable Java code lives inside a class: <code style={{ color: '#fed7aa' }}>public class Test {'{ ... }'}</code>.
+                  </p>
+                </div>
+
+                <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
+                  <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
+                    2. The Main Method
+                  </strong>
+                  <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
+                    Execution begins at: <code style={{ color: '#fed7aa' }}>public static void main(String[] args)</code>. It is the entry gate for Java applications.
+                  </p>
+                </div>
+
+                <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
+                  <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
+                    3. Newlines with println
+                  </strong>
+                  <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
+                    <code style={{ color: '#fed7aa' }}>println</code> stands for "print line". It prints the text inside double quotes and moves the cursor to a brand new line.
+                  </p>
+                </div>
+
+                <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
+                  <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
+                    4. Semicolon Rule
+                  </strong>
+                  <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
+                    Every single instruction/statement in Java must terminate with a semicolon (<code style={{ color: '#fed7aa' }}>;</code>).
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ background: '#0a0f1d', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '12px', overflow: 'hidden' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255, 255, 255, 0.05)', padding: '10px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  <span style={{ fontSize: '11px', fontFamily: 'monospace', color: '#fed7aa' }}>Test.java (Source Code from Class 01)</span>
+                  <button
+                    type="button"
+                    onClick={() => copyNotesCode(`public class Test {\n    public static void main(String[] args)\n    {\n        System.out.println("My name is Tanvir Ahmad");\n        System.out.println("My age is 22");\n        System.out.println("I am from Bangladesh");\n    }\n}`)}
+                    style={{ background: 'rgba(245, 158, 11, 0.2)', border: '1px solid #f59e0b', borderRadius: '6px', color: '#fbbf24', padding: '3px 10px', fontSize: '11px', cursor: 'pointer', fontWeight: 600 }}
+                  >
+                    Copy to Practice Lab &rarr;
+                  </button>
+                </div>
+                <pre style={{ margin: 0, padding: '16px', font: '13px/1.8 monospace', color: '#e2e8f0', overflowX: 'auto' }}>
 {`public class Test {
     public static void main(String[] args)
     {
@@ -445,8 +525,10 @@ function JavaPracticeLab({ video, onPassed, scope }) {
 }
 
 // Exercise: Print your name as well as your age and your country on new lines.`}
-            </pre>
-          </div>
+                </pre>
+              </div>
+            </>
+          )}
         </div>
       ) : (
         <div>

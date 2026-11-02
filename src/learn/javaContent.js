@@ -1,6 +1,5 @@
 // Java Programming Course Content & Curriculum
-// Class 01: Tanvir Ahmad's class on Java basics & printing fundamentals.
-// Designed to link directly to YouTube to save hosting bandwidth & storage.
+// Class 01 & 02: Tanvir Ahmad's recorded classes on Java fundamentals.
 // Sequential progression: Students progress through classes with interactive lab practice.
 
 export const javaVideos = [
@@ -20,31 +19,31 @@ export const javaVideos = [
   },
   {
     id: '02',
-    youtubeId: '',
-    title: 'Class 02: Variables & Data Types (int, double, String, boolean)',
-    summary: 'Discover how computers store values in memory, declaring variables, type rules, and assigning values in Java.',
-    duration: 'Coming soon',
+    youtubeId: 'rEH2VixyswE',
+    title: 'Class 02: Operators, Precedence & Pattern Printing',
+    summary: 'Master Java arithmetic operators (+, -, *, /, %), operator precedence rules () > * / % > + -, the crucial difference between print() and println(), and visual asterisk pattern designs.',
+    duration: '12 min 48 sec',
     course: 'java-programming',
     kind: 'video',
     path: '/learn/java-programming/02',
-    url: '',
+    url: 'https://www.youtube.com/watch?v=rEH2VixyswE',
     instructor: 'Tanvir Ahmad',
-    topics: ['Primitive data types', 'Variables & identifiers', 'Memory assignment', 'String vs numeric values'],
-    keyConcept: 'Variables hold data in memory. Strongly typed Java requires declaring the type before using a variable.'
+    topics: ['Arithmetic operators (+, -, *, /, %)', 'Operator precedence: () > * / % > + -', 'Left-to-right evaluation', 'print vs println', 'Asterisk pattern printing'],
+    keyConcept: 'Parentheses take highest priority. Multiplication, division, and modulo share equal precedence and evaluate left-to-right before addition and subtraction. print() keeps the cursor on the same line, while println() moves to the next line.'
   },
   {
     id: '03',
     youtubeId: '',
-    title: 'Class 03: String Concatenation & Arithmetic Operations',
-    summary: 'Combine text with values using the + operator, perform calculations, and understand operator precedence in Java.',
+    title: 'Class 03: Variables & Data Types (int, double, String, boolean)',
+    summary: 'Discover how computers store values in memory, declaring variables, type rules, and assigning values in Java.',
     duration: 'Coming soon',
     course: 'java-programming',
     kind: 'video',
     path: '/learn/java-programming/03',
     url: '',
     instructor: 'Tanvir Ahmad',
-    topics: ['String concatenation with +', 'Arithmetic operators (+, -, *, /, %)', 'Operator precedence', 'Printing expressions'],
-    keyConcept: 'When used with Strings, the + operator concatenates. When used with numbers, it performs arithmetic addition.'
+    topics: ['Primitive data types', 'Variables & identifiers', 'Memory assignment', 'String vs numeric values'],
+    keyConcept: 'Variables hold data in memory. Strongly typed Java requires declaring the type before using a variable.'
   },
   {
     id: '04',
@@ -69,7 +68,6 @@ export const javaVideos = [
     course: 'java-programming',
     kind: 'video',
     path: '/learn/java-programming/05',
-    url: '',
     instructor: 'Tanvir Ahmad',
     topics: ['for loop structure', 'while and do-while loops', 'Loop counters & increments', 'break and continue'],
     keyConcept: 'Loops repeat a block of code as long as a specified condition remains true.'
@@ -156,6 +154,66 @@ export const javaPracticeProblems = {
       minPrintLines: 2,
       sampleOutput: 'Hello, Java!\nWelcome to Lugaish Learning Portal!',
       hint: 'Ensure you have two System.out.println statements with the exact text inside double quotes.'
+    }
+  ],
+  '02': [
+    {
+      id: 'java02-p1',
+      title: 'Problem 1: Asterisk Triangle Pattern (print vs println)',
+      level: 'Beginner',
+      prompt: 'As taught by Tanvir in Class 02, write a program that prints a 3-line asterisk triangle pattern using System.out.println():\n*\n* *\n* * *',
+      starter: `public class Test {
+    public static void main(String[] args)
+    {
+        // Print a 3-line triangle pattern with asterisks
+        System.out.println("*");
+        System.out.println("* *");
+        System.out.println("* * *");
+    }
+}`,
+      expectedKeywords: ['public', 'class', 'main', 'System.out.'],
+      minPrintLines: 3,
+      sampleOutput: '*\n* *\n* * *',
+      hint: 'Use System.out.println() for each row of asterisks. Notice how println moves to a new line after each row.'
+    },
+    {
+      id: 'java02-p2',
+      title: 'Problem 2: Diamond Pattern Design',
+      level: 'Intermediate',
+      prompt: 'Print the 5-row diamond pattern demonstrated by Tanvir in Class 02:\n  *  \n * * \n* * *\n * * \n  *  ',
+      starter: `public class Test {
+    public static void main(String[] args)
+    {
+        // Print the 5-row diamond pattern below
+        System.out.println("  *  ");
+        System.out.println(" * * ");
+        System.out.println("* * *");
+        System.out.println(" * * ");
+        System.out.println("  *  ");
+    }
+}`,
+      expectedKeywords: ['public', 'class', 'main', 'System.out.println'],
+      minPrintLines: 5,
+      sampleOutput: '  *  \n * * \n* * *\n * * \n  *  ',
+      hint: 'Pay close attention to leading and center spaces in each double-quoted string to align the diamond symmetrically.'
+    },
+    {
+      id: 'java02-p3',
+      title: 'Problem 3: Arithmetic Precedence (5 * 6 / 7 % 3)',
+      level: 'Concept Check',
+      prompt: 'In Class 02, Tanvir explained the operator precedence rules: () > * / % > + -. Trace the expression 5 * 6 / 7 % 3 and print the calculation result using System.out.println.',
+      starter: `public class Test {
+    public static void main(String[] args)
+    {
+        // Expression: 5 * 6 / 7 % 3
+        // 5 * 6 = 30 -> 30 / 7 = 4 -> 4 % 3 = 1
+        System.out.println("The result is = " + (5 * 6 / 7 % 3));
+    }
+}`,
+      expectedKeywords: ['System.out.println'],
+      minPrintLines: 1,
+      sampleOutput: 'The result is = 1',
+      hint: 'Remember that * / % have equal precedence and are evaluated from left to right. In integer division, 30 / 7 gives 4, and 4 % 3 gives remainder 1.'
     }
   ]
 };

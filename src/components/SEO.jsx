@@ -43,6 +43,10 @@ const ROUTE_SEO = {
     title: 'Class 01: Java Basics & Printing Fundamentals | Lugaish',
     description: 'Understand Java class structure, the main method, and how System.out.println() prints whatever is inside double quotes.',
   },
+  '/learn/java-programming/02': {
+    title: 'Class 02: Operators, Precedence & Pattern Printing | Lugaish',
+    description: 'Master Java arithmetic operators, operator precedence hierarchy, print vs println, and pattern designs with Tanvir Ahmad.',
+  },
   '/learn/java': {
     title: 'Java Programming Course | Lugaish Learning Portal',
     description: 'Master Java programming from scratch with instructor Tanvir Ahmad. Interactive Java Lab with sequential progress.',

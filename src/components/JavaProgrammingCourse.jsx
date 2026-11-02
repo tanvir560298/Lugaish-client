@@ -7,7 +7,7 @@ export function JavaProgrammingCourse() {
   return (
     <article className="web-course-card" data-course="java-programming" style={{ borderColor: 'rgba(245, 158, 11, 0.3)' }}>
       <div className="web-course-visual" style={{ background: 'linear-gradient(135deg, #180d04 0%, #451a03 50%, #78350f 100%)' }}>
-        <span className="web-course-visual-label" style={{ color: '#fbbf24' }}>NEW RELEASE · CLASS 01 LIVE</span>
+        <span className="web-course-visual-label" style={{ color: '#fbbf24' }}>NEW RELEASE · CLASSES 01 & 02 LIVE</span>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: 'auto 0', zIndex: 1 }}>
           <span className="web-course-glyph" aria-hidden="true" style={{ color: '#fbbf24', fontFamily: 'monospace', margin: '10px 0 0' }}>
             {'{ Java }'}
@@ -26,13 +26,13 @@ export function JavaProgrammingCourse() {
       <div className="web-course-copy">
         <div className="web-course-topline">
           <span className="web-open-label" style={{ background: 'rgba(245, 158, 11, 0.12)', color: '#fbbf24', padding: '4px 10px', borderRadius: '20px' }}>
-            <span style={{ background: '#fbbf24' }} /> AVAILABLE NOW · CLASS 01 READY
+            <span style={{ background: '#fbbf24' }} /> AVAILABLE NOW · CLASSES 01 & 02 READY
           </span>
           <span className="web-course-free">Free course</span>
         </div>
         <h3>Java Programming: Beginner to Master</h3>
         <p>
-          Master one of the world's most widely-used enterprise and application languages. Learn Java class structure, the golden double-quote printing rule, and solve hands-on coding exercises in our <strong>interactive browser Java Lab</strong> with sequential progress.
+          Master one of the world's most widely-used enterprise and application languages. Learn Java class structure, the golden double-quote printing rule, operator precedence, and pattern designs with hands-on exercises in our <strong>interactive browser Java Lab</strong>.
         </p>
         <div className="web-course-meta">
           <span><Play size={15} />{javaVideos.length} structured classes</span>
@@ -44,7 +44,7 @@ export function JavaProgrammingCourse() {
           <Link className="lx-primary" to="/learn/java-programming" style={{ background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)', borderColor: '#f59e0b', color: '#ffffff' }}>
             Start Java Programming <ArrowRight size={17} />
           </Link>
-          <span><Check size={14} /> Class 01 live on YouTube</span>
+          <span><Check size={14} /> Classes 01 & 02 live on YouTube</span>
         </div>
       </div>
     </article>

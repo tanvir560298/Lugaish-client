@@ -5,16 +5,17 @@ export const javaMilestones = [
   { id: 'jm-1', title: 'First Java Class', desc: 'Wrote and understood Java class structure & main method' },
   { id: 'jm-2', title: 'Master of Double Quotes', desc: 'Successfully printed text using System.out.println with quotes' },
   { id: 'jm-3', title: 'Multi-Line Printing', desc: 'Printed separate lines with individual println statements' },
-  { id: 'jm-4', title: 'Java Explorer', desc: 'Completed hands-on practice problems in the Java Lab' }
+  { id: 'jm-4', title: 'Operator & Pattern Master', desc: 'Mastered arithmetic precedence, print vs println, and pattern designs' }
 ];
 
 /**
  * Parses and simulates basic Java code execution in the browser.
- * Focuses on fundamentals: classes, main method, System.out.println, strings, quotes, and newlines.
+ * Focuses on fundamentals: classes, main method, System.out.println, System.out.print,
+ * strings, quotes, operators, and pattern designs.
  */
 export function runJavaSimulation(code) {
   if (!code || typeof code !== 'string') {
-    return { success: false, errors: ['No code provided.'], output: '' };
+    return { success: false, errors: ['No code provided.'], output: '', linesCount: 0 };
   }
 
   const errors = [];
@@ -78,8 +79,8 @@ export function runJavaSimulation(code) {
   }
 
   // Simulate print statements execution
-  const printedOutputs = [];
-  // Regular expression to match System.out.println(...) and System.out.print(...)
+  const outputLines = [];
+  let currentLine = '';
   const printRegex = /System\.out\.(println|print)\s*\(([\s\S]*?)\)\s*;/g;
   let match;
 
@@ -88,23 +89,33 @@ export function runJavaSimulation(code) {
     const arg = match[2].trim();
 
     if (arg === '') {
-      printedOutputs.push(isPrintln ? '' : '');
+      if (isPrintln) {
+        outputLines.push(currentLine);
+        currentLine = '';
+      }
       continue;
     }
 
-    // Evaluate argument
-    // Handle string literals and concatenation
     const evaluated = evaluateJavaPrintArg(arg);
-    printedOutputs.push(evaluated);
+    currentLine += evaluated;
+
+    if (isPrintln) {
+      outputLines.push(currentLine);
+      currentLine = '';
+    }
   }
 
-  const finalOutput = printedOutputs.join('\n');
+  if (currentLine) {
+    outputLines.push(currentLine);
+  }
+
+  const finalOutput = outputLines.join('\n');
 
   return {
     success: true,
     output: finalOutput,
     errors: [],
-    linesCount: printedOutputs.length
+    linesCount: outputLines.length
   };
 }
 
@@ -123,21 +134,71 @@ function evaluateJavaPrintArg(expr) {
     return parts.map(part => evaluateJavaPrintArg(part.trim())).join('');
   }
 
-  // Pure numeric expression: 5 + 3
-  if (/^[\d\s+\-*/%()]+$/.test(expr)) {
+  // Arithmetic expression with parentheses or operators: (5 * 6 / 7 % 3) or 1 + 2
+  const cleanedExpr = expr.replace(/^\(|\)$/g, '').trim();
+  if (/^[\d\s+\-*/%()]+$/.test(cleanedExpr)) {
     try {
-      // Safe arithmetic evaluator
-      const sanitized = expr.replace(/[^0-9+\-*/%()]/g, '');
-      // eslint-disable-next-line no-new-func
-      const val = Function(`'use strict'; return (${sanitized})`)();
+      // Evaluate integer arithmetic adhering to Java integer division
+      const val = evaluateJavaIntArithmetic(cleanedExpr);
       return String(val);
     } catch {
       return expr;
     }
   }
 
-  // Fallback: strip quotes if present or return as is
+  // Fallback: strip outer quotes if present or return as is
   return expr.replace(/^"|"$/g, '');
+}
+
+/**
+ * Evaluates integer arithmetic with Java integer truncation & precedence semantics
+ */
+function evaluateJavaIntArithmetic(expr) {
+  let clean = expr;
+  // Handle parentheses first
+  while (clean.includes('(')) {
+    clean = clean.replace(/\(([^()]+)\)/g, (_, inner) => evaluateJavaIntArithmetic(inner));
+  }
+
+  const tokens = [];
+  const regex = /\s*([0-9]+|[+\-*/%])\s*/g;
+  let m;
+  while ((m = regex.exec(clean)) !== null) {
+    tokens.push(m[1]);
+  }
+  if (!tokens.length) return 0;
+
+  // First pass: left-to-right for * / %
+  const pass1 = [];
+  let i = 0;
+  while (i < tokens.length) {
+    const t = tokens[i];
+    if (t === '*' || t === '/' || t === '%') {
+      const prev = Number(pass1.pop());
+      const next = Number(tokens[i + 1]);
+      let res = 0;
+      if (t === '*') res = prev * next;
+      else if (t === '/') res = next === 0 ? 0 : Math.trunc(prev / next);
+      else if (t === '%') res = next === 0 ? 0 : Math.trunc(prev % next);
+      pass1.push(res);
+      i += 2;
+    } else {
+      pass1.push(t);
+      i++;
+    }
+  }
+
+  // Second pass: left-to-right for + -
+  let result = Number(pass1[0]);
+  let j = 1;
+  while (j < pass1.length) {
+    const op = pass1[j];
+    const nextVal = Number(pass1[j + 1]);
+    if (op === '+') result += nextVal;
+    if (op === '-') result -= nextVal;
+    j += 2;
+  }
+  return result;
 }
 
 /**
@@ -148,6 +209,7 @@ function splitConcatenation(expr) {
   let current = '';
   let inQuotes = false;
   let escaped = false;
+  let parenDepth = 0;
 
   for (let i = 0; i < expr.length; i++) {
     const ch = expr[i];
@@ -163,7 +225,12 @@ function splitConcatenation(expr) {
     }
     escaped = false;
 
-    if (ch === '+' && !inQuotes) {
+    if (!inQuotes) {
+      if (ch === '(') parenDepth++;
+      if (ch === ')') parenDepth--;
+    }
+
+    if (ch === '+' && !inQuotes && parenDepth === 0) {
       parts.push(current);
       current = '';
     } else {
@@ -215,9 +282,8 @@ export function checkJavaPractice(problem, code) {
     };
   }
 
-  // Specific problem checks
+  // Specific problem checks for Class 01
   if (problem.id === 'java01-p1') {
-    // Should print name, age, and country
     const hasName = /name|tanvir|ahmad|[a-zA-Z]+/i.test(sim.output);
     const hasAge = /\d+/.test(sim.output);
     const hasCountry = /bangladesh|country|[a-zA-Z]+/i.test(sim.output);
@@ -243,9 +309,46 @@ export function checkJavaPractice(problem, code) {
     }
   }
 
+  // Specific problem checks for Class 02
+  if (problem.id === 'java02-p1') {
+    // Triangle pattern with asterisks
+    if (!sim.output.includes('*') || sim.linesCount < 3) {
+      return {
+        ok: false,
+        message: 'Please print a 3-line triangle pattern using asterisks (*).',
+        errors: ['Each line should contain increasing numbers of asterisks.'],
+        output: sim.output
+      };
+    }
+  }
+
+  if (problem.id === 'java02-p2') {
+    // Diamond or shape pattern
+    if (!sim.output.includes('*') || sim.linesCount < 3) {
+      return {
+        ok: false,
+        message: 'Please print the asterisk diamond/shape pattern shown in Class 02.',
+        errors: ['Use System.out.println() with spaced asterisks to form the shape.'],
+        output: sim.output
+      };
+    }
+  }
+
+  if (problem.id === 'java02-p3') {
+    // Precedence calculation: 5 * 6 / 7 % 3 = 1
+    if (!sim.output.includes('1')) {
+      return {
+        ok: false,
+        message: 'The arithmetic expression 5 * 6 / 7 % 3 should evaluate to 1.',
+        errors: ['Check your expression: (5 * 6 / 7 % 3). Remember * / % are evaluated left-to-right.'],
+        output: sim.output
+      };
+    }
+  }
+
   return {
     ok: true,
-    message: 'Awesome work! Your Java code compiled and executed perfectly! You mastered the double-quotes printing rule.',
+    message: 'Awesome work! Your Java code compiled and executed perfectly! You mastered the concept.',
     errors: [],
     output: sim.output
   };
