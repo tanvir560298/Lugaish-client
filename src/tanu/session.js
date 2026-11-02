@@ -1,5 +1,6 @@
 import {htmlVideos} from '../learn/htmlContent.js';
 import {cVideos} from '../learn/cContent.js';
+import {javaVideos} from '../learn/javaContent.js';
 export function sessionRoute(lesson) {
   if(lesson.course==='web-development-html') {
     const video=htmlVideos.find(v=>v.id===lesson.id);
@@ -9,6 +10,11 @@ export function sessionRoute(lesson) {
   if(lesson.course==='c-programming') {
     const video=cVideos.find(v=>v.id===lesson.id);
     if(!video)throw Error('This C programming lesson is unavailable.');
+    return video.path;
+  }
+  if(lesson.course==='java-programming') {
+    const video=javaVideos.find(v=>v.id===lesson.id);
+    if(!video)throw Error('This Java programming lesson is unavailable.');
     return video.path;
   }
   return lesson.kind==='video'?'/classroom':`/learn/java/${lesson.id}`;

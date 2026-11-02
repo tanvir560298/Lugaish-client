@@ -34,6 +34,19 @@ const ROUTE_SEO = {
     title: 'Class 01: Welcome to C Programming | Lugaish',
     description: 'Discover why C is the foundation of computing, learn about Dennis Ritchie and Bell Labs, and run your first C program in English.',
   },
+  '/learn/java-programming': {
+    title: 'Java Programming Course | Lugaish Learning Portal',
+    description: 'Master Java programming from scratch with instructor Tanvir Ahmad. Learn class structure, printing rules, and practice in our interactive Java Lab.',
+    keywords: 'Java programming, learn Java, Java language, Java course, Lugaish, coding for beginners',
+  },
+  '/learn/java-programming/01': {
+    title: 'Class 01: Java Basics & Printing Fundamentals | Lugaish',
+    description: 'Understand Java class structure, the main method, and how System.out.println() prints whatever is inside double quotes.',
+  },
+  '/learn/java': {
+    title: 'Java Programming Course | Lugaish Learning Portal',
+    description: 'Master Java programming from scratch with instructor Tanvir Ahmad. Interactive Java Lab with sequential progress.',
+  },
   '/learn/web-development/html': {
     title: 'Web Development — HTML in Bangla | Lugaish',
     description: 'Seven beginner HTML video lessons in Bangla, from your first tag to a portfolio website.',

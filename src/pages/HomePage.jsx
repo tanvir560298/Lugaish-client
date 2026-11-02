@@ -3,6 +3,7 @@ import { ArrowRight, ArrowUpRight, Code2, Sparkles, BookOpen, Check, ArrowDown }
 import { UpcomingCourses } from '../components/UpcomingCourses.jsx';
 import { WebCourseArtwork, WebDevelopmentCourse } from '../components/WebDevelopmentCourse.jsx';
 import { CProgrammingCourse } from '../components/CProgrammingCourse.jsx';
+import { JavaProgrammingCourse } from '../components/JavaProgrammingCourse.jsx';
 import { HscCelebrationBanner } from '../components/HscCelebrationBanner.jsx';
 import { CampusPreview } from '../components/CampusPreview.jsx';
 import { useAppContext } from '../state/AppContext.jsx';
@@ -56,6 +57,7 @@ export function HomePage() {
         <Link className="home-quiet-link" to="/learn">All courses <ArrowUpRight size={17}/></Link>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '20px' }}>
+        <JavaProgrammingCourse />
         <CProgrammingCourse />
         <WebDevelopmentCourse />
       </div>

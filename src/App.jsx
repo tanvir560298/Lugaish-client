@@ -40,6 +40,7 @@ const SpeakingPracticePage = lazy(() => import('./pages/SpeakingPracticePage.jsx
 const CertificatePage = lazy(() => import('./pages/CertificatePage.jsx').then(module => ({ default: module.CertificatePage })));
 const HtmlCoursePage = lazy(() => import('./learn/HtmlCoursePage.jsx').then(m=>({default:m.HtmlCoursePage})));
 const CCoursePage = lazy(() => import('./learn/CCoursePage.jsx').then(m=>({default:m.CCoursePage})));
+const JavaCoursePage = lazy(() => import('./learn/JavaCoursePage.jsx').then(m=>({default:m.JavaCoursePage})));
 const LearnPage = lazy(() => import('./learn/LearnPages.jsx').then(m => ({default:m.LearnPage})));
 const NovyraWorkspace = lazy(() => import('./novyra/NovyraWorkspace.jsx').then(module => ({ default: module.NovyraWorkspace })));
 import { NovyraProvider } from './novyra/NovyraContext.jsx';
@@ -204,8 +205,10 @@ export default function App() {
               <Route path='/learn/c-programming/:videoId' element={<CCoursePage />} />
               <Route path='/learn/c' element={<Navigate to="/learn/c-programming" replace />} />
               <Route path='/learn/c/:videoId' element={<Navigate to="/learn/c-programming" replace />} />
-              <Route path='/learn/java' element={<Navigate to="/learn" replace />} />
-              <Route path='/learn/java/:lessonId' element={<Navigate to="/learn" replace />} />
+              <Route path='/learn/java-programming' element={<JavaCoursePage />} />
+              <Route path='/learn/java-programming/:videoId' element={<JavaCoursePage />} />
+              <Route path='/learn/java' element={<JavaCoursePage />} />
+              <Route path='/learn/java/:videoId' element={<JavaCoursePage />} />
               <Route path='/tanu' element={TANU_AI_AVAILABLE ? <ProtectedRoute><NovyraWorkspace /></ProtectedRoute> : <TanuComingSoonPage />} />
               <Route path='/novyra' element={TANU_AI_AVAILABLE ? <ProtectedRoute><NovyraWorkspace /></ProtectedRoute> : <TanuComingSoonPage />} />
               <Route path='/pricing' element={<Navigate to="/learn" replace />} />

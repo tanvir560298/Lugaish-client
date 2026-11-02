@@ -1,6 +1,7 @@
 import { UpcomingCourses } from '../components/UpcomingCourses.jsx';
 import { WebDevelopmentCourse } from '../components/WebDevelopmentCourse.jsx';
 import { CProgrammingCourse } from '../components/CProgrammingCourse.jsx';
+import { JavaProgrammingCourse } from '../components/JavaProgrammingCourse.jsx';
 import './learn.css';
 
 export function LearnPage() {
@@ -16,9 +17,10 @@ export function LearnPage() {
       <section className="catalog-ongoing" aria-labelledby="ongoing-title">
         <div className="course-section-heading">
           <h2 id="ongoing-title">Ongoing courses</h2>
-          <span>02 COURSES · OPEN NOW</span>
+          <span>03 COURSES · OPEN NOW</span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <JavaProgrammingCourse />
           <CProgrammingCourse />
           <WebDevelopmentCourse />
         </div>
