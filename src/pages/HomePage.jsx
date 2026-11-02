@@ -4,7 +4,6 @@ import { UpcomingCourses } from '../components/UpcomingCourses.jsx';
 import { WebCourseArtwork, WebDevelopmentCourse } from '../components/WebDevelopmentCourse.jsx';
 import { CProgrammingCourse } from '../components/CProgrammingCourse.jsx';
 import { JavaProgrammingCourse } from '../components/JavaProgrammingCourse.jsx';
-import { HscCelebrationBanner } from '../components/HscCelebrationBanner.jsx';
 import { CampusPreview } from '../components/CampusPreview.jsx';
 import { useAppContext } from '../state/AppContext.jsx';
 import '../learn/learn.css';
@@ -14,8 +13,6 @@ export function HomePage() {
   const { state } = useAppContext();
 
   return <div className="lx-home home-redesign home-focused">
-    {/* HSC 2026 Celebration Special Banner */}
-    <HscCelebrationBanner />
 
     {/* Event Announcement: C Programming Launch */}
     <section className="c-launch-event-banner" aria-label="C Programming Launch Event">
