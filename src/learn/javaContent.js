@@ -6,14 +6,14 @@
 export const javaVideos = [
   {
     id: '01',
-    youtubeId: '', // Paste YouTube Video ID once uploaded (e.g. 'abcdefghijk')
+    youtubeId: 'ukCm0p5PJFA',
     title: 'Class 01: Introduction to Java & Printing Fundamentals',
     summary: 'Learn Java class structure, public static void main, and the fundamental rule: whatever goes inside double quotes in System.out.println() prints to screen.',
     duration: '9 min 38 sec',
     course: 'java-programming',
     kind: 'video',
     path: '/learn/java-programming/01',
-    url: '',
+    url: 'https://www.youtube.com/watch?v=ukCm0p5PJFA',
     instructor: 'Tanvir Ahmad',
     topics: ['Java class anatomy', 'public static void main', 'System.out.println()', 'The double-quotes rule', 'Writing new lines'],
     keyConcept: 'Whatever is written inside double quotes ("...") in System.out.println() is printed verbatim to the output screen.'

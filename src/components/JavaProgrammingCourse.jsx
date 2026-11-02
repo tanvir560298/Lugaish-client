@@ -44,7 +44,7 @@ export function JavaProgrammingCourse() {
           <Link className="lx-primary" to="/learn/java-programming" style={{ background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)', borderColor: '#f59e0b', color: '#ffffff' }}>
             Start Java Programming <ArrowRight size={17} />
           </Link>
-          <span><Check size={14} /> Class 01 interactive lab & syllabus live</span>
+          <span><Check size={14} /> Class 01 live on YouTube</span>
         </div>
       </div>
     </article>

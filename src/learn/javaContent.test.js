@@ -9,7 +9,8 @@ test('Java Programming course has Class 01 with Tanvir Ahmad video and printing 
   assert.equal(class01.course, 'java-programming');
   assert.equal(class01.path, '/learn/java-programming/01');
   assert.equal(class01.instructor, 'Tanvir Ahmad');
-  assert.equal(typeof class01.youtubeId, 'string');
+  assert.equal(class01.youtubeId, 'ukCm0p5PJFA');
+  assert.equal(class01.url, 'https://www.youtube.com/watch?v=ukCm0p5PJFA');
   assert.ok(class01.summary.includes('double quotes'));
 });
 
