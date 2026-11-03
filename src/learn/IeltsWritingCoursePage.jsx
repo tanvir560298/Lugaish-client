@@ -1006,3 +1006,4 @@ export function IeltsWritingCoursePage() {
     </div>
   );
 }
+
