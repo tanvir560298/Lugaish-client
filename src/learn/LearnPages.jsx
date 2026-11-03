@@ -2,6 +2,7 @@ import { UpcomingCourses } from '../components/UpcomingCourses.jsx';
 import { WebDevelopmentCourse } from '../components/WebDevelopmentCourse.jsx';
 import { CProgrammingCourse } from '../components/CProgrammingCourse.jsx';
 import { JavaProgrammingCourse } from '../components/JavaProgrammingCourse.jsx';
+import { IeltsWritingCourse } from '../components/IeltsWritingCourse.jsx';
 import './learn.css';
 
 export function LearnPage() {
@@ -11,15 +12,16 @@ export function LearnPage() {
         <p className="lx-eyebrow">A CLEAR PLACE TO START</p>
         <h1>Build a skill.<br/>Make it yours.</h1>
         <p className="lx-lead">
-          Start with our ongoing programming and web development courses. Learn the fundamentals, follow structured step-by-step lessons, and build real projects.
+          Start with our ongoing English writing, programming, and web development courses. Learn the fundamentals, follow structured step-by-step lessons, and build real confidence.
         </p>
       </header>
       <section className="catalog-ongoing" aria-labelledby="ongoing-title">
         <div className="course-section-heading">
           <h2 id="ongoing-title">Ongoing courses</h2>
-          <span>03 COURSES · OPEN NOW</span>
+          <span>04 COURSES · OPEN NOW</span>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <IeltsWritingCourse />
           <JavaProgrammingCourse />
           <CProgrammingCourse />
           <WebDevelopmentCourse />

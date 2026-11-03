@@ -41,6 +41,7 @@ const CertificatePage = lazy(() => import('./pages/CertificatePage.jsx').then(mo
 const HtmlCoursePage = lazy(() => import('./learn/HtmlCoursePage.jsx').then(m=>({default:m.HtmlCoursePage})));
 const CCoursePage = lazy(() => import('./learn/CCoursePage.jsx').then(m=>({default:m.CCoursePage})));
 const JavaCoursePage = lazy(() => import('./learn/JavaCoursePage.jsx').then(m=>({default:m.JavaCoursePage})));
+const IeltsWritingCoursePage = lazy(() => import('./learn/IeltsWritingCoursePage.jsx').then(m => ({default: m.IeltsWritingCoursePage})));
 const LearnPage = lazy(() => import('./learn/LearnPages.jsx').then(m => ({default:m.LearnPage})));
 const NovyraWorkspace = lazy(() => import('./novyra/NovyraWorkspace.jsx').then(module => ({ default: module.NovyraWorkspace })));
 import { NovyraProvider } from './novyra/NovyraContext.jsx';
@@ -209,6 +210,8 @@ export default function App() {
               <Route path='/learn/java-programming/:videoId' element={<JavaCoursePage />} />
               <Route path='/learn/java' element={<JavaCoursePage />} />
               <Route path='/learn/java/:videoId' element={<JavaCoursePage />} />
+              <Route path='/learn/ielts-writing' element={<IeltsWritingCoursePage />} />
+              <Route path='/learn/ielts-writing/:day' element={<IeltsWritingCoursePage />} />
               <Route path='/tanu' element={TANU_AI_AVAILABLE ? <ProtectedRoute><NovyraWorkspace /></ProtectedRoute> : <TanuComingSoonPage />} />
               <Route path='/novyra' element={TANU_AI_AVAILABLE ? <ProtectedRoute><NovyraWorkspace /></ProtectedRoute> : <TanuComingSoonPage />} />
               <Route path='/pricing' element={<Navigate to="/learn" replace />} />
