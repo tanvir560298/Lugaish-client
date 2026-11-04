@@ -4,6 +4,7 @@ import { UpcomingCourses } from '../components/UpcomingCourses.jsx';
 import { WebCourseArtwork, WebDevelopmentCourse } from '../components/WebDevelopmentCourse.jsx';
 import { CProgrammingCourse } from '../components/CProgrammingCourse.jsx';
 import { JavaProgrammingCourse } from '../components/JavaProgrammingCourse.jsx';
+import { IeltsWritingCourse } from '../components/IeltsWritingCourse.jsx';
 import { CampusPreview } from '../components/CampusPreview.jsx';
 import { useAppContext } from '../state/AppContext.jsx';
 import '../learn/learn.css';
@@ -13,31 +14,6 @@ export function HomePage() {
   const { state } = useAppContext();
 
   return <div className="lx-home home-redesign home-focused">
-
-    {/* Event Announcement: C Programming Launch */}
-    <section className="c-launch-event-banner" aria-label="C Programming Launch Event">
-      <div className="c-launch-event-content">
-        <div className="c-launch-badge">
-          <span className="c-launch-pulse" /> NEW COURSE LAUNCH EVENT · LUGAISH CODE
-        </div>
-        <h2>Learn <em>C Programming</em> on Lugaish! 🚀</h2>
-        <p className="c-launch-lead">
-          Master the fundamentals of computer science and systems programming in English. Step-by-step sequential unlocking and hands-on practice lab are now live with Class 01!
-        </p>
-        <div className="c-launch-actions">
-          <Link to="/learn/c-programming/01" className="lx-primary">
-            Start Class 01 Now <ArrowRight size={17} />
-          </Link>
-          <Link to="/learn/c-programming" className="lx-secondary">
-            Explore Course Roadmap →
-          </Link>
-        </div>
-      </div>
-      <div className="c-launch-symbol" aria-hidden="true">
-        <span>{'{ C }'}</span>
-        <small>FIRST CLASS LIVE ON YOUTUBE</small>
-      </div>
-    </section>
 
     <section className="home-hero" aria-labelledby="home-title">
       <div className="home-hero-copy"><p className="home-kicker"><span/> A GOOD PLACE TO BEGIN</p><h1 id="home-title">Your first website.<br/><em>Your next chapter.</em></h1><p className="home-intro">Big possibilities start with a little curiosity.</p><p className="home-description">Learn web development in Bangla, one clear lesson at a time. Go from your first HTML tag to a website you can call your own.</p><div className="lx-actions"><Link className="lx-primary" to="/learn/web-development/html">Start learning for free <ArrowUpRight size={18}/></Link><a className="home-quiet-link" href="#learning-paths">Explore the course <ArrowDown size={15}/></a></div><div className="home-hero-notes"><span><Check size={14}/> Beginner friendly</span><span><Check size={14}/> Learn at your own pace</span></div></div>
@@ -54,6 +30,7 @@ export function HomePage() {
         <Link className="home-quiet-link" to="/learn">All courses <ArrowUpRight size={17}/></Link>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '20px' }}>
+        <IeltsWritingCourse />
         <JavaProgrammingCourse />
         <CProgrammingCourse />
         <WebDevelopmentCourse />
