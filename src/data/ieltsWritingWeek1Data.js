@@ -34,25 +34,28 @@ export const IELTS_WRITING_WEEK_1_DAYS = [
       banglaExplanation: `
 একটি পূর্ণাঙ্গ ইংরেজি বাক্য (Sentence) হতে হলে দুটি মৌলিক উপাদান থাকা অপরিহার্য:
 ১. **Subject (কর্তা):** বাক্যটি কাকে বা কী নিয়ে কথা বলছে।
-২. **Verb / Predicate (ক্রিয়া):** Subject কী করছে বা Subject-এর অবস্থা কী।
+২. **Verb (ক্রিয়া):** Subject কী করছে বা Subject-এর অবস্থা কী।
+
+💡 **মনে রাখুন — সব বাক্যে Object থাকা বাধ্যতামূলক নয়:**
+অনেকে মনে করেন প্রতিটি বাক্যে Object থাকতেই হবে। এটি ভুল ধারণা!
+• **Subject + Verb (অকর্মক ক্রিয়া):** *"Birds fly."* বা *"Children sleep."* — এখানে কোনো Object ছাড়াই বাক্যটি ব্যাকরণগতভাবে সম্পূর্ণ।
+• **Subject + Verb + Complement (অবস্থা/পরিচয়):** *"She is a doctor."* বা *"Education is vital."* — এখানে 'doctor' বা 'vital' হলো Subject Complement।
+• **Subject + Verb + Object (সকর্মক ক্রিয়া):** যখন কোনো কাজের লক্ষ্য বা গ্রহীতা থাকে, তখন ইংরেজি ভাষার নির্দিষ্ট নিয়ম হলো: **Subject + Verb + Object (S + V + O)**।
+যেমন: *"Students learn English."* — কখনোই বাংলা পদক্রম অনুযায়ী *"Students English learn"* বলা যাবে না।
 
 ⚠️ **Sentence Fragment (অসম্পূর্ণ বাক্য) চেনার উপায়:**
-বাংলায় আমরা অনেক সময় ছোট ছোট খণ্ডবাক্য বলে ভাব প্রকাশ করতে পারি, কিন্তু ইংরেজিতে Finite Verb ছাড়া কোনো বাক্য পূর্ণাঙ্গ নয়।
-• *"In the morning with my friends"* — বাক্য নয়, কারণ কোনো Subject ও Verb নেই (এটি একটি Phrase)।
+বাংলায় অনেক সময় ছোট খণ্ডবাক্য বলে ভাব প্রকাশ করা যায়, কিন্তু লিখিত ইংরেজিতে Finite Verb ছাড়া কোনো বাক্য পূর্ণাঙ্গ নয়।
+• *"In the morning with my friends"* — বাক্য নয়, কারণ কোনো Subject ও Finite Verb নেই (এটি কেবল একটি Phrase)।
 • *"The university student who lives in Dhaka"* — বাক্য নয়, কারণ ছাত্রটি কী করে বা তার অবস্থা কী, তা বলা হয়নি (Fragment)।
 • *"The student studies English."* — একটি **সঠিক ও পূর্ণাঙ্গ বাক্য**।
-
-**বাংলা বনাম ইংরেজির মূল পার্থক্য (Word Order):**
-বাংলায় আমরা বলি: "আমি (Subject) বই (Object) পড়ি (Verb)" — অর্থাৎ S + O + V।
-কিন্তু ইংরেজি ভাষার নিয়ম হলো: **Subject + Verb + Object (S + V + O)**।
-কখনোই বলা যাবে না: *"I books read"*। সর্বদা বলতে হবে: *"I read books."*
       `,
       formulas: [
-        { name: 'Pattern 1 (Intransitive)', structure: 'Subject (S) + Verb (V)', example: 'Children (S) + sleep (V).' },
-        { name: 'Pattern 2 (Transitive S-V-O)', structure: 'Subject (S) + Verb (V) + Object (O)', example: 'Students (S) + learn (V) + English (O).' },
-        { name: 'Pattern 3 (S-V-A)', structure: 'Subject (S) + Verb (V) + Adverbial/Place', example: 'Many people (S) + live (V) + in large cities (Adverbial).' }
+        { name: 'Pattern 1 (Intransitive S-V)', structure: 'Subject (S) + Verb (V)', example: 'Children (S) + sleep (V).' },
+        { name: 'Pattern 2 (Linking S-V-C)', structure: 'Subject (S) + Verb (V) + Complement (C)', example: 'Education (S) + is (V) + vital (Complement).' },
+        { name: 'Pattern 3 (Transitive S-V-O)', structure: 'Subject (S) + Verb (V) + Object (O)', example: 'Students (S) + learn (V) + English (O).' },
+        { name: 'Pattern 4 (S-V-A)', structure: 'Subject (S) + Verb (V) + Adverbial/Place', example: 'Many people (S) + live (V) + in large cities (Adverbial).' }
       ],
-      ieltsImpact: 'IELTS Writing Task 1 ও Task 2-এ ব্যান্ড স্কোর ৫.০ পাওয়ার প্রধান কারণ Sentence Fragments এবং শব্দের উল্টাপাল্টা ক্রম। প্রতিটি বাক্যের শুরুতে সুস্পষ্ট Subject ও Finite Verb স্থাপন করাই Band 7+ Grammatical Accuracy-র প্রথম ধাপ।'
+      ieltsImpact: 'IELTS Writing Criteria: Grammatical Range & Accuracy (GRA)-তে ভালো করতে হলে Sentence Fragment ও ভুল পদক্রম সম্পূর্ণ পরিহার করতে হবে। প্রতিটি বাক্যে সুস্পষ্ট Subject ও Finite Verb-এর সমন্বয়ে গঠিত সঠিক বাক্য কাঠামোই রচনার ভিত্তি।'
     },
     workedExamples: [
       { id: 1, s: 'I', v: 'study', o: 'English literature', meaning: 'আমি ইংরেজি সাহিত্য নিয়ে পড়াশোনা করি।' },
@@ -209,8 +212,8 @@ export const IELTS_WRITING_WEEK_1_DAYS = [
         "pos": "Verb",
         "banglaMeaning": "প্রয়োজন হওয়া / দাবি করা",
         "englishDefinition": "To need something for a particular purpose or official standard.",
-        "ieltsSentence": "Achieving Band 7 in IELTS Writing requires consistency, clarity, and grammatical precision.",
-        "contextTip": "অনানুষ্ঠানিক \"need\"-এর পরিবর্তে ফরমাল IELTS প্রবন্ধে সর্বদা \"require\" ব্যবহার করার পরামর্শ দেওয়া হয়।",
+        "ieltsSentence": "Academic writing requires clarity, factual support, and accurate sentence structures.",
+        "contextTip": "'require' একটি উপযুক্ত প্রাতিষ্ঠানিক ও আনুষ্ঠানিক শব্দ (যেমন: 'The task requires focus')। তবে সব জায়গায় অন্ধভাবে 'need'-এর বদলে 'require' বসানো ঠিক নয়; স্বাভাবিক ও অর্থবোধক ব্যবহার বজায় রাখাই সঠিক ইংরেজির লক্ষণ।",
         "practiceQuestion": "Complete the sentence: \"Higher education _______ deep critical thinking skills.\"",
         "targetWord": "requires",
         "hint": "Use the 3rd person singular form (-s)."
@@ -279,7 +282,7 @@ Noun বা Pronoun-এর দোষ, গুণ, অবস্থা বা ব�
         { name: 'Predicative Adjective', structure: 'Subject + Linking Verb + Adjective', example: 'Education (S) + is (V) + essential (Adj).' },
         { name: 'Pronoun Replacement', structure: 'Noun Phrase -> Subject Pronoun', example: 'The researchers -> They' }
       ],
-      ieltsImpact: 'পরীক্ষক Lexical Resource ও GRA-তে লক্ষ্য করেন আপনি Noun এবং Adjective-এর সঠিক রূপটি ব্যবহার করছেন কিনা। যেমন: "This topic is importance" লিখলে ব্যান্ড স্কোর ৫-এ নেমে যাবে; লিখতে হবে "This topic is important"।'
+      ieltsImpact: 'পরীক্ষক Lexical Resource ও GRA-তে লক্ষ্য করেন আপনি Noun এবং Adjective-এর সঠিক রূপটি ব্যবহার করছেন কিনা। যেমন: "This topic is importance" একটি ব্যাকরণগত ত্রুটি; গুণ বা বৈশিষ্ট্য প্রকাশে Adjective রূপ "This topic is important" ব্যবহার করতে হবে।'
     },
     workedExamples: [
       { id: 1, word: 'Education', pos: 'Noun', sentence: 'Higher education empowers young individuals.', meaning: 'উচ্চশিক্ষা তরুণদের ক্ষমতায়ন করে।' },
@@ -1162,7 +1165,7 @@ IELTS Writing-এ সাধারণ সত্য, বৈজ্ঞানিক �
         { name: 'Negative with Does not', structure: 'Subject + does not + Base Verb', example: 'He (S) + does not study (V) + late at night.' },
         { name: 'Question with Do/Does', structure: 'Do / Does + Subject + Base Verb?', example: 'Does (Aux) + technology (S) + enhance (V) + learning?' }
       ],
-      ieltsImpact: 'IELTS Writing Task 2-এ হাজারো পরীক্ষার্থী "Society depend on technology" লেখে। Society singular, তাই অবশ্যই "depends" হতে হবে। এই -s/-es বাদ পড়ার ভুলই গ্রামারে ব্যান্ড ৬-এর নিচে আটকে রাখার অন্যতম প্রধান কারণ।'
+      ieltsImpact: 'IELTS Writing Task 2-এ Third-person singular Subject-এর সাথে -s/-es বাদ দেওয়া একটি সাধারণ অসতর্কতামূলক ত্রুটি (যেমন: Society depends on technology)। নির্ভুল টেন্স ও সঠিক রূপ বজায় রাখা Grammatical Range & Accuracy-র জন্য অত্যন্ত গুরুত্বপূর্ণ।'
     },
     workedExamples: [
       { id: 1, s: 'The government', v: 'invests', o: 'in public transportation', meaning: 'সরকার গণপরিবহনে বিনিয়োগ করে।' },
@@ -1384,7 +1387,7 @@ Subject এবং Verb-এর মাঝে যদি Preposition যুক্ত
         { name: 'Plural Agreement', structure: 'Plural Subject + Base Verb / are / were', example: 'Renewable technologies (S) + reduce (V) + pollution.' },
         { name: 'Indefinite Pronoun Agreement', structure: 'Each / Everyone + Singular Verb', example: 'Every student (S) + deserves (V) + quality education.' }
       ],
-      ieltsImpact: 'Subject-Verb Agreement-এর ভুলকে IELTS পরীক্ষকরা "Systematic Error" হিসেবে দেখেন। একটি ৫-প্যারার রচনায় ২টির বেশি S-V Agreement-এর ভুল থাকলে Grammatical Range and Accuracy-তে কোনোভাবেই Band 7 পাওয়া সম্ভব নয়।'
+      ieltsImpact: 'Subject-Verb Agreement-এর ভুল একাডেমিক রচনার সাবলীলতা ও স্পষ্টতা নষ্ট করে। প্রাতিষ্ঠানিক লেখায় উচ্চমানের নির্ভুলতা বজায় রাখতে Subject ও Verb-এর সংখ্যা ও প্রকারের সামঞ্জস্য নিশ্চিত করা বাঞ্ছনীয়।'
     },
     workedExamples: [
       { id: 1, sub: 'The percentage of female researchers', v: 'has increased', note: 'Subject is "The percentage" (singular)' },

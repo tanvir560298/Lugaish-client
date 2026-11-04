@@ -33,17 +33,11 @@ function CoursePreview({ course }) {
   }
   if (!course) return <div className="lx-learn"><h1>Course preview not found</h1><Link className="lx-primary" to="/learn">Explore learning paths →</Link></div>;
   return <div className="lx-learn upcoming-preview"><Link className="lx-back" to="/learn#upcoming-courses">← All courses</Link><div className={`upcoming-preview-hero upcoming-${course.color}`}><div><span className="lx-pill">UPCOMING COURSE · COMING SOON</span><h1>{course.title}</h1><p className="lx-lead">{course.description}</p><div className="upcoming-tags">{course.tags.map(tag => <span key={tag}>{tag}</span>)}</div>          <div className="lx-actions">
-            {course.id === 'c-programming' ? (
-              <Link className="lx-primary" to="/learn/c-programming">
-                Class 01 is Live! Start Course →
-              </Link>
-            ) : (
-              <button className="lx-primary" type="button" aria-pressed={saved} onClick={toggleSaved}>
-                {saved ? <Check size={18}/> : <Bookmark size={18}/>} {saved ? 'Interest saved' : 'Save my interest'}
-              </button>
-            )}
-            <Link className="lx-secondary" to={course.id === 'c-programming' ? '/learn/c-programming/01' : '/learn/web-development/html'}>
-              {course.id === 'c-programming' ? 'Open Class 01 video →' : 'Try a free lesson →'}
+            <button className="lx-primary" type="button" aria-pressed={saved} onClick={toggleSaved}>
+              {saved ? <Check size={18}/> : <Bookmark size={18}/>} {saved ? 'Interest saved' : 'Save my interest'}
+            </button>
+            <Link className="lx-secondary" to="/learn">
+              Explore ongoing courses →
             </Link>
           </div><p className="upcoming-note">Saved on this browser only. Enrollment and email notifications are not open yet.</p><p role="status" aria-live="polite">{message}</p></div><span className="upcoming-preview-symbol" aria-hidden="true">{course.symbol}</span></div><section className="lx-section"><h2>What you’ll explore</h2><p>Planned course outline. The final syllabus and launch details will be confirmed before enrollment opens.</p><ol className="lx-syllabus">{course.topics.map((topic, index) => <li key={topic}><span>0{index + 1}</span><h3>{topic}</h3></li>)}</ol></section><UpcomingCourses/></div>;
 }

@@ -68,10 +68,35 @@ export function TanuGuideBot() {
   const location = useLocation();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [showPeek, setShowPeek] = useState(true);
+  const [showPeek, setShowPeek] = useState(() => {
+    try {
+      return !sessionStorage.getItem('lugaish_tanu_peek_dismissed');
+    } catch {
+      return true;
+    }
+  });
   const [tourActive, setTourActive] = useState(false);
   const [tourStep, setTourStep] = useState(0);
   const [targetRect, setTargetRect] = useState(null);
+
+  const dismissPeek = useCallback(() => {
+    setShowPeek(false);
+    try {
+      sessionStorage.setItem('lugaish_tanu_peek_dismissed', 'true');
+    } catch {
+      // sessionStorage unavailable
+    }
+  }, []);
+
+  // Auto-dismiss peek speech bubble after 8 seconds so it does not permanently obstruct screen
+  useEffect(() => {
+    if (showPeek) {
+      const timer = setTimeout(() => {
+        dismissPeek();
+      }, 8000);
+      return () => clearTimeout(timer);
+    }
+  }, [showPeek, dismissPeek]);
 
   // Update spotlight target positioning
   const updateSpotlight = useCallback(() => {
@@ -121,7 +146,7 @@ export function TanuGuideBot() {
     setIsOpen(true);
     setTourActive(true);
     setTourStep(0);
-    setShowPeek(false);
+    dismissPeek();
   };
 
   const handleNextTourStep = () => {
@@ -179,14 +204,14 @@ export function TanuGuideBot() {
       <div className="tanu-guide-container">
         {/* Peek Speech Bubble */}
         {showPeek && !isOpen && (
-          <div className="tanu-peek-bubble" onClick={() => setIsOpen(true)}>
+          <div className="tanu-peek-bubble" onClick={() => { setIsOpen(true); dismissPeek(); }}>
             <span>Tanu Bot:</span> Need help finding where to click? Let me guide you! 👋
             <button
               className="tanu-peek-close"
               aria-label="Dismiss message"
               onClick={(e) => {
                 e.stopPropagation();
-                setShowPeek(false);
+                dismissPeek();
               }}
             >
               <X size={14} />

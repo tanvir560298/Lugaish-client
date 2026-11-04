@@ -593,24 +593,24 @@
 /* Mobile responsive adjustments */
 @media (max-width: 640px) {
   .tanu-guide-container {
-    bottom: 16px;
-    right: 16px;
+    bottom: 84px; /* Give clearance so sticky bottom action bars are never obstructed */
+    right: 14px;
   }
   .tanu-bot-avatar-btn {
-    width: 56px;
-    height: 56px;
+    width: 52px;
+    height: 52px;
   }
   .tanu-bot-svg {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
   }
   .tanu-guide-card {
-    width: 320px;
+    width: min(340px, calc(100vw - 28px));
   }
   .tanu-peek-bubble {
     font-size: 12px;
     padding: 8px 12px;
-    max-width: 250px;
+    max-width: 240px;
   }
   .header-menu-guide-tip {
     font-size: 11px;

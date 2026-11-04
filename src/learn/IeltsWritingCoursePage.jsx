@@ -278,30 +278,24 @@ export function IeltsWritingCoursePage() {
             </p>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
-            <button
-              onClick={toggleDayComplete}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '10px 18px',
-                borderRadius: '12px',
-                fontSize: '13px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                background: isDayCompleted ? 'rgba(16, 185, 129, 0.2)' : 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-                color: isDayCompleted ? '#34d399' : '#ffffff',
-                border: isDayCompleted ? '1px solid rgba(52, 211, 153, 0.4)' : '1px solid rgba(59, 130, 246, 0.5)',
-                boxShadow: isDayCompleted ? 'none' : '0 4px 14px rgba(37, 99, 235, 0.35)'
-              }}
-            >
-              <CheckCircle2 size={16} />
-              {isDayCompleted ? 'Completed ✓' : 'Mark Day Complete'}
-            </button>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '7px 14px',
+              borderRadius: '20px',
+              fontSize: '12px',
+              fontWeight: 750,
+              background: isDayCompleted ? 'rgba(16, 185, 129, 0.15)' : 'rgba(59, 130, 246, 0.12)',
+              color: isDayCompleted ? '#34d399' : '#60a5fa',
+              border: isDayCompleted ? '1px solid rgba(52, 211, 153, 0.35)' : '1px solid rgba(59, 130, 246, 0.3)'
+            }}>
+              {isDayCompleted ? <CheckCircle2 size={15} /> : <Clock size={14} />}
+              {isDayCompleted ? 'Day Completed' : 'In Progress'}
+            </div>
             <span style={{ fontSize: '11px', color: 'var(--lx-muted)' }}>
-              Week 1 Progress: {progress.completedDays.length} / 7 Days Done
+              Week 1: {progress.completedDays.length} of 7 Days Completed
             </span>
           </div>
         </div>
