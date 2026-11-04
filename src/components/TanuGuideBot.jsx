@@ -20,32 +20,32 @@ import './tanu-guide-bot.css';
 const TOUR_STEPS = [
   {
     id: 'menu',
-    title: 'মেনু ও ৩-ডট (☰) বাটন',
+    title: 'Navigation Menu (3-Dots or ☰)',
     selectors: ['[data-tour="mobile-menu"]', '.header-menu', '.academic-nav'],
-    text: '১ম স্টেপ: উপরে থাকা এই মেনু বাটন (☰ বা ৩-ডট) অথবা নেভিগেশন বারে ক্লিক করলেই সব পৃষ্ঠার লিঙ্ক পেয়ে যাবে!',
-    hint: 'মোবাইলে ৩-ডট বা ☰ আইকনে ট্যাপ করো'
+    text: 'Step 1: Tap this menu button (☰ or 3-dots) or use the navigation bar above to view all course and page links!',
+    hint: 'On mobile, tap the 3-dots or ☰ icon'
   },
   {
     id: 'courses',
-    title: 'কোর্স ক্যাটালগ (Courses)',
+    title: 'Course Catalog (Courses)',
     selectors: ['[data-tour="courses-link"]', 'a[href="/learn"]'],
-    text: '২য় স্টেপ: সব কোর্স ও নতুন রিলিজ দেখতে এই "Courses" বাটনে ট্যাপ করো। এখানে সবগুলো ক্লাস সাজানো আছে।',
-    hint: 'কোর্স তালিকায় যেতে এই বাটনে ক্লিক করো'
+    text: 'Step 2: Tap "Courses" to browse all ongoing courses, video lessons, and learning tracks.',
+    hint: 'Tap to visit the complete course catalog'
   },
   {
     id: 'ielts-writing',
-    title: 'IELTS Writing & প্রোগ্রামিং ক্লাসেস',
+    title: 'IELTS Writing & Coding Tracks',
     selectors: ['[data-course="ielts-writing"]', '[data-tour="course-cards"]', '.web-course-card', '.home-paths'],
-    text: '৩য় স্টেপ: এই যে নতুন IELTS Writing Foundation ও Java/C কোর্স! সরাসরি পড়াশোনা শুরু করতে কার্ডের "Start" বাটনে ক্লিক করো।',
-    hint: 'কার্ডের বাটনে চাপ দিলে সরাসরি ক্লাস ওপেন হবে',
+    text: 'Step 3: Discover our featured courses! Tap "Start" on any course card to begin learning immediately.',
+    hint: 'Click any card button to jump into lessons',
     scroll: true
   },
   {
     id: 'tanu-companion',
-    title: 'Tanu AI স্টাডি হেল্পার',
+    title: 'Tanu AI Study Companion',
     selectors: ['[data-tour="tanu-link"]', 'a[href="/tanu"]'],
-    text: '৪র্থ স্টেপ: কোনো পড়াশোনায় সাহায্য লাগলে আমাকে (Tanu) ডাকলেই আমি তোমার পড়ার রুটিন ও প্রশ্নের উত্তর বুঝিয়ে দেবো!',
-    hint: 'যেকোনো সময় সাহায্যের জন্য Tanu AI-তে আসো'
+    text: 'Step 4: Need study help anytime? Tanu AI helps explain tricky grammar, code concepts, and builds your study routine!',
+    hint: 'Open Tanu AI anytime you need assistance'
   }
 ];
 
@@ -180,7 +180,7 @@ export function TanuGuideBot() {
         {/* Peek Speech Bubble */}
         {showPeek && !isOpen && (
           <div className="tanu-peek-bubble" onClick={() => setIsOpen(true)}>
-            <span>Tanu Bot:</span> বাটনগুলো চিনতে চাও? আমি গাইড করি! 👋
+            <span>Tanu Bot:</span> Need help finding where to click? Let me guide you! 👋
             <button
               className="tanu-peek-close"
               aria-label="Dismiss message"
@@ -213,7 +213,7 @@ export function TanuGuideBot() {
                 </div>
                 <div>
                   <h4>Tanu Guide Bot</h4>
-                  <span>তোমার ফ্রেন্ডলি স্টাডি গাইড</span>
+                  <span>Your friendly learning guide</span>
                 </div>
               </div>
               <button
@@ -251,7 +251,7 @@ export function TanuGuideBot() {
                       disabled={tourStep === 0}
                       style={{ opacity: tourStep === 0 ? 0.4 : 1 }}
                     >
-                      <ArrowLeft size={14} /> আগে
+                      <ArrowLeft size={14} /> Back
                     </button>
 
                     <button
@@ -259,7 +259,7 @@ export function TanuGuideBot() {
                       onClick={() => setTourActive(false)}
                       style={{ color: '#94a3b8' }}
                     >
-                      ট্যুর থামাও
+                      Exit Tour
                     </button>
 
                     <button
@@ -267,9 +267,9 @@ export function TanuGuideBot() {
                       onClick={handleNextTourStep}
                     >
                       {tourStep === TOUR_STEPS.length - 1 ? (
-                        <>শেষ করো <Check size={14} /></>
+                        <>Finish <Check size={14} /></>
                       ) : (
-                        <>পরবর্তী <ArrowRight size={14} /></>
+                        <>Next <ArrowRight size={14} /></>
                       )}
                     </button>
                   </div>
@@ -280,9 +280,9 @@ export function TanuGuideBot() {
                   <div className="tanu-dialogue-box">
                     <div className="tanu-dialogue-kicker">
                       <Sparkles size={12} />
-                      সহজ গাইডলাইন
+                      QUICK GUIDELINES
                     </div>
-                    <strong>কী করতে চাও?</strong> নিচে ক্লিক করলেই আমি তোমাকে সরাসরি নিয়ে যাবো, কোনো বাটন খোঁজা লাগবে না!
+                    <strong>Where would you like to go?</strong> Click any shortcut below and I will take you directly there — no need to search for buttons!
                   </div>
 
                   {/* Dedicated 3-Dots Menu Finder */}
@@ -300,8 +300,8 @@ export function TanuGuideBot() {
                       <Compass size={18} />
                     </div>
                     <div className="tanu-action-btn-text">
-                      <strong style={{ color: '#38bdf8' }}>👉 ৩-ডট (☰) মেনু কোথায়? দেখাও</strong>
-                      <small>উপরে থাকা মেনু বাটনটি হাইলাইট করে দেখাবো</small>
+                      <strong style={{ color: '#38bdf8' }}>👉 Where is the 3-dots (☰) menu?</strong>
+                      <small>Highlights the top navigation menu button</small>
                     </div>
                     <ChevronRight size={16} color="#38bdf8" />
                   </button>
@@ -316,8 +316,8 @@ export function TanuGuideBot() {
                       <Eye size={16} />
                     </div>
                     <div className="tanu-action-btn-text">
-                      <strong>✨ সবগুলো বাটন বুঝিয়ে দাও (ফুল ট্যুর)</strong>
-                      <small>কোর্স, IELTS, নেভিগেশন ও স্টাডি অপশনের গাইড</small>
+                      <strong>✨ Guided walkthrough of all buttons</strong>
+                      <small>Tour courses, menu, and study tools step by step</small>
                     </div>
                     <ChevronRight size={16} />
                   </button>
@@ -335,8 +335,8 @@ export function TanuGuideBot() {
                         <PenTool size={16} />
                       </div>
                       <div className="tanu-action-btn-text">
-                        <strong>IELTS Writing Day 01 শুরু করো</strong>
-                        <small>বাক্য তৈরি ও গ্রামার প্র্যাকটিস ল্যাব</small>
+                        <strong>Start IELTS Writing Day 01</strong>
+                        <small>Sentence building & grammar practice lab</small>
                       </div>
                       <ArrowRight size={14} />
                     </button>
@@ -348,11 +348,11 @@ export function TanuGuideBot() {
                         handleCloseGuide();
                       }}
                     >
-                      <div className="tanu-action-btn-icon" style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#34d399' }}>
+                      <div className="tanu-action-btn-icon" style={{ background: 'rgba(168, 85, 247, 0.2)', color: '#34d399' }}>
                         <BookOpen size={16} />
                       </div>
                       <div className="tanu-action-btn-text">
-                        <strong>সবগুলো কোর্স একসাথে দেখো</strong>
+                        <strong>Browse all courses</strong>
                         <small>Java, C, Web Development & IELTS</small>
                       </div>
                       <ArrowRight size={14} />
@@ -369,8 +369,8 @@ export function TanuGuideBot() {
                         <Sparkles size={16} />
                       </div>
                       <div className="tanu-action-btn-text">
-                        <strong>Tanu AI স্টাডি কম্প্যানিয়ন</strong>
-                        <small>পড়ার রুটিন তৈরি ও প্রশ্নের উত্তর পেতে</small>
+                        <strong>Tanu AI Study Companion</strong>
+                        <small>Ask questions & build personalized routines</small>
                       </div>
                       <ArrowRight size={14} />
                     </button>
@@ -386,7 +386,7 @@ export function TanuGuideBot() {
           className="tanu-bot-avatar-btn"
           onClick={() => setIsOpen(!isOpen)}
           aria-label={isOpen ? "Close Tanu Guide Bot" : "Open Tanu Guide Bot"}
-          title="Tanu Guide Bot — বাটনগুলো চিনতে আমাকে ক্লিক করো!"
+          title="Tanu Guide Bot — Click me for helpful button guidance!"
         >
           {/* Glowing Beacon on Antenna */}
           <span className="tanu-antenna-beacon" />

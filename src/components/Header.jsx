@@ -186,10 +186,10 @@ export function Header() {
                 }}
                 role="button"
                 tabIndex={0}
-                title="৩-ডট মেনু ওপেন করতে ক্লিক করো"
+                title="Click to open navigation menu"
               >
                 <span className="guide-tip-bot-icon">🤖</span>
-                <span>মেনু / ৩-ডট</span>
+                <span>Menu / 3-Dots</span>
                 <span className="guide-tip-arrow">👉</span>
                 <button
                   type="button"
@@ -233,7 +233,7 @@ export function Header() {
           <div className="mobile-nav-guide-tip">
             <span className="guide-tip-bot-icon">🤖</span>
             <div>
-              <strong>Tanu:</strong> সব ক্লাস ও রিসোর্স নিচে সাজানো আছে! পড়তে চাপ দাও 👇
+              <strong>Tanu:</strong> All courses and pages are listed below! Tap to explore 👇
             </div>
           </div>
           <div className="mobile-nav-caption">EXPLORE LUGAISH</div>
