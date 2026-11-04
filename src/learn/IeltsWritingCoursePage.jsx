@@ -28,6 +28,7 @@ import {
   IELTS_WRITING_WEEK_1_INFO,
   IELTS_WRITING_WEEK_1_DAYS
 } from '../data/ieltsWritingWeek1Data.js';
+import { IeltsWeeklyExam } from './IeltsWeeklyExam.jsx';
 import './learn.css';
 import './ielts-writing.css';
 
@@ -73,7 +74,7 @@ function saveStoredDraft(day, text) {
 export function IeltsWritingCoursePage() {
   const { day: rawDay = '1' } = useParams();
   const navigate = useNavigate();
-  const currentDayNum = Math.max(1, Math.min(7, parseInt(rawDay, 10) || 1));
+  const currentDayNum = Math.max(1, Math.min(8, parseInt(rawDay, 10) || 1));
 
   // 3-Step linear progression: 'study' | 'quiz' | 'words_writing'
   const [activeStep, setActiveStep] = useState('study');
@@ -98,6 +99,24 @@ export function IeltsWritingCoursePage() {
   const dayData = useMemo(() => {
     return IELTS_WRITING_WEEK_1_DAYS.find(d => d.day === currentDayNum) || IELTS_WRITING_WEEK_1_DAYS[0];
   }, [currentDayNum]);
+
+  // Handle Exam Completion for Day 8
+  const handleExamComplete = useCallback((examResult) => {
+    setProgress(prev => {
+      const isCompleted = prev.completedDays.includes(8);
+      const updated = {
+        ...prev,
+        completedDays: isCompleted ? prev.completedDays : [...prev.completedDays, 8],
+        scores: {
+          ...prev.scores,
+          'day-8': examResult.score,
+          'week-1-exam': examResult.score
+        }
+      };
+      saveStoredProgress(updated);
+      return updated;
+    });
+  }, []);
 
   // Reset states when changing day
   useEffect(() => {
@@ -271,7 +290,7 @@ export function IeltsWritingCoursePage() {
               </span>
             </div>
             <h1 style={{ fontSize: 'clamp(24px, 3.2vw, 36px)', margin: '4px 0 8px', fontWeight: 800, letterSpacing: '-0.03em', color: '#ffffff' }}>
-              Day 0{dayData.day}: {dayData.title}
+              {dayData.isExam ? `🏆 ${dayData.title}` : `Day 0${dayData.day}: ${dayData.title}`}
             </h1>
             <p style={{ margin: 0, fontSize: '15px', color: 'var(--lx-muted)', maxWidth: '720px' }}>
               {dayData.subtitle}
@@ -292,10 +311,10 @@ export function IeltsWritingCoursePage() {
               border: isDayCompleted ? '1px solid rgba(52, 211, 153, 0.35)' : '1px solid rgba(59, 130, 246, 0.3)'
             }}>
               {isDayCompleted ? <CheckCircle2 size={15} /> : <Clock size={14} />}
-              {isDayCompleted ? 'Day Completed' : 'In Progress'}
+              {isDayCompleted ? (dayData.isExam ? 'Exam Passed ✓' : 'Day Completed') : 'In Progress'}
             </div>
             <span style={{ fontSize: '11px', color: 'var(--lx-muted)' }}>
-              Week 1: {progress.completedDays.length} of 7 Days Completed
+              Week 1: {progress.completedDays.filter(d => d <= 7).length} of 7 Lessons Complete
             </span>
           </div>
         </div>
@@ -316,7 +335,7 @@ export function IeltsWritingCoursePage() {
         )}
       </header>
 
-      {/* 7-Day Quick Switcher Bar */}
+      {/* 8-Day Quick Switcher Bar */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))',
@@ -326,6 +345,7 @@ export function IeltsWritingCoursePage() {
         {IELTS_WRITING_WEEK_1_DAYS.map((d) => {
           const isSelected = d.day === currentDayNum;
           const isDone = progress.completedDays.includes(d.day);
+          const isExamDay = d.isExam;
           return (
             <Link
               key={d.day}
@@ -335,20 +355,37 @@ export function IeltsWritingCoursePage() {
                 flexDirection: 'column',
                 padding: '10px 12px',
                 borderRadius: '12px',
-                background: isSelected ? 'rgba(59, 130, 246, 0.2)' : 'var(--lx-panel, rgba(15, 23, 42, 0.6))',
-                border: isSelected ? '1.5px solid #3b82f6' : '1px solid var(--lx-border, rgba(255, 255, 255, 0.08))',
+                background: isSelected 
+                  ? (isExamDay ? 'rgba(245, 158, 11, 0.22)' : 'rgba(59, 130, 246, 0.2)') 
+                  : (isExamDay ? 'rgba(245, 158, 11, 0.08)' : 'var(--lx-panel, rgba(15, 23, 42, 0.6))'),
+                border: isSelected 
+                  ? (isExamDay ? '1.5px solid #fbbf24' : '1.5px solid #3b82f6') 
+                  : (isExamDay ? '1px dashed rgba(245, 158, 11, 0.35)' : '1px solid var(--lx-border, rgba(255, 255, 255, 0.08))'),
                 textDecoration: 'none',
                 color: 'inherit',
                 transition: 'all 0.18s ease'
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '3px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 800, color: isSelected ? '#60a5fa' : 'var(--lx-muted)' }}>
-                  DAY 0{d.day}
+                <span style={{ 
+                  fontSize: '11px', 
+                  fontWeight: 800, 
+                  color: isSelected 
+                    ? (isExamDay ? '#fbbf24' : '#60a5fa') 
+                    : (isExamDay ? '#f59e0b' : 'var(--lx-muted)') 
+                }}>
+                  {isExamDay ? 'DAY 08 · 🏆 EXAM' : `DAY 0${d.day}`}
                 </span>
                 {isDone && <Check size={13} color="#34d399" />}
               </div>
-              <strong style={{ fontSize: '12px', lineHeight: 1.3, fontWeight: isSelected ? 700 : 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <strong style={{ 
+                fontSize: '12px', 
+                lineHeight: 1.3, 
+                fontWeight: isSelected ? 700 : 500, 
+                overflow: 'hidden', 
+                textOverflow: 'ellipsis', 
+                whiteSpace: 'nowrap' 
+              }}>
                 {d.title}
               </strong>
             </Link>
@@ -356,8 +393,17 @@ export function IeltsWritingCoursePage() {
         })}
       </div>
 
-      {/* 3-STEP PROGRESSIVE STEPPER (Streamlined & Clutter-Free) */}
-      <div className="ielts-stepper-container" role="tablist" aria-label="Course Steps">
+      {/* RENDER EXAM OR STANDARD 3-STEP LESSON */}
+      {dayData.isExam ? (
+        <IeltsWeeklyExam
+          examData={dayData}
+          progress={progress}
+          onExamComplete={handleExamComplete}
+        />
+      ) : (
+        <>
+          {/* 3-STEP PROGRESSIVE STEPPER (Streamlined & Clutter-Free) */}
+          <div className="ielts-stepper-container" role="tablist" aria-label="Course Steps">
         <button
           className={`ielts-step-item ${activeStep === 'study' ? 'is-active' : ''}`}
           onClick={() => setActiveStep('study')}
@@ -1163,6 +1209,27 @@ export function IeltsWritingCoursePage() {
                 {isDayCompleted ? 'Completed ✓' : `Mark Day 0${currentDayNum} Done`}
               </button>
 
+              {currentDayNum === 7 && (
+                <Link
+                  to="/learn/ielts-writing/8"
+                  className="ielts-submit-btn"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '11px 22px',
+                    borderRadius: '10px',
+                    textDecoration: 'none',
+                    fontWeight: 750,
+                    background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                    borderColor: '#fbbf24',
+                    color: '#ffffff'
+                  }}
+                >
+                  <Trophy size={16} /> Take Day 08 Mastery Exam <ArrowRight size={16} />
+                </Link>
+              )}
+
               {currentDayNum < 7 && (
                 <Link
                   to={`/learn/ielts-writing/${currentDayNum + 1}`}
@@ -1184,6 +1251,8 @@ export function IeltsWritingCoursePage() {
           </div>
         </div>
       )}
-    </div>
-  );
+      </>
+    )}
+  </div>
+);
 }

@@ -2,6 +2,8 @@
 // 60-Day IELTS Writing Challenge — Week 1: Sentence Building & Basic Grammar
 // Developed for Lugaish Language Learning Platform
 
+import { WEEK_1_EXAM_DATA, getWeekVocabulary as getWeeklyVocabularyHelper } from './ieltsWeeklyExamData.js';
+
 export const IELTS_WRITING_WEEK_1_INFO = {
   courseId: 'ielts-writing-foundation',
   title: '60-Day IELTS Writing Challenge',
@@ -9,8 +11,8 @@ export const IELTS_WRITING_WEEK_1_INFO = {
   weekTitle: 'Week 1: Sentence Building & Basic Grammar',
   targetBand: 'Foundation to Band 6.5+',
   instructor: 'Tanvir Ahmad',
-  totalDays: 7,
-  description: 'Master English sentence architecture, parts of speech, be-verbs, articles, plurals, Present Simple, and Subject-Verb Agreement with in-depth grammar discussions and interactive practice drills.'
+  totalDays: 8, // Days 1-7 Instructional & Revision + Day 8 Weekly Mastery Exam
+  description: 'Master English sentence architecture, parts of speech, be-verbs, articles, plurals, Present Simple, and Subject-Verb Agreement, concluding with the comprehensive Week 1 Mastery Exam.'
 };
 
 export const IELTS_WRITING_WEEK_1_DAYS = [
@@ -1555,5 +1557,20 @@ Subject এবং Verb-এর মাঝে যদি Preposition যুক্ত
       taskDescription: 'Complete the Week 1 Self-Assessment Checklist and review any mistakes made in Days 1 to 6 before moving to Week 2: Compound & Complex Sentences.',
       newVocabulary: ['competence', 'remarkable', 'collaborative', 'comprehensive', 'perseverance']
     }
-  }
+  },
+
+  // =========================================================================
+  // DAY 8: WEEK 1 MASTERY EXAM (COMPREHENSIVE ASSESSMENT)
+  // =========================================================================
+  WEEK_1_EXAM_DATA
 ];
+
+/**
+ * Helper to retrieve all vocabulary for a given week from the dataset.
+ */
+export function getWeekVocabulary(weekNumber = 1) {
+  return getWeeklyVocabularyHelper(weekNumber, IELTS_WRITING_WEEK_1_DAYS);
+}
+
+export { WEEK_1_EXAM_DATA };
+

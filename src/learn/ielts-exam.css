@@ -1,0 +1,547 @@
+/* src/learn/ielts-exam.css */
+/* Professional, Distraction-Free Weekly Mastery Exam System for Lugaish */
+
+.ielts-exam-container {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: clamp(16px, 3vw, 32px);
+  color: var(--lx-text, #f8fafc);
+  font-family: inherit;
+}
+
+/* =========================================================================
+   1. EXAM INTRO & INSTRUCTIONS
+   ========================================================================= */
+
+.exam-intro-card {
+  background: var(--lx-panel, rgba(30, 41, 59, 0.6));
+  border: 1px solid var(--lx-border, rgba(255, 255, 255, 0.1));
+  border-radius: 20px;
+  padding: clamp(24px, 4vw, 40px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  margin-bottom: 30px;
+}
+
+.exam-intro-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.exam-trophy-badge {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.3) 100%);
+  border: 1.5px solid #fbbf24;
+  color: #fbbf24;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+  flex-shrink: 0;
+}
+
+.exam-intro-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin: 24px 0;
+}
+
+.exam-meta-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--lx-border, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.exam-meta-box strong {
+  display: block;
+  font-size: 15px;
+  color: var(--lx-text, #ffffff);
+}
+
+.exam-meta-box small {
+  display: block;
+  font-size: 11px;
+  color: var(--lx-muted, #94a3b8);
+  margin-top: 2px;
+}
+
+.exam-sections-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 13.5px;
+}
+
+.exam-sections-table th,
+.exam-sections-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--lx-border, rgba(255, 255, 255, 0.08));
+  text-align: left;
+}
+
+.exam-sections-table th {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--lx-muted, #94a3b8);
+}
+
+/* =========================================================================
+   2. STICKY EXAM STATUS BAR & SECTION TABS
+   ========================================================================= */
+
+.exam-sticky-bar {
+  position: sticky;
+  top: 72px;
+  z-index: 95;
+  background: var(--lx-panel, rgba(15, 23, 42, 0.95));
+  border: 1px solid var(--lx-border, rgba(255, 255, 255, 0.12));
+  border-radius: 16px;
+  padding: 12px 20px;
+  margin-bottom: 24px;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.exam-timer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-family: ui-monospace, monospace;
+  font-size: 14px;
+  font-weight: 750;
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+}
+
+.exam-timer-pill.is-warning {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
+  color: #f87171;
+  animation: pulse-timer 1.5s infinite;
+}
+
+@keyframes pulse-timer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.exam-progress-stat {
+  font-size: 12px;
+  color: var(--lx-muted, #94a3b8);
+  font-weight: 600;
+}
+
+.exam-progress-stat strong {
+  color: var(--lx-text, #ffffff);
+}
+
+.exam-section-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px 0 12px;
+  margin-bottom: 20px;
+  scrollbar-width: none;
+}
+
+.exam-section-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.exam-tab-btn {
+  padding: 9px 14px;
+  border-radius: 10px;
+  background: var(--lx-panel, rgba(30, 41, 59, 0.5));
+  border: 1px solid var(--lx-border, rgba(255, 255, 255, 0.08));
+  color: var(--lx-muted, #94a3b8);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.18s ease;
+}
+
+.exam-tab-btn:hover {
+  color: var(--lx-text, #ffffff);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.exam-tab-btn.is-active {
+  background: rgba(59, 130, 246, 0.18);
+  border-color: #3b82f6;
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.25);
+}
+
+.exam-tab-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  color: inherit;
+}
+
+/* =========================================================================
+   3. QUESTION CARDS & INPUTS
+   ========================================================================= */
+
+.exam-question-card {
+  background: var(--lx-panel, rgba(30, 41, 59, 0.5));
+  border: 1.5px solid var(--lx-border, rgba(255, 255, 255, 0.1));
+  border-radius: 16px;
+  padding: clamp(18px, 3vw, 26px);
+  margin-bottom: 20px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.exam-question-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.exam-question-kicker {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #38bdf8;
+  text-transform: uppercase;
+}
+
+.exam-question-points {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--lx-muted, #94a3b8);
+}
+
+.exam-question-text {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--lx-text, #ffffff);
+  margin: 0 0 16px;
+}
+
+/* MCQ Option Buttons */
+.exam-options-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.exam-option-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--lx-border, rgba(255, 255, 255, 0.09));
+  color: var(--lx-text, #ffffff);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.exam-option-btn:hover {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+.exam-option-btn.is-selected {
+  background: rgba(59, 130, 246, 0.18);
+  border-color: #3b82f6;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+  color: #ffffff;
+}
+
+.exam-option-letter {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.exam-option-btn.is-selected .exam-option-letter {
+  background: #3b82f6;
+  color: #ffffff;
+}
+
+/* Input Fields & Textareas */
+.exam-text-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--lx-border, rgba(255, 255, 255, 0.15));
+  color: var(--lx-text, #ffffff);
+  font-size: 14.5px;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.exam-text-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.exam-textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid var(--lx-border, rgba(255, 255, 255, 0.15));
+  color: var(--lx-text, #ffffff);
+  font-family: inherit;
+  font-size: 14.5px;
+  line-height: 1.7;
+  outline: none;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.exam-textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* Target Vocabulary Cloud for Section E */
+.exam-vocab-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px dashed var(--lx-border, rgba(255, 255, 255, 0.15));
+  margin: 12px 0 16px;
+}
+
+.exam-vocab-chip {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--lx-border, rgba(255, 255, 255, 0.1));
+  color: var(--lx-muted, #94a3b8);
+  transition: all 0.2s;
+}
+
+.exam-vocab-chip.is-used {
+  background: rgba(52, 211, 153, 0.18);
+  border-color: #34d399;
+  color: #34d399;
+  font-weight: 800;
+}
+
+/* Word Count Bar */
+.exam-word-counter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--lx-muted, #94a3b8);
+  margin-top: 8px;
+}
+
+.exam-word-counter strong {
+  color: #38bdf8;
+}
+
+/* =========================================================================
+   4. EXAM RESULT & REVIEW SCREEN
+   ========================================================================= */
+
+.exam-result-banner {
+  border-radius: 20px;
+  padding: clamp(24px, 4vw, 36px);
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.exam-result-banner.is-pass {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(15, 23, 42, 0.9) 100%);
+  border: 1.5px solid #10b981;
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+}
+
+.exam-result-banner.is-fail {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(15, 23, 42, 0.9) 100%);
+  border: 1.5px solid #ef4444;
+  box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);
+}
+
+.exam-score-display {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.exam-score-big {
+  font-size: clamp(38px, 6vw, 54px);
+  font-weight: 850;
+  line-height: 1;
+}
+
+.exam-score-total {
+  font-size: 18px;
+  color: var(--lx-muted, #94a3b8);
+}
+
+.exam-scores-breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.exam-breakdown-card {
+  background: var(--lx-panel, rgba(30, 41, 59, 0.6));
+  border: 1px solid var(--lx-border, rgba(255, 255, 255, 0.1));
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+
+.exam-breakdown-card strong {
+  display: block;
+  font-size: 14px;
+  color: var(--lx-text, #ffffff);
+  margin-bottom: 6px;
+}
+
+.exam-breakdown-card small {
+  font-size: 12px;
+  color: var(--lx-muted, #94a3b8);
+}
+
+/* Confirmation Modal */
+.exam-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.exam-modal-box {
+  width: 100%;
+  max-width: 480px;
+  background: var(--lx-panel, #0f172a);
+  border: 1.5px solid var(--lx-border, rgba(255, 255, 255, 0.15));
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+/* Light Theme WCAG AA Adaptations */
+:root[data-theme="light"] .exam-intro-card,
+:root[data-theme="light"] .exam-question-card,
+:root[data-theme="light"] .exam-breakdown-card,
+:root[data-theme="light"] .exam-modal-box {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  color: #0f172a;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+}
+
+:root[data-theme="light"] .exam-sticky-bar {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+:root[data-theme="light"] .exam-question-text {
+  color: #0f172a;
+}
+
+:root[data-theme="light"] .exam-option-btn {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #1e293b;
+}
+
+:root[data-theme="light"] .exam-option-btn:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+:root[data-theme="light"] .exam-option-btn.is-selected {
+  background: #dbeafe;
+  border-color: #2563eb;
+  color: #1e3a8a;
+}
+
+:root[data-theme="light"] .exam-text-input,
+:root[data-theme="light"] .exam-textarea {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+:root[data-theme="light"] .exam-vocab-pool {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+/* Responsive mobile adjustments */
+@media (max-width: 640px) {
+  .exam-sticky-bar {
+    top: 60px;
+    padding: 10px 14px;
+  }
+  .exam-timer-pill {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+  .exam-question-card {
+    padding: 16px;
+  }
+  .exam-question-text {
+    font-size: 14px;
+  }
+}
