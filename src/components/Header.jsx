@@ -17,7 +17,8 @@ export function Header() {
   const { state, actions } = useAppContext(),
     { pathname, hash } = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false),
-    [accountOpen, setAccountOpen] = useState(false);
+    [accountOpen, setAccountOpen] = useState(false),
+    [menuTipDismissed, setMenuTipDismissed] = useState(false);
   const header = useRef(null),
     menu = useRef(null),
     account = useRef(null),
@@ -127,6 +128,7 @@ export function Header() {
               className="header-nav-link"
               key={href}
               to={href}
+              data-tour={href === "/learn" ? "courses-link" : href === "/tanu" ? "tanu-link" : undefined}
               aria-current={active(href) ? "page" : undefined}
             >
               {label}{href === "/tanu" && <span className="nav-ai-mark" aria-hidden="true">✦</span>}
@@ -146,6 +148,7 @@ export function Header() {
             <div className="academic-account" ref={account}>
               <button
                 ref={accountButton}
+                data-tour="account-menu"
                 className="academic-account-trigger"
               aria-label={accountOpen?"Close account menu":"Open account menu"}
                 aria-expanded={accountOpen}
@@ -172,21 +175,53 @@ export function Header() {
           ) : (
             <><Link className="header-signin" to="/login">Sign in</Link><Link className="header-auth header-start campus-button" to="/learn/web-development/html">Start learning <ArrowUpRight size={16}/></Link></>
           )}
-          <button
-            ref={menu}
-            className="header-menu academic-icon"
-            aria-label={
-              mobileOpen ? "Close navigation menu" : "Open navigation menu"
-            }
-            aria-expanded={mobileOpen}
-            aria-controls="mobile-navigation"
-            onClick={() => {
-              setMobileOpen((v) => !v);
-              setAccountOpen(false);
-            }}
-          >
-            {mobileOpen ? <X size={21} /> : <Menu size={21} />}
-          </button>
+          <div className="header-menu-guide-wrapper">
+            {!mobileOpen && !menuTipDismissed && (
+              <div
+                className="header-menu-guide-tip"
+                onClick={() => {
+                  setMobileOpen(true);
+                  setAccountOpen(false);
+                  setMenuTipDismissed(true);
+                }}
+                role="button"
+                tabIndex={0}
+                title="৩-ডট মেনু ওপেন করতে ক্লিক করো"
+              >
+                <span className="guide-tip-bot-icon">🤖</span>
+                <span>মেনু / ৩-ডট</span>
+                <span className="guide-tip-arrow">👉</span>
+                <button
+                  type="button"
+                  className="guide-tip-dismiss"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMenuTipDismissed(true);
+                  }}
+                  aria-label="Dismiss guide tip"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            )}
+            <button
+              ref={menu}
+              data-tour="mobile-menu"
+              className={`header-menu academic-icon ${!mobileOpen && !menuTipDismissed ? 'is-highlighted' : ''}`}
+              aria-label={
+                mobileOpen ? "Close navigation menu" : "Open navigation menu"
+              }
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-navigation"
+              onClick={() => {
+                setMobileOpen((v) => !v);
+                setAccountOpen(false);
+                setMenuTipDismissed(true);
+              }}
+            >
+              {mobileOpen ? <X size={21} /> : <Menu size={21} />}
+            </button>
+          </div>
         </div>
       </div>
       {mobileOpen && (
@@ -195,6 +230,12 @@ export function Header() {
           className="mobile-nav academic-mobile-nav"
           aria-label="Mobile navigation"
         >
+          <div className="mobile-nav-guide-tip">
+            <span className="guide-tip-bot-icon">🤖</span>
+            <div>
+              <strong>Tanu:</strong> সব ক্লাস ও রিসোর্স নিচে সাজানো আছে! পড়তে চাপ দাও 👇
+            </div>
+          </div>
           <div className="mobile-nav-caption">EXPLORE LUGAISH</div>
           {links.map(([href, label], index) => (
             <Link key={href} to={href} aria-current={active(href) ? "page" : undefined}>

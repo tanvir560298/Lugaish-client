@@ -16,7 +16,7 @@ export function HomePage() {
   return <div className="lx-home home-redesign home-focused">
 
     <section className="home-hero" aria-labelledby="home-title">
-      <div className="home-hero-copy"><p className="home-kicker"><span/> A GOOD PLACE TO BEGIN</p><h1 id="home-title">Your first website.<br/><em>Your next chapter.</em></h1><p className="home-intro">Big possibilities start with a little curiosity.</p><p className="home-description">Learn web development in Bangla, one clear lesson at a time. Go from your first HTML tag to a website you can call your own.</p><div className="lx-actions"><Link className="lx-primary" to="/learn/web-development/html">Start learning for free <ArrowUpRight size={18}/></Link><a className="home-quiet-link" href="#learning-paths">Explore the course <ArrowDown size={15}/></a></div><div className="home-hero-notes"><span><Check size={14}/> Beginner friendly</span><span><Check size={14}/> Learn at your own pace</span></div></div>
+      <div className="home-hero-copy"><p className="home-kicker"><span/> A GOOD PLACE TO BEGIN</p><h1 id="home-title">Your first website.<br/><em>Your next chapter.</em></h1><p className="home-intro">Big possibilities start with a little curiosity.</p><p className="home-description">Learn web development in Bangla, one clear lesson at a time. Go from your first HTML tag to a website you can call your own.</p><div className="home-guide-action-card"><div className="mini-guide-bot-pill"><span className="mini-bot-icon">🤖</span><span><strong>Tanu Guide:</strong> শুরু করতে নিচের বাটনে চাপ দাও 👇</span></div><div className="lx-actions"><Link className="lx-primary" to="/learn/web-development/html">Start learning for free <ArrowUpRight size={18}/></Link><a className="home-quiet-link" href="#learning-paths">Explore the course <ArrowDown size={15}/></a></div></div><div className="home-hero-notes"><span><Check size={14}/> Beginner friendly</span><span><Check size={14}/> Learn at your own pace</span></div></div>
       <div className="home-hero-studio"><div className="home-studio-caption"><span><Code2 size={15}/> THE BUILDING STARTS HERE</span><span>01 — WEB DEVELOPMENT</span></div><WebCourseArtwork/><div className="home-studio-note"><span><span className="web-status-dot"/> A little practice. Something you made.</span><span>LEARN → BUILD → GROW</span></div></div>
     </section>
     <div className="home-chapter-strip"><span>LESS SCROLLING. MORE BUILDING.</span><p>One focused course. A clear place to start.</p><a href="#learning-paths" aria-label="Explore the ongoing course"><ArrowDown size={18}/></a></div>
@@ -29,7 +29,14 @@ export function HomePage() {
         </div>
         <Link className="home-quiet-link" to="/learn">All courses <ArrowUpRight size={17}/></Link>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '20px' }}>
+      <div className="home-courses-bot-guide">
+        <span className="mini-bot-icon" style={{ fontSize: '20px' }}>🤖</span>
+        <div>
+          <strong>Tanu: কোন কোর্সটি করতে চাও?</strong>
+          <p>IELTS Writing, Java, C বা Web Development — সরাসরি ক্লাসে যেতে কোর্সের বাটনে ট্যাপ করো 👇</p>
+        </div>
+      </div>
+      <div data-tour="course-cards" style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginTop: '16px' }}>
         <IeltsWritingCourse />
         <JavaProgrammingCourse />
         <CProgrammingCourse />

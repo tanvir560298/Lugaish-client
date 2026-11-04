@@ -45,7 +45,7 @@ const IeltsWritingCoursePage = lazy(() => import('./learn/IeltsWritingCoursePage
 const LearnPage = lazy(() => import('./learn/LearnPages.jsx').then(m => ({default:m.LearnPage})));
 const NovyraWorkspace = lazy(() => import('./novyra/NovyraWorkspace.jsx').then(module => ({ default: module.NovyraWorkspace })));
 import { NovyraProvider } from './novyra/NovyraContext.jsx';
-import { NovyraPanel } from './novyra/NovyraPanel.jsx';
+import { TanuGuideBot } from './components/TanuGuideBot.jsx';
 
 function PageFallback() {
   return (
@@ -244,7 +244,7 @@ export default function App() {
               <Route path='*' element={<Navigate to='/' replace />} />
             </Routes>
           </Suspense>
-          <NovyraPanel />
+          <TanuGuideBot />
           <TanuCoach />
         </Layout>
       </TanuSessionProvider>

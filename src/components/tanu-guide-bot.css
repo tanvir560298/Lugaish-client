@@ -1,0 +1,620 @@
+/* src/components/tanu-guide-bot.css */
+/* Cute Animated Guide Bot & Interactive Button Pointers for Lugaish */
+
+:root {
+  --bot-mint: #34d399;
+  --bot-cyan: #38bdf8;
+  --bot-blue: #2563eb;
+  --bot-amber: #fbbf24;
+  --bot-bg: #0f172a;
+  --bot-surface: rgba(15, 23, 42, 0.94);
+  --bot-border: rgba(56, 189, 248, 0.4);
+  --bot-glow: rgba(56, 189, 248, 0.3);
+}
+
+/* =========================================================================
+   1. HEADER MENU (3-DOTS) GUIDE POINTER
+   ========================================================================= */
+
+.header-menu-guide-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+@media (min-width: 1001px) {
+  .header-menu-guide-wrapper {
+    display: none !important;
+  }
+}
+
+.header-menu-guide-tip {
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-right: 10px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
+  border: 1.5px solid #38bdf8;
+  border-radius: 20px;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 750;
+  color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(56, 189, 248, 0.35);
+  animation: guide-tip-bounce-x 1.8s ease-in-out infinite;
+  z-index: 100;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+@keyframes guide-tip-bounce-x {
+  0%, 100% { transform: translateY(-50%) translateX(0); }
+  50% { transform: translateY(-50%) translateX(-6px); }
+}
+
+.guide-tip-bot-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #34d399 0%, #38bdf8 100%);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  color: #0f172a;
+  box-shadow: 0 0 8px #38bdf8;
+}
+
+.guide-tip-arrow {
+  color: #38bdf8;
+  font-size: 14px;
+  animation: guide-arrow-wiggle 1s infinite alternate;
+}
+
+@keyframes guide-arrow-wiggle {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(4px); }
+}
+
+.guide-tip-dismiss {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 2px;
+  margin-left: 2px;
+  display: flex;
+  align-items: center;
+}
+.guide-tip-dismiss:hover {
+  color: #f87171;
+}
+
+/* Pulsing highlight ring on the 3-dots / menu button itself */
+.header-menu.is-highlighted {
+  position: relative;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5), 0 0 20px rgba(56, 189, 248, 0.6) !important;
+  border-color: #38bdf8 !important;
+  animation: menu-pulse 1.8s infinite;
+}
+
+@keyframes menu-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.4), 0 0 15px rgba(56, 189, 248, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(56, 189, 248, 0.7), 0 0 25px rgba(56, 189, 248, 0.7); }
+}
+
+/* Inside the open mobile navigation drawer */
+.mobile-nav-guide-tip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin: 6px 0 14px;
+  font-size: 12.5px;
+  color: #f1f5f9;
+}
+
+.mobile-nav-guide-tip strong {
+  color: #38bdf8;
+}
+
+/* =========================================================================
+   2. HOME HERO & COURSE ACTION CUTE GUIDE BADGES
+   ========================================================================= */
+
+.home-guide-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-bottom: 12px;
+  animation: guide-pill-float 3s ease-in-out infinite;
+}
+
+.home-guide-action-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 18px 0 12px;
+}
+
+.mini-guide-bot-pill {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  color: #38bdf8;
+  animation: guide-pill-float 2.5s ease-in-out infinite;
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.15);
+}
+
+.mini-bot-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-courses-bot-guide {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 14px;
+  padding: 12px 18px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  color: #e2e8f0;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+
+.home-courses-bot-guide strong {
+  display: block;
+  color: #38bdf8;
+  font-size: 13.5px;
+  margin-bottom: 2px;
+}
+
+.home-courses-bot-guide p {
+  margin: 0;
+  font-size: 12.5px;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+@keyframes guide-pill-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* =========================================================================
+   3. FLOATING TANU GUIDE BOT (MAIN COMPANION)
+   ========================================================================= */
+
+.tanu-guide-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: auto;
+  font-family: inherit;
+}
+
+/* Floating speech bubble prompt before user opens the bot */
+.tanu-peek-bubble {
+  background: var(--bot-surface);
+  color: #f1f5f9;
+  border: 1.5px solid var(--bot-border);
+  border-radius: 18px;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 25px var(--bot-glow);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  animation: tanu-bounce 3s ease-in-out infinite;
+  backdrop-filter: blur(14px);
+  max-width: 300px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.tanu-peek-bubble:hover {
+  transform: translateY(-3px) scale(1.02);
+  border-color: #38bdf8;
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.6), 0 0 30px rgba(56, 189, 248, 0.45);
+}
+
+.tanu-peek-bubble span {
+  color: #38bdf8;
+  font-weight: 750;
+}
+
+/* Close little 'x' on peek bubble */
+.tanu-peek-close {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 2px;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+.tanu-peek-close:hover {
+  color: #f87171;
+}
+
+/* Avatar button itself */
+.tanu-bot-avatar-btn {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #091326 0%, #1e293b 50%, #0f172a 100%);
+  border: 2px solid var(--bot-border);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 25px var(--bot-glow);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  padding: 0;
+  overflow: visible;
+}
+
+.tanu-bot-avatar-btn:hover {
+  transform: scale(1.08) rotate(-2deg);
+  border-color: #38bdf8;
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.6), 0 0 35px rgba(56, 189, 248, 0.45);
+}
+
+.tanu-bot-avatar-btn:active {
+  transform: scale(0.96);
+}
+
+/* Glowing antenna beacon */
+.tanu-antenna-beacon {
+  position: absolute;
+  top: -8px;
+  right: 14px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 10px #34d399, 0 0 20px #34d399;
+  animation: tanu-beacon-pulse 1.8s infinite;
+}
+
+@keyframes tanu-beacon-pulse {
+  0% { transform: scale(0.8); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 15px #34d399, 0 0 30px #34d399; }
+  100% { transform: scale(0.8); opacity: 0.8; }
+}
+
+/* Cute SVG Character Face */
+.tanu-bot-svg {
+  width: 48px;
+  height: 48px;
+  animation: tanu-float 4s ease-in-out infinite;
+}
+
+.tanu-bot-eye {
+  animation: tanu-blink 4s infinite;
+  transform-origin: center;
+}
+
+@keyframes tanu-blink {
+  0%, 90%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+@keyframes tanu-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes tanu-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* =========================================================================
+   4. INTERACTIVE GUIDE MODAL / PANEL
+   ========================================================================= */
+
+.tanu-guide-card {
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  background: var(--bot-surface);
+  border: 1.5px solid var(--bot-border);
+  border-radius: 22px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 40px var(--bot-glow);
+  backdrop-filter: blur(20px);
+  overflow: hidden;
+  margin-bottom: 14px;
+  animation: tanu-card-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes tanu-card-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.tanu-guide-header {
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tanu-guide-header-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tanu-guide-header-title h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 750;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.tanu-guide-header-title span {
+  font-size: 11px;
+  color: #38bdf8;
+  font-weight: 600;
+  display: block;
+}
+
+.tanu-guide-close-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tanu-guide-close-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #f87171;
+}
+
+.tanu-guide-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.tanu-dialogue-box {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 14px;
+  padding: 14px 16px;
+  color: #f1f5f9;
+  font-size: 13.5px;
+  line-height: 1.6;
+  position: relative;
+}
+
+.tanu-dialogue-kicker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #38bdf8;
+  margin-bottom: 6px;
+}
+
+.tanu-action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tanu-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-align: left;
+}
+
+.tanu-action-btn:hover {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.4);
+  transform: translateX(4px);
+  color: #ffffff;
+}
+
+.tanu-action-btn.is-highlight {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.3) 0%, rgba(56, 189, 248, 0.2) 100%);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.tanu-action-btn-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+.tanu-action-btn-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.tanu-action-btn-text strong {
+  display: block;
+  font-size: 13px;
+}
+
+.tanu-action-btn-text small {
+  display: block;
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 1px;
+}
+
+.tanu-tour-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tanu-tour-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+  transition: all 0.15s ease;
+}
+
+.tanu-tour-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.tanu-tour-nav-btn.is-primary {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  border-color: #3b82f6;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+
+.tanu-tour-nav-btn.is-primary:hover {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+/* =========================================================================
+   5. SPOTLIGHT OVERLAY & POINTER ARROW
+   ========================================================================= */
+
+.tanu-spotlight-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9990;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.tanu-target-spotlight {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 12px;
+  border: 2px solid #38bdf8;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.25), 0 0 25px rgba(56, 189, 248, 0.5);
+  animation: tanu-ring-pulse 1.8s ease-in-out infinite;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 9995;
+}
+
+@keyframes tanu-ring-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.3), 0 0 20px rgba(56, 189, 248, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(56, 189, 248, 0.5), 0 0 35px rgba(56, 189, 248, 0.7); }
+}
+
+.tanu-pointer-hand {
+  position: absolute;
+  z-index: 9996;
+  pointer-events: none;
+  animation: tanu-point-bounce 1.2s infinite;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+}
+
+@keyframes tanu-point-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 640px) {
+  .tanu-guide-container {
+    bottom: 16px;
+    right: 16px;
+  }
+  .tanu-bot-avatar-btn {
+    width: 56px;
+    height: 56px;
+  }
+  .tanu-bot-svg {
+    width: 40px;
+    height: 40px;
+  }
+  .tanu-guide-card {
+    width: 320px;
+  }
+  .tanu-peek-bubble {
+    font-size: 12px;
+    padding: 8px 12px;
+    max-width: 250px;
+  }
+  .header-menu-guide-tip {
+    font-size: 11px;
+    padding: 5px 10px;
+    gap: 5px;
+  }
+}
