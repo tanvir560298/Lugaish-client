@@ -186,6 +186,50 @@ export const IELTS_WRITING_WEEK_1_DAYS = [
       ],
       modelAnswer: 'I study computer science at a university. I read English articles every morning. My brother helps me with grammar exercises. I want to achieve Band 7 in the IELTS examination. Practice improves my writing confidence.'
     },
+    dailyThreeWords: [
+    {
+        "level": "Common",
+        "levelBadge": "Level 1 · Common Foundation",
+        "word": "Improve",
+        "phonetic": "/ɪmˈpruːv/",
+        "pos": "Verb",
+        "banglaMeaning": "উন্নত করা / বৃদ্ধি করা",
+        "englishDefinition": "To make or become better in quality, skill, or condition.",
+        "ieltsSentence": "Regular practice significantly improves your sentence accuracy and IELTS writing score.",
+        "contextTip": "IELTS Writing Task 2-এ উন্নয়ন বা বৃদ্ধির আলোচনায় \"increase\" বা \"improve\" সবচেয়ে নির্ভরযোগ্য ট্রানজিটিভ ভার্ব।",
+        "practiceQuestion": "Complete the sentence: \"Daily reading _______ writing fluency.\"",
+        "targetWord": "improves",
+        "hint": "Use the 3rd person singular form (-s)."
+    },
+    {
+        "level": "Intermediate",
+        "levelBadge": "Level 2 · Academic Core",
+        "word": "Require",
+        "phonetic": "/rɪˈkwaɪər/",
+        "pos": "Verb",
+        "banglaMeaning": "প্রয়োজন হওয়া / দাবি করা",
+        "englishDefinition": "To need something for a particular purpose or official standard.",
+        "ieltsSentence": "Achieving Band 7 in IELTS Writing requires consistency, clarity, and grammatical precision.",
+        "contextTip": "অনানুষ্ঠানিক \"need\"-এর পরিবর্তে ফরমাল IELTS প্রবন্ধে সর্বদা \"require\" ব্যবহার করার পরামর্শ দেওয়া হয়।",
+        "practiceQuestion": "Complete the sentence: \"Higher education _______ deep critical thinking skills.\"",
+        "targetWord": "requires",
+        "hint": "Use the 3rd person singular form (-s)."
+    },
+    {
+        "level": "Advanced",
+        "levelBadge": "Level 3 · Band 7+ Lexical Resource",
+        "word": "Facilitate",
+        "phonetic": "/fəˈsɪlɪteɪt/",
+        "pos": "Verb",
+        "banglaMeaning": "সহজতর করা / কোনো প্রক্রিয়াকে সুগম করা",
+        "englishDefinition": "To make an action, process, or development much easier to achieve.",
+        "ieltsSentence": "Modern digital classrooms facilitate personalized learning experiences for ambitious university students.",
+        "contextTip": "সাধারণ \"help\"-এর জায়গায় \"facilitate\" ব্যবহার করলে পরীক্ষক আপনার উচ্চমার্গের লেক্সিক্যাল রিসোর্স লক্ষ্য করবেন।",
+        "practiceQuestion": "Complete the sentence: \"Good public transportation _______ urban economic growth.\"",
+        "targetWord": "facilitates",
+        "hint": "Use the 3rd person singular form (-s)."
+    }
+],
     homework: {
       taskDescription: 'Write 5 more sentences about your family (2 sentences), your education (2 sentences), and your favorite hobby (1 sentence). Identify the Subject, Verb, and Object for each sentence.',
       newVocabulary: ['improve', 'achieve', 'require', 'support', 'develop']
@@ -356,6 +400,50 @@ Noun বা Pronoun-এর দোষ, গুণ, অবস্থা বা ব�
       ],
       modelAnswer: 'My best friend is an intelligent person. He is always helpful when I face difficult math problems. We study together in the university library. He has a patient attitude toward learning. We enjoy productive academic discussions.'
     },
+    dailyThreeWords: [
+    {
+        "level": "Common",
+        "levelBadge": "Level 1 · Common Foundation",
+        "word": "Useful",
+        "phonetic": "/ˈjuːsfl/",
+        "pos": "Adjective",
+        "banglaMeaning": "দরকারী / উপকারী",
+        "englishDefinition": "Able to be used for a practical purpose or helping you to do something.",
+        "ieltsSentence": "Learning basic grammar rules is useful for constructing error-free paragraphs.",
+        "contextTip": "\"useful\" একটি বর্ণনামূলক Adjective যা Noun-এর গুণ প্রকাশ করে (e.g., a useful skill)।",
+        "practiceQuestion": "Complete the sentence: \"Online libraries provide _______ resources for research students.\"",
+        "targetWord": "useful",
+        "hint": "Type the adjective form."
+    },
+    {
+        "level": "Intermediate",
+        "levelBadge": "Level 2 · Academic Core",
+        "word": "Crucial",
+        "phonetic": "/ˈkruːʃl/",
+        "pos": "Adjective",
+        "banglaMeaning": "অত্যন্ত গুরুত্বপূর্ণ / নির্ণায়ক",
+        "englishDefinition": "Extremely important or decisive for the success of something.",
+        "ieltsSentence": "Time management is a crucial factor during the official IELTS writing examination.",
+        "contextTip": "প্রবন্ধে বারবার \"important\" না লিখে ভ্যারিয়েশন হিসেবে \"crucial\" বা \"vital\" ব্যবহার করুন।",
+        "practiceQuestion": "Complete the sentence: \"Early childhood education plays a _______ role in mental development.\"",
+        "targetWord": "crucial",
+        "hint": "Type the adjective meaning extremely important."
+    },
+    {
+        "level": "Advanced",
+        "levelBadge": "Level 3 · Band 7+ Lexical Resource",
+        "word": "Indispensable",
+        "phonetic": "/ˌɪndɪˈspensəbl/",
+        "pos": "Adjective",
+        "banglaMeaning": "অপরিহার্য / যার কোনো বিকল্প নেই",
+        "englishDefinition": "Too important to be without; completely essential.",
+        "ieltsSentence": "Technological tools have become indispensable assets in modern university research.",
+        "contextTip": "Band 8+ লেক্সিক্যাল স্ট্যান্ডার্ডের জন্য \"essential\"-এর উচ্চমানের প্রতিশব্দ হলো \"indispensable\"।",
+        "practiceQuestion": "Complete the sentence: \"Clean drinking water is an _______ human necessity.\"",
+        "targetWord": "indispensable",
+        "hint": "Spelling tip: in-dis-pen-sable (ends in -able)."
+    }
+],
     homework: {
       taskDescription: 'Write a short description of your dream career using 6 sentences. Use at least 4 adjectives and identify their corresponding nouns.',
       newVocabulary: ['essential', 'significant', 'practical', 'diligent', 'inspiring']
@@ -525,6 +613,50 @@ Noun বা Pronoun-এর দোষ, গুণ, অবস্থা বা ব�
       ],
       modelAnswer: 'I am a dedicated student. My classes are intellectually stimulating. The university campus is modern and spacious. Yesterday, the library was crowded with researchers. We were very tired after the long seminar. Was the teacher available for questions? Is practical learning better than theoretical lectures?'
     },
+    dailyThreeWords: [
+    {
+        "level": "Common",
+        "levelBadge": "Level 1 · Common Foundation",
+        "word": "Famous",
+        "phonetic": "/ˈfeɪməs/",
+        "pos": "Adjective",
+        "banglaMeaning": "বিখ্যাত / সুপরিচিত",
+        "englishDefinition": "Known and recognized by many people.",
+        "ieltsSentence": "Oxford is a famous academic institution known for worldwide research excellence.",
+        "contextTip": "Be-verb-এর পর Predicative Adjective হিসেবে অবস্থা বোঝাতে \"famous\" বসে।",
+        "practiceQuestion": "Complete the sentence: \"Shakespeare was a _______ English playwright.\"",
+        "targetWord": "famous",
+        "hint": "Type the common adjective for well-known."
+    },
+    {
+        "level": "Intermediate",
+        "levelBadge": "Level 2 · Academic Core",
+        "word": "Prominent",
+        "phonetic": "/ˈprɑːmɪnənt/",
+        "pos": "Adjective",
+        "banglaMeaning": "বিশিষ্ট / গুরুত্বপূর্ণ ও প্রভাবশালী",
+        "englishDefinition": "Important, famous, or noticeable.",
+        "ieltsSentence": "Renewable energy is a prominent topic in contemporary environmental debates.",
+        "contextTip": "IELTS Task 2-এ সমাজ বা বিজ্ঞানের অগ্রণী বিষয়ের ক্ষেত্রে \"prominent role\" বা \"prominent issue\" লিখুন।",
+        "practiceQuestion": "Complete the sentence: \"The scientist played a _______ role in developing clean energy.\"",
+        "targetWord": "prominent",
+        "hint": "Starts with pro- and ends with -nent."
+    },
+    {
+        "level": "Advanced",
+        "levelBadge": "Level 3 · Band 7+ Lexical Resource",
+        "word": "Renowned",
+        "phonetic": "/rɪˈnaʊnd/",
+        "pos": "Adjective",
+        "banglaMeaning": "আন্তর্জাতিকভাবে সুখ্যাত ও প্রশংসিত",
+        "englishDefinition": "Widely known and highly admired for quality or achievement.",
+        "ieltsSentence": "The professor is internationally renowned for groundbreaking climate change publications.",
+        "contextTip": "সাধারণ \"famous\"-এর তুলনায় \"renowned\" শব্দটি গভীর শ্রদ্ধা ও বিশ্বজনীন স্বীকৃতি প্রকাশ করে।",
+        "practiceQuestion": "Complete the sentence: \"The hospital is _______ for its exceptional cardiac surgery.\"",
+        "targetWord": "renowned",
+        "hint": "Spelled re-n-o-w-n-e-d."
+    }
+],
     homework: {
       taskDescription: 'Write 6 sentences about your hometown using at least 3 different Be verbs. Include details on whether it is peaceful, crowded, or modern.',
       newVocabulary: ['available', 'accessible', 'feasible', 'reliable', 'exceptional']
@@ -698,6 +830,50 @@ Articles হলো Noun-এর পূর্বে বসে Noun-টি অন�
       ],
       modelAnswer: 'I study at a reputable university in my city. The campus provides modern laboratories and an extensive library for students. Education is considered a priority by the faculty. I met an inspiring professor who offered valuable guidance for my research project.'
     },
+    dailyThreeWords: [
+    {
+        "level": "Common",
+        "levelBadge": "Level 1 · Common Foundation",
+        "word": "Environment",
+        "phonetic": "/ɪnˈvaɪrənmənt/",
+        "pos": "Noun",
+        "banglaMeaning": "পরিবেশ / চারপাশের প্রাকৃতিক পরিমণ্ডল",
+        "englishDefinition": "The natural world, including air, water, and land in which life exists.",
+        "ieltsSentence": "Human industrial activities continue to exert severe pressure on the global environment.",
+        "contextTip": "প্রাকৃতিক পরিবেশ বোঝাতে সর্বদা definite article \"the environment\" ব্যবহার করতে হয়।",
+        "practiceQuestion": "Complete the sentence: \"Protecting the _______ is an urgent priority for all nations.\"",
+        "targetWord": "environment",
+        "hint": "Remember the silent \"n\" before \"ment\"."
+    },
+    {
+        "level": "Intermediate",
+        "levelBadge": "Level 2 · Academic Core",
+        "word": "Surroundings",
+        "phonetic": "/səˈraʊndɪŋz/",
+        "pos": "Noun (Plural)",
+        "banglaMeaning": "পারিপার্শ্বিক অবস্থা / চারপাশের পরিবেশ",
+        "englishDefinition": "The place where someone or something is and the things that are in it.",
+        "ieltsSentence": "A clean and peaceful learning environment positively influences student cognitive focus.",
+        "contextTip": "\"surroundings\" শব্দটি সর্বদা Plural হিসেবে ব্যবহৃত হয় এবং এর সাথে Plural Verb বসে।",
+        "practiceQuestion": "Complete the sentence: \"Students thrive when their physical _______ are organized and calm.\"",
+        "targetWord": "surroundings",
+        "hint": "Do not forget the final plural -s."
+    },
+    {
+        "level": "Advanced",
+        "levelBadge": "Level 3 · Band 7+ Lexical Resource",
+        "word": "Ecosystem",
+        "phonetic": "/ˈiːkəʊsɪstəm/",
+        "pos": "Noun",
+        "banglaMeaning": "বাস্তুতন্ত্র / প্রাকৃতিক ভারসাম্য ব্যবস্থা",
+        "englishDefinition": "All plants and living creatures in an area considered in relation to their environment.",
+        "ieltsSentence": "Deforestation causes irreparable degradation to marine and terrestrial ecosystems alike.",
+        "contextTip": "IELTS Environmental Essays-এ \"nature\" বা \"forest\"-এর চেয়ে \"ecosystem\" অনেক বেশি স্পেসিফিক ও একাডেমিক।",
+        "practiceQuestion": "Complete the sentence: \"Excessive plastic pollution damages the delicate marine _______.\"",
+        "targetWord": "ecosystem",
+        "hint": "Spelling: eco + system."
+    }
+],
     homework: {
       taskDescription: 'Write 5 sentences explaining "Why Knowledge Is Power". Highlight all articles and explain why zero article was used for uncountable nouns.',
       newVocabulary: ['university', 'engineer', 'opportunity', 'phenomenon', 'initiative']
@@ -883,6 +1059,50 @@ IELTS Writing-এ শিক্ষার্থীদের সবচেয়ে ঘ
       ],
       modelAnswer: 'Education provides many opportunities for young people in modern society. It offers valuable knowledge that helps individuals solve complex problems. Many students attend universities to gain professional qualifications. Teachers provide useful advice during academic projects. Comprehensive research shows that educated citizens contribute significantly to national economic growth.'
     },
+    dailyThreeWords: [
+    {
+        "level": "Common",
+        "levelBadge": "Level 1 · Common Foundation",
+        "word": "Problem",
+        "phonetic": "/ˈprɑːbləm/",
+        "pos": "Noun (Countable)",
+        "banglaMeaning": "সমস্যা / জটিল পরিস্থিতি",
+        "englishDefinition": "A matter or situation regarded as unwelcome or harmful and needing to be overcome.",
+        "ieltsSentence": "Traffic congestion is a severe problem in many rapidly expanding metropolitan areas.",
+        "contextTip": "\"problem\" একটি Countable Noun, তাই Singular হলে \"a problem\" বা Plural হলে \"problems\" লিখতে হয়।",
+        "practiceQuestion": "Complete the sentence: \"Urban air pollution remains a critical _______ in developing countries.\"",
+        "targetWord": "problem",
+        "hint": "Type the singular countable noun."
+    },
+    {
+        "level": "Intermediate",
+        "levelBadge": "Level 2 · Academic Core",
+        "word": "Obstacle",
+        "phonetic": "/ˈɑːbstəkl/",
+        "pos": "Noun (Countable)",
+        "banglaMeaning": "প্রতিবন্ধকতা / পথরোধকারী বাধা",
+        "englishDefinition": "A thing that blocks one’s way or prevents or hinders progress.",
+        "ieltsSentence": "High tuition fees represent a major obstacle for underprivileged students seeking tertiary degrees.",
+        "contextTip": "IELTS Writing-এ \"problem\"-এর সুন্দর ও ফর্মাল সিনোনিম হিসেবে \"obstacle\" বা \"barrier\" ব্যবহৃত হয়।",
+        "practiceQuestion": "Complete the sentence: \"Language barriers can be a significant _______ to international trade.\"",
+        "targetWord": "obstacle",
+        "hint": "Spelled o-b-s-t-a-c-l-e."
+    },
+    {
+        "level": "Advanced",
+        "levelBadge": "Level 3 · Band 7+ Lexical Resource",
+        "word": "Dilemma",
+        "phonetic": "/dɪˈlemə/",
+        "pos": "Noun (Countable)",
+        "banglaMeaning": "উভয়সংকট / কঠিন নৈতিক বা কৌশলগত দ্বন্দ্ব",
+        "englishDefinition": "A situation in which a difficult choice has to be made between two or more alternatives.",
+        "ieltsSentence": "Policymakers face an ethical dilemma between rapid industrialization and environmental preservation.",
+        "contextTip": "যখন দুটি বিপরীতধর্মী গুরুত্বপূর্ণ বিষয়ের মধ্যে সিদ্ধান্ত নেওয়া কঠিন হয়, তখন \"dilemma\" শব্দটি পরীক্ষককে মুগ্ধ করে।",
+        "practiceQuestion": "Complete the sentence: \"Balancing career ambitions and family duties poses a genuine _______ for young parents.\"",
+        "targetWord": "dilemma",
+        "hint": "Double \"m\": di-lem-ma."
+    }
+],
     homework: {
       taskDescription: 'Write a 60-word paragraph describing the items in your study room or office. Underline all countable nouns in blue and all uncountable nouns in green.',
       newVocabulary: ['criterion', 'equipment', 'evidence', 'feedback', 'phenomenon']
@@ -1066,6 +1286,50 @@ IELTS Writing-এ সাধারণ সত্য, বৈজ্ঞানিক �
       ],
       modelAnswer: 'I wake up at six o\'clock every morning. I usually review thirty new vocabulary words before breakfast. My tutor sends daily writing feedback via email. I always read academic articles from international publications for thirty minutes. In the afternoon, I attend university lectures. I often practice sentence building exercises in the evening. I never submit assignments without proofreading my grammar.'
     },
+    dailyThreeWords: [
+    {
+        "level": "Common",
+        "levelBadge": "Level 1 · Common Foundation",
+        "word": "Consume",
+        "phonetic": "/kənˈsuːm/",
+        "pos": "Verb",
+        "banglaMeaning": "ব্যবহার বা ভোগ করা / খাওয়া",
+        "englishDefinition": "To use up, eat, drink, or expend resources, fuel, or energy.",
+        "ieltsSentence": "Modern vehicles consume substantially less fuel due to advanced mechanical efficiency.",
+        "contextTip": "Present Simple-এ Third-Person Singular Subject হলে \"consumes\" লিখতে হয়।",
+        "practiceQuestion": "Complete the sentence: \"A heavy computer program _______ a large amount of battery power.\"",
+        "targetWord": "consumes",
+        "hint": "Third-person singular (-s)."
+    },
+    {
+        "level": "Intermediate",
+        "levelBadge": "Level 2 · Academic Core",
+        "word": "Allocate",
+        "phonetic": "/ˈæləkeɪt/",
+        "pos": "Verb",
+        "banglaMeaning": "নির্দিষ্ট কাজের জন্য বরাদ্দ করা",
+        "englishDefinition": "To distribute resources, time, or funds for a particular purpose.",
+        "ieltsSentence": "Responsible governments allocate substantial financial budgets to healthcare and primary education.",
+        "contextTip": "IELTS Writing Task 2-এ সরকারি বাজেট বরাদ্দের ক্ষেত্রে \"allocate\" অপরিহার্য একটি ভার্ব।",
+        "practiceQuestion": "Complete the sentence: \"The ministry should _______ more funds for public school libraries.\"",
+        "targetWord": "allocate",
+        "hint": "Base form after modal \"should\"."
+    },
+    {
+        "level": "Advanced",
+        "levelBadge": "Level 3 · Band 7+ Lexical Resource",
+        "word": "Prioritize",
+        "phonetic": "/praɪˈɔːrətaɪz/",
+        "pos": "Verb",
+        "banglaMeaning": "গুরুত্ব অনুসারে অগ্রাধিকার দেওয়া",
+        "englishDefinition": "To designate or treat something as more important than other things.",
+        "ieltsSentence": "Successful students prioritize constructive study habits over mindless digital distractions.",
+        "contextTip": "\"Give importance to\"-এর চেয়ে একক শব্দ \"prioritize\" অনেক বেশি পরিশীলিত ও প্রভাবশালী।",
+        "practiceQuestion": "Complete the sentence: \"Urban city planners must _______ pedestrian safety over vehicle speed.\"",
+        "targetWord": "prioritize",
+        "hint": "Spelled p-r-i-o-r-i-t-i-z-e."
+    }
+],
     homework: {
       taskDescription: 'Write 6 sentences describing the daily routine of a family member or friend (e.g., your mother, father, or roommate). Ensure every sentence uses the third-person -s/-es correctly.',
       newVocabulary: ['regularly', 'consistently', 'frequently', 'maintain', 'prioritize']
@@ -1240,6 +1504,50 @@ Subject এবং Verb-এর মাঝে যদি Preposition যুক্ত
       ],
       modelAnswer: 'I am an ambitious university student aiming for higher education in the United Kingdom. I study English every day to enhance my language competence. My university provides an excellent academic environment with extensive research facilities. Learning academic writing requires consistent practice and patience. Achieving Band 7 in IELTS opens remarkable career opportunities for my future. I always complete my daily grammar tasks with genuine enthusiasm.'
     },
+    dailyThreeWords: [
+    {
+        "level": "Common",
+        "levelBadge": "Level 1 · Common Foundation",
+        "word": "Connect",
+        "phonetic": "/kəˈnekt/",
+        "pos": "Verb",
+        "banglaMeaning": "যুক্ত করা / সম্পর্কিত হওয়া",
+        "englishDefinition": "To bring together or establish a relationship between two or more things.",
+        "ieltsSentence": "High-speed internet networks connect rural communities to global educational resources.",
+        "contextTip": "Subject যদি Plural হয় (networks), Verb-এর সাথে -s যুক্ত হবে না (connect)।",
+        "practiceQuestion": "Complete the sentence: \"Effective teachers _______ classroom lessons to real-world experience.\"",
+        "targetWord": "connect",
+        "hint": "Plural subject \"teachers\" takes base verb."
+    },
+    {
+        "level": "Intermediate",
+        "levelBadge": "Level 2 · Academic Core",
+        "word": "Correlate",
+        "phonetic": "/ˈkɔːrəleɪt/",
+        "pos": "Verb",
+        "banglaMeaning": "পরস্পর সম্পর্কযুক্ত হওয়া / সমানুপাতিক হওয়া",
+        "englishDefinition": "To have a mutual relationship or connection, in which one thing affects another.",
+        "ieltsSentence": "Academic studies prove that parental involvement strongly correlates with children’s academic success.",
+        "contextTip": "IELTS Task 1 ও Task 2-এ দুটি উপাত্তের সম্পর্ক তুলে ধরতে \"correlates with\" একটি অসাধারণ টার্ম।",
+        "practiceQuestion": "Complete the sentence: \"Higher education levels generally _______ with higher lifetime earnings.\"",
+        "targetWord": "correlate",
+        "hint": "Plural subject \"levels\" takes base verb correlate."
+    },
+    {
+        "level": "Advanced",
+        "levelBadge": "Level 3 · Band 7+ Lexical Resource",
+        "word": "Synthesize",
+        "phonetic": "/ˈsɪnθəsaɪz/",
+        "pos": "Verb",
+        "banglaMeaning": "বিভিন্ন তথ্য একত্র করে সমন্বিত সিদ্ধান্তে পৌঁছানো",
+        "englishDefinition": "To combine a range of different ideas, facts, or elements into a coherent whole.",
+        "ieltsSentence": "A proficient IELTS essay synthesizes diverse arguments before presenting a balanced final conclusion.",
+        "contextTip": "Band 8+ Writing-এ তথ্য সমন্বয় করার সামর্থ্য বোঝাতে \"synthesize\" শব্দটি ব্যবহৃত হয়।",
+        "practiceQuestion": "Complete the sentence: \"Researchers must _______ data from multiple experiments to form a clear theory.\"",
+        "targetWord": "synthesize",
+        "hint": "Base form after modal \"must\"."
+    }
+],
     homework: {
       taskDescription: 'Complete the Week 1 Self-Assessment Checklist and review any mistakes made in Days 1 to 6 before moving to Week 2: Compound & Complex Sentences.',
       newVocabulary: ['competence', 'remarkable', 'collaborative', 'comprehensive', 'perseverance']
