@@ -13,120 +13,7 @@
 }
 
 /* =========================================================================
-   1. HEADER MENU (3-DOTS) GUIDE POINTER
-   ========================================================================= */
-
-.header-menu-guide-wrapper {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
-@media (min-width: 1001px) {
-  .header-menu-guide-wrapper {
-    display: none !important;
-  }
-}
-
-.header-menu-guide-tip {
-  position: absolute;
-  right: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-  margin-right: 10px;
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
-  border: 1.5px solid #38bdf8;
-  border-radius: 20px;
-  padding: 6px 14px;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  white-space: nowrap;
-  font-size: 12px;
-  font-weight: 750;
-  color: #ffffff;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(56, 189, 248, 0.35);
-  animation: guide-tip-bounce-x 1.8s ease-in-out infinite;
-  z-index: 100;
-  pointer-events: auto;
-  cursor: pointer;
-}
-
-@keyframes guide-tip-bounce-x {
-  0%, 100% { transform: translateY(-50%) translateX(0); }
-  50% { transform: translateY(-50%) translateX(-6px); }
-}
-
-.guide-tip-bot-icon {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #34d399 0%, #38bdf8 100%);
-  display: grid;
-  place-items: center;
-  font-size: 12px;
-  color: #0f172a;
-  box-shadow: 0 0 8px #38bdf8;
-}
-
-.guide-tip-arrow {
-  color: #38bdf8;
-  font-size: 14px;
-  animation: guide-arrow-wiggle 1s infinite alternate;
-}
-
-@keyframes guide-arrow-wiggle {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(4px); }
-}
-
-.guide-tip-dismiss {
-  background: transparent;
-  border: none;
-  color: #94a3b8;
-  cursor: pointer;
-  padding: 2px;
-  margin-left: 2px;
-  display: flex;
-  align-items: center;
-}
-.guide-tip-dismiss:hover {
-  color: #f87171;
-}
-
-/* Pulsing highlight ring on the 3-dots / menu button itself */
-.header-menu.is-highlighted {
-  position: relative;
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5), 0 0 20px rgba(56, 189, 248, 0.6) !important;
-  border-color: #38bdf8 !important;
-  animation: menu-pulse 1.8s infinite;
-}
-
-@keyframes menu-pulse {
-  0%, 100% { box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.4), 0 0 15px rgba(56, 189, 248, 0.4); }
-  50% { box-shadow: 0 0 0 6px rgba(56, 189, 248, 0.7), 0 0 25px rgba(56, 189, 248, 0.7); }
-}
-
-/* Inside the open mobile navigation drawer */
-.mobile-nav-guide-tip {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  border-radius: 12px;
-  padding: 10px 14px;
-  margin: 6px 0 14px;
-  font-size: 12.5px;
-  color: #f1f5f9;
-}
-
-.mobile-nav-guide-tip strong {
-  color: #38bdf8;
-}
-
-/* =========================================================================
-   2. HOME HERO & COURSE ACTION CUTE GUIDE BADGES
+   1. HOME HERO & COURSE ACTION CUTE GUIDE BADGES
    ========================================================================= */
 
 .home-guide-pill {
@@ -415,22 +302,23 @@
 }
 
 .tanu-guide-body {
-  padding: 20px;
+  padding: 14px 16px 18px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  max-height: 480px;
+  gap: 12px;
+  max-height: min(440px, 70vh);
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .tanu-dialogue-box {
   background: rgba(30, 41, 59, 0.7);
   border: 1px solid rgba(56, 189, 248, 0.25);
   border-radius: 14px;
-  padding: 14px 16px;
+  padding: 12px 14px;
   color: #f1f5f9;
-  font-size: 13.5px;
-  line-height: 1.6;
+  font-size: 13px;
+  line-height: 1.5;
   position: relative;
 }
 
@@ -443,7 +331,7 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: #38bdf8;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .tanu-action-list {
@@ -456,7 +344,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 14px;
+  padding: 10px 12px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -472,13 +360,13 @@
 .tanu-action-btn:hover {
   background: rgba(56, 189, 248, 0.15);
   border-color: rgba(56, 189, 248, 0.4);
-  transform: translateX(4px);
+  transform: translateX(3px);
   color: #ffffff;
 }
 
 .tanu-action-btn.is-highlight {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.3) 0%, rgba(56, 189, 248, 0.2) 100%);
-  border-color: rgba(56, 189, 248, 0.4);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.25) 0%, rgba(56, 189, 248, 0.15) 100%);
+  border-color: rgba(56, 189, 248, 0.45);
 }
 
 .tanu-action-btn-icon {
@@ -487,8 +375,6 @@
   border-radius: 10px;
   display: grid;
   place-items: center;
-  background: rgba(56, 189, 248, 0.12);
-  color: #38bdf8;
   flex-shrink: 0;
 }
 
@@ -499,7 +385,8 @@
 
 .tanu-action-btn-text strong {
   display: block;
-  font-size: 13px;
+  font-size: 12.5px;
+  color: #ffffff;
 }
 
 .tanu-action-btn-text small {
@@ -507,114 +394,44 @@
   font-size: 11px;
   color: #94a3b8;
   margin-top: 1px;
-}
-
-.tanu-tour-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.tanu-tour-nav-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
-  color: #cbd5e1;
-  transition: all 0.15s ease;
-}
-
-.tanu-tour-nav-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-}
-
-.tanu-tour-nav-btn.is-primary {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  border-color: #3b82f6;
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
-}
-
-.tanu-tour-nav-btn.is-primary:hover {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-}
-
-/* =========================================================================
-   5. SPOTLIGHT OVERLAY & POINTER ARROW
-   ========================================================================= */
-
-.tanu-spotlight-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9990;
-  pointer-events: none;
-  transition: all 0.3s ease;
-}
-
-.tanu-target-spotlight {
-  position: absolute;
-  pointer-events: none;
-  border-radius: 12px;
-  border: 2px solid #38bdf8;
-  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.25), 0 0 25px rgba(56, 189, 248, 0.5);
-  animation: tanu-ring-pulse 1.8s ease-in-out infinite;
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  z-index: 9995;
-}
-
-@keyframes tanu-ring-pulse {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.3), 0 0 20px rgba(56, 189, 248, 0.4); }
-  50% { box-shadow: 0 0 0 8px rgba(56, 189, 248, 0.5), 0 0 35px rgba(56, 189, 248, 0.7); }
-}
-
-.tanu-pointer-hand {
-  position: absolute;
-  z-index: 9996;
-  pointer-events: none;
-  animation: tanu-point-bounce 1.2s infinite;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
-}
-
-@keyframes tanu-point-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  line-height: 1.35;
 }
 
 /* Mobile responsive adjustments */
 @media (max-width: 640px) {
   .tanu-guide-container {
-    bottom: 84px; /* Give clearance so sticky bottom action bars are never obstructed */
-    right: 14px;
+    bottom: 84px; /* Clearance above sticky bottom submit bars */
+    right: 12px;
   }
   .tanu-bot-avatar-btn {
-    width: 52px;
-    height: 52px;
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
   }
   .tanu-bot-svg {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
   }
   .tanu-guide-card {
-    width: min(340px, calc(100vw - 28px));
+    width: min(330px, calc(100vw - 24px));
+    max-height: 68vh;
+  }
+  .tanu-guide-body {
+    padding: 12px 12px 16px;
+    gap: 10px;
+    max-height: calc(68vh - 65px);
+  }
+  .tanu-action-btn {
+    padding: 9px 10px;
+    gap: 10px;
+  }
+  .tanu-action-btn-icon {
+    width: 28px;
+    height: 28px;
   }
   .tanu-peek-bubble {
-    font-size: 12px;
-    padding: 8px 12px;
-    max-width: 240px;
-  }
-  .header-menu-guide-tip {
-    font-size: 11px;
-    padding: 5px 10px;
-    gap: 5px;
+    font-size: 11.5px;
+    padding: 7px 11px;
+    max-width: 220px;
   }
 }
