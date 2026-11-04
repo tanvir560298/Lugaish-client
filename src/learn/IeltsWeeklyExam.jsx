@@ -1271,3 +1271,6 @@ export function IeltsWeeklyExam({
 
   return null;
 }
+
+export default IeltsWeeklyExam;
+

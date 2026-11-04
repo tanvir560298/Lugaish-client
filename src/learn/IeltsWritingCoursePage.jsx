@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import {
   BookOpen,
@@ -173,8 +173,9 @@ export function IeltsWritingCoursePage() {
   const handleSubmitQuiz = () => {
     let correctCount = 0;
     const results = {};
+    const problems = dayData.practiceProblems || [];
 
-    dayData.practiceProblems.forEach((problem) => {
+    problems.forEach((problem) => {
       const pid = problem.id;
       let isCorrect = false;
       let userAnswer = '';
@@ -201,8 +202,8 @@ export function IeltsWritingCoursePage() {
 
     const scoreData = {
       correct: correctCount,
-      total: dayData.practiceProblems.length,
-      percentage: Math.round((correctCount / dayData.practiceProblems.length) * 100)
+      total: problems.length,
+      percentage: problems.length > 0 ? Math.round((correctCount / problems.length) * 100) : 0
     };
 
     setQuizResults(results);
@@ -251,11 +252,12 @@ export function IeltsWritingCoursePage() {
   const isWordCountSufficient = wordCount >= (dayData.writingChallenge?.minimumWords || 35);
 
   // Quiz answered count
-  const answeredCount = dayData.practiceProblems.filter(p => {
+  const practiceProblems = dayData.practiceProblems || [];
+  const answeredCount = practiceProblems.filter(p => {
     if (p.type === 'mcq') return selectedOptions[p.id] !== undefined;
     return !!(typedAnswers[p.id] || '').trim();
   }).length;
-  const totalQuestions = dayData.practiceProblems.length;
+  const totalQuestions = practiceProblems.length;
 
   return (
     <div className="ielts-course-shell">
@@ -1256,3 +1258,6 @@ export function IeltsWritingCoursePage() {
   </div>
 );
 }
+
+export default IeltsWritingCoursePage;
+
