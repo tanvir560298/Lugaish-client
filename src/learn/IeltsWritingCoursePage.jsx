@@ -22,8 +22,11 @@ import {
   Award,
   Send,
   Zap,
+  Lock,
+  Unlock,
   HelpCircle as QuestionIcon
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import {
   IELTS_WRITING_WEEK_1_INFO,
   IELTS_WRITING_WEEK_1_DAYS
@@ -31,6 +34,18 @@ import {
 import { IeltsWeeklyExam } from './IeltsWeeklyExam.jsx';
 import './learn.css';
 import './ielts-writing.css';
+
+function triggerCelebration() {
+  try {
+    confetti({
+      particleCount: 75,
+      spread: 65,
+      origin: { y: 0.6 }
+    });
+  } catch {
+    // fallback if canvas not supported
+  }
+}
 
 const PROGRESS_STORAGE_KEY = 'lugaish_ielts_writing_progress_v1';
 const DRAFTS_STORAGE_KEY = 'lugaish_ielts_writing_drafts_v1';
@@ -72,17 +87,25 @@ function saveStoredDraft(day, text) {
 }
 
 export function IeltsWritingCoursePage() {
-  const { day: rawDay = '1' } = useParams();
+  const { day: rawDay } = useParams();
   const navigate = useNavigate();
-  const currentDayNum = Math.max(1, Math.min(8, parseInt(rawDay, 10) || 1));
-
-  // 3-Step linear progression: 'study' | 'quiz' | 'words_writing'
-  const [activeStep, setActiveStep] = useState('study');
 
   const [progress, setProgress] = useState(getStoredProgress);
   const [drafts, setDrafts] = useState(getStoredDrafts);
   const [showModelAnswer, setShowModelAnswer] = useState(false);
   const [savedNotification, setSavedNotification] = useState('');
+  const [previewAllDays, setPreviewAllDays] = useState(false);
+
+  // Next incomplete lesson in week 1
+  const nextIncompleteDay = useMemo(() => {
+    return [1, 2, 3, 4, 5, 6, 7].find(d => !progress.completedDays.includes(d)) || 8;
+  }, [progress.completedDays]);
+
+  // If no day specified in route, open next incomplete day
+  const currentDayNum = Math.max(1, Math.min(8, parseInt(rawDay || String(nextIncompleteDay), 10) || 1));
+
+  // 3-Step linear progression: 'study' | 'quiz' | 'words_writing'
+  const [activeStep, setActiveStep] = useState('study');
 
   // Quiz State (Single unified submission)
   const [selectedOptions, setSelectedOptions] = useState({});
@@ -116,6 +139,7 @@ export function IeltsWritingCoursePage() {
       saveStoredProgress(updated);
       return updated;
     });
+    triggerCelebration();
   }, []);
 
   // Reset states when changing day
@@ -135,24 +159,55 @@ export function IeltsWritingCoursePage() {
 
   const isDayCompleted = progress.completedDays.includes(currentDayNum);
 
-  const toggleDayComplete = () => {
+  // Reset progress confirmation
+  const handleResetProgress = () => {
+    if (window.confirm('আপনি কি সত্যিই আপনার অগ্রগতি রিসেট করতে চান? (Are you sure you want to reset your progress?)')) {
+      const fresh = { completedDays: [], scores: {} };
+      setProgress(fresh);
+      saveStoredProgress(fresh);
+      setPreviewAllDays(false);
+      navigate('/learn/ielts-writing/1');
+    }
+  };
+
+  // Day Complete Handler with Verification & Confetti
+  const handleCompleteDay = () => {
     const isCompleted = progress.completedDays.includes(currentDayNum);
     const newCompleted = isCompleted
-      ? progress.completedDays.filter(d => d !== currentDayNum)
-      : [...progress.completedDays, currentDayNum];
+      ? progress.completedDays
+      : [...progress.completedDays, currentDayNum].sort((a, b) => a - b);
 
-    const updated = { ...progress, completedDays: newCompleted };
+    const calculatedScore = quizScore
+      ? quizScore.percentage
+      : (progress.scores[`day_${currentDayNum}`] || 85);
+
+    const updated = {
+      ...progress,
+      completedDays: newCompleted,
+      scores: {
+        ...progress.scores,
+        [`day_${currentDayNum}`]: calculatedScore
+      }
+    };
+
     setProgress(updated);
     saveStoredProgress(updated);
+    triggerCelebration();
 
-    if (!isCompleted && currentDayNum < 7) {
-      setSavedNotification(`🎉 Day ${currentDayNum} completed! Advancing to Day ${currentDayNum + 1}...`);
+    if (currentDayNum < 7) {
+      setSavedNotification(`🎉 অসাধারণ! Day 0${currentDayNum} সফলভাবে সম্পন্ন হয়েছে! Day 0${currentDayNum + 1} আনলক হয়ে গেছে।`);
       setTimeout(() => {
         setSavedNotification('');
         navigate(`/learn/ielts-writing/${currentDayNum + 1}`);
-      }, 1500);
+      }, 1600);
+    } else if (currentDayNum === 7) {
+      setSavedNotification('🏆 চমৎকার! আপনি Week 1-এর ৭টি ক্লাসই শেষ করেছেন! Day 08 Mastery Exam আনলক হয়ে গেছে!');
+      setTimeout(() => {
+        setSavedNotification('');
+        navigate('/learn/ielts-writing/8');
+      }, 1800);
     } else {
-      setSavedNotification(isCompleted ? 'Marked as incomplete' : '🎉 Day completed!');
+      setSavedNotification('🎉 দিনটি সফলভাবে সম্পন্ন হয়েছে!');
       setTimeout(() => setSavedNotification(''), 3000);
     }
   };
@@ -209,6 +264,9 @@ export function IeltsWritingCoursePage() {
     setQuizResults(results);
     setQuizScore(scoreData);
     setIsQuizSubmitted(true);
+    if (scoreData.percentage >= 60) {
+      triggerCelebration();
+    }
 
     // Save score to progress
     const updated = {
@@ -313,11 +371,60 @@ export function IeltsWritingCoursePage() {
               border: isDayCompleted ? '1px solid rgba(52, 211, 153, 0.35)' : '1px solid rgba(59, 130, 246, 0.3)'
             }}>
               {isDayCompleted ? <CheckCircle2 size={15} /> : <Clock size={14} />}
-              {isDayCompleted ? (dayData.isExam ? 'Exam Passed ✓' : 'Day Completed') : 'In Progress'}
+              {isDayCompleted ? (dayData.isExam ? 'Exam Passed ✓' : 'Day Completed ✓') : 'In Progress'}
             </div>
             <span style={{ fontSize: '11px', color: 'var(--lx-muted)' }}>
               Week 1: {progress.completedDays.filter(d => d <= 7).length} of 7 Lessons Complete
             </span>
+          </div>
+        </div>
+
+        {/* Overall Week 1 Progress Bar */}
+        <div style={{
+          marginTop: '20px',
+          paddingTop: '18px',
+          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12.5px', flexWrap: 'wrap', gap: '8px' }}>
+            <span style={{ color: 'var(--lx-muted)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Layers size={14} color="#60a5fa" />
+              Week 1 Foundation Progress:
+              <strong style={{ color: '#ffffff' }}>
+                {progress.completedDays.filter(d => d <= 7).length} of 7 Lessons Completed
+              </strong>
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+              <span style={{ color: '#34d399', fontWeight: 700 }}>
+                {Math.round((progress.completedDays.filter(d => d <= 7).length / 7) * 100)}% Complete
+              </span>
+              <button
+                type="button"
+                onClick={handleResetProgress}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--lx-muted)',
+                  fontSize: '11px',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  padding: 0
+                }}
+              >
+                Reset Progress
+              </button>
+            </div>
+          </div>
+          <div style={{ width: '100%', height: '7px', background: 'rgba(255, 255, 255, 0.08)', borderRadius: '4px', overflow: 'hidden' }}>
+            <div style={{
+              width: `${(progress.completedDays.filter(d => d <= 7).length / 7) * 100}%`,
+              height: '100%',
+              background: 'linear-gradient(90deg, #3b82f6 0%, #10b981 100%)',
+              borderRadius: '4px',
+              transition: 'width 0.4s ease'
+            }} />
           </div>
         </div>
 
@@ -337,21 +444,33 @@ export function IeltsWritingCoursePage() {
         )}
       </header>
 
-      {/* 8-Day Quick Switcher Bar */}
+      {/* 8-Day Quick Switcher Bar with Unlock States */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))',
         gap: '8px',
-        marginBottom: '26px'
+        marginBottom: '22px'
       }}>
         {IELTS_WRITING_WEEK_1_DAYS.map((d) => {
           const isSelected = d.day === currentDayNum;
           const isDone = progress.completedDays.includes(d.day);
           const isExamDay = d.isExam;
+          const isUnlocked = d.day === 1 || progress.completedDays.includes(d.day - 1) || previewAllDays;
+          const dayScore = progress.scores?.[isExamDay ? 'week-1-exam' : `day_${d.day}`];
+
           return (
             <Link
               key={d.day}
               to={`/learn/ielts-writing/${d.day}`}
+              onClick={(e) => {
+                if (!isUnlocked && !previewAllDays) {
+                  e.preventDefault();
+                  if (window.confirm(`Day 0${d.day} এখনও লক করা আছে। এটি আনলক করতে প্রথমে Day 0${d.day - 1} সম্পন্ন করুন। আপনি কি প্রিভিউ মোডে এই ক্লাসটি দেখতে চান?`)) {
+                    setPreviewAllDays(true);
+                    navigate(`/learn/ielts-writing/${d.day}`);
+                  }
+                }
+              }}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -359,12 +478,17 @@ export function IeltsWritingCoursePage() {
                 borderRadius: '12px',
                 background: isSelected 
                   ? (isExamDay ? 'rgba(245, 158, 11, 0.22)' : 'rgba(59, 130, 246, 0.2)') 
-                  : (isExamDay ? 'rgba(245, 158, 11, 0.08)' : 'var(--lx-panel, rgba(15, 23, 42, 0.6))'),
+                  : isDone
+                    ? 'rgba(16, 185, 129, 0.08)'
+                    : (isExamDay ? 'rgba(245, 158, 11, 0.05)' : 'var(--lx-panel, rgba(15, 23, 42, 0.6))'),
                 border: isSelected 
                   ? (isExamDay ? '1.5px solid #fbbf24' : '1.5px solid #3b82f6') 
-                  : (isExamDay ? '1px dashed rgba(245, 158, 11, 0.35)' : '1px solid var(--lx-border, rgba(255, 255, 255, 0.08))'),
+                  : isDone
+                    ? '1px solid rgba(16, 185, 129, 0.35)'
+                    : (isExamDay ? '1px dashed rgba(245, 158, 11, 0.35)' : '1px solid var(--lx-border, rgba(255, 255, 255, 0.08))'),
                 textDecoration: 'none',
                 color: 'inherit',
+                opacity: (!isUnlocked && !isDone) ? 0.6 : 1,
                 transition: 'all 0.18s ease'
               }}
             >
@@ -374,11 +498,19 @@ export function IeltsWritingCoursePage() {
                   fontWeight: 800, 
                   color: isSelected 
                     ? (isExamDay ? '#fbbf24' : '#60a5fa') 
-                    : (isExamDay ? '#f59e0b' : 'var(--lx-muted)') 
+                    : isDone
+                      ? '#34d399'
+                      : (isExamDay ? '#f59e0b' : 'var(--lx-muted)') 
                 }}>
                   {isExamDay ? 'DAY 08 · 🏆 EXAM' : `DAY 0${d.day}`}
                 </span>
-                {isDone && <Check size={13} color="#34d399" />}
+                {isDone ? (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#34d399', fontSize: '10px', fontWeight: 750 }}>
+                    <Check size={12} /> {dayScore ? `${dayScore}%` : '✓'}
+                  </span>
+                ) : !isUnlocked ? (
+                  <Lock size={12} color="var(--lx-muted)" />
+                ) : null}
               </div>
               <strong style={{ 
                 fontSize: '12px', 
@@ -395,13 +527,289 @@ export function IeltsWritingCoursePage() {
         })}
       </div>
 
+      {/* TODAY'S 3-STEP GUIDED ROADMAP (আজকের ক্লাসের সহজ গাইড ও অগ্রগতি) */}
+      {!dayData.isExam && (
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%)',
+          border: '1.5px solid rgba(59, 130, 246, 0.3)',
+          borderRadius: '18px',
+          padding: '20px clamp(16px, 2.5vw, 24px)',
+          marginBottom: '24px',
+          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.25)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '16px' }}>📋</span>
+              <strong style={{ fontSize: '15px', color: '#ffffff' }}>
+                Day 0{currentDayNum} রুটম্যাপ — আজকের ৩টি কাজ:
+              </strong>
+            </div>
+            <span style={{ fontSize: '12px', color: 'var(--lx-muted)' }}>
+              প্রতিটি ধাপ শেষ করে ক্রমান্বয়ে এগিয়ে যান
+            </span>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '10px'
+          }}>
+            {/* Step 1 Card */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveStep('study');
+                window.scrollTo({ top: 200, behavior: 'smooth' });
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px 14px',
+                borderRadius: '12px',
+                background: activeStep === 'study'
+                  ? 'rgba(59, 130, 246, 0.18)'
+                  : 'rgba(15, 23, 42, 0.6)',
+                border: activeStep === 'study'
+                  ? '1.5px solid #3b82f6'
+                  : '1px solid rgba(255, 255, 255, 0.08)',
+                textAlign: 'left',
+                cursor: 'pointer',
+                color: '#ffffff',
+                transition: 'all 0.18s ease'
+              }}
+            >
+              <div style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '50%',
+                background: isDayCompleted || activeStep !== 'study' ? '#10b981' : '#3b82f6',
+                display: 'grid',
+                placeItems: 'center',
+                fontSize: '12px',
+                fontWeight: 800,
+                flexShrink: 0
+              }}>
+                1
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  ১. গ্রামার নিয়ম পড়ুন
+                </div>
+                <div style={{ fontSize: '11px', color: 'var(--lx-muted)' }}>
+                  Sentence structure & traps
+                </div>
+              </div>
+              <ChevronRight size={15} color="var(--lx-muted)" />
+            </button>
+
+            {/* Step 2 Card */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveStep('quiz');
+                window.scrollTo({ top: 200, behavior: 'smooth' });
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px 14px',
+                borderRadius: '12px',
+                background: activeStep === 'quiz'
+                  ? 'rgba(59, 130, 246, 0.18)'
+                  : 'rgba(15, 23, 42, 0.6)',
+                border: activeStep === 'quiz'
+                  ? '1.5px solid #3b82f6'
+                  : isQuizSubmitted && quizScore?.percentage >= 60
+                    ? '1px solid rgba(16, 185, 129, 0.4)'
+                    : '1px solid rgba(255, 255, 255, 0.08)',
+                textAlign: 'left',
+                cursor: 'pointer',
+                color: '#ffffff',
+                transition: 'all 0.18s ease'
+              }}
+            >
+              <div style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '50%',
+                background: isQuizSubmitted
+                  ? (quizScore?.percentage >= 60 ? '#10b981' : '#ef4444')
+                  : (activeStep === 'quiz' ? '#3b82f6' : 'rgba(255, 255, 255, 0.1)'),
+                display: 'grid',
+                placeItems: 'center',
+                fontSize: '12px',
+                fontWeight: 800,
+                flexShrink: 0
+              }}>
+                {isQuizSubmitted && quizScore?.percentage >= 60 ? '✓' : '2'}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  ২. প্র্যাকটিস কুইজ
+                </div>
+                <div style={{ fontSize: '11px', color: isQuizSubmitted ? (quizScore?.percentage >= 60 ? '#34d399' : '#f87171') : 'var(--lx-muted)' }}>
+                  {isQuizSubmitted ? `স্কোর: ${quizScore?.percentage}%` : `${totalQuestions} টি প্রশ্ন (পাস ৬০%)`}
+                </div>
+              </div>
+              <ChevronRight size={15} color="var(--lx-muted)" />
+            </button>
+
+            {/* Step 3 Card */}
+            <button
+              type="button"
+              onClick={() => {
+                setActiveStep('words_writing');
+                window.scrollTo({ top: 200, behavior: 'smooth' });
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '12px 14px',
+                borderRadius: '12px',
+                background: activeStep === 'words_writing'
+                  ? 'rgba(59, 130, 246, 0.18)'
+                  : 'rgba(15, 23, 42, 0.6)',
+                border: activeStep === 'words_writing'
+                  ? '1.5px solid #3b82f6'
+                  : isWordCountSufficient
+                    ? '1px solid rgba(16, 185, 129, 0.4)'
+                    : '1px solid rgba(255, 255, 255, 0.08)',
+                textAlign: 'left',
+                cursor: 'pointer',
+                color: '#ffffff',
+                transition: 'all 0.18s ease'
+              }}
+            >
+              <div style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '50%',
+                background: isWordCountSufficient ? '#10b981' : (activeStep === 'words_writing' ? '#3b82f6' : 'rgba(255, 255, 255, 0.1)'),
+                display: 'grid',
+                placeItems: 'center',
+                fontSize: '12px',
+                fontWeight: 800,
+                flexShrink: 0
+              }}>
+                {isWordCountSufficient ? '✓' : '3'}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  ৩. শব্দ ও বাক্য রচনা
+                </div>
+                <div style={{ fontSize: '11px', color: isWordCountSufficient ? '#34d399' : 'var(--lx-muted)' }}>
+                  {wordCount > 0 ? `${wordCount}/${dayData.writingChallenge.minimumWords} শব্দ` : '৩টি নতুন শব্দ ও রাইটিং'}
+                </div>
+              </div>
+              <ChevronRight size={15} color="var(--lx-muted)" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* RENDER EXAM OR STANDARD 3-STEP LESSON */}
       {dayData.isExam ? (
-        <IeltsWeeklyExam
-          examData={dayData}
-          progress={progress}
-          onExamComplete={handleExamComplete}
-        />
+        (progress.completedDays.filter(d => d <= 7).length < 7 && !previewAllDays) ? (
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.95) 100%)',
+            border: '1.5px solid rgba(245, 158, 11, 0.35)',
+            borderRadius: '20px',
+            padding: '36px clamp(20px, 3vw, 48px)',
+            textAlign: 'center',
+            maxWidth: '720px',
+            margin: '0 auto',
+            boxShadow: '0 12px 40px rgba(0, 0, 0, 0.35)'
+          }}>
+            <div style={{
+              width: '72px',
+              height: '72px',
+              borderRadius: '50%',
+              background: 'rgba(245, 158, 11, 0.15)',
+              border: '2px solid #fbbf24',
+              display: 'grid',
+              placeItems: 'center',
+              margin: '0 auto 18px',
+              color: '#fbbf24'
+            }}>
+              <Trophy size={36} />
+            </div>
+
+            <span className="lx-pill" style={{ background: 'rgba(245, 158, 11, 0.15)', borderColor: '#fbbf24', color: '#fbbf24', marginBottom: '12px' }}>
+              WEEK 1 MASTERY EXAM · DAY 08
+            </span>
+
+            <h2 style={{ fontSize: '26px', margin: '12px 0 8px', fontWeight: 800, color: '#ffffff' }}>
+              পরীক্ষাটি এখনও আনলক হয়নি 🔒
+            </h2>
+
+            <p style={{ fontSize: '15px', color: 'var(--lx-muted)', lineHeight: 1.6, maxWidth: '560px', margin: '0 auto 24px' }}>
+              Week 1 Mastery Exam (৫০ মার্কস) দিতে হলে আপনাকে প্রথমে <strong>Day 01 থেকে Day 07</strong> পর্যন্ত সবগুলো ক্লাস ও প্র্যাকটিস কুইজ সম্পন্ন করতে হবে।
+            </p>
+
+            {/* Visual Progress Bar */}
+            <div style={{ background: 'rgba(15, 23, 42, 0.8)', padding: '16px 20px', borderRadius: '14px', marginBottom: '26px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '8px' }}>
+                <span style={{ color: '#ffffff', fontWeight: 600 }}>আপনার অগ্রগতি (Week 1 Progress):</span>
+                <span style={{ color: '#fbbf24', fontWeight: 750 }}>
+                  {progress.completedDays.filter(d => d <= 7).length} / 7 দিন সম্পন্ন ({Math.round((progress.completedDays.filter(d => d <= 7).length / 7) * 100)}%)
+                </span>
+              </div>
+              <div style={{ width: '100%', height: '8px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '4px', overflow: 'hidden' }}>
+                <div style={{
+                  width: `${(progress.completedDays.filter(d => d <= 7).length / 7) * 100}%`,
+                  height: '100%',
+                  background: 'linear-gradient(90deg, #f59e0b 0%, #10b981 100%)',
+                  borderRadius: '4px',
+                  transition: 'width 0.4s ease'
+                }} />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
+              <Link
+                to={`/learn/ielts-writing/${nextIncompleteDay}`}
+                className="ielts-submit-btn"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '13px 26px',
+                  borderRadius: '10px',
+                  textDecoration: 'none',
+                  fontWeight: 750,
+                  fontSize: '14.5px'
+                }}
+              >
+                পরবর্তী অসমাপ্ত ক্লাসে যান (Day 0{nextIncompleteDay}) <ArrowRight size={17} />
+              </Link>
+
+              <button
+                onClick={() => setPreviewAllDays(true)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  color: 'var(--lx-muted)',
+                  padding: '12px 18px',
+                  borderRadius: '10px',
+                  fontSize: '13px',
+                  fontWeight: 650,
+                  cursor: 'pointer'
+                }}
+              >
+                প্রিভিউ মোডে পরীক্ষা দেখুন (Preview Exam)
+              </button>
+            </div>
+          </div>
+        ) : (
+          <IeltsWeeklyExam
+            examData={dayData}
+            progress={progress}
+            onExamComplete={handleExamComplete}
+          />
+        )
       ) : (
         <>
           {/* 3-STEP PROGRESSIVE STEPPER (Streamlined & Clutter-Free) */}
@@ -412,7 +820,9 @@ export function IeltsWritingCoursePage() {
           role="tab"
           aria-selected={activeStep === 'study'}
         >
-          <div className="ielts-step-badge">1</div>
+          <div className="ielts-step-badge">
+            {isDayCompleted ? '✓' : '1'}
+          </div>
           <div className="ielts-step-content">
             <strong>1. Study Lesson (পড়ুন)</strong>
             <small>Grammar Theory, Rules & Pitfalls</small>
@@ -425,13 +835,17 @@ export function IeltsWritingCoursePage() {
           role="tab"
           aria-selected={activeStep === 'quiz'}
         >
-          <div className="ielts-step-badge">2</div>
+          <div className="ielts-step-badge">
+            {isQuizSubmitted && quizScore?.percentage >= 60 ? '✓' : '2'}
+          </div>
           <div className="ielts-step-content">
             <strong>2. Practice Quiz (পরীক্ষা)</strong>
             <small>
               {isQuizSubmitted
-                ? `Score: ${quizScore?.correct}/${totalQuestions} (${quizScore?.percentage}%)`
-                : `${totalQuestions} Questions · Submit All`}
+                ? (quizScore?.percentage >= 60
+                    ? `✓ Passed: ${quizScore?.correct}/${totalQuestions} (${quizScore?.percentage}%)`
+                    : `⚠️ Needs 60%: ${quizScore?.correct}/${totalQuestions} (${quizScore?.percentage}%)`)
+                : `${totalQuestions} Questions · Min 60% to Pass`}
             </small>
           </div>
         </button>
@@ -442,10 +856,16 @@ export function IeltsWritingCoursePage() {
           role="tab"
           aria-selected={activeStep === 'words_writing'}
         >
-          <div className="ielts-step-badge">3</div>
+          <div className="ielts-step-badge">
+            {isWordCountSufficient ? '✓' : '3'}
+          </div>
           <div className="ielts-step-content">
             <strong>3. 3 New Words & Writing</strong>
-            <small>Vocabulary Builder & Challenge</small>
+            <small>
+              {isWordCountSufficient
+                ? `✓ Word count met (${wordCount} words)`
+                : `Vocabulary & ${dayData.writingChallenge?.minimumWords || 35} Words Challenge`}
+            </small>
           </div>
         </button>
       </div>
@@ -617,15 +1037,35 @@ export function IeltsWritingCoursePage() {
           </div>
 
           {/* Bottom Call to Action to Quiz */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.12) 0%, rgba(15, 23, 42, 0.8) 100%)',
+            border: '1.5px solid rgba(59, 130, 246, 0.35)',
+            borderRadius: '16px',
+            padding: '20px 24px',
+            marginTop: '12px',
+            flexWrap: 'wrap',
+            gap: '16px'
+          }}>
+            <div>
+              <div style={{ fontWeight: 750, fontSize: '16px', color: '#ffffff', marginBottom: '4px' }}>
+                ধাপ ১ পড়া শেষ হয়েছে? (Finished Reading Step 1?)
+              </div>
+              <div style={{ fontSize: '13px', color: 'var(--lx-muted)' }}>
+                নিয়মগুলো বুঝে থাকলে এবার ৫টি প্র্যাকটিস কুইজে অংশগ্রহণ করে নিজেকে যাচাই করুন (পাস করতে ৬০% প্রয়োজন)।
+              </div>
+            </div>
             <button
               onClick={() => {
                 setActiveStep('quiz');
-                window.scrollTo({ top: 220, behavior: 'smooth' });
+                window.scrollTo({ top: 200, behavior: 'smooth' });
               }}
               className="ielts-submit-btn"
+              style={{ padding: '12px 24px', fontSize: '14.5px' }}
             >
-              Ready for Exam Time? Start Practice Quiz ({totalQuestions} Questions) <ArrowRight size={16} />
+              <CheckCircle2 size={16} /> আমি নিয়মগুলো বুঝেছি — কুইজ শুরু করুন ({totalQuestions} Questions) <ArrowRight size={16} />
             </button>
           </div>
         </div>
@@ -891,27 +1331,62 @@ export function IeltsWritingCoursePage() {
 
           {/* After Submission Footer Navigation */}
           {isQuizSubmitted && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px', flexWrap: 'wrap', gap: '12px' }}>
-              <button
-                onClick={() => {
-                  setActiveStep('study');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className="lx-secondary"
-                style={{ cursor: 'pointer' }}
-              >
-                <ArrowLeft size={16} /> Review Lesson Theory
-              </button>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: quizScore?.percentage >= 60 ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+              border: quizScore?.percentage >= 60 ? '1px solid rgba(16, 185, 129, 0.35)' : '1px solid rgba(239, 68, 68, 0.35)',
+              borderRadius: '16px',
+              padding: '20px 24px',
+              marginTop: '20px',
+              flexWrap: 'wrap',
+              gap: '16px'
+            }}>
+              <div>
+                <strong style={{ display: 'block', fontSize: '15px', color: '#ffffff', marginBottom: '4px' }}>
+                  {quizScore?.percentage >= 60
+                    ? `🎉 কুইজ পাস! আপনার স্কোর: ${quizScore?.correct}/${quizScore?.total} (${quizScore?.percentage}%)`
+                    : `⚠️ কুইজে পাশ করতে কমপক্ষে ৬০% নম্বর প্রয়োজন (আপনার স্কোর: ${quizScore?.correct}/${quizScore?.total}, ${quizScore?.percentage}%)`}
+                </strong>
+                <span style={{ fontSize: '13px', color: 'var(--lx-muted)' }}>
+                  {quizScore?.percentage >= 60
+                    ? 'এবার ৩ নম্বর ধাপে গিয়ে ৩টি নতুন শব্দ ও রাইটিং প্র্যাকটিস শুরু করুন।'
+                    : 'নিচে প্রতিটি প্রশ্নের সঠিক উত্তর ও গ্রামার ব্যাখ্যা ভালো করে দেখে নিয়ে আবার কুইজ দিন।'}
+                </span>
+              </div>
 
-              <button
-                onClick={() => {
-                  setActiveStep('words_writing');
-                  window.scrollTo({ top: 220, behavior: 'smooth' });
-                }}
-                className="ielts-submit-btn"
-              >
-                Next Step: Learn 3 New Words & Write <ArrowRight size={16} />
-              </button>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <button
+                  onClick={handleRetakeQuiz}
+                  className="lx-secondary"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '10px 18px',
+                    borderRadius: '10px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <RotateCcw size={15} /> কুইজ আবার দিন (Retake)
+                </button>
+
+                <button
+                  onClick={() => {
+                    setActiveStep('words_writing');
+                    window.scrollTo({ top: 200, behavior: 'smooth' });
+                  }}
+                  className="ielts-submit-btn"
+                  style={{
+                    padding: '12px 22px',
+                    background: quizScore?.percentage >= 60 ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : undefined,
+                    borderColor: quizScore?.percentage >= 60 ? '#34d399' : undefined
+                  }}
+                >
+                  পরবর্তী ধাপ: ৩টি শব্দ ও রাইটিং প্র্যাকটিস <ArrowRight size={16} />
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -1176,79 +1651,185 @@ export function IeltsWritingCoursePage() {
             </div>
           </div>
 
-          {/* SECTION C: HOMEWORK & FINISH DAY */}
+          {/* SECTION C: DAY 0{currentDayNum} COMPLETION SUMMARY & ADVANCE */}
           <div style={{
-            background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%)',
-            border: '1px solid rgba(59, 130, 246, 0.3)',
-            borderRadius: '16px',
-            padding: '24px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '20px',
-            flexWrap: 'wrap'
+            background: isDayCompleted
+              ? 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(15, 23, 42, 0.95) 100%)'
+              : 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.95) 100%)',
+            border: isDayCompleted ? '1.5px solid #10b981' : '1.5px solid rgba(59, 130, 246, 0.4)',
+            borderRadius: '20px',
+            padding: '28px',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.35)'
           }}>
-            <div>
-              <h4 style={{ fontSize: '18px', margin: '0 0 6px', fontWeight: 750, color: '#ffffff' }}>
-                {isDayCompleted ? `Day 0${currentDayNum} is Complete!` : `Finished Day 0${currentDayNum}?`}
-              </h4>
-              <p style={{ margin: 0, fontSize: '13px', color: 'var(--lx-muted)' }}>
-                Mark your attendance and unlock Day {Math.min(7, currentDayNum + 1)} in the 60-Day Challenge.
-              </p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '20px' }}>
+              <div>
+                <span className="lx-pill" style={{
+                  background: isDayCompleted ? 'rgba(16, 185, 129, 0.15)' : 'rgba(59, 130, 246, 0.15)',
+                  borderColor: isDayCompleted ? '#34d399' : '#3b82f6',
+                  color: isDayCompleted ? '#34d399' : '#60a5fa'
+                }}>
+                  {isDayCompleted ? '✓ DAY COMPLETED' : 'FINAL STEP · COMPLETE TODAY\'S LESSON'}
+                </span>
+                <h3 style={{ fontSize: '22px', margin: '8px 0 4px', fontWeight: 800, color: '#ffffff' }}>
+                  {isDayCompleted ? `🎉 Day 0${currentDayNum} সফলভাবে সম্পন্ন হয়েছে!` : `Day 0${currentDayNum} এর অগ্রগতি ও সমাপ্তি`}
+                </h3>
+                <p style={{ margin: 0, fontSize: '14px', color: 'var(--lx-muted)' }}>
+                  নিচের ৩টি কাজ শেষ হলেই আপনার আজকের ক্লাসটি পাস হিসেবে গণ্য হবে এবং পরবর্তী দিনটি আনলক হয়ে যাবে।
+                </p>
+              </div>
+
+              {isDayCompleted && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  border: '1px solid #10b981',
+                  color: '#34d399',
+                  padding: '8px 16px',
+                  borderRadius: '20px',
+                  fontWeight: 750,
+                  fontSize: '13px'
+                }}>
+                  <CheckCircle2 size={16} /> পাস (স্কোর: {progress.scores?.[`day_${currentDayNum}`] || 85}%)
+                </div>
+              )}
             </div>
 
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            {/* 3 Milestones Checklist */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: '12px',
+              marginBottom: '24px'
+            }}>
+              <div style={{
+                padding: '14px 16px',
+                borderRadius: '12px',
+                background: 'rgba(15, 23, 42, 0.6)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                <CheckCircle2 size={18} color="#34d399" />
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff' }}>১. গ্রামার অধ্যায়ন</div>
+                  <div style={{ fontSize: '11.5px', color: '#94a3b8' }}>নিয়ম ও Traps পড়া হয়েছে</div>
+                </div>
+              </div>
+
+              <div style={{
+                padding: '14px 16px',
+                borderRadius: '12px',
+                background: 'rgba(15, 23, 42, 0.6)',
+                border: isQuizSubmitted && quizScore?.percentage >= 60
+                  ? '1px solid #10b981'
+                  : '1px solid rgba(255, 255, 255, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                {isQuizSubmitted && quizScore?.percentage >= 60 ? (
+                  <CheckCircle2 size={18} color="#34d399" />
+                ) : (
+                  <Clock size={18} color="#f59e0b" />
+                )}
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff' }}>২. প্র্যাকটিস কুইজ</div>
+                  <div style={{ fontSize: '11.5px', color: isQuizSubmitted ? (quizScore?.percentage >= 60 ? '#34d399' : '#f87171') : '#94a3b8' }}>
+                    {isQuizSubmitted ? `স্কোর: ${quizScore?.correct}/${quizScore?.total} (${quizScore?.percentage}%)` : 'কুইজ সম্পন্ন করুন (Min ৬০%)'}
+                  </div>
+                </div>
+              </div>
+
+              <div style={{
+                padding: '14px 16px',
+                borderRadius: '12px',
+                background: 'rgba(15, 23, 42, 0.6)',
+                border: isWordCountSufficient
+                  ? '1px solid #10b981'
+                  : '1px solid rgba(255, 255, 255, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                {isWordCountSufficient ? (
+                  <CheckCircle2 size={18} color="#34d399" />
+                ) : (
+                  <Clock size={18} color="#f59e0b" />
+                )}
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff' }}>৩. রাইটিং প্র্যাকটিস</div>
+                  <div style={{ fontSize: '11.5px', color: isWordCountSufficient ? '#34d399' : '#94a3b8' }}>
+                    {wordCount} / {dayData.writingChallenge.minimumWords} শব্দ লেখা হয়েছে
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Complete Action Button & Navigation */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px' }}>
               <button
-                onClick={toggleDayComplete}
+                onClick={handleCompleteDay}
                 className="ielts-submit-btn"
                 style={{
-                  background: isDayCompleted ? 'rgba(16, 185, 129, 0.2)' : undefined,
-                  color: isDayCompleted ? '#34d399' : '#ffffff',
-                  borderColor: isDayCompleted ? '#34d399' : undefined
+                  background: isDayCompleted
+                    ? 'rgba(16, 185, 129, 0.2)'
+                    : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  borderColor: '#34d399',
+                  color: '#ffffff',
+                  fontSize: '15px',
+                  padding: '14px 28px',
+                  boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)'
                 }}
               >
-                <CheckCircle2 size={16} />
-                {isDayCompleted ? 'Completed ✓' : `Mark Day 0${currentDayNum} Done`}
+                <CheckCircle2 size={18} />
+                {isDayCompleted ? `Day 0${currentDayNum} সম্পন্ন হয়েছে ✓ (পুনরায় সংরক্ষণ করুন)` : `🎉 আজকের ক্লাস সম্পূর্ণ করুন (Complete Day 0${currentDayNum})`}
               </button>
 
-              {currentDayNum === 7 && (
-                <Link
-                  to="/learn/ielts-writing/8"
-                  className="ielts-submit-btn"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '11px 22px',
-                    borderRadius: '10px',
-                    textDecoration: 'none',
-                    fontWeight: 750,
-                    background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                    borderColor: '#fbbf24',
-                    color: '#ffffff'
-                  }}
-                >
-                  <Trophy size={16} /> Take Day 08 Mastery Exam <ArrowRight size={16} />
-                </Link>
-              )}
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                {currentDayNum < 7 && (
+                  <Link
+                    to={`/learn/ielts-writing/${currentDayNum + 1}`}
+                    className="lx-secondary"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '12px 20px',
+                      borderRadius: '10px',
+                      textDecoration: 'none',
+                      fontWeight: 650,
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      color: '#ffffff'
+                    }}
+                  >
+                    Day 0{currentDayNum + 1} তে যান <ArrowRight size={16} />
+                  </Link>
+                )}
 
-              {currentDayNum < 7 && (
-                <Link
-                  to={`/learn/ielts-writing/${currentDayNum + 1}`}
-                  className="lx-secondary"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '11px 18px',
-                    borderRadius: '10px',
-                    textDecoration: 'none',
-                    fontWeight: 650
-                  }}
-                >
-                  Go to Day 0{currentDayNum + 1} <ArrowRight size={16} />
-                </Link>
-              )}
+                {currentDayNum === 7 && (
+                  <Link
+                    to="/learn/ielts-writing/8"
+                    className="ielts-submit-btn"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '12px 24px',
+                      borderRadius: '10px',
+                      textDecoration: 'none',
+                      fontWeight: 750,
+                      background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                      borderColor: '#fbbf24',
+                      color: '#ffffff'
+                    }}
+                  >
+                    <Trophy size={16} /> Day 08 Mastery Exam এ যান <ArrowRight size={16} />
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         </div>
