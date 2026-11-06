@@ -29,6 +29,7 @@ import {
   checkJavaPractice,
   javaMilestones
 } from './javaPractice.js';
+import { NestedLoopsPracticeLab } from './NestedLoopsPracticeLab.jsx';
 import './learn.css';
 
 const loadYouTube = createYouTubeLoader({ window, document, setTimeout, clearTimeout });
@@ -746,7 +747,7 @@ export function JavaCoursePage() {
     }
   }, [completed, scope]);
 
-  const activeId = videoId || '01';
+  const activeId = videoId === 'nested-loops' ? '05' : (videoId || '01');
   const currentVideo = javaVideos.find(v => v.id === activeId) || javaVideos[0];
 
   const handleMarkComplete = (idToComplete = currentVideo.id) => {
@@ -797,6 +798,54 @@ export function JavaCoursePage() {
         </div>
       </header>
 
+      {/* Practice Set Quick Banner */}
+      {currentVideo.id !== '05' && (
+        <div
+          style={{
+            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(180, 83, 9, 0.1) 100%)',
+            border: '1px solid rgba(245, 158, 11, 0.35)',
+            borderRadius: '12px',
+            padding: '14px 18px',
+            margin: '20px 0 10px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '12px'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '20px' }}>🔥</span>
+            <div>
+              <strong style={{ color: '#fbbf24', fontSize: '13px' }}>
+                Featured Practice Set: Nested Loops &amp; Algorithmic Simulation (10 Problems)
+              </strong>
+              <p style={{ margin: 0, fontSize: '11px', color: '#fed7aa' }}>
+                Star triangles, pyramids, Selection Sort, and Codeforces challenges (Fox &amp; Snake, Gravity Flip, Queue at School, Twins).
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/learn/java-programming/05"
+            style={{
+              background: 'linear-gradient(135deg, #d97706, #b45309)',
+              border: '1px solid #f59e0b',
+              color: '#ffffff',
+              borderRadius: '8px',
+              padding: '7px 14px',
+              fontSize: '11px',
+              fontWeight: 700,
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            Open 10 Practice Problems <ArrowRight size={13} />
+          </Link>
+        </div>
+      )}
+
       {/* Main Watch & Curriculum Layout */}
       <div className="html-watch-layout" style={{ marginTop: '28px' }}>
         {/* Left: Video Player & Practice Lab */}
@@ -808,11 +857,19 @@ export function JavaCoursePage() {
             isCompleted={completed.includes(currentVideo.id)}
           />
 
-          <JavaPracticeLab
-            video={currentVideo}
-            onPassed={handlePracticePassed}
-            scope={scope}
-          />
+          {currentVideo.id === '05' ? (
+            <NestedLoopsPracticeLab
+              onPassed={handlePracticePassed}
+              scope={scope}
+              courseId="java-programming"
+            />
+          ) : (
+            <JavaPracticeLab
+              video={currentVideo}
+              onPassed={handlePracticePassed}
+              scope={scope}
+            />
+          )}
         </div>
 
         {/* Right: Curriculum Roadmap & Class Selector */}
@@ -831,7 +888,8 @@ export function JavaCoursePage() {
 
           <ol style={{ padding: '8px' }}>
             {javaVideos.map((vid) => {
-              const unlocked = isJavaClassUnlocked(vid.id, completed);
+              const isPracticeSet = vid.id === '05';
+              const unlocked = isJavaClassUnlocked(vid.id, completed) || isPracticeSet;
               const isDone = completed.includes(vid.id);
               const isCurrent = vid.id === currentVideo.id;
 
@@ -850,11 +908,18 @@ export function JavaCoursePage() {
                         {isDone ? <CheckCircle2 size={16} /> : vid.id}
                       </span>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <strong style={{ color: isCurrent ? '#fbbf24' : '#f8fafc' }}>
-                          {vid.title.replace(/^Class \d+:\s*/, '')}
-                        </strong>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                          <strong style={{ color: isCurrent ? '#fbbf24' : '#f8fafc' }}>
+                            {vid.title.replace(/^Class \d+:\s*/, '')}
+                          </strong>
+                          {isPracticeSet && (
+                            <span style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', fontSize: '9px', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                              10 Problems
+                            </span>
+                          )}
+                        </div>
                         <small style={{ color: 'var(--lx-muted)' }}>
-                          {vid.youtubeId ? vid.duration : 'YouTube link soon'} {isDone && '· Done ✓'}
+                          {isPracticeSet ? 'Practice Set 01 · Open Lab' : (vid.youtubeId ? vid.duration : 'YouTube link soon')} {isDone && '· Done ✓'}
                         </small>
                       </div>
                     </Link>

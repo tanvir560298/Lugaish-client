@@ -2,6 +2,9 @@
 // Class 01 video: Owner-supplied YouTube video (https://youtu.be/r8hVKDRUGLQ)
 // Sequential progression: Students must finish previous class to unlock the next.
 
+import { nestedLoopsPracticeProblems } from './nestedLoopsPracticeData.js';
+export { nestedLoopsPracticeProblems };
+
 export const cVideos = [
   {
     id: '01',
@@ -39,9 +42,9 @@ export const cVideos = [
   {
     id: '04',
     youtubeId: '',
-    title: 'Loops & Iterations (for, while, do-while)',
-    summary: 'Automate repetitive tasks, count loops, and solve sequence problems.',
-    duration: 'Coming soon',
+    title: 'Class 04: Nested Loops Practice Problems (Practice Set 01)',
+    summary: 'Master nested loops, pattern printing, arrays, selection sort & simulation with 10 structured practice problems (Easy, Medium, Hard).',
+    duration: '10 Problems · Practice Set',
     course: 'c-programming',
     kind: 'video',
     path: '/learn/c-programming/04',
@@ -149,7 +152,8 @@ export const cPracticeProblems = {
       sampleOutput: 'Positive',
       hint: 'Compare num > 0 inside the if condition.'
     }
-  ]
+  ],
+  '04': nestedLoopsPracticeProblems
 };
 
 // Clean and validate stored watched IDs

@@ -210,6 +210,8 @@ export default function App() {
               <Route path='/learn/java-programming/:videoId' element={<JavaCoursePage />} />
               <Route path='/learn/java' element={<JavaCoursePage />} />
               <Route path='/learn/java/:videoId' element={<JavaCoursePage />} />
+              <Route path='/learn/nested-loops' element={<Navigate to="/learn/java-programming/05" replace />} />
+              <Route path='/practice/nested-loops' element={<Navigate to="/learn/java-programming/05" replace />} />
               <Route path='/learn/ielts-writing' element={<IeltsWritingCoursePage />} />
               <Route path='/learn/ielts-writing/:day' element={<IeltsWritingCoursePage />} />
               <Route path='/tanu' element={TANU_AI_AVAILABLE ? <ProtectedRoute><NovyraWorkspace /></ProtectedRoute> : <TanuComingSoonPage />} />

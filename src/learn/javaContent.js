@@ -2,6 +2,9 @@
 // Class 01 & 02: Tanvir Ahmad's recorded classes on Java fundamentals.
 // Sequential progression: Students progress through classes with interactive lab practice.
 
+import { nestedLoopsPracticeProblems } from './nestedLoopsPracticeData.js';
+export { nestedLoopsPracticeProblems };
+
 export const javaVideos = [
   {
     id: '01',
@@ -62,15 +65,15 @@ export const javaVideos = [
   {
     id: '05',
     youtubeId: '',
-    title: 'Class 05: Loops & Iterations (for, while, do-while)',
-    summary: 'Automate repetitive tasks, count loops, and iterate through sequences without repeating code.',
-    duration: 'Coming soon',
+    title: 'Class 05: Nested Loops Practice Problems',
+    summary: 'Master nested loops, pattern printing, arrays, selection sort & simulation with 10 structured practice problems (Easy, Medium, Hard).',
+    duration: '10 Problems · Practice Set',
     course: 'java-programming',
     kind: 'video',
     path: '/learn/java-programming/05',
     instructor: 'Tanvir Ahmad',
-    topics: ['for loop structure', 'while and do-while loops', 'Loop counters & increments', 'break and continue'],
-    keyConcept: 'Loops repeat a block of code as long as a specified condition remains true.'
+    topics: ['Nested Loops', 'Pattern Printing', 'Spaces & Alignment', 'Selection Sort', 'Simulation & Greedy Logic'],
+    keyConcept: 'Nested loops iterate through 2D grids and patterns. In algorithms, nested loops power manual sorting like Selection Sort and discrete-time simulations.'
   },
   {
     id: '06',
@@ -215,7 +218,8 @@ export const javaPracticeProblems = {
       sampleOutput: 'The result is = 1',
       hint: 'Remember that * / % have equal precedence and are evaluated from left to right. In integer division, 30 / 7 gives 4, and 4 % 3 gives remainder 1.'
     }
-  ]
+  ],
+  '05': nestedLoopsPracticeProblems
 };
 
 // Clean and sanitize progress IDs from localStorage

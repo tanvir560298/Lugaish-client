@@ -35,11 +35,29 @@ export function CProgrammingCourse() {
           <span><Code2 size={15} />Interactive Practice Lab</span>
           <span><Lock size={15} />Sequential Unlocking</span>
         </div>
-        <div className="web-course-bottom">
+        <div className="web-course-bottom" style={{ flexWrap: 'wrap', gap: '12px' }}>
           <Link className="lx-primary" to="/learn/c-programming">
             Start C Programming <ArrowRight size={17} />
           </Link>
-          <span><Check size={14} /> Class 01 live on YouTube</span>
+          <Link
+            to="/learn/c-programming/04"
+            style={{
+              background: 'rgba(56, 189, 248, 0.15)',
+              border: '1px solid #38bdf8',
+              color: '#38bdf8',
+              borderRadius: '10px',
+              padding: '11px 16px',
+              fontSize: '13px',
+              fontWeight: 700,
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            🔥 Nested Loops Practice (10 Problems) →
+          </Link>
+          <span><Check size={14} /> Class 01 live · Practice Set 01 Ready</span>
         </div>
       </div>
     </article>

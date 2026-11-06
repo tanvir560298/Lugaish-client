@@ -6,6 +6,7 @@ import { useTanuPlayback } from '../tanu/GuidedSession.jsx';
 import { createYouTubeLoader } from '../classroom/youtubeApi.js';
 import { cVideos, cPracticeProblems, cleanCProgress, isClassUnlocked } from './cContent.js';
 import { checkCPractice, runCSimulation, cMilestones } from './cPractice.js';
+import { NestedLoopsPracticeLab } from './NestedLoopsPracticeLab.jsx';
 import './learn.css';
 
 const loadYouTube = createYouTubeLoader({ window, document, setTimeout, clearTimeout });
@@ -344,7 +345,8 @@ function CCourse({ videoId }) {
   const completed = saved.key === key ? saved.value : [];
   const practised = practice.key === practiceKey ? practice.value : [];
 
-  const video = cVideos.find(v => v.id === videoId);
+  const activeVideoId = videoId === 'nested-loops' ? '04' : videoId;
+  const video = cVideos.find(v => v.id === activeVideoId);
   const isLocked = video ? !isClassUnlocked(video.id, completed) : false;
 
   const currentIndex = video ? cVideos.findIndex(item => item.id === video.id) : -1;
@@ -389,7 +391,8 @@ function CCourse({ videoId }) {
   }
 
   // SEQUENTIAL LOCKED SCREEN: If student navigates to a locked class without finishing prior ones
-  if (video && isLocked) {
+  // Practice Set 01 (Class 04) is open for direct practice
+  if (video && isLocked && video.id !== '04') {
     const priorClass = previous || cVideos[0];
     return (
       <div className="lx-learn lx-html-course">
@@ -470,8 +473,9 @@ function CCourse({ videoId }) {
 
           <ol className="lx-syllabus html-roadmap">
             {cVideos.map((item, index) => {
+              const isPracticeSet = item.id === '04';
               const done = completed.includes(item.id);
-              const unlocked = isClassUnlocked(item.id, completed);
+              const unlocked = isClassUnlocked(item.id, completed) || isPracticeSet;
 
               return (
                 <li key={item.id} className={`${done ? 'is-complete' : ''} ${!unlocked ? 'opacity-65' : ''}`}>
@@ -480,7 +484,7 @@ function CCourse({ videoId }) {
                   </span>
                   <div>
                     <span className="html-roadmap-phase">
-                      {index === 0 ? 'CLASS 01 · OPEN NOW' : unlocked ? 'UNLOCKED' : 'LOCKED · COMPLETE PREVIOUS'}
+                      {index === 0 ? 'CLASS 01 · OPEN NOW' : isPracticeSet ? 'PRACTICE SET · 10 PROBLEMS OPEN' : unlocked ? 'UNLOCKED' : 'LOCKED · COMPLETE PREVIOUS'}
                     </span>
                     <h2>{item.title}</h2>
                     <p>{item.summary}</p>
@@ -533,9 +537,10 @@ function CCourse({ videoId }) {
               </div>
               <ol>
                 {cVideos.map(item => {
+                  const isPracticeSet = item.id === '04';
                   const done = completed.includes(item.id);
                   const isCurrent = video.id === item.id;
-                  const unlocked = isClassUnlocked(item.id, completed);
+                  const unlocked = isClassUnlocked(item.id, completed) || isPracticeSet;
 
                   if (!unlocked) {
                     return (
@@ -571,7 +576,15 @@ function CCourse({ videoId }) {
             </aside>
           </div>
 
-          <CPracticeLab video={video} scope={state.isLoggedIn ? state.userEmail : 'guest'} onPassed={savePractice} />
+          {video.id === '04' ? (
+            <NestedLoopsPracticeLab
+              onPassed={savePractice}
+              scope={state.isLoggedIn ? state.userEmail : 'guest'}
+              courseId="c-programming"
+            />
+          ) : (
+            <CPracticeLab video={video} scope={state.isLoggedIn ? state.userEmail : 'guest'} onPassed={savePractice} />
+          )}
 
           <div id="c-complete" className="html-after-lesson">
             <div>

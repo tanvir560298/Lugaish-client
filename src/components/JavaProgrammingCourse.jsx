@@ -40,11 +40,29 @@ export function JavaProgrammingCourse() {
           <span><Code2 size={15} />Interactive Java Lab</span>
           <span><Lock size={15} />Sequential Unlocking</span>
         </div>
-        <div className="web-course-bottom">
+        <div className="web-course-bottom" style={{ flexWrap: 'wrap', gap: '12px' }}>
           <Link className="lx-primary" to="/learn/java-programming" style={{ background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)', borderColor: '#f59e0b', color: '#ffffff' }}>
             Start Java Programming <ArrowRight size={17} />
           </Link>
-          <span><Check size={14} /> Classes 01 & 02 live on YouTube</span>
+          <Link
+            to="/learn/java-programming/05"
+            style={{
+              background: 'rgba(245, 158, 11, 0.15)',
+              border: '1px solid #f59e0b',
+              color: '#fbbf24',
+              borderRadius: '10px',
+              padding: '11px 16px',
+              fontSize: '13px',
+              fontWeight: 700,
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            🔥 Nested Loops Practice (10 Problems) →
+          </Link>
+          <span><Check size={14} /> Classes 01 & 02 live · Practice Set 01 Ready</span>
         </div>
       </div>
     </article>
