@@ -4,27 +4,23 @@ import { nestedLoopsPracticeProblems } from './nestedLoopsPracticeData.js';
 import { javaVideos, javaPracticeProblems } from './javaContent.js';
 import { cVideos, cPracticeProblems } from './cContent.js';
 
-test('Nested Loops Practice Set contains exactly 10 problems', () => {
-  assert.equal(nestedLoopsPracticeProblems.length, 10, 'Must have 10 practice problems');
+test('Nested Loops Practice Set contains exactly 14 problems', () => {
+  assert.equal(nestedLoopsPracticeProblems.length, 14, 'Must have 14 practice problems');
 });
 
-test('Difficulty distribution matches specification: Easy (3), Medium (3), Hard (4)', () => {
+test('Difficulty distribution covers Easy, Medium, and Hard', () => {
   const easy = nestedLoopsPracticeProblems.filter(p => p.difficulty === 'Easy');
   const medium = nestedLoopsPracticeProblems.filter(p => p.difficulty === 'Medium');
   const hard = nestedLoopsPracticeProblems.filter(p => p.difficulty === 'Hard');
 
-  assert.equal(easy.length, 3, 'Should have 3 Easy problems');
-  assert.equal(medium.length, 3, 'Should have 3 Medium problems');
-  assert.equal(hard.length, 4, 'Should have 4 Hard problems');
-
-  assert.deepEqual(easy.map(p => p.number), [1, 2, 3]);
-  assert.deepEqual(medium.map(p => p.number), [4, 5, 6]);
-  assert.deepEqual(hard.map(p => p.number), [7, 8, 9, 10]);
+  assert.equal(easy.length, 4, 'Should have 4 Easy problems');
+  assert.equal(medium.length, 5, 'Should have 5 Medium problems');
+  assert.equal(hard.length, 5, 'Should have 5 Hard problems');
 });
 
-test('Codeforces problems have accurate external contest URLs and IDs', () => {
+test('Codeforces problems have accurate external contest URLs and IDs including Assiut Sheets', () => {
   const cfProblems = nestedLoopsPracticeProblems.filter(p => Boolean(p.externalUrl));
-  assert.equal(cfProblems.length, 4, 'There should be 4 Codeforces problems');
+  assert.equal(cfProblems.length, 8, 'There should be 8 Codeforces problems');
 
   const p6 = nestedLoopsPracticeProblems.find(p => p.number === 6);
   assert.equal(p6.codeforcesId, '510A');
@@ -43,9 +39,26 @@ test('Codeforces problems have accurate external contest URLs and IDs', () => {
   assert.equal(p10.codeforcesId, '160A');
   assert.equal(p10.externalUrl, 'https://codeforces.com/problemset/problem/160/A');
   assert.ok(p10.specialInstruction.includes('Selection Sort'));
+
+  // Assiut Sheet 2 & 3 Problems
+  const p11 = nestedLoopsPracticeProblems.find(p => p.number === 11);
+  assert.equal(p11.codeforcesId, 'P (Sheet 2)');
+  assert.equal(p11.externalUrl, 'https://codeforces.com/group/MWSDmqGsZm/contest/219432/problem/P');
+
+  const p12 = nestedLoopsPracticeProblems.find(p => p.number === 12);
+  assert.equal(p12.codeforcesId, 'T (Sheet 2)');
+  assert.equal(p12.externalUrl, 'https://codeforces.com/group/MWSDmqGsZm/contest/219432/problem/T');
+
+  const p13 = nestedLoopsPracticeProblems.find(p => p.number === 13);
+  assert.equal(p13.codeforcesId, 'W (Sheet 2)');
+  assert.equal(p13.externalUrl, 'https://codeforces.com/group/MWSDmqGsZm/contest/219432/problem/W');
+
+  const p14 = nestedLoopsPracticeProblems.find(p => p.number === 14);
+  assert.equal(p14.codeforcesId, 'H (Sheet 3)');
+  assert.equal(p14.externalUrl, 'https://codeforces.com/group/MWSDmqGsZm/contest/219774/problem/H');
 });
 
-test('All 10 problems contain instructional prerequisites, step-by-step logic and dual language starters', () => {
+test('All 14 problems contain instructional prerequisites, step-by-step logic and dual language starters and solutions', () => {
   for (const prob of nestedLoopsPracticeProblems) {
     assert.ok(prob.title, `Problem ${prob.number} must have a title`);
     assert.ok(prob.statement, `Problem ${prob.number} must have a statement`);
@@ -67,16 +80,16 @@ test('All 10 problems contain instructional prerequisites, step-by-step logic an
   }
 });
 
-test('Java Programming Class 05 connects to the 10 nested loops problems', () => {
+test('Java Programming Class 05 connects to the nested loops problems', () => {
   const class05 = javaVideos.find(v => v.id === '05');
   assert.ok(class05, 'Java Class 05 must exist');
   assert.ok(class05.title.toLowerCase().includes('nested loops'));
-  assert.equal(javaPracticeProblems['05'].length, 10);
+  assert.equal(javaPracticeProblems['05'].length, 14);
 });
 
-test('C Programming Class 04 connects to the 10 nested loops problems', () => {
+test('C Programming Class 04 connects to the nested loops problems', () => {
   const class04 = cVideos.find(v => v.id === '04');
   assert.ok(class04, 'C Class 04 must exist');
   assert.ok(class04.title.toLowerCase().includes('nested loops'));
-  assert.equal(cPracticeProblems['04'].length, 10);
+  assert.equal(cPracticeProblems['04'].length, 14);
 });

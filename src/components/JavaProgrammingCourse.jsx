@@ -60,7 +60,7 @@ export function JavaProgrammingCourse() {
               gap: '6px'
             }}
           >
-            🔥 Nested Loops Practice (10 Problems) →
+            🔥 Nested Loops Practice (14 Problems) →
           </Link>
           <span><Check size={14} /> Classes 01 & 02 live · Practice Set 01 Ready</span>
         </div>

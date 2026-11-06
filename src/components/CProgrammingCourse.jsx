@@ -55,7 +55,7 @@ export function CProgrammingCourse() {
               gap: '6px'
             }}
           >
-            🔥 Nested Loops Practice (10 Problems) →
+            🔥 Nested Loops Practice (14 Problems) →
           </Link>
           <span><Check size={14} /> Class 01 live · Practice Set 01 Ready</span>
         </div>

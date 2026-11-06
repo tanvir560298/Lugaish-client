@@ -818,10 +818,10 @@ export function JavaCoursePage() {
             <span style={{ fontSize: '20px' }}>🔥</span>
             <div>
               <strong style={{ color: '#fbbf24', fontSize: '13px' }}>
-                Featured Practice Set: Nested Loops &amp; Algorithmic Simulation (10 Problems)
+                Featured Practice Set: Nested Loops &amp; Algorithmic Simulation (14 Problems)
               </strong>
               <p style={{ margin: 0, fontSize: '11px', color: '#fed7aa' }}>
-                Star triangles, pyramids, Selection Sort, and Codeforces challenges (Fox &amp; Snake, Gravity Flip, Queue at School, Twins).
+                Star triangles, pyramids, Selection Sort, and Codeforces challenges (Fox &amp; Snake, Shape 1, 2, 3, Gravity Flip, Queue at School, Twins).
               </p>
             </div>
           </div>
@@ -841,7 +841,7 @@ export function JavaCoursePage() {
               gap: '6px'
             }}
           >
-            Open 10 Practice Problems <ArrowRight size={13} />
+            Open 14 Practice Problems <ArrowRight size={13} />
           </Link>
         </div>
       )}
@@ -914,7 +914,7 @@ export function JavaCoursePage() {
                           </strong>
                           {isPracticeSet && (
                             <span style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', fontSize: '9px', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
-                              10 Problems
+                              14 Problems
                             </span>
                           )}
                         </div>

@@ -1160,5 +1160,453 @@ public class Main {
     }
 }`,
     expectedKeywords: ['for', 'scanf', 'printf']
+  },
+  {
+    id: 'nested-p11',
+    number: 11,
+    title: 'Problem 11: Shape 1 (Inverted Left Triangle)',
+    difficulty: 'Easy',
+    level: 'Easy',
+    topics: ['Nested Loops', 'Decreasing Loops', 'Pattern Printing'],
+    originalProblem: 'Codeforces Sheet 2 (Problem P: Shape1)',
+    codeforcesId: 'P (Sheet 2)',
+    externalUrl: 'https://codeforces.com/group/MWSDmqGsZm/contest/219432/problem/P',
+    statement: `Given a number N. Print a face-down right triangle containing N lines using asterisks (*).
+
+The first line has N stars, the second has N - 1 stars, and the last line has 1 star. Do not print leading spaces.`,
+    inputFormat: 'A single integer N (1 <= N <= 99).',
+    constraints: '1 <= N <= 99',
+    sampleInput: '4',
+    sampleOutput: `****
+***
+**
+*`,
+    explanation: 'Line 1 has 4 stars, line 2 has 3 stars, line 3 has 2 stars, and line 4 has 1 star. No spaces between or before stars.',
+    instructional: {
+      prerequisites: [
+        'Decreasing outer loop: Run outer loop i from N down to 1 (or from 1 to N with inner bound N - i + 1).',
+        'Inner star loop: In row i, print i asterisks without spaces.',
+        'Newline: Print \\n after each line.'
+      ],
+      stepByStepLogic: [
+        'Step 1: Read integer N.',
+        'Step 2: Loop i from N down to 1 (for int i = N; i >= 1; i--).',
+        'Step 3: Inside, loop j from 1 to i: printf("*");.',
+        'Step 4: Print "\\n".'
+      ],
+      commonPitfalls: [
+        'Do not add leading spaces here; this triangle starts from column 0.',
+        'Do not print space between stars on the same line.'
+      ],
+      timeComplexity: 'O(N^2) time, O(1) space.'
+    },
+    starter: `#include <stdio.h>
+
+int main() {
+    int N;
+    if (scanf("%d", &N) != 1) return 0;
+
+    // TODO: Print face-down triangle with N lines
+    // Line i contains (N - i + 1) stars without spaces
+
+    return 0;
+}`,
+    starterJava: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        if (!sc.hasNextInt()) return;
+        int N = sc.nextInt();
+
+        // TODO: Print Shape 1
+    }
+}`,
+    solutionC: `#include <stdio.h>
+
+int main() {
+    int N;
+    if (scanf("%d", &N) != 1) return 0;
+
+    for (int i = N; i >= 1; i--) {
+        for (int j = 1; j <= i; j++) {
+            printf("*");
+        }
+        printf("\\n");
+    }
+
+    return 0;
+}`,
+    solutionJava: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        if (!sc.hasNextInt()) return;
+        int N = sc.nextInt();
+
+        for (int i = N; i >= 1; i--) {
+            for (int j = 1; j <= i; j++) {
+                System.out.print("*");
+            }
+            System.out.println();
+        }
+    }
+}`,
+    expectedKeywords: ['for', 'printf']
+  },
+  {
+    id: 'nested-p12',
+    number: 12,
+    title: 'Problem 12: Shape 2 (Star Pyramid)',
+    difficulty: 'Medium',
+    level: 'Medium',
+    topics: ['Nested Loops', 'Spaces', 'Odd Number Arithmetic'],
+    originalProblem: 'Codeforces Sheet 2 (Problem T: Shape2)',
+    codeforcesId: 'T (Sheet 2)',
+    externalUrl: 'https://codeforces.com/group/MWSDmqGsZm/contest/219432/problem/T',
+    statement: `Given a number N. Print a centered pyramid of stars (*) consisting of N lines.
+
+Line i (from 1 to N) contains N - i spaces, followed by 2*i - 1 stars.
+Note: Do not print any trailing spaces after the stars on each line!`,
+    inputFormat: 'A single integer N (1 <= N <= 99).',
+    constraints: '1 <= N <= 99',
+    sampleInput: '4',
+    sampleOutput: `   *
+  ***
+ *****
+*******`,
+    explanation: 'Line 1 has 3 spaces and 1 star. Line 2 has 2 spaces and 3 stars. Line 3 has 1 space and 5 stars. Line 4 has 0 spaces and 7 stars.',
+    instructional: {
+      prerequisites: [
+        'Row geometry: Line i (1 to N) has exactly (N - i) leading spaces and (2*i - 1) stars.',
+        'Odd numbers: Consecutive rows increase in width by 2 stars (1, 3, 5, 7, ...).',
+        'No trailing spaces: Competitive judges will give Presentation Error if you print spaces after the stars.'
+      ],
+      stepByStepLogic: [
+        'Step 1: Read integer N.',
+        'Step 2: Loop i from 1 to N.',
+        'Step 3: Print N - i spaces: for (int s = 1; s <= N - i; s++) printf(" ");.',
+        'Step 4: Print 2*i - 1 stars: for (int j = 1; j <= 2*i - 1; j++) printf("*");.',
+        'Step 5: Print "\\n".'
+      ],
+      commonPitfalls: [
+        'Do not print trailing spaces after the stars.',
+        'Ensure the star formula is 2*i - 1, not 2*i + 1.'
+      ],
+      timeComplexity: 'O(N^2) time, O(1) space.'
+    },
+    starter: `#include <stdio.h>
+
+int main() {
+    int N;
+    if (scanf("%d", &N) != 1) return 0;
+
+    // TODO: Loop i from 1 to N
+    // Print (N - i) spaces, then (2*i - 1) stars without trailing spaces
+
+    return 0;
+}`,
+    starterJava: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        if (!sc.hasNextInt()) return;
+        int N = sc.nextInt();
+
+        // TODO: Star pyramid
+    }
+}`,
+    solutionC: `#include <stdio.h>
+
+int main() {
+    int N;
+    if (scanf("%d", &N) != 1) return 0;
+
+    for (int i = 1; i <= N; i++) {
+        // Leading spaces
+        for (int s = 1; s <= N - i; s++) {
+            printf(" ");
+        }
+        // Stars
+        for (int j = 1; j <= 2 * i - 1; j++) {
+            printf("*");
+        }
+        printf("\\n");
+    }
+
+    return 0;
+}`,
+    solutionJava: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        if (!sc.hasNextInt()) return;
+        int N = sc.nextInt();
+
+        for (int i = 1; i <= N; i++) {
+            for (int s = 1; s <= N - i; s++) {
+                System.out.print(" ");
+            }
+            for (int j = 1; j <= 2 * i - 1; j++) {
+                System.out.print("*");
+            }
+            System.out.println();
+        }
+    }
+}`,
+    expectedKeywords: ['for', 'printf']
+  },
+  {
+    id: 'nested-p13',
+    number: 13,
+    title: 'Problem 13: Shape 3 (Full Diamond Pattern)',
+    difficulty: 'Hard',
+    level: 'Hard',
+    topics: ['Nested Loops', 'Centered Symmetry', 'Diamond Pattern'],
+    originalProblem: 'Codeforces Sheet 2 (Problem W: Shape3)',
+    codeforcesId: 'W (Sheet 2)',
+    externalUrl: 'https://codeforces.com/group/MWSDmqGsZm/contest/219432/problem/W',
+    statement: `Given a number N. Print a centered diamond consisting of 2*N lines using asterisks (*).
+
+The upper half contains N lines forming an upright pyramid (from 1 to 2*N - 1 stars).
+The lower half contains N lines forming an inverted pyramid (from 2*N - 1 down to 1 stars).
+Note: The widest line of 2*N - 1 stars is printed TWICE (once in the upper half, once in the lower half).`,
+    inputFormat: 'A single integer N (1 <= N <= 99).',
+    constraints: '1 <= N <= 99',
+    sampleInput: '4',
+    sampleOutput: `   *
+  ***
+ *****
+*******
+*******
+ *****
+  ***
+   *`,
+    explanation: 'Lines 1 to 4 form an upright pyramid. Lines 5 to 8 form an inverted pyramid with identical width order.',
+    instructional: {
+      prerequisites: [
+        'Two-phase symmetry: Upper pyramid runs i from 1 to N; lower pyramid runs i from N down to 1.',
+        'Row i formulas for both halves:',
+        '  - Leading spaces = N - i.',
+        '  - Stars = 2*i - 1.',
+        'Important distinction: Unlike Problem 07, the widest row of 2*N - 1 stars is repeated here!'
+      ],
+      stepByStepLogic: [
+        'Step 1: Read N.',
+        'Step 2: Upper half: loop i from 1 to N:',
+        '        - Print N - i spaces.',
+        '        - Print 2*i - 1 stars.',
+        '        - Print "\\n".',
+        'Step 3: Lower half: loop i from N down to 1:',
+        '        - Print N - i spaces.',
+        '        - Print 2*i - 1 stars.',
+        '        - Print "\\n".'
+      ],
+      commonPitfalls: [
+        'Make sure the lower loop starts at N (so line 2*N-1 stars is printed again), not N - 1.',
+        'Do not print any trailing spaces after the stars on any row.'
+      ],
+      timeComplexity: 'O(N^2) time, O(1) space.'
+    },
+    starter: `#include <stdio.h>
+
+int main() {
+    int N;
+    if (scanf("%d", &N) != 1) return 0;
+
+    // TODO: Upper half: i from 1 to N
+    // Lower half: i from N down to 1
+
+    return 0;
+}`,
+    starterJava: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        if (!sc.hasNextInt()) return;
+        int N = sc.nextInt();
+
+        // TODO: Full Diamond Pattern (Shape 3)
+    }
+}`,
+    solutionC: `#include <stdio.h>
+
+int main() {
+    int N;
+    if (scanf("%d", &N) != 1) return 0;
+
+    // Upper half (lines 1 to N)
+    for (int i = 1; i <= N; i++) {
+        for (int s = 1; s <= N - i; s++) printf(" ");
+        for (int j = 1; j <= 2 * i - 1; j++) printf("*");
+        printf("\\n");
+    }
+
+    // Lower half (lines N down to 1)
+    for (int i = N; i >= 1; i--) {
+        for (int s = 1; s <= N - i; s++) printf(" ");
+        for (int j = 1; j <= 2 * i - 1; j++) printf("*");
+        printf("\\n");
+    }
+
+    return 0;
+}`,
+    solutionJava: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        if (!sc.hasNextInt()) return;
+        int N = sc.nextInt();
+
+        // Upper half
+        for (int i = 1; i <= N; i++) {
+            for (int s = 1; s <= N - i; s++) System.out.print(" ");
+            for (int j = 1; j <= 2 * i - 1; j++) System.out.print("*");
+            System.out.println();
+        }
+
+        // Lower half
+        for (int i = N; i >= 1; i--) {
+            for (int s = 1; s <= N - i; s++) System.out.print(" ");
+            for (int j = 1; j <= 2 * i - 1; j++) System.out.print("*");
+            System.out.println();
+        }
+    }
+}`,
+    expectedKeywords: ['for', 'printf']
+  },
+  {
+    id: 'nested-p14',
+    number: 14,
+    title: 'Problem 14: Sorting (Array Sorting)',
+    difficulty: 'Medium',
+    level: 'Medium',
+    topics: ['Arrays', 'Selection Sort', 'Nested Loops'],
+    specialInstruction: 'Implement sorting manually using nested loops (Selection Sort or Bubble Sort).',
+    originalProblem: 'Codeforces Sheet 3 (Problem H: Sorting)',
+    codeforcesId: 'H (Sheet 3)',
+    externalUrl: 'https://codeforces.com/group/MWSDmqGsZm/contest/219774/problem/H',
+    statement: `Given a number N and an array of N numbers. Print the numbers after sorting them in non-decreasing (ascending) order.
+
+Special Instruction: Implement manual sorting using nested loops (Selection Sort). Do not use built-in sort functions.`,
+    inputFormat: `First line: Single integer N (1 <= N <= 1000).
+Second line: N space-separated integers A_1, A_2, ..., A_N (-100 <= A_i <= 100).`,
+    constraints: '1 <= N <= 1000; -100 <= A_i <= 100',
+    sampleInput: `3
+3 1 2`,
+    sampleOutput: '1 2 3',
+    explanation: 'The sorted order of [3, 1, 2] is [1, 2, 3].',
+    instructional: {
+      prerequisites: [
+        'Selection Sort logic: In step i (0 to N - 2), find the index of the minimum element in range [i, N - 1], and swap it with arr[i].',
+        'Nested loop bounds:',
+        '  - Outer loop i from 0 to N - 2.',
+        '  - Inner loop j from i + 1 to N - 1.',
+        'Negative numbers: Array elements can be negative (-100 <= A_i <= 100); Selection Sort handles negative values naturally.'
+      ],
+      stepByStepLogic: [
+        'Step 1: Read N.',
+        'Step 2: Read N integers into an array: for (int i = 0; i < N; i++) scanf("%d", &a[i]);.',
+        'Step 3: Run Selection Sort:',
+        '        - min_idx = i;',
+        '        - for j = i + 1 to N - 1: if a[j] < a[min_idx], min_idx = j;',
+        '        - swap a[i] and a[min_idx];',
+        'Step 4: Print sorted array separated by spaces.',
+        'Step 5: Output a final newline.'
+      ],
+      commonPitfalls: [
+        'Ensure the array size is declared large enough (at least 1005).',
+        'Separate elements with a space and end with newline.'
+      ],
+      timeComplexity: 'O(N^2) time using Selection Sort, O(N) space.'
+    },
+    starter: `#include <stdio.h>
+
+int main() {
+    int n;
+    if (scanf("%d", &n) != 1) return 0;
+    int a[1005];
+    for (int i = 0; i < n; i++) scanf("%d", &a[i]);
+
+    // TODO: Sort array 'a' in ascending order using manual Selection Sort
+    // Print sorted array separated by space
+
+    return 0;
+}`,
+    starterJava: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        if (!sc.hasNextInt()) return;
+        int n = sc.nextInt();
+        int[] a = new int[n];
+        for (int i = 0; i < n; i++) a[i] = sc.nextInt();
+
+        // TODO: Selection Sort ascending
+    }
+}`,
+    solutionC: `#include <stdio.h>
+
+int main() {
+    int n;
+    if (scanf("%d", &n) != 1) return 0;
+    int a[1005];
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &a[i]);
+    }
+
+    // Selection Sort
+    for (int i = 0; i < n - 1; i++) {
+        int min_idx = i;
+        for (int j = i + 1; j < n; j++) {
+            if (a[j] < a[min_idx]) {
+                min_idx = j;
+            }
+        }
+        int temp = a[i];
+        a[i] = a[min_idx];
+        a[min_idx] = temp;
+    }
+
+    // Print sorted elements
+    for (int i = 0; i < n; i++) {
+        printf("%d%c", a[i], i == n - 1 ? '\\n' : ' ');
+    }
+
+    return 0;
+}`,
+    solutionJava: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        if (!sc.hasNextInt()) return;
+        int n = sc.nextInt();
+        int[] a = new int[n];
+        for (int i = 0; i < n; i++) a[i] = sc.nextInt();
+
+        // Selection Sort
+        for (int i = 0; i < n - 1; i++) {
+            int min_idx = i;
+            for (int j = i + 1; j < n; j++) {
+                if (a[j] < a[min_idx]) min_idx = j;
+            }
+            int temp = a[i];
+            a[i] = a[min_idx];
+            a[min_idx] = temp;
+        }
+
+        for (int i = 0; i < n; i++) {
+            System.out.print(a[i] + (i == n - 1 ? "\\n" : " "));
+        }
+    }
+}`,
+    expectedKeywords: ['for', 'scanf', 'printf']
   }
 ];

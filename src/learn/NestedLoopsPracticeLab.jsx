@@ -42,6 +42,12 @@ export function NestedLoopsPracticeLab({ onPassed, scope = 'guest', courseId = '
     return p.difficulty === difficultyFilter;
   });
 
+  const totalCount = nestedLoopsPracticeProblems.length;
+  const easyCount = nestedLoopsPracticeProblems.filter(p => p.difficulty === 'Easy').length;
+  const medCount = nestedLoopsPracticeProblems.filter(p => p.difficulty === 'Medium').length;
+  const hardCount = nestedLoopsPracticeProblems.filter(p => p.difficulty === 'Hard').length;
+  const cfCount = nestedLoopsPracticeProblems.filter(p => Boolean(p.externalUrl)).length;
+
   const currentProblem = nestedLoopsPracticeProblems[selectedIdx] || nestedLoopsPracticeProblems[0];
 
   const storageKey = `lugaish_practice_v1:${scope}:${language}:${currentProblem.id}`;
@@ -230,27 +236,27 @@ export function NestedLoopsPracticeLab({ onPassed, scope = 'guest', courseId = '
               </span>
             </div>
             <h2 style={{ fontSize: '24px', color: '#f8fafc', margin: '4px 0 8px', letterSpacing: '-0.02em' }}>
-              Nested Loops Practice Problems (10 Problems)
+              Nested Loops Practice Problems ({totalCount} Problems)
             </h2>
             <p style={{ color: '#fed7aa', fontSize: '13px', margin: 0, maxWidth: '820px', lineHeight: 1.6 }}>
-              Solve 10 carefully designed problems in C or Java. Level up from fundamental star and number patterns to Codeforces algorithmic challenges like Fox &amp; Snake, Gravity Flip, Queue at School, and Twins.
+              Solve {totalCount} carefully designed problems in C or Java. Level up from fundamental star and number patterns to Codeforces algorithmic challenges like Fox &amp; Snake, Shape 1, 2, 3, Gravity Flip, Queue at School, and Twins.
             </p>
           </div>
 
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
             <div style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 14px', textAlign: 'center' }}>
               <span style={{ fontSize: '10px', color: 'var(--lx-muted)', display: 'block', fontWeight: 600 }}>TOTAL PROBLEMS</span>
-              <strong style={{ fontSize: '18px', color: '#fbbf24' }}>10</strong>
+              <strong style={{ fontSize: '18px', color: '#fbbf24' }}>{totalCount}</strong>
             </div>
             <div style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '10px 14px', textAlign: 'center' }}>
               <span style={{ fontSize: '10px', color: 'var(--lx-muted)', display: 'block', fontWeight: 600 }}>EASY / MED / HARD</span>
               <strong style={{ fontSize: '18px', color: '#f8fafc' }}>
-                <span style={{ color: '#10b981' }}>3</span> / <span style={{ color: '#f59e0b' }}>3</span> / <span style={{ color: '#ef4444' }}>4</span>
+                <span style={{ color: '#10b981' }}>{easyCount}</span> / <span style={{ color: '#f59e0b' }}>{medCount}</span> / <span style={{ color: '#ef4444' }}>{hardCount}</span>
               </strong>
             </div>
             <div style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '10px', padding: '10px 14px', textAlign: 'center' }}>
               <span style={{ fontSize: '10px', color: '#93c5fd', display: 'block', fontWeight: 600 }}>CODEFORCES</span>
-              <strong style={{ fontSize: '18px', color: '#60a5fa' }}>4 Tasks</strong>
+              <strong style={{ fontSize: '18px', color: '#60a5fa' }}>{cfCount} Tasks</strong>
             </div>
           </div>
         </div>
@@ -261,11 +267,11 @@ export function NestedLoopsPracticeLab({ onPassed, scope = 'guest', courseId = '
             <Filter size={12} /> Filter by:
           </span>
           {[
-            { id: 'all', label: 'All Problems (10)' },
-            { id: 'Easy', label: 'Easy (3)' },
-            { id: 'Medium', label: 'Medium (3)' },
-            { id: 'Hard', label: 'Hard (4)' },
-            { id: 'codeforces', label: 'Codeforces Contests (4)' }
+            { id: 'all', label: `All Problems (${totalCount})` },
+            { id: 'Easy', label: `Easy (${easyCount})` },
+            { id: 'Medium', label: `Medium (${medCount})` },
+            { id: 'Hard', label: `Hard (${hardCount})` },
+            { id: 'codeforces', label: `Codeforces Contests (${cfCount})` }
           ].map(f => (
             <button
               key={f.id}
