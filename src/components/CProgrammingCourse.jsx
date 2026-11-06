@@ -40,7 +40,7 @@ export function CProgrammingCourse() {
             Start C Programming <ArrowRight size={17} />
           </Link>
           <Link
-            to="/learn/c-programming/04"
+            to="/learn/c-programming/02"
             style={{
               background: 'rgba(56, 189, 248, 0.15)',
               border: '1px solid #38bdf8',

@@ -521,32 +521,35 @@ export function NestedLoopsPracticeLab({ onPassed, scope = 'guest', courseId = '
           </div>
         </div>
 
-        {/* PROMINENT CODEFORCES ACTION BANNER (When link is available) */}
+        {/* PROMINENT CODEFORCES ACTION BANNER */}
         {currentProblem.externalUrl && (
           <div
             style={{
-              background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.4) 0%, rgba(37, 99, 235, 0.25) 50%, rgba(15, 23, 42, 0.6) 100%)',
-              border: '1px solid rgba(96, 165, 250, 0.45)',
-              borderRadius: '12px',
-              padding: '18px 20px',
+              background: 'linear-gradient(135deg, rgba(30, 58, 138, 0.45) 0%, rgba(37, 99, 235, 0.28) 50%, rgba(15, 23, 42, 0.7) 100%)',
+              border: '1px solid rgba(96, 165, 250, 0.5)',
+              borderRadius: '14px',
+              padding: '18px 22px',
               marginBottom: '24px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               flexWrap: 'wrap',
               gap: '16px',
-              boxShadow: '0 4px 20px rgba(37, 99, 235, 0.25)'
+              boxShadow: '0 4px 20px rgba(37, 99, 235, 0.3)'
             }}
           >
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                <span style={{ fontSize: '14px' }}>🏆</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '18px' }}>🏆</span>
                 <strong style={{ color: '#93c5fd', fontSize: '14px', letterSpacing: '0.02em' }}>
-                  Official Problem on Codeforces ({currentProblem.originalProblem})
+                  Solve on Codeforces: {currentProblem.originalProblem || currentProblem.codeforcesId}
                 </strong>
+                <span style={{ background: 'rgba(16, 185, 129, 0.2)', border: '1px solid #10b981', color: '#34d399', fontSize: '10px', padding: '2px 8px', borderRadius: '4px', fontWeight: 800 }}>
+                  ⭐ Increases Your Codeforces Rating &amp; AC Count
+                </span>
               </div>
-              <p style={{ margin: 0, fontSize: '12px', color: '#e2e8f0', maxWidth: '650px', lineHeight: 1.5 }}>
-                You can write and test your solution in our interactive editor below, and also submit your code directly on Codeforces to get official judge verdicts!
+              <p style={{ margin: 0, fontSize: '12px', color: '#e2e8f0', maxWidth: '680px', lineHeight: 1.6 }}>
+                Directly submit your code on Codeforces to grow your competitive programming rank and build a strong problem-solving profile! You can test your logic and run testcases in our interactive editor below first.
               </p>
             </div>
 
@@ -561,18 +564,17 @@ export function NestedLoopsPracticeLab({ onPassed, scope = 'guest', courseId = '
                 background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
                 border: '1px solid #60a5fa',
                 borderRadius: '10px',
-                padding: '10px 18px',
+                padding: '11px 20px',
                 color: '#ffffff',
                 fontWeight: 800,
                 fontSize: '13px',
                 textDecoration: 'none',
-                boxShadow: '0 4px 14px rgba(37, 99, 235, 0.4)',
+                boxShadow: '0 4px 16px rgba(37, 99, 235, 0.45)',
                 cursor: 'pointer',
                 whiteSpace: 'nowrap'
               }}
             >
-              <span>Start Solving Problem {String(currentProblem.number).padStart(2, '0')} on Codeforces ({currentProblem.codeforcesId})</span>
-              <ExternalLink size={15} />
+              <span>🚀 Solve on Codeforces ↗</span>
             </a>
           </div>
         )}

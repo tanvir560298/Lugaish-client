@@ -747,7 +747,7 @@ export function JavaCoursePage() {
     }
   }, [completed, scope]);
 
-  const activeId = videoId === 'nested-loops' ? '05' : (videoId || '01');
+  const activeId = (videoId === 'nested-loops' || videoId === '05') ? '03' : (videoId || '01');
   const currentVideo = javaVideos.find(v => v.id === activeId) || javaVideos[0];
 
   const handleMarkComplete = (idToComplete = currentVideo.id) => {
@@ -799,7 +799,7 @@ export function JavaCoursePage() {
       </header>
 
       {/* Practice Set Quick Banner */}
-      {currentVideo.id !== '05' && (
+      {currentVideo.id !== '03' && (
         <div
           style={{
             background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(180, 83, 9, 0.1) 100%)',
@@ -826,7 +826,7 @@ export function JavaCoursePage() {
             </div>
           </div>
           <Link
-            to="/learn/java-programming/05"
+            to="/learn/java-programming/03"
             style={{
               background: 'linear-gradient(135deg, #d97706, #b45309)',
               border: '1px solid #f59e0b',
@@ -857,7 +857,62 @@ export function JavaCoursePage() {
             isCompleted={completed.includes(currentVideo.id)}
           />
 
-          {currentVideo.id === '05' ? (
+          {/* Direct Jump to Practice Problems right after video */}
+          {currentVideo.id !== '03' && (
+            <div
+              style={{
+                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(180, 83, 9, 0.12) 100%)',
+                border: '1px solid rgba(245, 158, 11, 0.4)',
+                borderRadius: '14px',
+                padding: '16px 20px',
+                margin: '18px 0 24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '14px'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ fontSize: '26px' }}>🚀</span>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ background: '#f59e0b', color: '#180d04', fontSize: '10px', fontWeight: 800, padding: '2px 8px', borderRadius: '4px' }}>
+                      PRACTICE LAB
+                    </span>
+                    <span style={{ color: '#fed7aa', fontSize: '11px', fontWeight: 600 }}>14 Structured Tasks</span>
+                  </div>
+                  <h3 style={{ margin: '4px 0 2px', fontSize: '15px', color: '#f8fafc', fontWeight: 700 }}>
+                    Finished Watching? Jump Directly into Practice Problems!
+                  </h3>
+                  <p style={{ margin: 0, fontSize: '12px', color: '#fde68a' }}>
+                    Solve nested loops, pattern printing, Selection Sort, and Codeforces challenges to boost your platform rating.
+                  </p>
+                </div>
+              </div>
+              <Link
+                to="/learn/java-programming/03"
+                style={{
+                  background: 'linear-gradient(135deg, #d97706, #b45309)',
+                  border: '1px solid #f59e0b',
+                  color: '#ffffff',
+                  borderRadius: '8px',
+                  padding: '9px 16px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 4px 14px rgba(245, 158, 11, 0.3)'
+                }}
+              >
+                Jump to Practice Lab →
+              </Link>
+            </div>
+          )}
+
+          {currentVideo.id === '03' ? (
             <NestedLoopsPracticeLab
               onPassed={handlePracticePassed}
               scope={scope}
@@ -888,7 +943,7 @@ export function JavaCoursePage() {
 
           <ol style={{ padding: '8px' }}>
             {javaVideos.map((vid) => {
-              const isPracticeSet = vid.id === '05';
+              const isPracticeSet = vid.id === '03' || vid.id === '05';
               const unlocked = isJavaClassUnlocked(vid.id, completed) || isPracticeSet;
               const isDone = completed.includes(vid.id);
               const isCurrent = vid.id === currentVideo.id;

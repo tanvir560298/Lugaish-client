@@ -23,16 +23,10 @@ test('Sequential unlocking rule: Class 01 is unlocked; subsequent classes requir
   // Class 02 unlocks once Class 01 is completed
   assert.equal(isClassUnlocked('02', ['01']), true);
 
-  // Class 03 is locked if only Class 01 is completed
-  assert.equal(isClassUnlocked('03', ['01']), false);
-
-  // Class 03 unlocks once Class 02 is completed
-  assert.equal(isClassUnlocked('03', ['01', '02']), true);
-
   // getNextUnlockedClass points to first uncompleted class
   assert.equal(getNextUnlockedClass([]).id, '01');
   assert.equal(getNextUnlockedClass(['01']).id, '02');
-  assert.equal(getNextUnlockedClass(['01', '02']).id, '03');
+  assert.equal(getNextUnlockedClass(['01', '02']).id, '01');
 });
 
 test('cleanCProgress cleans duplicates and ignores invalid IDs', () => {

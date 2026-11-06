@@ -20,67 +20,12 @@ export const cVideos = [
   {
     id: '02',
     youtubeId: '',
-    title: 'How a C Program Works: Source Code, Compiler & Execution',
-    summary: 'Understand how source code is written, translated by a compiler, and how computers process inputs (e.g. 2 + 3) into outputs (5).',
-    duration: '1 min',
-    course: 'c-programming',
-    kind: 'video',
-    path: '/learn/c-programming/02',
-    url: ''
-  },
-  {
-    id: '03',
-    youtubeId: '',
-    title: 'Conditions & Decision Making (if, else if, switch)',
-    summary: 'Branching logic, boolean expressions, and real-world decision structures.',
-    duration: 'Coming soon',
-    course: 'c-programming',
-    kind: 'video',
-    path: '/learn/c-programming/03',
-    url: ''
-  },
-  {
-    id: '04',
-    youtubeId: '',
-    title: 'Class 04: Nested Loops Practice Problems (Practice Set 01)',
+    title: 'Class 02: Nested Loops Practice Problems (Practice Set 01)',
     summary: 'Master nested loops, pattern printing, arrays, selection sort & simulation with 14 structured practice problems (Easy, Medium, Hard).',
     duration: '14 Problems · Practice Set',
     course: 'c-programming',
     kind: 'video',
-    path: '/learn/c-programming/04',
-    url: ''
-  },
-  {
-    id: '05',
-    youtubeId: '',
-    title: 'Functions & Modular Code',
-    summary: 'Creating reusable functions, parameters, return types, and scope in C.',
-    duration: 'Coming soon',
-    course: 'c-programming',
-    kind: 'video',
-    path: '/learn/c-programming/05',
-    url: ''
-  },
-  {
-    id: '06',
-    youtubeId: '',
-    title: 'Arrays & Strings in C',
-    summary: 'Storing collections of data, iterating arrays, and string handling.',
-    duration: 'Coming soon',
-    course: 'c-programming',
-    kind: 'video',
-    path: '/learn/c-programming/06',
-    url: ''
-  },
-  {
-    id: '07',
-    youtubeId: '',
-    title: 'Pointers & Memory Architecture',
-    summary: 'Understand memory addresses, the dereference operator, and how memory really works.',
-    duration: 'Coming soon',
-    course: 'c-programming',
-    kind: 'video',
-    path: '/learn/c-programming/07',
+    path: '/learn/c-programming/02',
     url: ''
   }
 ];
@@ -153,6 +98,7 @@ export const cPracticeProblems = {
       hint: 'Compare num > 0 inside the if condition.'
     }
   ],
+  '02': nestedLoopsPracticeProblems,
   '04': nestedLoopsPracticeProblems
 };
 

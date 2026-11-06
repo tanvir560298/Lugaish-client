@@ -95,7 +95,5 @@ export function checkCPractice(problem, code) {
 
 export const cMilestones = [
   { name: 'First Compile', description: 'Setup, syntax & your first printf program', ids: ['01'] },
-  { name: 'Control Flow', description: 'Variables, inputs and decision logic', ids: ['02', '03'] },
-  { name: 'Mastering Loops', description: 'Repetition and sequence automation', ids: ['04'] },
-  { name: 'Code Architecture', description: 'Modular functions, arrays and memory', ids: ['05', '06', '07'] },
+  { name: 'Mastering Loops', description: 'Nested loops, pattern printing & Codeforces algorithmic tasks', ids: ['02'] }
 ];

@@ -37,85 +37,15 @@ export const javaVideos = [
   {
     id: '03',
     youtubeId: '',
-    title: 'Class 03: Variables & Data Types (int, double, String, boolean)',
-    summary: 'Discover how computers store values in memory, declaring variables, type rules, and assigning values in Java.',
-    duration: 'Coming soon',
-    course: 'java-programming',
-    kind: 'video',
-    path: '/learn/java-programming/03',
-    url: '',
-    instructor: 'Tanvir Ahmad',
-    topics: ['Primitive data types', 'Variables & identifiers', 'Memory assignment', 'String vs numeric values'],
-    keyConcept: 'Variables hold data in memory. Strongly typed Java requires declaring the type before using a variable.'
-  },
-  {
-    id: '04',
-    youtubeId: '',
-    title: 'Class 04: Conditions & Decision Making (if, else if, else)',
-    summary: 'Branching logic, boolean expressions, relational operators, and decision-making structures in Java.',
-    duration: 'Coming soon',
-    course: 'java-programming',
-    kind: 'video',
-    path: '/learn/java-programming/04',
-    url: '',
-    instructor: 'Tanvir Ahmad',
-    topics: ['if and else statements', 'Comparison operators (==, !=, >, <, >=, <=)', 'Logical AND/OR (&&, ||)', 'Nested conditions'],
-    keyConcept: 'Conditions allow programs to make decisions based on true or false boolean expressions.'
-  },
-  {
-    id: '05',
-    youtubeId: '',
-    title: 'Class 05: Nested Loops Practice Problems',
+    title: 'Class 03: Nested Loops Practice Problems (Practice Set 01)',
     summary: 'Master nested loops, pattern printing, arrays, selection sort & simulation with 14 structured practice problems (Easy, Medium, Hard).',
     duration: '14 Problems · Practice Set',
     course: 'java-programming',
     kind: 'video',
-    path: '/learn/java-programming/05',
+    path: '/learn/java-programming/03',
     instructor: 'Tanvir Ahmad',
     topics: ['Nested Loops', 'Pattern Printing', 'Spaces & Alignment', 'Selection Sort', 'Simulation & Greedy Logic'],
     keyConcept: 'Nested loops iterate through 2D grids and patterns. In algorithms, nested loops power manual sorting like Selection Sort and discrete-time simulations.'
-  },
-  {
-    id: '06',
-    youtubeId: '',
-    title: 'Class 06: Methods & Modular Java Code',
-    summary: 'Write reusable methods, define parameters, return values, and organize clean modular Java applications.',
-    duration: 'Coming soon',
-    course: 'java-programming',
-    kind: 'video',
-    path: '/learn/java-programming/06',
-    url: '',
-    instructor: 'Tanvir Ahmad',
-    topics: ['Method declarations', 'Parameters & arguments', 'Return types', 'Method overloading'],
-    keyConcept: 'Methods encapsulate reusable logic and make programs organized and maintainable.'
-  },
-  {
-    id: '07',
-    youtubeId: '',
-    title: 'Class 07: Object-Oriented Programming (OOP) Fundamentals',
-    summary: 'Master the core power of Java: creating custom classes, instantiating objects, and constructors.',
-    duration: 'Coming soon',
-    course: 'java-programming',
-    kind: 'video',
-    path: '/learn/java-programming/07',
-    url: '',
-    instructor: 'Tanvir Ahmad',
-    topics: ['Classes & Objects', 'Constructors', 'Instance variables', 'The this keyword'],
-    keyConcept: 'Java is an object-oriented language where real-world concepts are modeled as objects with state and behavior.'
-  },
-  {
-    id: '08',
-    youtubeId: '',
-    title: 'Class 08: Arrays & Collections in Java',
-    summary: 'Store ordered collections of data, iterate with enhanced for-each loops, and explore dynamic ArrayLists.',
-    duration: 'Coming soon',
-    course: 'java-programming',
-    kind: 'video',
-    path: '/learn/java-programming/08',
-    url: '',
-    instructor: 'Tanvir Ahmad',
-    topics: ['Array declaration & indexing', 'Iterating arrays with loops', 'Enhanced for-each loop', 'ArrayList fundamentals'],
-    keyConcept: 'Arrays store multiple values of the same type in a single contiguous block of memory.'
   }
 ];
 
@@ -219,6 +149,7 @@ export const javaPracticeProblems = {
       hint: 'Remember that * / % have equal precedence and are evaluated from left to right. In integer division, 30 / 7 gives 4, and 4 % 3 gives remainder 1.'
     }
   ],
+  '03': nestedLoopsPracticeProblems,
   '05': nestedLoopsPracticeProblems
 };
 

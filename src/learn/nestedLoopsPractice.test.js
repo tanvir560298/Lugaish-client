@@ -20,7 +20,7 @@ test('Difficulty distribution covers Easy, Medium, and Hard', () => {
 
 test('Codeforces problems have accurate external contest URLs and IDs including Assiut Sheets', () => {
   const cfProblems = nestedLoopsPracticeProblems.filter(p => Boolean(p.externalUrl));
-  assert.equal(cfProblems.length, 8, 'There should be 8 Codeforces problems');
+  assert.equal(cfProblems.length, 14, 'All 14 problems now provide Codeforces platform practice links');
 
   const p6 = nestedLoopsPracticeProblems.find(p => p.number === 6);
   assert.equal(p6.codeforcesId, '510A');
@@ -80,16 +80,20 @@ test('All 14 problems contain instructional prerequisites, step-by-step logic an
   }
 });
 
-test('Java Programming Class 05 connects to the nested loops problems', () => {
-  const class05 = javaVideos.find(v => v.id === '05');
-  assert.ok(class05, 'Java Class 05 must exist');
-  assert.ok(class05.title.toLowerCase().includes('nested loops'));
+test('Java Programming Practice Class connects to the nested loops problems', () => {
+  const javaPracticeClass = javaVideos.find(v => v.title.toLowerCase().includes('nested loops'));
+  assert.ok(javaPracticeClass, 'Java practice class must exist');
+  assert.ok(javaPracticeClass.title.toLowerCase().includes('nested loops'));
+  assert.equal(javaPracticeProblems[javaPracticeClass.id].length, 14);
+  assert.equal(javaPracticeProblems['03'].length, 14);
   assert.equal(javaPracticeProblems['05'].length, 14);
 });
 
-test('C Programming Class 04 connects to the nested loops problems', () => {
-  const class04 = cVideos.find(v => v.id === '04');
-  assert.ok(class04, 'C Class 04 must exist');
-  assert.ok(class04.title.toLowerCase().includes('nested loops'));
+test('C Programming Practice Class connects to the nested loops problems', () => {
+  const cPracticeClass = cVideos.find(v => v.title.toLowerCase().includes('nested loops'));
+  assert.ok(cPracticeClass, 'C practice class must exist');
+  assert.ok(cPracticeClass.title.toLowerCase().includes('nested loops'));
+  assert.equal(cPracticeProblems[cPracticeClass.id].length, 14);
+  assert.equal(cPracticeProblems['02'].length, 14);
   assert.equal(cPracticeProblems['04'].length, 14);
 });

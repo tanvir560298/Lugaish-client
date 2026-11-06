@@ -10,6 +10,9 @@ export const nestedLoopsPracticeProblems = [
     title: 'Problem 01: Right-Aligned Star Triangle',
     difficulty: 'Easy',
     level: 'Easy',
+    originalProblem: 'Assiut Sheet #2 (Loops) · Problem O: Pyramid',
+    codeforcesId: 'Sheet 2 (Problem O)',
+    externalUrl: 'https://codeforces.com/group/MWSDmqGsZm/contest/219432/problem/O',
     topics: ['Nested Loops', 'Spaces', 'Pattern Printing'],
     statement: `You are given an integer N. Write a C program to print a right-aligned triangle containing N rows.
 
@@ -113,6 +116,9 @@ public class Main {
     title: 'Problem 02: Reverse Star Triangle',
     difficulty: 'Easy',
     level: 'Easy',
+    originalProblem: 'Assiut Sheet #2 (Loops) · Problem P: Shape 1',
+    codeforcesId: 'Sheet 2 (Problem P)',
+    externalUrl: 'https://codeforces.com/group/MWSDmqGsZm/contest/219432/problem/P',
     topics: ['Nested Loops', 'Decreasing Loops'],
     statement: `Given an integer N, print an inverted right-aligned star triangle. The first row contains N stars. Each following row contains one fewer star and one additional leading space.`,
     inputFormat: 'A single integer N.',
@@ -212,6 +218,9 @@ public class Main {
     title: 'Problem 03: Alphabet Triangle',
     difficulty: 'Easy',
     level: 'Easy',
+    originalProblem: 'Assiut Sheet #2 (Loops) · Characters & Grid Contest',
+    codeforcesId: 'Sheet 2 (Loops Contest)',
+    externalUrl: 'https://codeforces.com/group/MWSDmqGsZm/contest/219432',
     topics: ['Nested Loops', 'Characters', 'ASCII'],
     statement: `Write a C program that takes an integer N and prints an alphabet triangle.
 
@@ -311,6 +320,9 @@ public class Main {
     title: 'Problem 04: Right-Aligned Number Triangle',
     difficulty: 'Medium',
     level: 'Medium',
+    originalProblem: 'Assiut Sheet #2 (Loops) · Problem V: PUM',
+    codeforcesId: 'Sheet 2 (Problem V)',
+    externalUrl: 'https://codeforces.com/group/MWSDmqGsZm/contest/219432/problem/V',
     topics: ['Nested Loops', 'Number Patterns', 'Spaces'],
     statement: `Given an integer N, print a right-aligned number triangle.
 
@@ -414,6 +426,9 @@ public class Main {
     title: 'Problem 05: Inverted Pyramid',
     difficulty: 'Medium',
     level: 'Medium',
+    originalProblem: 'Assiut Sheet #2 (Loops) · Problem T: Shape 2',
+    codeforcesId: 'Sheet 2 (Problem T)',
+    externalUrl: 'https://codeforces.com/group/MWSDmqGsZm/contest/219432/problem/T',
     topics: ['Nested Loops', 'Arithmetic Patterns'],
     statement: `You are given an integer N. Print an inverted pyramid using stars.
 
@@ -631,6 +646,9 @@ public class Main {
     title: 'Problem 07: Alternating Diamond Pattern',
     difficulty: 'Hard',
     level: 'Hard',
+    originalProblem: 'Assiut Sheet #2 (Loops) · Problem W: Shape 3',
+    codeforcesId: 'Sheet 2 (Problem W)',
+    externalUrl: 'https://codeforces.com/group/MWSDmqGsZm/contest/219432/problem/W',
     topics: ['Nested Loops', 'Conditions', 'Spaces', 'Symmetry'],
     statement: `Write a C program that takes an integer N and prints a centered diamond-shaped pattern consisting of # and - symbols.
 

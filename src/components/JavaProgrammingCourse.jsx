@@ -45,7 +45,7 @@ export function JavaProgrammingCourse() {
             Start Java Programming <ArrowRight size={17} />
           </Link>
           <Link
-            to="/learn/java-programming/05"
+            to="/learn/java-programming/03"
             style={{
               background: 'rgba(245, 158, 11, 0.15)',
               border: '1px solid #f59e0b',

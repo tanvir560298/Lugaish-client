@@ -104,7 +104,7 @@ function CPlayer({ video, onEnded }) {
   }, [video.id, video.youtubeId, video.course, version, report, onEnded]);
 
   if (!video.youtubeId) {
-    const isPracticeModule = video.id === '04';
+    const isPracticeModule = video.id === '02' || video.id === '04';
     return (
       <section className="html-player" aria-label="C video player">
         <div className="html-player-stage" style={{ minHeight: '340px' }}>
@@ -355,7 +355,7 @@ function CCourse({ videoId }) {
   const completed = saved.key === key ? saved.value : [];
   const practised = practice.key === practiceKey ? practice.value : [];
 
-  const activeVideoId = videoId === 'nested-loops' ? '04' : videoId;
+  const activeVideoId = (videoId === 'nested-loops' || videoId === '04') ? '02' : videoId;
   const video = cVideos.find(v => v.id === activeVideoId);
   const isLocked = video ? !isClassUnlocked(video.id, completed) : false;
 
@@ -401,8 +401,8 @@ function CCourse({ videoId }) {
   }
 
   // SEQUENTIAL LOCKED SCREEN: If student navigates to a locked class without finishing prior ones
-  // Practice Set 01 (Class 04) is open for direct practice
-  if (video && isLocked && video.id !== '04') {
+  // Practice Set 01 (Class 02) is open for direct practice
+  if (video && isLocked && video.id !== '02' && video.id !== '04') {
     const priorClass = previous || cVideos[0];
     return (
       <div className="lx-learn lx-html-course">
@@ -481,7 +481,7 @@ function CCourse({ videoId }) {
                   <span style={{ background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8', fontSize: '10px', fontWeight: 800, padding: '2px 8px', borderRadius: '6px', letterSpacing: '0.08em' }}>
                     FEATURED PRACTICE SET · UNLOCKED FOR ALL
                   </span>
-                  <span style={{ color: '#94a3b8', fontSize: '12px' }}>Class 04</span>
+                  <span style={{ color: '#94a3b8', fontSize: '12px' }}>Class 02</span>
                 </div>
                 <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#f8fafc', margin: '2px 0 6px' }}>
                   Practice Set 01: Nested Loops &amp; Pattern Printing (14 Problems)
@@ -492,7 +492,7 @@ function CCourse({ videoId }) {
               </div>
             </div>
             <Link
-              to="/learn/c-programming/04"
+              to="/learn/c-programming/02"
               className="lx-primary"
               style={{
                 whiteSpace: 'nowrap',
@@ -519,7 +519,7 @@ function CCourse({ videoId }) {
                 {completed.length ? 'Continue Class' : 'Start Class 01'} <ArrowRight size={16} />
               </Link>
               {!completed.length && (
-                <Link className="lx-secondary" to="/learn/c-programming/04">
+                <Link className="lx-secondary" to="/learn/c-programming/02">
                   Jump to Practice Set 01 (14 Problems) →
                 </Link>
               )}
@@ -538,7 +538,7 @@ function CCourse({ videoId }) {
 
           <ol className="lx-syllabus html-roadmap">
             {cVideos.map((item, index) => {
-              const isPracticeSet = item.id === '04';
+              const isPracticeSet = item.id === '02' || item.id === '04';
               const done = completed.includes(item.id);
               const unlocked = isClassUnlocked(item.id, completed) || isPracticeSet;
 
@@ -578,8 +578,8 @@ function CCourse({ videoId }) {
             <Link className="lx-secondary" to="/learn/c-programming">Course Roadmap</Link>
           </div>
 
-          {/* Quick Banner for Class 04 if currently in another class */}
-          {video.id !== '04' && (
+          {/* Quick Banner for Practice Set if currently in another class */}
+          {video.id !== '02' && (
             <div
               style={{
                 background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.12) 0%, rgba(30, 58, 138, 0.25) 100%)',
@@ -601,12 +601,12 @@ function CCourse({ videoId }) {
                     Featured Practice Set: Nested Loops &amp; Algorithmic Simulation (14 Problems)
                   </strong>
                   <p style={{ margin: 0, fontSize: '11px', color: '#cbd5e1' }}>
-                    Class 04 is unlocked: Star triangles, pyramids, Selection Sort, and Codeforces challenges in C.
+                    Class 02 is unlocked: Star triangles, pyramids, Selection Sort, and Codeforces challenges in C.
                   </p>
                 </div>
               </div>
               <Link
-                to="/learn/c-programming/04"
+                to="/learn/c-programming/02"
                 style={{
                   background: 'linear-gradient(135deg, #0284c7, #0369a1)',
                   border: '1px solid #38bdf8',
@@ -640,7 +640,64 @@ function CCourse({ videoId }) {
           </nav>
 
           <div className="html-watch-layout" id="c-watch">
-            <CPlayer video={video} onEnded={() => markCompleted(video.id)} />
+            <div style={{ minWidth: 0 }}>
+              <CPlayer video={video} onEnded={() => markCompleted(video.id)} />
+
+              {/* Direct Jump Card to Practice Problems right after video */}
+              {video.id !== '02' && (
+                <div
+                  style={{
+                    background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.16) 0%, rgba(30, 58, 138, 0.25) 100%)',
+                    border: '1px solid rgba(56, 189, 248, 0.4)',
+                    borderRadius: '14px',
+                    padding: '16px 20px',
+                    margin: '18px 0 24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '14px'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <span style={{ fontSize: '26px' }}>🚀</span>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ background: '#38bdf8', color: '#0f172a', fontSize: '10px', fontWeight: 800, padding: '2px 8px', borderRadius: '4px' }}>
+                          PRACTICE LAB
+                        </span>
+                        <span style={{ color: '#93c5fd', fontSize: '11px', fontWeight: 600 }}>14 Structured Tasks</span>
+                      </div>
+                      <h3 style={{ margin: '4px 0 2px', fontSize: '15px', color: '#f8fafc', fontWeight: 700 }}>
+                        Finished Watching? Jump Directly into Practice Problems!
+                      </h3>
+                      <p style={{ margin: 0, fontSize: '12px', color: '#cbd5e1' }}>
+                        Solve nested loops, pattern printing, Selection Sort, and Codeforces challenges to boost your platform rating.
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    to="/learn/c-programming/02"
+                    style={{
+                      background: 'linear-gradient(135deg, #0284c7, #0369a1)',
+                      border: '1px solid #38bdf8',
+                      color: '#ffffff',
+                      borderRadius: '8px',
+                      padding: '9px 16px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      boxShadow: '0 4px 14px rgba(56, 189, 248, 0.3)'
+                    }}
+                  >
+                    Jump to Practice Lab →
+                  </Link>
+                </div>
+              )}
+            </div>
 
             <aside className="html-class-list" aria-label="Course classes">
               <div className="html-class-list-heading">
@@ -650,7 +707,7 @@ function CCourse({ videoId }) {
               </div>
               <ol>
                 {cVideos.map(item => {
-                  const isPracticeSet = item.id === '04';
+                  const isPracticeSet = item.id === '02' || item.id === '04';
                   const done = completed.includes(item.id);
                   const isCurrent = video.id === item.id;
                   const unlocked = isClassUnlocked(item.id, completed) || isPracticeSet;
@@ -689,7 +746,7 @@ function CCourse({ videoId }) {
             </aside>
           </div>
 
-          {video.id === '04' ? (
+          {(video.id === '02' || video.id === '04') ? (
             <NestedLoopsPracticeLab
               onPassed={savePractice}
               scope={state.isLoggedIn ? state.userEmail : 'guest'}
