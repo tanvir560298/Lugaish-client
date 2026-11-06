@@ -104,14 +104,24 @@ function CPlayer({ video, onEnded }) {
   }, [video.id, video.youtubeId, video.course, version, report, onEnded]);
 
   if (!video.youtubeId) {
+    const isPracticeModule = video.id === '04';
     return (
       <section className="html-player" aria-label="C video player">
-        <div className="html-player-stage" style={{ minHeight: '380px' }}>
+        <div className="html-player-stage" style={{ minHeight: '340px' }}>
           <div className="html-player-placeholder">
-            <span className="html-player-symbol" aria-hidden="true">🎬</span>
-            <strong>Class Video Coming Soon</strong>
-            <p>This class video is being edited and uploaded. You can already try the practice problems below!</p>
+            <span className="html-player-symbol" aria-hidden="true">{isPracticeModule ? '⚡' : '🎬'}</span>
+            <strong>{isPracticeModule ? 'Interactive Practice Lab · 14 Problems' : 'Class Video Coming Soon'}</strong>
+            <p>
+              {isPracticeModule
+                ? 'Dive right into solving nested loops, pattern printing, Selection Sort, and Codeforces challenges in C below!'
+                : 'This class video is being edited and uploaded. You can already try the practice problems below!'}
+            </p>
           </div>
+        </div>
+        <div className="html-player-footer">
+          <span role="status">
+            {isPracticeModule ? '⚡ Interactive Coding Lab Active · 14 Problems Available' : 'Preparing lesson video'}
+          </span>
         </div>
       </section>
     );
@@ -449,6 +459,54 @@ function CCourse({ videoId }) {
             </aside>
           </header>
 
+          {/* Featured Practice Set Banner */}
+          <section
+            style={{
+              background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.12) 0%, rgba(30, 58, 138, 0.25) 100%)',
+              border: '1px solid rgba(56, 189, 248, 0.35)',
+              borderRadius: '16px',
+              padding: '20px 24px',
+              margin: '20px 0 24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: '16px'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', maxWidth: '750px' }}>
+              <span style={{ fontSize: '28px', lineHeight: 1 }}>🔥</span>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <span style={{ background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8', fontSize: '10px', fontWeight: 800, padding: '2px 8px', borderRadius: '6px', letterSpacing: '0.08em' }}>
+                    FEATURED PRACTICE SET · UNLOCKED FOR ALL
+                  </span>
+                  <span style={{ color: '#94a3b8', fontSize: '12px' }}>Class 04</span>
+                </div>
+                <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#f8fafc', margin: '2px 0 6px' }}>
+                  Practice Set 01: Nested Loops &amp; Pattern Printing (14 Problems)
+                </h2>
+                <p style={{ margin: 0, fontSize: '13px', color: '#cbd5e1', lineHeight: 1.6 }}>
+                  Star triangles, pyramids, Selection Sort, and Codeforces challenges (Fox &amp; Snake, Shape 1, Shape 2, Shape 3, Sorting, Gravity Flip, Queue at the School, Twins). Available in C with interactive guidance and verified solutions!
+                </p>
+              </div>
+            </div>
+            <Link
+              to="/learn/c-programming/04"
+              className="lx-primary"
+              style={{
+                whiteSpace: 'nowrap',
+                padding: '10px 20px',
+                fontSize: '13px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              Open 14 Practice Problems <ArrowRight size={16} />
+            </Link>
+          </section>
+
           <section className="html-start-card">
             <div className="html-start-number">{nextUnlocked.id}</div>
             <div>
@@ -456,9 +514,16 @@ function CCourse({ videoId }) {
               <h2>{completed.length ? nextUnlocked.title : 'Class 01: Welcome to C'}</h2>
               <p>{nextUnlocked.summary}</p>
             </div>
-            <Link className="lx-primary" to={nextUnlocked.path}>
-              {completed.length ? 'Continue Class' : 'Start Class 01'} <ArrowRight size={16} />
-            </Link>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+              <Link className="lx-primary" to={nextUnlocked.path}>
+                {completed.length ? 'Continue Class' : 'Start Class 01'} <ArrowRight size={16} />
+              </Link>
+              {!completed.length && (
+                <Link className="lx-secondary" to="/learn/c-programming/04">
+                  Jump to Practice Set 01 (14 Problems) →
+                </Link>
+              )}
+            </div>
           </section>
 
           <CMilestones completed={completed} />
@@ -484,7 +549,7 @@ function CCourse({ videoId }) {
                   </span>
                   <div>
                     <span className="html-roadmap-phase">
-                      {index === 0 ? 'CLASS 01 · OPEN NOW' : isPracticeSet ? 'PRACTICE SET · 10 PROBLEMS OPEN' : unlocked ? 'UNLOCKED' : 'LOCKED · COMPLETE PREVIOUS'}
+                      {index === 0 ? 'CLASS 01 · OPEN NOW' : isPracticeSet ? 'PRACTICE SET · 14 PROBLEMS OPEN' : unlocked ? 'UNLOCKED' : 'LOCKED · COMPLETE PREVIOUS'}
                     </span>
                     <h2>{item.title}</h2>
                     <p>{item.summary}</p>
@@ -512,6 +577,54 @@ function CCourse({ videoId }) {
             </div>
             <Link className="lx-secondary" to="/learn/c-programming">Course Roadmap</Link>
           </div>
+
+          {/* Quick Banner for Class 04 if currently in another class */}
+          {video.id !== '04' && (
+            <div
+              style={{
+                background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.12) 0%, rgba(30, 58, 138, 0.25) 100%)',
+                border: '1px solid rgba(56, 189, 248, 0.35)',
+                borderRadius: '12px',
+                padding: '14px 18px',
+                margin: '16px 0 24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '12px'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '20px' }}>🔥</span>
+                <div>
+                  <strong style={{ color: '#38bdf8', fontSize: '13px' }}>
+                    Featured Practice Set: Nested Loops &amp; Algorithmic Simulation (14 Problems)
+                  </strong>
+                  <p style={{ margin: 0, fontSize: '11px', color: '#cbd5e1' }}>
+                    Class 04 is unlocked: Star triangles, pyramids, Selection Sort, and Codeforces challenges in C.
+                  </p>
+                </div>
+              </div>
+              <Link
+                to="/learn/c-programming/04"
+                style={{
+                  background: 'linear-gradient(135deg, #0284c7, #0369a1)',
+                  border: '1px solid #38bdf8',
+                  color: '#ffffff',
+                  borderRadius: '8px',
+                  padding: '7px 14px',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                Open 14 Practice Problems <ArrowRight size={13} />
+              </Link>
+            </div>
+          )}
 
           <div className="html-lesson-progress">
             <span>{completed.length} of {cVideos.length} classes completed</span>
@@ -565,7 +678,7 @@ function CCourse({ videoId }) {
                         <span>
                           <strong>{item.title}</strong>
                           <small>
-                            {isCurrent ? 'Current class' : done ? 'Completed ✓' : `Class ${item.id} · Unlocked`}
+                            {isCurrent ? 'Current class' : done ? 'Completed ✓' : isPracticeSet ? 'Practice Set · 14 Problems' : `Class ${item.id} · Unlocked`}
                           </small>
                         </span>
                       </Link>
