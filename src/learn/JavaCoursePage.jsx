@@ -13,7 +13,13 @@ import {
   Check,
   BookOpen,
   Award,
-  Tv
+  Tv,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  Copy,
+  Lightbulb,
+  CheckCircle
 } from 'lucide-react';
 import { useAppContext } from '../state/AppContext.jsx';
 import { useTanuPlayback } from '../tanu/GuidedSession.jsx';
@@ -238,18 +244,58 @@ function JavaVideoPlayer({ video, onEnded, onMarkComplete, isCompleted }) {
 }
 
 function JavaPracticeLab({ video, onPassed, scope }) {
-  const problems = javaPracticeProblems[video.id] || [];
+  const allProblems = javaPracticeProblems[video.id] || [];
+  const [filter, setFilter] = useState('all'); // 'all' | 'solved' | 'pending'
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [activeTab, setActiveTab] = useState('lab'); // 'lab' | 'notes'
-  const currentProblem = problems[selectedIdx] || null;
+  const [showSolution, setShowSolution] = useState(false);
+  const [copiedSolution, setCopiedSolution] = useState(false);
+  const [copiedSample, setCopiedSample] = useState(false);
+
+  // Solved problem tracking in localStorage
+  const solvedStorageKey = `lugaish_java_solved_probs_v1:${scope}`;
+  const [solvedIds, setSolvedIds] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(solvedStorageKey) || '[]');
+      return Array.isArray(saved) ? saved : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const markProblemSolved = (probId) => {
+    if (!probId) return;
+    setSolvedIds(prev => {
+      const next = prev.includes(probId) ? prev : [...prev, probId];
+      try {
+        localStorage.setItem(solvedStorageKey, JSON.stringify(next));
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  };
+
+  const solvedCount = allProblems.filter(p => solvedIds.includes(p.id)).length;
+  const pendingCount = allProblems.length - solvedCount;
+
+  // Filtered problems list
+  const displayedProblems = allProblems.filter(p => {
+    const isSolved = solvedIds.includes(p.id);
+    if (filter === 'solved') return isSolved;
+    if (filter === 'pending') return !isSolved;
+    return true;
+  });
+
+  const currentProblem = displayedProblems[selectedIdx] || displayedProblems[0] || null;
 
   const storageKey = `lugaish_java_draft_v1:${scope}:${video.id}:${currentProblem?.id || 'default'}`;
   const [code, setCode] = useState(() => {
     if (!currentProblem) return '';
     try {
-      return localStorage.getItem(storageKey) ?? currentProblem.starter;
+      return localStorage.getItem(storageKey) ?? (currentProblem.starterJava || currentProblem.starter || '');
     } catch {
-      return currentProblem.starter;
+      return currentProblem.starterJava || currentProblem.starter || '';
     }
   });
 
@@ -260,12 +306,13 @@ function JavaPracticeLab({ video, onPassed, scope }) {
     if (!currentProblem) return;
     try {
       const savedCode = localStorage.getItem(storageKey);
-      setCode(savedCode ?? currentProblem.starter);
+      setCode(savedCode ?? (currentProblem.starterJava || currentProblem.starter || ''));
     } catch {
-      setCode(currentProblem.starter);
+      setCode(currentProblem.starterJava || currentProblem.starter || '');
     }
     setTerminalOutput('');
     setFeedback(null);
+    setShowSolution(false);
   }, [currentProblem?.id, storageKey]);
 
   useEffect(() => {
@@ -276,6 +323,31 @@ function JavaPracticeLab({ video, onPassed, scope }) {
       /* ignore */
     }
   }, [code, storageKey, currentProblem]);
+
+  const handleCopySolution = () => {
+    const sol = currentProblem?.solutionJava || currentProblem?.solution || '';
+    if (!sol) return;
+    navigator.clipboard?.writeText(sol);
+    setCopiedSolution(true);
+    setTimeout(() => setCopiedSolution(false), 2000);
+  };
+
+  const handleLoadSolution = () => {
+    const sol = currentProblem?.solutionJava || currentProblem?.solution || '';
+    if (!sol) return;
+    setCode(sol);
+    setFeedback({
+      ok: true,
+      message: 'Official solution loaded into editor! You can now run or inspect it.'
+    });
+  };
+
+  const handleCopySample = (text) => {
+    if (!text) return;
+    navigator.clipboard?.writeText(text);
+    setCopiedSample(true);
+    setTimeout(() => setCopiedSample(false), 2000);
+  };
 
   const handleRun = () => {
     const sim = runJavaSimulation(code);
@@ -298,13 +370,15 @@ function JavaPracticeLab({ video, onPassed, scope }) {
       setTerminalOutput(`[Java Output]\n${result.output}\n\n[Status: Verified by Lugaish Java Checker]`);
     }
     if (result.ok) {
+      markProblemSolved(currentProblem.id);
       onPassed(video.id, currentProblem.id);
     }
   };
 
   const handleReset = () => {
     if (!currentProblem) return;
-    setCode(currentProblem.starter);
+    const defaultCode = currentProblem.starterJava || currentProblem.starter || '';
+    setCode(defaultCode);
     setTerminalOutput('');
     setFeedback(null);
     try {
@@ -363,7 +437,7 @@ function JavaPracticeLab({ video, onPassed, scope }) {
               gap: '6px'
             }}
           >
-            <BookOpen size={15} /> Class Notes & Reference
+            <BookOpen size={15} /> Topic Overview &amp; Notes
           </button>
         </div>
 
@@ -376,203 +450,354 @@ function JavaPracticeLab({ video, onPassed, scope }) {
 
       {activeTab === 'notes' ? (
         <div style={{ padding: '8px 4px' }}>
-          {video.id === '02' ? (
-            <>
-              <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)', borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
-                <h3 style={{ color: '#fbbf24', fontSize: '18px', marginTop: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Sparkles size={18} /> Class 02 Key Concepts: Operators, Precedence & Patterns
-                </h3>
-                <p style={{ fontSize: '14px', lineHeight: 1.8, color: '#fef3c7', margin: '8px 0 0' }}>
-                  In Class 02, instructor Tanvir Ahmad teaches operator precedence rules, left-to-right evaluation, the difference between <code style={{ background: 'rgba(0,0,0,0.4)', padding: '2px 6px', borderRadius: '4px', color: '#6ee7b7' }}>print()</code> and <code style={{ background: 'rgba(0,0,0,0.4)', padding: '2px 6px', borderRadius: '4px', color: '#93c5fd' }}>println()</code>, and how to draw asterisk pattern shapes.
-                </p>
-              </div>
+          <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)', borderRadius: '12px', padding: '20px', marginBottom: '20px' }}>
+            <h3 style={{ color: '#fbbf24', fontSize: '18px', marginTop: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Sparkles size={18} /> {video.title}
+            </h3>
+            <p style={{ fontSize: '14px', lineHeight: 1.8, color: '#fef3c7', margin: '8px 0 0' }}>
+              {video.summary}
+            </p>
+          </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '24px' }}>
-                <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
-                  <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
-                    1. Operator Precedence
-                  </strong>
-                  <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
-                    Hierarchy: <strong>( )</strong> &gt; <strong>* / %</strong> &gt; <strong>+ -</strong>. Parentheses are calculated first. Multiplicative operators have equal precedence and run left-to-right before addition and subtraction.
-                  </p>
-                </div>
-
-                <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
-                  <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
-                    2. Integer Tracing: 5 * 6 / 7 % 3
-                  </strong>
-                  <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
-                    5 * 6 = 30 &rarr; 30 / 7 = 4 (integer division drops decimals) &rarr; 4 % 3 = 1 (remainder). Final answer is <strong>1</strong>.
-                  </p>
-                </div>
-
-                <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
-                  <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
-                    3. print() vs println()
-                  </strong>
-                  <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
-                    <code style={{ color: '#fed7aa' }}>System.out.print()</code> writes text and keeps the cursor on the same line. <code style={{ color: '#fed7aa' }}>System.out.println()</code> writes and then creates a new line.
-                  </p>
-                </div>
-
-                <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
-                  <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
-                    4. Visual Pattern Printing
-                  </strong>
-                  <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
-                    By strategically aligning spaces and asterisks, you can print triangles, diamonds, and boxes directly to the terminal.
-                  </p>
-                </div>
-              </div>
-
-              <div style={{ background: '#0a0f1d', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '12px', overflow: 'hidden' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255, 255, 255, 0.05)', padding: '10px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
-                  <span style={{ fontSize: '11px', fontFamily: 'monospace', color: '#fed7aa' }}>Test.java (Source Code from Class 02)</span>
-                  <button
-                    type="button"
-                    onClick={() => copyNotesCode(`public class Test {\n    public static void main(String[] args)\n    {\n        System.out.println("  *  ");\n        System.out.println(" * * ");\n        System.out.println("* * *");\n        System.out.println(" * * ");\n        System.out.println("  *  ");\n    }\n}`)}
-                    style={{ background: 'rgba(245, 158, 11, 0.2)', border: '1px solid #f59e0b', borderRadius: '6px', color: '#fbbf24', padding: '3px 10px', fontSize: '11px', cursor: 'pointer', fontWeight: 600 }}
-                  >
-                    Copy to Practice Lab &rarr;
-                  </button>
-                </div>
-                <pre style={{ margin: 0, padding: '16px', font: '13px/1.8 monospace', color: '#e2e8f0', overflowX: 'auto' }}>
-{`public class Test {
-    public static void main(String[] args)
-    {
-        // Diamond Pattern from Class 02
-        System.out.println("  *  ");
-        System.out.println(" * * ");
-        System.out.println("* * *");
-        System.out.println(" * * ");
-        System.out.println("  *  ");
-
-        // Operator Precedence: 5 * 6 / 7 % 3 evaluates to 1
-        System.out.println("The output is = " + (5 * 6 / 7 % 3));
-    }
-}`}
-                </pre>
-              </div>
-            </>
-          ) : (
-            <>
-              <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)', borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
-                <h3 style={{ color: '#fbbf24', fontSize: '18px', marginTop: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Sparkles size={18} /> The Golden Rule of Java Printing
-                </h3>
-                <p style={{ fontSize: '14px', lineHeight: 1.8, color: '#fef3c7', margin: '8px 0 0' }}>
-                  In Class 01, instructor Tanvir Ahmad focuses on the essential behavior of printing in Java:
-                  <strong> Whatever you write inside double quotes <code style={{ background: 'rgba(0,0,0,0.4)', padding: '2px 6px', borderRadius: '4px', color: '#6ee7b7' }}>"..."</code> in <code style={{ background: 'rgba(0,0,0,0.4)', padding: '2px 6px', borderRadius: '4px', color: '#93c5fd' }}>System.out.println()</code> is printed directly to the output screen!</strong>
-                </p>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px', marginBottom: '24px' }}>
-                <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
-                  <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
-                    1. Class Structure
-                  </strong>
-                  <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
-                    Every piece of runnable Java code lives inside a class: <code style={{ color: '#fed7aa' }}>public class Test {'{ ... }'}</code>.
-                  </p>
-                </div>
-
-                <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
-                  <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
-                    2. The Main Method
-                  </strong>
-                  <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
-                    Execution begins at: <code style={{ color: '#fed7aa' }}>public static void main(String[] args)</code>. It is the entry gate for Java applications.
-                  </p>
-                </div>
-
-                <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
-                  <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
-                    3. Newlines with println
-                  </strong>
-                  <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
-                    <code style={{ color: '#fed7aa' }}>println</code> stands for "print line". It prints the text inside double quotes and moves the cursor to a brand new line.
-                  </p>
-                </div>
-
-                <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '16px' }}>
-                  <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '6px' }}>
-                    4. Semicolon Rule
-                  </strong>
-                  <p style={{ fontSize: '12px', color: 'var(--lx-muted)', margin: 0 }}>
-                    Every single instruction/statement in Java must terminate with a semicolon (<code style={{ color: '#fed7aa' }}>;</code>).
-                  </p>
-                </div>
-              </div>
-
-              <div style={{ background: '#0a0f1d', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '12px', overflow: 'hidden' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255, 255, 255, 0.05)', padding: '10px 16px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
-                  <span style={{ fontSize: '11px', fontFamily: 'monospace', color: '#fed7aa' }}>Test.java (Source Code from Class 01)</span>
-                  <button
-                    type="button"
-                    onClick={() => copyNotesCode(`public class Test {\n    public static void main(String[] args)\n    {\n        System.out.println("My name is Tanvir Ahmad");\n        System.out.println("My age is 22");\n        System.out.println("I am from Bangladesh");\n    }\n}`)}
-                    style={{ background: 'rgba(245, 158, 11, 0.2)', border: '1px solid #f59e0b', borderRadius: '6px', color: '#fbbf24', padding: '3px 10px', fontSize: '11px', cursor: 'pointer', fontWeight: 600 }}
-                  >
-                    Copy to Practice Lab &rarr;
-                  </button>
-                </div>
-                <pre style={{ margin: 0, padding: '16px', font: '13px/1.8 monospace', color: '#e2e8f0', overflowX: 'auto' }}>
-{`public class Test {
-    public static void main(String[] args)
-    {
-        System.out.println("My name is Tanvir Ahmad");
-        System.out.println("My age is 22");
-        System.out.println("I am from Bangladesh");
-    }
-}
-
-// Exercise: Print your name as well as your age and your country on new lines.`}
-                </pre>
-              </div>
-            </>
-          )}
+          <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '18px' }}>
+            <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '8px' }}>
+              🎯 Learning Roadmap for this Topic
+            </strong>
+            <p style={{ fontSize: '13px', color: 'var(--lx-muted)', lineHeight: 1.7, margin: 0 }}>
+              Solve the coding exercises in the <strong>Interactive Java Lab</strong> tab. Each problem gives you instant feedback in the simulated Java Virtual Machine (JVM).
+            </p>
+          </div>
         </div>
       ) : (
         <div>
-          {problems.length > 1 && (
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', overflowX: 'auto', paddingBottom: '4px' }}>
-              {problems.map((p, idx) => (
+          {/* Solved / Pending Filter Bar */}
+          {allProblems.length > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '14px' }}>
+              <div style={{ display: 'flex', gap: '6px' }}>
                 <button
-                  key={p.id}
                   type="button"
-                  onClick={() => setSelectedIdx(idx)}
+                  onClick={() => { setFilter('all'); setSelectedIdx(0); }}
                   style={{
-                    background: idx === selectedIdx ? 'linear-gradient(135deg, #d97706, #b45309)' : 'var(--lx-panel)',
-                    borderColor: idx === selectedIdx ? '#f59e0b' : 'var(--lx-border)',
-                    color: idx === selectedIdx ? '#ffffff' : 'var(--lx-muted)',
-                    borderWidth: '1px',
-                    borderStyle: 'solid',
-                    borderRadius: '8px',
-                    padding: '8px 14px',
+                    background: filter === 'all' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.04)',
+                    border: `1px solid ${filter === 'all' ? '#f59e0b' : 'var(--lx-border)'}`,
+                    color: filter === 'all' ? '#fbbf24' : 'var(--lx-muted)',
+                    borderRadius: '6px',
+                    padding: '5px 12px',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  All Problems ({allProblems.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setFilter('solved'); setSelectedIdx(0); }}
+                  style={{
+                    background: filter === 'solved' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.04)',
+                    border: `1px solid ${filter === 'solved' ? '#10b981' : 'var(--lx-border)'}`,
+                    color: filter === 'solved' ? '#34d399' : 'var(--lx-muted)',
+                    borderRadius: '6px',
+                    padding: '5px 12px',
                     fontSize: '11px',
                     fontWeight: 700,
                     cursor: 'pointer',
-                    whiteSpace: 'nowrap'
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
                   }}
                 >
-                  {p.title}
+                  <CheckCircle size={12} /> Solved ({solvedCount})
                 </button>
-              ))}
+                <button
+                  type="button"
+                  onClick={() => { setFilter('pending'); setSelectedIdx(0); }}
+                  style={{
+                    background: filter === 'pending' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255, 255, 255, 0.04)',
+                    border: `1px solid ${filter === 'pending' ? '#f59e0b' : 'var(--lx-border)'}`,
+                    color: filter === 'pending' ? '#fed7aa' : 'var(--lx-muted)',
+                    borderRadius: '6px',
+                    padding: '5px 12px',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Pending ({pendingCount})
+                </button>
+              </div>
+
+              <span style={{ fontSize: '11px', color: 'var(--lx-muted)' }}>
+                {solvedCount} of {allProblems.length} solved in this topic
+              </span>
+            </div>
+          )}
+
+          {/* Problem Selector Tabs */}
+          {displayedProblems.length > 1 && (
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', overflowX: 'auto', paddingBottom: '4px' }}>
+              {displayedProblems.map((p, idx) => {
+                const isSolved = solvedIds.includes(p.id);
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => setSelectedIdx(idx)}
+                    style={{
+                      background: idx === selectedIdx ? 'linear-gradient(135deg, #d97706, #b45309)' : 'var(--lx-panel)',
+                      borderColor: idx === selectedIdx ? '#f59e0b' : isSolved ? '#10b981' : 'var(--lx-border)',
+                      color: idx === selectedIdx ? '#ffffff' : isSolved ? '#34d399' : 'var(--lx-muted)',
+                      borderWidth: '1px',
+                      borderStyle: 'solid',
+                      borderRadius: '8px',
+                      padding: '8px 14px',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    {isSolved && <CheckCircle size={12} style={{ color: '#34d399' }} />}
+                    <span>{p.title}</span>
+                  </button>
+                );
+              })}
             </div>
           )}
 
           {currentProblem ? (
             <div>
               <div style={{ marginBottom: '18px' }}>
-                <span className="html-start-kicker" style={{ color: '#fbbf24' }}>
-                  STEP 2 · JAVA PRACTICE LAB · {currentProblem.level.toUpperCase()}
-                </span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+                  <span className="html-start-kicker" style={{ color: '#fbbf24' }}>
+                    TOPIC {video.id} · {(currentProblem.level || currentProblem.difficulty || 'PRACTICE').toUpperCase()}
+                  </span>
+                  {solvedIds.includes(currentProblem.id) && (
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      background: 'rgba(16, 185, 129, 0.15)',
+                      color: '#34d399',
+                      border: '1px solid rgba(16, 185, 129, 0.3)',
+                      padding: '3px 10px',
+                      borderRadius: '12px',
+                      fontSize: '11px',
+                      fontWeight: 700
+                    }}>
+                      <CheckCircle size={12} /> Solved ✓
+                    </span>
+                  )}
+                </div>
+
                 <h2 style={{ fontSize: '22px', margin: '6px 0 8px' }}>{currentProblem.title}</h2>
+
+                {/* External Link Button (If Link Provided) */}
+                {currentProblem.externalUrl && (
+                  <div style={{ margin: '8px 0 12px' }}>
+                    <a
+                      href={currentProblem.externalUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        background: 'rgba(59, 130, 246, 0.15)',
+                        border: '1px solid #3b82f6',
+                        color: '#60a5fa',
+                        padding: '7px 14px',
+                        borderRadius: '8px',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        textDecoration: 'none',
+                        boxShadow: '0 2px 8px rgba(59, 130, 246, 0.2)'
+                      }}
+                    >
+                      <ExternalLink size={14} /> Open Original Problem Link ↗
+                    </a>
+                  </div>
+                )}
+
+                {/* Short Idea & Key Logic (If Link or Summary Provided) */}
+                {currentProblem.shortIdea && (
+                  <div style={{
+                    background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.08) 100%)',
+                    border: '1px solid rgba(245, 158, 11, 0.35)',
+                    borderRadius: '10px',
+                    padding: '12px 16px',
+                    margin: '12px 0 16px',
+                    fontSize: '13px',
+                    lineHeight: 1.7,
+                    color: '#fef3c7'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fbbf24', fontWeight: 700, marginBottom: '4px' }}>
+                      <Lightbulb size={16} /> Short Idea &amp; Key Logic:
+                    </div>
+                    <p style={{ margin: 0 }}>{currentProblem.shortIdea}</p>
+                  </div>
+                )}
+
                 <p style={{ fontSize: '13px', lineHeight: 1.7, color: 'var(--lx-muted)', margin: 0 }}>
                   {currentProblem.prompt}
                 </p>
-                <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '8px', padding: '10px 14px', marginTop: '12px', fontSize: '12px', color: '#fed7aa' }}>
-                  <strong>💡 Hint:</strong> {currentProblem.hint}
-                </div>
+
+                {/* Sample Input / Output */}
+                {(currentProblem.sampleInput || currentProblem.sampleOutput) && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '10px', marginTop: '12px' }}>
+                    {currentProblem.sampleInput && (
+                      <div style={{ background: 'rgba(0, 0, 0, 0.35)', border: '1px solid var(--lx-border)', borderRadius: '8px', padding: '10px 12px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                          <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--lx-muted)' }}>SAMPLE INPUT</span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopySample(currentProblem.sampleInput)}
+                            style={{ background: 'transparent', border: 'none', color: '#fbbf24', cursor: 'pointer', fontSize: '10px' }}
+                          >
+                            Copy
+                          </button>
+                        </div>
+                        <pre style={{ margin: 0, fontSize: '11.5px', fontFamily: 'monospace', color: '#f8fafc', whiteSpace: 'pre-wrap' }}>
+                          {currentProblem.sampleInput}
+                        </pre>
+                      </div>
+                    )}
+                    {currentProblem.sampleOutput && (
+                      <div style={{ background: 'rgba(0, 0, 0, 0.35)', border: '1px solid var(--lx-border)', borderRadius: '8px', padding: '10px 12px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--lx-muted)', display: 'block', marginBottom: '4px' }}>
+                          SAMPLE OUTPUT
+                        </span>
+                        <pre style={{ margin: 0, fontSize: '11.5px', fontFamily: 'monospace', color: '#34d399', whiteSpace: 'pre-wrap' }}>
+                          {currentProblem.sampleOutput}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Hint */}
+                {currentProblem.hint && (
+                  <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '8px', padding: '10px 14px', marginTop: '12px', fontSize: '12px', color: '#fed7aa' }}>
+                    <strong>💡 Hint:</strong> {currentProblem.hint}
+                  </div>
+                )}
+
+                {/* View Solved Code Button */}
+                {(currentProblem.solutionJava || currentProblem.solution) && (
+                  <div style={{ marginTop: '14px', marginBottom: '14px' }}>
+                    <button
+                      type="button"
+                      onClick={() => setShowSolution(!showSolution)}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        background: showSolution ? 'rgba(16, 185, 129, 0.18)' : 'rgba(245, 158, 11, 0.14)',
+                        border: `1px solid ${showSolution ? '#10b981' : '#f59e0b'}`,
+                        color: showSolution ? '#34d399' : '#fbbf24',
+                        borderRadius: '8px',
+                        padding: '7px 14px',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {showSolution ? <EyeOff size={14} /> : <Eye size={14} />}
+                      {showSolution ? 'Hide Solved Solution' : '💡 View Solved Code'}
+                    </button>
+                  </div>
+                )}
+
+                {/* Solved Solution Box */}
+                {showSolution && (currentProblem.solutionJava || currentProblem.solution) && (
+                  <div style={{
+                    background: '#040711',
+                    border: '1px solid rgba(16, 185, 129, 0.4)',
+                    borderRadius: '10px',
+                    overflow: 'hidden',
+                    marginBottom: '16px'
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '8px 14px',
+                      background: 'rgba(16, 185, 129, 0.1)',
+                      borderBottom: '1px solid rgba(16, 185, 129, 0.2)'
+                    }}>
+                      <span style={{ fontSize: '11px', color: '#34d399', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                        <CheckCircle2 size={13} /> Official Solved Solution (Java)
+                      </span>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          type="button"
+                          onClick={handleCopySolution}
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.08)',
+                            border: '1px solid rgba(255, 255, 255, 0.15)',
+                            color: '#f8fafc',
+                            borderRadius: '6px',
+                            padding: '4px 10px',
+                            fontSize: '11px',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          <Copy size={12} /> {copiedSolution ? 'Copied!' : 'Copy Code'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleLoadSolution}
+                          style={{
+                            background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+                            border: '1px solid #10b981',
+                            color: '#ffffff',
+                            borderRadius: '6px',
+                            padding: '4px 10px',
+                            fontSize: '11px',
+                            cursor: 'pointer',
+                            fontWeight: 700,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          <Code2 size={12} /> Load into Editor
+                        </button>
+                      </div>
+                    </div>
+                    <pre style={{
+                      margin: 0,
+                      padding: '14px',
+                      fontSize: '12.5px',
+                      lineHeight: 1.6,
+                      color: '#e2e8f0',
+                      fontFamily: 'monospace',
+                      overflowX: 'auto',
+                      whiteSpace: 'pre'
+                    }}>
+                      {currentProblem.solutionJava || currentProblem.solution || currentProblem.starter}
+                    </pre>
+                    {currentProblem.solutionExplanation && (
+                      <div style={{
+                        padding: '10px 14px',
+                        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                        background: 'rgba(15, 23, 42, 0.5)',
+                        fontSize: '12px',
+                        color: '#94a3b8',
+                        lineHeight: 1.6
+                      }}>
+                        <strong style={{ color: '#f8fafc' }}>Logic Explanation: </strong>
+                        {currentProblem.solutionExplanation}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
@@ -582,7 +807,7 @@ function JavaPracticeLab({ video, onPassed, scope }) {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <Code2 size={14} style={{ color: '#fbbf24' }} />
                       <span style={{ fontSize: '11px', fontFamily: 'monospace', color: '#f8fafc', fontWeight: 600 }}>
-                        Test.java
+                        Main.java
                       </span>
                     </div>
                     <span style={{ fontSize: '10px', color: 'var(--lx-muted)' }}>Java 25 (Standard Edition)</span>
@@ -679,7 +904,7 @@ function JavaPracticeLab({ video, onPassed, scope }) {
 
                   <div style={{ flex: 1, padding: '16px', font: '12px/1.8 monospace', color: '#94a3b8', minHeight: '240px', overflowY: 'auto', whiteSpace: 'pre-wrap' }}>
                     <div style={{ color: '#38bdf8', marginBottom: '8px' }}>
-                      tanvir@lugaish-java-sandbox:~$ javac Test.java && java Test
+                      tanvir@lugaish-java-sandbox:~$ javac Main.java && java Main
                     </div>
                     {terminalOutput ? (
                       <div style={{ color: terminalOutput.includes('Error') ? '#f87171' : '#e2e8f0' }}>
@@ -714,9 +939,25 @@ function JavaPracticeLab({ video, onPassed, scope }) {
               </div>
             </div>
           ) : (
-            <p style={{ color: 'var(--lx-muted)', fontSize: '13px' }}>
-              Practice problems for this class are coming soon.
-            </p>
+            <div style={{
+              padding: '48px 24px',
+              textAlign: 'center',
+              background: 'rgba(15, 23, 42, 0.5)',
+              border: '1px dashed rgba(245, 158, 11, 0.3)',
+              borderRadius: '12px',
+              margin: '12px 0'
+            }}>
+              <Code2 size={36} style={{ color: '#fbbf24', margin: '0 auto 12px' }} />
+              <h3 style={{ color: '#f8fafc', margin: '0 0 8px', fontSize: '18px' }}>
+                {video.topicTitle || video.title}
+              </h3>
+              <p style={{ color: 'var(--lx-muted)', fontSize: '13px', margin: '0 auto 18px', maxWidth: '520px', lineHeight: 1.6 }}>
+                এই টপিকের প্রবলেমগুলো আপলোড হওয়ার অপেক্ষায় রয়েছে। তানভীর ভাই একে একে প্রবলেম দিচ্ছেন এবং সেগুলো এই ল্যাবে তৎক্ষণাৎ যুক্ত হয়ে যাবে!
+              </p>
+              <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center', background: 'rgba(245, 158, 11, 0.12)', border: '1px solid rgba(245, 158, 11, 0.25)', padding: '6px 14px', borderRadius: '20px', color: '#fbbf24', fontSize: '11px', fontWeight: 600 }}>
+                <span>Ready to receive problems</span>
+              </div>
+            </div>
           )}
         </div>
       )}
@@ -815,7 +1056,7 @@ export function JavaCoursePage() {
     );
   }
 
-  const activeId = (videoId === 'nested-loops' || videoId === '05') ? '03' : (videoId || javaVideos[0]?.id || '01');
+  const activeId = videoId === 'nested-loops' ? '05' : (videoId || javaVideos[0]?.id || '01');
   const currentVideo = javaVideos.find(v => v.id === activeId) || javaVideos[0];
 
   const handleMarkComplete = (idToComplete = currentVideo.id) => {
@@ -839,9 +1080,9 @@ export function JavaCoursePage() {
             <Link to="/learn" style={{ color: 'var(--lx-muted)', fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
               Courses <ArrowRight size={12} />
             </Link>
-            <span style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 700 }}>Java Programming</span>
+            <span style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 700 }}>Java Programming Track</span>
             <span style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', fontSize: '10px', padding: '2px 8px', borderRadius: '12px', fontWeight: 600 }}>
-              Class {currentVideo.id} of {String(javaVideos.length).padStart(2, '0')}
+              Topic {currentVideo.id} of {String(javaVideos.length).padStart(2, '0')}
             </span>
           </div>
           <h1 style={{ fontSize: 'clamp(26px, 3.5vw, 42px)', margin: '4px 0 10px', letterSpacing: '-0.03em' }}>
@@ -855,7 +1096,7 @@ export function JavaCoursePage() {
         <div className="html-progress-card" style={{ borderColor: 'rgba(245, 158, 11, 0.3)', minWidth: '220px' }}>
           <span style={{ color: '#fbbf24' }}>COURSE PROGRESS</span>
           <strong style={{ color: '#f8fafc' }}>
-            {completed.length} <small>/ {javaVideos.length} classes</small>
+            {completed.length} <small>/ {javaVideos.length} topics</small>
           </strong>
           <div className="html-progress-track" style={{ marginTop: '10px' }}>
             <span style={{ width: `${percentComplete}%`, background: 'linear-gradient(90deg, #f59e0b, #fbbf24)' }} />
@@ -866,8 +1107,8 @@ export function JavaCoursePage() {
         </div>
       </header>
 
-      {/* Practice Set Quick Banner */}
-      {currentVideo.id !== '03' && (
+      {/* Nested Loops Quick Banner */}
+      {currentVideo.id !== '05' && (
         <div
           style={{
             background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(180, 83, 9, 0.1) 100%)',
@@ -894,7 +1135,7 @@ export function JavaCoursePage() {
             </div>
           </div>
           <Link
-            to="/learn/java-programming/03"
+            to="/learn/java-programming/05"
             style={{
               background: 'linear-gradient(135deg, #d97706, #b45309)',
               border: '1px solid #f59e0b',
@@ -925,62 +1166,7 @@ export function JavaCoursePage() {
             isCompleted={completed.includes(currentVideo.id)}
           />
 
-          {/* Direct Jump to Practice Problems right after video */}
-          {currentVideo.id !== '03' && (
-            <div
-              style={{
-                background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.16) 0%, rgba(180, 83, 9, 0.12) 100%)',
-                border: '1px solid rgba(245, 158, 11, 0.4)',
-                borderRadius: '14px',
-                padding: '16px 20px',
-                margin: '18px 0 24px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap',
-                gap: '14px'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{ fontSize: '26px' }}>🚀</span>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ background: '#f59e0b', color: '#180d04', fontSize: '10px', fontWeight: 800, padding: '2px 8px', borderRadius: '4px' }}>
-                      PRACTICE LAB
-                    </span>
-                    <span style={{ color: '#fed7aa', fontSize: '11px', fontWeight: 600 }}>14 Structured Tasks</span>
-                  </div>
-                  <h3 style={{ margin: '4px 0 2px', fontSize: '15px', color: '#f8fafc', fontWeight: 700 }}>
-                    Finished Watching? Jump Directly into Practice Problems!
-                  </h3>
-                  <p style={{ margin: 0, fontSize: '12px', color: '#fde68a' }}>
-                    Solve nested loops, pattern printing, Selection Sort, and Codeforces challenges to boost your platform rating.
-                  </p>
-                </div>
-              </div>
-              <Link
-                to="/learn/java-programming/03"
-                style={{
-                  background: 'linear-gradient(135deg, #d97706, #b45309)',
-                  border: '1px solid #f59e0b',
-                  color: '#ffffff',
-                  borderRadius: '8px',
-                  padding: '9px 16px',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  textDecoration: 'none',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: '0 4px 14px rgba(245, 158, 11, 0.3)'
-                }}
-              >
-                Jump to Practice Lab →
-              </Link>
-            </div>
-          )}
-
-          {currentVideo.id === '03' ? (
+          {currentVideo.id === '05' ? (
             <NestedLoopsPracticeLab
               onPassed={handlePracticePassed}
               scope={scope}
@@ -995,81 +1181,55 @@ export function JavaCoursePage() {
           )}
         </div>
 
-        {/* Right: Curriculum Roadmap & Class Selector */}
+        {/* Right: Curriculum Roadmap & Topic Selector */}
         <aside className="html-class-list" style={{ borderColor: 'rgba(245, 158, 11, 0.25)' }}>
           <div className="html-class-list-heading" style={{ background: 'rgba(24, 13, 4, 0.6)' }}>
             <span style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.12em', color: '#fbbf24' }}>
-              JAVA SYLLABUS ROADMAP
+              JAVA 14 TOPICS ROADMAP
             </span>
             <strong style={{ fontSize: '16px', color: '#f8fafc', marginTop: '4px' }}>
-              Sequential Classes
+              Syllabus Topics
             </strong>
             <p style={{ fontSize: '11px', color: 'var(--lx-muted)' }}>
-              Complete each class to unlock the next.
+              Select any topic to view problems &amp; practice.
             </p>
           </div>
 
           <ol style={{ padding: '8px' }}>
             {javaVideos.map((vid) => {
-              const isPracticeSet = vid.id === '03' || vid.id === '05';
-              const unlocked = isJavaClassUnlocked(vid.id, completed) || isPracticeSet;
               const isDone = completed.includes(vid.id);
               const isCurrent = vid.id === currentVideo.id;
+              const probCount = javaPracticeProblems[vid.id]?.length || 0;
 
               return (
                 <li key={vid.id}>
-                  {unlocked ? (
-                    <Link
-                      to={`/learn/java-programming/${vid.id}`}
-                      aria-current={isCurrent ? 'page' : undefined}
-                      style={{
-                        background: isCurrent ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
-                        boxShadow: isCurrent ? 'inset 3px 0 #f59e0b' : 'none'
-                      }}
-                    >
-                      <span className="html-class-number" style={{ color: isDone ? '#10b981' : isCurrent ? '#fbbf24' : 'var(--lx-muted)' }}>
-                        {isDone ? <CheckCircle2 size={16} /> : vid.id}
-                      </span>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                          <strong style={{ color: isCurrent ? '#fbbf24' : '#f8fafc' }}>
-                            {vid.title.replace(/^Class \d+:\s*/, '')}
-                          </strong>
-                          {isPracticeSet && (
-                            <span style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', fontSize: '9px', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
-                              14 Problems
-                            </span>
-                          )}
-                        </div>
-                        <small style={{ color: 'var(--lx-muted)' }}>
-                          {isPracticeSet ? 'Practice Set 01 · Open Lab' : (vid.youtubeId ? vid.duration : 'YouTube link soon')} {isDone && '· Done ✓'}
-                        </small>
-                      </div>
-                    </Link>
-                  ) : (
-                    <div
-                      style={{
-                        display: 'flex',
-                        gap: '12px',
-                        alignItems: 'center',
-                        padding: '13px 12px',
-                        opacity: 0.5,
-                        cursor: 'not-allowed'
-                      }}
-                    >
-                      <span className="html-class-number">
-                        <Lock size={14} />
-                      </span>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <strong style={{ color: 'var(--lx-muted)' }}>
-                          {vid.title.replace(/^Class \d+:\s*/, '')}
+                  <Link
+                    to={`/learn/java-programming/${vid.id}`}
+                    aria-current={isCurrent ? 'page' : undefined}
+                    style={{
+                      background: isCurrent ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
+                      boxShadow: isCurrent ? 'inset 3px 0 #f59e0b' : 'none'
+                    }}
+                  >
+                    <span className="html-class-number" style={{ color: isDone ? '#10b981' : isCurrent ? '#fbbf24' : 'var(--lx-muted)' }}>
+                      {isDone ? <CheckCircle2 size={16} /> : vid.id}
+                    </span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                        <strong style={{ color: isCurrent ? '#fbbf24' : '#f8fafc' }}>
+                          {vid.topicTitle || vid.title.replace(/^Topic \d+:\s*/, '')}
                         </strong>
-                        <small style={{ color: 'var(--lx-muted)' }}>
-                          Finish Class {String(Number(vid.id) - 1).padStart(2, '0')} to unlock
-                        </small>
+                        {probCount > 0 && (
+                          <span style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', fontSize: '9px', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                            {probCount} {probCount === 1 ? 'Problem' : 'Problems'}
+                          </span>
+                        )}
                       </div>
+                      <small style={{ color: 'var(--lx-muted)' }}>
+                        {probCount > 0 ? `${probCount} Practice ${probCount === 1 ? 'Problem' : 'Problems'}` : 'Problems uploading soon'} {isDone && '· Done ✓'}
+                      </small>
                     </div>
-                  )}
+                  </Link>
                 </li>
               );
             })}

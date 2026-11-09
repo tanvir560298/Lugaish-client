@@ -3,23 +3,23 @@ import assert from 'node:assert/strict';
 import { javaVideos, javaPracticeProblems, cleanJavaProgress, isJavaClassUnlocked, getNextUnlockedJavaClass } from './javaContent.js';
 import { runJavaSimulation, checkJavaPractice } from './javaPractice.js';
 
-test('Java Programming course is reset and ready for new curriculum', () => {
-  assert.ok(Array.isArray(javaVideos), 'javaVideos must be an array');
+test('Java Programming course has 14 structured topic modules', () => {
+  assert.equal(javaVideos.length, 14, 'Must have 14 topic modules');
+  assert.equal(javaVideos[0].id, '01');
+  assert.ok(javaVideos[0].title.includes('Basic Input, Output & Variables'));
+  assert.equal(javaVideos[13].id, '14');
+  assert.ok(javaVideos[13].title.includes('Basic Data Structures & Algorithms'));
   assert.ok(typeof javaPracticeProblems === 'object', 'javaPracticeProblems must be an object');
 });
 
-test('Sequential unlocking rules and progression helpers handle empty and populated states safely', () => {
-  // When reset/empty
-  assert.equal(isJavaClassUnlocked('01', []), false);
-  assert.equal(getNextUnlockedJavaClass([]), null);
+test('Sequential unlocking rules and progression helpers handle 14 topics safely', () => {
+  assert.equal(isJavaClassUnlocked('01', []), true);
+  assert.equal(isJavaClassUnlocked('02', []), true);
+  assert.equal(isJavaClassUnlocked('14', []), true);
+  assert.equal(getNextUnlockedJavaClass([]).id, '01');
 
-  // If classes are added later
-  const mockVideos = [
-    { id: '01', title: 'Class 01' },
-    { id: '02', title: 'Class 02' }
-  ];
   // Verify clean progress handling
-  assert.deepEqual(cleanJavaProgress(['01', '01', 'xyz']), []);
+  assert.deepEqual(cleanJavaProgress(['01', '01', 'xyz']), ['01']);
   assert.deepEqual(cleanJavaProgress(null), []);
 });
 
