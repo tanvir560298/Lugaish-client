@@ -41,6 +41,8 @@ const CertificatePage = lazy(() => import('./pages/CertificatePage.jsx').then(mo
 const HtmlCoursePage = lazy(() => import('./learn/HtmlCoursePage.jsx').then(m=>({default:m.HtmlCoursePage})));
 const CCoursePage = lazy(() => import('./learn/CCoursePage.jsx').then(m=>({default:m.CCoursePage})));
 const JavaCoursePage = lazy(() => import('./learn/JavaCoursePage.jsx').then(m=>({default:m.JavaCoursePage})));
+const JavaPracticeListingPage = lazy(() => import('./practice/java/JavaPracticeListingPage.jsx').then(m => ({ default: m.JavaPracticeListingPage })));
+const JavaProblemSolverPage = lazy(() => import('./practice/java/JavaProblemSolverPage.jsx').then(m => ({ default: m.JavaProblemSolverPage })));
 const IeltsWritingCoursePage = lazy(() => import('./learn/IeltsWritingCoursePage.jsx').then(m => ({default: m.IeltsWritingCoursePage})));
 const LearnPage = lazy(() => import('./learn/LearnPages.jsx').then(m => ({default:m.LearnPage})));
 const NovyraWorkspace = lazy(() => import('./novyra/NovyraWorkspace.jsx').then(module => ({ default: module.NovyraWorkspace })));
@@ -211,6 +213,10 @@ export default function App() {
               <Route path='/learn/java' element={<JavaCoursePage />} />
               <Route path='/learn/java/:videoId' element={<JavaCoursePage />} />
               <Route path='/learn/nested-loops' element={<Navigate to="/learn/java-programming/05" replace />} />
+              <Route path='/practice' element={<Navigate to="/practice/java/basic-io-variables" replace />} />
+              <Route path='/practice/java' element={<Navigate to="/practice/java/basic-io-variables" replace />} />
+              <Route path='/practice/java/basic-io-variables' element={<JavaPracticeListingPage />} />
+              <Route path='/practice/java/basic-io-variables/:problemSlug' element={<JavaProblemSolverPage />} />
               <Route path='/practice/nested-loops' element={<Navigate to="/learn/java-programming/05" replace />} />
               <Route path='/practice/c-nested-loops' element={<Navigate to="/learn/c-programming/02" replace />} />
               <Route path='/practice/java-nested-loops' element={<Navigate to="/learn/java-programming/05" replace />} />
