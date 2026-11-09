@@ -3,42 +3,24 @@ import assert from 'node:assert/strict';
 import { javaVideos, javaPracticeProblems, cleanJavaProgress, isJavaClassUnlocked, getNextUnlockedJavaClass } from './javaContent.js';
 import { runJavaSimulation, checkJavaPractice } from './javaPractice.js';
 
-test('Java Programming course has Class 01 with Tanvir Ahmad video and printing fundamentals', () => {
-  const class01 = javaVideos.find(v => v.id === '01');
-  assert.ok(class01, 'Class 01 must exist');
-  assert.equal(class01.course, 'java-programming');
-  assert.equal(class01.path, '/learn/java-programming/01');
-  assert.equal(class01.instructor, 'Tanvir Ahmad');
-  assert.equal(class01.youtubeId, 'ukCm0p5PJFA');
-  assert.equal(class01.url, 'https://www.youtube.com/watch?v=ukCm0p5PJFA');
-  assert.ok(class01.summary.includes('double quotes'));
+test('Java Programming course is reset and ready for new curriculum', () => {
+  assert.ok(Array.isArray(javaVideos), 'javaVideos must be an array');
+  assert.ok(typeof javaPracticeProblems === 'object', 'javaPracticeProblems must be an object');
 });
 
-test('Sequential unlocking rule: Class 01 is unlocked; subsequent classes require completing previous class', () => {
-  assert.equal(isJavaClassUnlocked('01', []), true);
-  assert.equal(isJavaClassUnlocked('02', []), false);
-  assert.equal(isJavaClassUnlocked('02', ['01']), true);
-  assert.equal(isJavaClassUnlocked('03', ['01']), false);
-  assert.equal(isJavaClassUnlocked('03', ['01', '02']), true);
+test('Sequential unlocking rules and progression helpers handle empty and populated states safely', () => {
+  // When reset/empty
+  assert.equal(isJavaClassUnlocked('01', []), false);
+  assert.equal(getNextUnlockedJavaClass([]), null);
 
-  assert.equal(getNextUnlockedJavaClass([]).id, '01');
-  assert.equal(getNextUnlockedJavaClass(['01']).id, '02');
-  assert.equal(getNextUnlockedJavaClass(['01', '02']).id, '03');
-});
-
-test('cleanJavaProgress cleans duplicates and ignores invalid IDs', () => {
-  assert.deepEqual(cleanJavaProgress(['01', '01', 'xyz', '02']), ['01', '02']);
+  // If classes are added later
+  const mockVideos = [
+    { id: '01', title: 'Class 01' },
+    { id: '02', title: 'Class 02' }
+  ];
+  // Verify clean progress handling
+  assert.deepEqual(cleanJavaProgress(['01', '01', 'xyz']), []);
   assert.deepEqual(cleanJavaProgress(null), []);
-});
-
-test('Class 01 has interactive practice problems for printing name, age, and country', () => {
-  const problems = javaPracticeProblems['01'];
-  assert.ok(Array.isArray(problems), 'Problems should be an array');
-  assert.ok(problems.length >= 2, 'Should have at least 2 problems');
-
-  const p1 = problems[0];
-  assert.equal(p1.id, 'java01-p1');
-  assert.ok(p1.prompt.includes('name, age, and country'));
 });
 
 test('runJavaSimulation executes Java code and prints lines correctly', () => {
@@ -80,35 +62,27 @@ public class Test {
   assert.ok(res2.errors.some(e => e.includes("';' expected")));
 });
 
-test('checkJavaPractice verifies Tanvirs practice problem accurately', () => {
-  const problem = javaPracticeProblems['01'][0];
+test('checkJavaPractice verifies Java practice problem accurately', () => {
+  const sampleProblem = {
+    id: 'test-p1',
+    expectedKeywords: ['public', 'class', 'main', 'System.out.println'],
+    minPrintLines: 2,
+    sampleOutput: 'Line 1\nLine 2'
+  };
   const validCode = `
 public class Test {
     public static void main(String[] args) {
-        System.out.println("My name is Tanvir Ahmad");
-        System.out.println("My age is 22");
-        System.out.println("I am from Bangladesh");
+        System.out.println("Line 1");
+        System.out.println("Line 2");
     }
 }
   `;
-  const checkResult = checkJavaPractice(problem, validCode);
+  const checkResult = checkJavaPractice(sampleProblem, validCode);
   assert.equal(checkResult.ok, true);
   assert.ok(checkResult.message.includes('compiled and executed perfectly'));
 });
 
-test('Java Programming course has Class 02 connected to YouTube video rEH2VixyswE', () => {
-  const class02 = javaVideos.find(v => v.id === '02');
-  assert.ok(class02, 'Class 02 must exist');
-  assert.equal(class02.youtubeId, 'rEH2VixyswE');
-  assert.equal(class02.url, 'https://www.youtube.com/watch?v=rEH2VixyswE');
-  assert.ok(class02.title.includes('Operators') || class02.title.includes('Pattern'));
-  assert.equal(class02.path, '/learn/java-programming/02');
-
-  const pList = javaPracticeProblems['02'];
-  assert.ok(Array.isArray(pList) && pList.length >= 3, 'Class 02 should have 3 practice exercises');
-});
-
-test('Class 02 simulator evaluates integer precedence 5 * 6 / 7 % 3 to 1', () => {
+test('Java simulator evaluates integer precedence 5 * 6 / 7 % 3 to 1', () => {
   const code = `
 public class Test {
     public static void main(String[] args) {

@@ -747,7 +747,75 @@ export function JavaCoursePage() {
     }
   }, [completed, scope]);
 
-  const activeId = (videoId === 'nested-loops' || videoId === '05') ? '03' : (videoId || '01');
+  if (!javaVideos || javaVideos.length === 0) {
+    return (
+      <div className="lx-learn" style={{ maxWidth: '1000px', margin: '40px auto', padding: '30px 20px', textAlign: 'center' }}>
+        <div style={{
+          background: 'rgba(15, 23, 42, 0.75)',
+          border: '1px solid rgba(245, 158, 11, 0.3)',
+          borderRadius: '20px',
+          padding: '50px 30px',
+          backdropFilter: 'blur(10px)',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.4)'
+        }}>
+          <div style={{
+            width: '72px',
+            height: '72px',
+            borderRadius: '50%',
+            background: 'rgba(245, 158, 11, 0.15)',
+            border: '1px solid rgba(245, 158, 11, 0.4)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 20px',
+            color: '#fbbf24'
+          }}>
+            <Coffee size={36} />
+          </div>
+          <span style={{
+            background: 'rgba(245, 158, 11, 0.2)',
+            color: '#fbbf24',
+            fontSize: '12px',
+            fontWeight: 700,
+            padding: '4px 14px',
+            borderRadius: '20px',
+            display: 'inline-block',
+            marginBottom: '16px'
+          }}>
+            CURRICULUM RESET · READY FOR NEW CONTENT
+          </span>
+          <h1 style={{ fontSize: 'clamp(24px, 4vw, 36px)', color: '#f8fafc', margin: '0 0 14px' }}>
+            Java Programming Course
+          </h1>
+          <p style={{ maxWidth: '600px', margin: '0 auto 28px', color: '#94a3b8', fontSize: '15px', lineHeight: 1.7 }}>
+            জাভা কোর্সের আগের কনটেন্ট সফলভাবে রিমুভ করা হয়েছে। এখন নতুন সিলেবাস, ভিডিও ক্লাস ও প্র্যাকটিস সমস্যা যুক্ত করার জন্য প্রস্তুত।
+          </p>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link
+              to="/learn"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                color: '#ffffff',
+                fontWeight: 700,
+                padding: '12px 24px',
+                borderRadius: '12px',
+                textDecoration: 'none',
+                fontSize: '14px',
+                boxShadow: '0 4px 15px rgba(245, 158, 11, 0.3)'
+              }}
+            >
+              <ArrowRight size={16} /> ব্রাউজ অন্য কোর্সসমূহ
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const activeId = (videoId === 'nested-loops' || videoId === '05') ? '03' : (videoId || javaVideos[0]?.id || '01');
   const currentVideo = javaVideos.find(v => v.id === activeId) || javaVideos[0];
 
   const handleMarkComplete = (idToComplete = currentVideo.id) => {
