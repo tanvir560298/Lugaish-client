@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '../../api/client.js';
-import { TOPIC_1_METADATA, SOLVED_STORAGE_KEY } from './javaPracticeData.js';
+import { TOPIC_1_METADATA, SOLVED_STORAGE_KEY, FALLBACK_PUBLIC_PROBLEMS } from './javaPracticeData.js';
 
 /**
  * Returns array of solved problem IDs from local storage.
@@ -51,21 +51,22 @@ export async function fetchTopicProblems(topicSlug = 'basic-io-variables') {
 
     if (!res.ok) {
       if (res.status === 404) {
-        return { topic: TOPIC_1_METADATA, problems: [] };
+        return { topic: TOPIC_1_METADATA, problems: FALLBACK_PUBLIC_PROBLEMS[topicSlug] || [] };
       }
       throw new Error(`Server returned ${res.status}`);
     }
 
     const data = await res.json();
+    const serverProblems = Array.isArray(data.problems) && data.problems.length > 0 ? data.problems : (FALLBACK_PUBLIC_PROBLEMS[topicSlug] || []);
     return {
       topic: data.topic || TOPIC_1_METADATA,
-      problems: Array.isArray(data.problems) ? data.problems : []
+      problems: serverProblems
     };
   } catch (err) {
     console.warn('[PracticeClient] Could not fetch problems from server, falling back to local metadata:', err.message);
     return {
       topic: TOPIC_1_METADATA,
-      problems: []
+      problems: FALLBACK_PUBLIC_PROBLEMS[topicSlug] || []
     };
   }
 }
@@ -79,16 +80,16 @@ export async function fetchProblemDetail(topicSlug = 'basic-io-variables', probl
       headers: { 'Accept': 'application/json' }
     });
 
-    if (!res.ok) {
-      return null;
+    if (res.ok) {
+      const data = await res.json();
+      if (data.problem) return data.problem;
     }
-
-    const data = await res.json();
-    return data.problem || null;
   } catch (err) {
-    console.error('[PracticeClient] Failed to fetch problem detail:', err);
-    return null;
+    console.warn('[PracticeClient] Failed to fetch problem detail from server, checking fallback:', err.message);
   }
+
+  const fallbackList = FALLBACK_PUBLIC_PROBLEMS[topicSlug] || [];
+  return fallbackList.find(p => p.slug === problemSlug || p.id === problemSlug) || null;
 }
 
 /**
@@ -170,3 +171,4 @@ export async function submitJavaSolution({ topicSlug = 'basic-io-variables', pro
     };
   }
 }
+
