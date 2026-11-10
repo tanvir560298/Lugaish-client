@@ -54,8 +54,18 @@ export function JavaPracticeListingPage() {
   const filteredProblems = useMemo(() => {
     return problems.filter((prob) => {
       // Difficulty filter
-      if (selectedDifficulty !== 'All' && prob.difficulty?.toLowerCase() !== selectedDifficulty.toLowerCase()) {
-        return false;
+      if (selectedDifficulty !== 'All') {
+        const probDiff = (prob.difficulty || '').toLowerCase();
+        const selDiff = selectedDifficulty.toLowerCase();
+        if (selDiff === 'easy') {
+          if (!probDiff.startsWith('easy')) return false;
+        } else if (selDiff === 'medium') {
+          if (probDiff !== 'medium' && probDiff !== 'easy+') return false;
+        } else if (selDiff === 'hard') {
+          if (probDiff !== 'hard' && probDiff !== 'challenge') return false;
+        } else if (probDiff !== selDiff) {
+          return false;
+        }
       }
       // Source filter
       if (selectedSource === 'Lugaish' && prob.problemType !== 'lugaish') {
@@ -70,7 +80,8 @@ export function JavaPracticeListingPage() {
         const matchesTitle = prob.title?.toLowerCase().includes(query);
         const matchesNumber = prob.number?.toString().includes(query);
         const matchesPlatform = prob.sourcePlatform?.toLowerCase().includes(query);
-        if (!matchesTitle && !matchesNumber && !matchesPlatform) {
+        const matchesConcepts = prob.concepts?.toLowerCase().includes(query);
+        if (!matchesTitle && !matchesNumber && !matchesPlatform && !matchesConcepts) {
           return false;
         }
       }
@@ -85,11 +96,11 @@ export function JavaPracticeListingPage() {
   const solvedCount = problems.filter((p) => p.problemType === 'lugaish' && solvedIds.includes(p.id)).length;
 
   const getDifficultyBadge = (difficulty = 'Easy') => {
-    const diff = difficulty.toLowerCase();
-    if (diff === 'hard') {
+    const diff = (difficulty || '').toLowerCase();
+    if (diff === 'hard' || diff === 'challenge') {
       return (
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
-          Hard
+          {difficulty}
         </span>
       );
     }
@@ -97,6 +108,13 @@ export function JavaPracticeListingPage() {
       return (
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
           Medium
+        </span>
+      );
+    }
+    if (diff === 'easy+' || diff === 'easy plus') {
+      return (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+          Easy+
         </span>
       );
     }
@@ -345,7 +363,11 @@ export function JavaPracticeListingPage() {
                           )}
                         </div>
                         <div className="text-xs text-slate-400 mt-0.5">
-                          {topic.title} • {prob.language || 'Java'}
+                          {prob.concepts ? (
+                            <span className="text-slate-300 font-medium">{prob.concepts}</span>
+                          ) : (
+                            <span>{topic.title} • {prob.language || 'Java'}</span>
+                          )}
                         </div>
                       </td>
 
@@ -444,14 +466,19 @@ export function JavaPracticeListingPage() {
                     <h3 className="font-bold text-white text-base">
                       {prob.title}
                     </h3>
+                    {prob.concepts && (
+                      <div className="text-xs text-slate-300 font-medium mt-0.5">
+                        {prob.concepts}
+                      </div>
+                    )}
                     <div className="text-xs text-slate-400 mt-1 flex items-center gap-2">
                       {isExternal ? (
                         <span className="text-purple-400 font-medium">
-                          Source: {prob.sourcePlatform || 'External'}
+                          Platform: {prob.sourcePlatform || 'External'}
                         </span>
                       ) : (
                         <span className="text-blue-400 font-medium flex items-center gap-1">
-                          <Sparkles className="w-3 h-3" /> Lugaish Original
+                          <Sparkles className="w-3.5 h-3.5" /> Lugaish Original
                         </span>
                       )}
                     </div>

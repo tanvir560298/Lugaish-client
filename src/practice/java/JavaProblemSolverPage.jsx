@@ -72,6 +72,15 @@ export function JavaProblemSolverPage() {
           return;
         }
 
+        if (prob.problemType === 'external') {
+          if (prob.externalUrl) {
+            window.location.replace(prob.externalUrl);
+            return;
+          }
+          navigate('/practice/java/basic-io-variables', { replace: true });
+          return;
+        }
+
         setProblem(prob);
         setCode(prob.starterCode || DEFAULT_JAVA_STARTER);
         setSolved(isProblemSolved(prob.id));
