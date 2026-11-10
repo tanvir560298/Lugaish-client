@@ -4,6 +4,35 @@
   padding-top: 32px;
 }
 
+.java-lesson-brief { border-block: 1px solid var(--lx-border); padding: 28px 0 20px; }
+.java-lesson-brief-top { display: flex; align-items: center; gap: 16px; }
+.java-lesson-icon { width: 52px; height: 52px; border-radius: 8px; display: grid; place-items: center; background: #38bdf812; color: var(--java-accent); flex-shrink: 0; }
+.java-eyebrow { font-size: 11px; color: var(--lx-muted); font-weight: 650; }
+.java-course .java-lesson-brief h2 { font-size: 24px; letter-spacing: 0; margin: 4px 0; }
+.java-status { margin-left: auto; font-size: 11px; color: var(--lx-muted); border: 1px solid var(--lx-border); padding: 4px 8px; border-radius: 4px; white-space: nowrap; }
+.java-lesson-brief > p { max-width: 560px; color: var(--lx-muted); font-size: 14px; margin: 20px 0; line-height: 1.7; }
+.java-lesson-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.java-course .java-lesson-actions button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 11px 16px; background: var(--lx-panel); border: 1px solid var(--lx-border); color: var(--lx-text); font-size: 13px; }
+.java-course .java-lesson-actions .java-action-primary { background: #0e7490; border-color: #0e7490; color: white; }
+.java-lesson-actions button:hover { filter: brightness(1.12); }
+.java-lesson-meta { display: flex; flex-wrap: wrap; gap: 20px; padding-top: 24px; font-size: 12px; color: var(--lx-muted); }
+.java-lesson-meta strong { color: var(--lx-text); margin-left: 6px; }
+#java-lesson-sections { scroll-margin-top: 110px; }
+.java-course .html-class-list { background: transparent; border: 0; border-left: 1px solid var(--lx-border); border-radius: 0; }
+.java-course .html-class-list-heading { padding: 0 20px 20px; }
+.java-course .html-class-list ol { padding: 0 0 0 12px !important; }
+.java-course .html-class-list li > a { padding: 12px; margin: 2px 0; box-shadow: none; }
+.java-course .html-class-list li strong { font-size: 13px; line-height: 1.5; color: var(--lx-text) !important; }
+.java-course .html-class-list li small { font-size: 11px; }
+.java-course .html-class-list li > a[aria-current='page'] strong { color: var(--java-accent) !important; }
+@media (max-width: 600px) {
+  .java-lesson-brief-top { gap: 12px; flex-wrap: wrap; }
+  .java-course .java-lesson-brief h2 { font-size: 20px; }
+  .java-status { margin-left: 64px; }
+  .java-lesson-actions { flex-direction: column; }
+  .java-course .html-class-list { border-left: 0; border-top: 1px solid var(--lx-border); padding-top: 24px; }
+}
+
 .java-leaderboard { padding: 20px 0; border-block: 1px solid var(--lx-border, #334155); }
 .java-leaderboard h2 { display: flex; align-items: center; gap: 10px; font-size: 20px !important; letter-spacing: 0 !important; }
 .java-leaderboard p { font-size: 12px; color: var(--lx-muted); margin: 8px 0; }

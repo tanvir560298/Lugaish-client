@@ -29,7 +29,7 @@ import './javaCourse.css';
 
 const loadYouTube = createYouTubeLoader({ window, document, setTimeout, clearTimeout });
 
-function JavaVideoPlayer({ video, onEnded, onMarkComplete, isCompleted }) {
+function JavaVideoPlayer({ video, onEnded, onMarkComplete, isCompleted, onSelectSection }) {
   const host = useRef(null);
   const player = useRef(null);
   const report = useTanuPlayback();
@@ -123,58 +123,21 @@ function JavaVideoPlayer({ video, onEnded, onMarkComplete, isCompleted }) {
 
   if (!video.youtubeId) {
     return (
-      <section className="html-player" aria-label="Java video player" style={{ borderColor: 'rgba(245, 158, 11, 0.3)' }}>
-        <div className="html-player-stage" style={{ minHeight: '360px' }}>
-          <div className="html-player-placeholder" style={{ background: 'radial-gradient(ellipse at 50% 35%, #451a03, #080f1d 75%)' }}>
-            <span className="html-player-symbol" style={{ borderColor: 'rgba(245, 158, 11, 0.4)', color: '#fbbf24' }}>
-              <Coffee size={28} />
-            </span>
-            <strong style={{ fontSize: '20px', color: '#fef3c7' }}>{video.title}</strong>
-            <p style={{ maxWidth: '480px', color: '#fed7aa', fontSize: '13px', margin: '8px 0 16px', lineHeight: 1.6 }}>
-              Tanvir is recording and uploading this lecture video to the YouTube channel. You can review the topic notes and solve the practice problems below!
-            </p>
-            <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center', background: 'rgba(245, 158, 11, 0.15)', padding: '6px 14px', borderRadius: '20px', color: '#fbbf24', fontSize: '11px', fontWeight: 600 }}>
-              <Tv size={14} />
-              <span>YouTube Video Link will be connected here</span>
-            </div>
-          </div>
+      <section className="java-lesson-brief" aria-label="Java video player">
+        <div className="java-lesson-brief-top">
+          <span className="java-lesson-icon"><Tv size={24} /></span>
+          <div><span className="java-eyebrow">LESSON {video.id}</span><h2>Video coming soon</h2></div>
+          <span className="java-status">In production</span>
         </div>
-        <div className="html-player-footer" style={{ background: 'rgba(24, 13, 4, 0.95)', borderTop: '1px solid rgba(245, 158, 11, 0.2)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span style={{ color: isCompleted ? '#38bdf8' : '#fbbf24', fontWeight: 600 }}>
-              {isCompleted ? '✓ Class Completed' : `☕ Topic ${video.id} Lecture Ready`}
-            </span>
-            <span style={{ color: 'var(--lx-muted)' }}>•</span>
-            <span style={{ color: 'var(--lx-muted)' }}>Instructor: <strong style={{ color: '#fed7aa' }}>{video.instructor}</strong></span>
-            <span style={{ color: 'var(--lx-muted)' }}>•</span>
-            <span style={{ color: 'var(--lx-muted)' }}>{video.duration}</span>
-          </div>
-
-          <button
-            type="button"
-            onClick={onMarkComplete}
-            style={{
-              background: isCompleted ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)',
-              border: `1px solid ${isCompleted ? '#10b981' : '#f59e0b'}`,
-              borderRadius: '6px',
-              padding: '4px 12px',
-              fontSize: '11px',
-              color: isCompleted ? '#10b981' : '#fbbf24',
-              cursor: 'pointer',
-              fontWeight: 600,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '4px'
-            }}
-          >
-            {isCompleted ? <Check size={12} /> : null}
-            {isCompleted ? 'Completed' : 'Mark Completed'}
-          </button>
+        <p>The lecture is being prepared. Start with the study notes or put your knowledge to work with the available challenges.</p>
+        <div className="java-lesson-actions">
+          <button type="button" onClick={() => onSelectSection('notes')}><BookOpen size={16} /> Read lesson notes <ArrowRight size={16} /></button>
+          <button type="button" className="java-action-primary" onClick={() => onSelectSection('practice')}><Code2 size={16} /> Start practicing <ArrowRight size={16} /></button>
         </div>
+        <div className="java-lesson-meta"><span>Instructor <strong>{video.instructor}</strong></span><span>Java fundamentals</span></div>
       </section>
     );
   }
-
   return (
     <section className="html-player" aria-label="Java video player" style={{ borderColor: 'rgba(245, 158, 11, 0.3)' }}>
       <div className="html-player-stage" aria-busy={status === 'loading'} style={{ minHeight: '380px' }}>
@@ -474,6 +437,10 @@ export function JavaCoursePage() {
         <div style={{ minWidth: 0 }}>
           <JavaVideoPlayer
             video={currentVideo}
+            onSelectSection={section => {
+              setActiveTab(section);
+              document.getElementById('java-lesson-sections')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
             onEnded={() => handleMarkComplete(currentVideo.id)}
             onMarkComplete={() => handleMarkComplete(currentVideo.id)}
             isCompleted={completed.includes(currentVideo.id)}
@@ -481,7 +448,7 @@ export function JavaCoursePage() {
 
           {/* TWO TABS: Topic Overview & Notes vs Practice Problems */}
           <div style={{ marginTop: '28px' }}>
-            <div className="java-course-tabs" aria-label="Lesson sections">
+            <div id="java-lesson-sections" className="java-course-tabs" aria-label="Lesson sections">
               <button
                 type="button"
                 onClick={() => setActiveTab('notes')}
