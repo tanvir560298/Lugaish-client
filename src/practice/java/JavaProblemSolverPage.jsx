@@ -690,6 +690,11 @@ export function JavaProblemSolverPage() {
                               {submitResult.testCasesPassed} of {submitResult.totalTestCases} test cases passed
                             </div>
                           )}
+                          {submitResult.message && (
+                            <div className="text-xs text-slate-300 mt-1">
+                              {submitResult.message}
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -806,9 +811,19 @@ export function JavaProblemSolverPage() {
                     {/* Runtime Stderr */}
                     {(runResult?.stderr || submitResult?.stderr) && !runResult?.compileOutput && (
                       <div className="mt-3">
-                        <div className="text-amber-400 text-[11px] mb-1 font-bold">Standard Error / Stack Trace:</div>
+                        <div className="text-amber-400 text-[11px] mb-1 font-bold">Standard Error / Diagnostic:</div>
                         <pre className="p-3 bg-amber-950/20 border border-amber-500/30 rounded-xl text-amber-300 whitespace-pre-wrap overflow-x-auto max-h-60">
                           {runResult?.stderr || submitResult?.stderr}
+                        </pre>
+                      </div>
+                    )}
+
+                    {/* Service / Diagnostic Message */}
+                    {runResult?.message && !runResult?.compileOutput && !runResult?.stderr && (
+                      <div className="mt-3">
+                        <div className="text-amber-400 text-[11px] mb-1 font-bold">Execution Message:</div>
+                        <pre className="p-3 bg-amber-950/20 border border-amber-500/30 rounded-xl text-amber-300 whitespace-pre-wrap overflow-x-auto max-h-60">
+                          {runResult.message}
                         </pre>
                       </div>
                     )}

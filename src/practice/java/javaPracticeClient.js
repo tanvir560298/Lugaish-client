@@ -93,9 +93,104 @@ export async function fetchProblemDetail(topicSlug = 'basic-io-variables', probl
 }
 
 /**
+ * Direct sandboxed execution via Judge0 CE (https://ce.judge0.com) with base64 encoding and polling.
+ * Used as high-reliability direct fallback for running code in browser client.
+ */
+async function executeDirectJudge0({ sourceCode, stdin = '' }) {
+  const toBase64 = (str) => {
+    try {
+      return btoa(unescape(encodeURIComponent(str || '')));
+    } catch {
+      return '';
+    }
+  };
+
+  const fromBase64 = (str) => {
+    if (!str || typeof str !== 'string') return '';
+    try {
+      const decoded = decodeURIComponent(escape(atob(str)));
+      return decoded;
+    } catch {
+      return str;
+    }
+  };
+
+  const payload = {
+    source_code: toBase64(sourceCode),
+    language_id: 62, // OpenJDK 13/14
+    stdin: stdin ? toBase64(stdin) : '',
+    cpu_time_limit: 5,
+    memory_limit: 128000
+  };
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
+
+  const res = await fetch('https://ce.judge0.com/submissions?base64_encoded=true&wait=true', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    signal: controller.signal
+  });
+
+  clearTimeout(timeout);
+
+  if (!res.ok) {
+    throw new Error(`Execution service responded with HTTP ${res.status}`);
+  }
+
+  let data = await res.json();
+
+  // If in queue or processing, poll the token
+  if (data?.status?.id <= 2 && data?.token) {
+    for (let i = 0; i < 15; i++) {
+      await new Promise(r => setTimeout(r, 1000));
+      try {
+        const poll = await fetch(`https://ce.judge0.com/submissions/${data.token}?base64_encoded=true`);
+        if (poll.ok) {
+          const polled = await poll.json();
+          if (polled?.status?.id > 2) {
+            data = polled;
+            break;
+          }
+        }
+      } catch {
+        // continue polling
+      }
+    }
+  }
+
+  const statusId = data?.status?.id ?? 0;
+  const statusDesc = data?.status?.description ?? 'Unknown';
+
+  let verdict = 'Accepted';
+  if (statusId === 3) verdict = 'Accepted';
+  else if (statusId === 4) verdict = 'Wrong Answer';
+  else if (statusId === 5) verdict = 'Time Limit Exceeded';
+  else if (statusId === 6) verdict = 'Compilation Error';
+  else if (statusId >= 7 && statusId <= 12) verdict = 'Runtime Error';
+  else if (statusId >= 13) verdict = 'Execution Service Unavailable';
+  else if (statusId <= 2) verdict = 'Time Limit Exceeded';
+  else verdict = statusDesc;
+
+  return {
+    success: verdict === 'Accepted',
+    verdict,
+    statusId,
+    stdout: fromBase64(data.stdout),
+    stderr: fromBase64(data.stderr),
+    compileOutput: fromBase64(data.compile_output),
+    message: fromBase64(data.message),
+    time: parseFloat(data.time) || 0,
+    memory: parseInt(data.memory, 10) || 0
+  };
+}
+
+/**
  * Runs student Java code with optional custom input (no judge / no hidden tests).
  */
 export async function runJavaCode({ sourceCode, stdin = '' }) {
+  // First attempt to run via configured backend API
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
@@ -109,9 +204,22 @@ export async function runJavaCode({ sourceCode, stdin = '' }) {
 
     clearTimeout(timeout);
 
-    const data = await res.json();
-    return data;
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.verdict) {
+        return data;
+      }
+    }
+  } catch (backendErr) {
+    console.warn('[PracticeClient] Backend run endpoint unavailable, falling back to direct sandbox:', backendErr.message);
+  }
+
+  // Fallback: direct isolated execution via Judge0 CE
+  try {
+    const directResult = await executeDirectJudge0({ sourceCode, stdin });
+    return directResult;
   } catch (err) {
+    console.error('[PracticeClient] Direct sandbox execution failed:', err);
     if (err.name === 'AbortError') {
       return {
         success: false,
@@ -124,7 +232,7 @@ export async function runJavaCode({ sourceCode, stdin = '' }) {
     return {
       success: false,
       verdict: 'Execution Service Unavailable',
-      stderr: 'Unable to communicate with compiler service. Please try again.',
+      stderr: 'Unable to communicate with compiler service. Please check your internet connection and try again.',
       stdout: '',
       compileOutput: ''
     };
@@ -137,7 +245,7 @@ export async function runJavaCode({ sourceCode, stdin = '' }) {
 export async function submitJavaSolution({ topicSlug = 'basic-io-variables', problemId, sourceCode }) {
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 25000);
+    const timeout = setTimeout(() => controller.abort(), 35000);
 
     const res = await fetch(`${API_BASE_URL}/practice/java/submit`, {
       method: 'POST',
@@ -147,6 +255,17 @@ export async function submitJavaSolution({ topicSlug = 'basic-io-variables', pro
     });
 
     clearTimeout(timeout);
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      return {
+        success: false,
+        verdict: 'Execution Service Unavailable',
+        message: errData.error || (res.status === 404
+          ? 'Backend judging service is currently deploying or offline. Please trigger deploy on Render or retry shortly.'
+          : `Judge service responded with HTTP ${res.status}. Please retry shortly.`)
+      };
+    }
 
     const data = await res.json();
 
@@ -167,7 +286,7 @@ export async function submitJavaSolution({ topicSlug = 'basic-io-variables', pro
     return {
       success: false,
       verdict: 'Execution Service Unavailable',
-      message: 'Could not connect to the judge service. Please try again in a few moments.'
+      message: 'Could not connect to the judge service. Please verify server connectivity and retry shortly.'
     };
   }
 }
