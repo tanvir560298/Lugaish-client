@@ -25,6 +25,7 @@ import { JavaTopicPracticeListing } from '../practice/java/JavaTopicPracticeList
 import { JavaTopicNotes } from './JavaTopicNotes.jsx';
 import { getSolvedProblemIds } from '../practice/java/javaPracticeClient.js';
 import './learn.css';
+import './javaCourse.css';
 
 const loadYouTube = createYouTubeLoader({ window, document, setTimeout, clearTimeout });
 
@@ -378,7 +379,7 @@ export function JavaCoursePage() {
   const percentComplete = Math.round((completed.length / javaVideos.length) * 100);
 
   return (
-    <div className="lx-learn lx-html-course" style={{ maxWidth: '1400px' }}>
+    <div className="lx-learn lx-html-course java-course" style={{ maxWidth: '1400px' }}>
       {/* Top Header */}
       <header className="html-lesson-top" style={{ borderBottom: '1px solid var(--lx-border)', paddingBottom: '24px' }}>
         <div>
@@ -480,10 +481,11 @@ export function JavaCoursePage() {
 
           {/* TWO TABS: Topic Overview & Notes vs Practice Problems */}
           <div style={{ marginTop: '28px' }}>
-            <div style={{ display: 'flex', gap: '10px', borderBottom: '1px solid var(--lx-border)', paddingBottom: '12px', marginBottom: '24px' }}>
+            <div className="java-course-tabs" aria-label="Lesson sections">
               <button
                 type="button"
                 onClick={() => setActiveTab('notes')}
+                aria-pressed={activeTab === 'notes'}
                 style={{
                   background: activeTab === 'notes' ? 'rgba(245, 158, 11, 0.16)' : 'transparent',
                   borderColor: activeTab === 'notes' ? '#f59e0b' : 'transparent',
@@ -507,6 +509,7 @@ export function JavaCoursePage() {
               <button
                 type="button"
                 onClick={() => setActiveTab('practice')}
+                aria-pressed={activeTab === 'practice'}
                 style={{
                   background: activeTab === 'practice' ? 'rgba(245, 158, 11, 0.16)' : 'transparent',
                   borderColor: activeTab === 'practice' ? '#f59e0b' : 'transparent',

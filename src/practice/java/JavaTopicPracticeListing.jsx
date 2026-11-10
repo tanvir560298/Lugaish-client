@@ -143,7 +143,7 @@ export function JavaTopicPracticeListing({
   };
 
   return (
-    <div className={compact ? 'space-y-5' : 'space-y-6'}>
+    <div className={`java-practice-list ${compact ? 'space-y-5' : 'space-y-6'}`}>
       {/* Quick Metrics Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-slate-900/70 rounded-xl p-3 border border-slate-800">

@@ -1,0 +1,103 @@
+.java-course {
+  --java-accent: #38bdf8;
+  --java-line: var(--lx-border, #334155);
+}
+
+.java-course h1 {
+  font-size: 30px !important;
+  line-height: 1.25;
+  letter-spacing: 0 !important;
+}
+
+.java-course button,
+.java-course a[class*="inline-flex"],
+.java-course .html-player-footer a {
+  min-height: 40px;
+  border-radius: 6px !important;
+  letter-spacing: 0;
+  box-shadow: none;
+  font-weight: 600;
+}
+
+.java-course :is(button, a, input, select):focus-visible {
+  outline: 2px solid var(--java-accent);
+  outline-offset: 3px;
+}
+
+.java-course button svg,
+.java-course a svg { flex-shrink: 0; }
+
+.java-course .html-player,
+.java-course .html-class-list,
+.java-course .html-progress-card {
+  border-radius: 8px;
+  border-color: var(--java-line) !important;
+  box-shadow: none;
+}
+
+.java-course .html-player-stage {
+  aspect-ratio: 16 / 9;
+  min-height: 0 !important;
+}
+
+.java-course .html-player-footer {
+  padding: 16px;
+  gap: 16px;
+  background: var(--lx-panel, #111827) !important;
+  border-color: var(--java-line) !important;
+}
+
+.java-course .html-player-footer > div { flex-wrap: wrap; row-gap: 8px; }
+.java-course .html-player-footer button { padding: 8px 14px !important; }
+
+.java-course-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--java-line);
+  margin-bottom: 24px;
+}
+
+.java-course .java-course-tabs > button {
+  border: 0 !important;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 14px 16px !important;
+  min-height: 52px;
+  line-height: 1.4;
+}
+
+.java-course .java-course-tabs > button[aria-pressed="true"] {
+  color: var(--java-accent) !important;
+  border-bottom-color: var(--java-accent) !important;
+}
+
+.java-course .java-course-tabs > button:hover { background: #38bdf80d !important; }
+.java-course .java-course-tabs > button > span { border-radius: 4px !important; }
+.java-course .html-class-list-heading { background: transparent !important; padding: 20px; }
+.java-course .html-class-list li > a { border-radius: 6px; padding: 14px 12px; }
+.java-course .html-class-list li > a[aria-current="page"] {
+  background: #38bdf80d !important;
+  box-shadow: inset 3px 0 var(--java-accent) !important;
+}
+.java-course .html-class-number { border-radius: 6px; }
+.java-course .java-practice-list :is(.rounded-2xl, .rounded-xl) { border-radius: 8px; box-shadow: none; }
+.java-course .java-practice-list table { table-layout: auto; }
+.java-course .java-practice-list :is(th, td) { padding: 14px 12px; }
+.java-course .java-practice-list td a { line-height: 1.4; text-align: left; }
+.java-course .java-practice-list input { min-height: 42px; border-radius: 6px; }
+
+@media (max-width: 1100px) {
+  .java-course .html-watch-layout { grid-template-columns: minmax(0, 1fr); }
+  .java-course .html-class-list { position: static; max-height: none; }
+}
+
+@media (max-width: 600px) {
+  .java-course h1 { font-size: 24px !important; }
+  .java-course .html-lesson-top { gap: 20px; }
+  .java-course .html-progress-card { width: 100%; min-width: 0 !important; }
+  .java-course .java-course-tabs > button { padding: 12px 8px !important; font-size: 12px !important; flex: 1; }
+  .java-course .html-player-footer { flex-direction: column; align-items: stretch; }
+  .java-course .html-player-placeholder { padding: 20px; }
+  .java-course .html-player-stage:has(.html-player-placeholder) { aspect-ratio: auto; min-height: 280px !important; }
+}
