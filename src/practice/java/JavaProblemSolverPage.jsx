@@ -700,6 +700,11 @@ export function JavaProblemSolverPage() {
                         )}
                         <div>
                           <div className="font-bold text-sm">{submitResult.verdict}</div>
+                          {submitResult.score && <p role="status" className="mt-2 text-sm text-emerald-400">
+                            {submitResult.score.congratulations ? `Congratulations! You are now #${submitResult.score.rank} on the Java leaderboard. ` : ''}
+                            {submitResult.score.awarded ? '+5 points! ' : 'Already credited. '}{submitResult.score.points} total points.
+                          </p>}
+                          {submitResult.scoreMessage && <p role="status">{submitResult.scoreMessage}</p>}
                           {submitResult.totalTestCases !== undefined && (
                             <div className="text-xs text-slate-300 mt-0.5">
                               {submitResult.testCasesPassed} of {submitResult.totalTestCases} test cases passed

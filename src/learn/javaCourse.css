@@ -4,6 +4,14 @@
   padding-top: 32px;
 }
 
+.java-leaderboard { padding: 20px 0; border-block: 1px solid var(--lx-border, #334155); }
+.java-leaderboard h2 { display: flex; align-items: center; gap: 10px; font-size: 20px !important; letter-spacing: 0 !important; }
+.java-leaderboard p { font-size: 12px; color: var(--lx-muted); margin: 8px 0; }
+.java-leaderboard ol { list-style: none; padding: 0; margin: 16px 0; }
+.java-leaderboard li { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto auto; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--lx-border, #334155); font-size: 14px; align-items: center; }
+.java-leaderboard li span { overflow-wrap: anywhere; }
+.java-leaderboard li b { white-space: nowrap; }
+
 .java-course h1 {
   font-size: 30px !important;
   line-height: 1.25;

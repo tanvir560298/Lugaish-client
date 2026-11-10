@@ -1,4 +1,5 @@
-import { API_BASE_URL } from '../../api/client.js';
+import { API_BASE_URL, getAuthToken } from '../../api/client.js';
+export const JAVA_RANKING_API = (import.meta.env.VITE_API_URL || 'https://lugaish-server.onrender.com/api').replace(/\/$/, '');
 import { TOPIC_1_METADATA, SOLVED_STORAGE_KEY, FALLBACK_PUBLIC_PROBLEMS } from './javaPracticeData.js';
 
 /**
@@ -285,7 +286,8 @@ export async function runJavaCode({ sourceCode, stdin = '' }) {
  * Submits student Java code for official evaluation against official test cases.
  */
 export async function submitJavaSolution({ topicSlug = 'basic-io-variables', problemId, sourceCode }) {
-  const endpoints = getCandidateEndpoints('/api/practice/java/submit');
+  const token = getAuthToken();
+  const endpoints = token ? [`${JAVA_RANKING_API}/practice/java/submit`] : getCandidateEndpoints('/api/practice/java/submit');
   let lastError = null;
 
   for (const endpoint of endpoints) {
@@ -296,6 +298,7 @@ export async function submitJavaSolution({ topicSlug = 'basic-io-variables', pro
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        ...(token ? { headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } } : {}),
         body: JSON.stringify({ topicSlug, problemId, sourceCode }),
         signal: controller.signal
       });
@@ -326,6 +329,7 @@ export async function submitJavaSolution({ topicSlug = 'basic-io-variables', pro
     }
   }
 
+  if (token) return { success: false, verdict: 'Execution Service Unavailable', message: 'Ranked submission could not reach the server. Please retry; no points were awarded.' };
   // Resilient fallback: evaluate sample test cases directly if backend routes are unreachable
   const fallbackList = FALLBACK_PUBLIC_PROBLEMS[topicSlug] || [];
   const prob = fallbackList.find(p => p.id === problemId || p.slug === problemId);

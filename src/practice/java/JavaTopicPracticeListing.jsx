@@ -12,6 +12,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { fetchTopicProblems, getSolvedProblemIds } from './javaPracticeClient.js';
+import { JavaLeaderboard } from './JavaLeaderboard.jsx';
 import { TOPIC_1_METADATA, FALLBACK_PUBLIC_PROBLEMS } from './javaPracticeData.js';
 
 export function JavaTopicPracticeListing({
@@ -144,6 +145,7 @@ export function JavaTopicPracticeListing({
 
   return (
     <div className={`java-practice-list ${compact ? 'space-y-5' : 'space-y-6'}`}>
+      <JavaLeaderboard />
       {/* Quick Metrics Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-slate-900/70 rounded-xl p-3 border border-slate-800">
