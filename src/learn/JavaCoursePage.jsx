@@ -206,7 +206,7 @@ export function JavaCoursePage() {
     if (typeof window !== 'undefined' && window.location.hash === '#practice') {
       return 'practice';
     }
-    return 'notes';
+    return window.location.hash === '#notes' ? 'notes' : 'practice';
   });
 
   // Solved problem IDs synchronized with practice system
@@ -325,6 +325,7 @@ export function JavaCoursePage() {
   const currentVideo = javaVideos.find(v => v.id === activeId) || javaVideos[0];
   const currentProblems = javaPracticeProblems[currentVideo.id] || [];
   const topicProblemCount = currentProblems.length;
+  const firstChallenge = currentProblems.find(problem => problem.problemType === 'lugaish');
 
   const handleMarkComplete = (idToComplete = currentVideo.id) => {
     if (!completed.includes(idToComplete)) {
@@ -363,7 +364,20 @@ export function JavaCoursePage() {
       <div className="html-watch-layout" style={{ marginTop: '28px' }}>
         {/* Left: Video Player & Tabs */}
         <div style={{ minWidth: 0 }}>
-          <JavaVideoPlayer
+          {topicProblemCount > 0 && <section className="java-practice-spotlight" aria-label="Start Java practice">
+            <div className="java-practice-mark" aria-hidden="true"><Code2 size={30} /></div>
+            <div className="java-practice-invitation">
+              <span className="java-eyebrow">PRACTICE IS OPEN</span>
+              <h2>Your next skill starts with one problem.</h2>
+              <p>{topicProblemCount} challenges ready. Write Java, test your ideas, and learn by solving.</p>
+              <div className="java-practice-cta">
+                {firstChallenge ? <Link className="java-start-challenge" to={`/practice/java/basic-io-variables/${firstChallenge.slug || firstChallenge.id}`}><Code2 size={17} /> Start first challenge <ArrowRight size={17} /></Link> : <button className="java-start-challenge" onClick={() => { setActiveTab('practice'); document.getElementById('java-lesson-sections')?.scrollIntoView({ behavior: 'smooth' }); }}>Explore challenges <ArrowRight size={17} /></button>}
+                <button className="java-browse-challenges" onClick={() => { setActiveTab('practice'); document.getElementById('java-lesson-sections')?.scrollIntoView({ behavior: 'smooth' }); }}>Browse all {topicProblemCount} challenges <ArrowRight size={15} /></button>
+              </div>
+            </div>
+          </section>}
+          {!currentVideo.youtubeId && <p className="java-video-note"><Tv size={15} /> Video lessons are on the way. Study notes are available now.</p>}
+          {currentVideo.youtubeId && <JavaVideoPlayer
             video={currentVideo}
             onSelectSection={section => {
               setActiveTab(section);
@@ -372,7 +386,7 @@ export function JavaCoursePage() {
             onEnded={() => handleMarkComplete(currentVideo.id)}
             onMarkComplete={() => handleMarkComplete(currentVideo.id)}
             isCompleted={completed.includes(currentVideo.id)}
-          />
+          />}
 
           {/* TWO TABS: Topic Overview & Notes vs Practice Problems */}
           <div style={{ marginTop: '28px' }}>

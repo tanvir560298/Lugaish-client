@@ -4,6 +4,25 @@
   padding-top: 32px;
 }
 
+.java-practice-spotlight { display: flex; gap: 24px; align-items: flex-start; padding: 28px 0; border-block: 1px solid var(--lx-border); }
+.java-practice-mark { width: 64px; height: 64px; flex-shrink: 0; display: grid; place-items: center; background: #0e7490; color: white; border-radius: 8px; }
+.java-practice-invitation { flex: 1; }
+.java-course .java-practice-invitation h2 { font-size: 26px; letter-spacing: 0; margin: 8px 0 12px; }
+.java-practice-invitation p { color: var(--lx-muted); font-size: 14px; margin: 0; }
+.java-practice-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 22px; }
+.java-course .java-start-challenge { display: inline-flex; gap: 10px; align-items: center; justify-content: center; background: #0e7490; color: white; border: 1px solid #0e7490; padding: 12px 18px; border-radius: 6px; font-size: 14px; font-weight: 650; min-height: 46px; }
+.java-course .java-browse-challenges { display: inline-flex; gap: 8px; align-items: center; padding: 10px 0; color: var(--lx-text); background: transparent; border: 0; font-size: 13px; }
+.java-start-challenge:hover { background: #155e75; }
+.java-video-note { display: flex; align-items: center; gap: 8px; color: var(--lx-muted); font-size: 12px; margin: 14px 0 0; }
+@media (max-width: 600px) {
+  .java-practice-spotlight { flex-direction: column; gap: 16px; padding: 20px 0; }
+  .java-practice-mark { width: 48px; height: 48px; }
+  .java-course .java-practice-invitation h2 { font-size: 22px; line-height: 1.3; }
+  .java-practice-cta { align-items: stretch; flex-direction: column; }
+  .java-video-note { align-items: flex-start; }
+  .java-video-note svg { flex-shrink: 0; }
+}
+
 .java-course.java-course { max-width: 1120px !important; border-radius: 0; padding: 28px 24px; }
 .java-workspace-header { border-bottom: 1px solid var(--lx-border); padding-bottom: 24px; }
 .java-back-link { font-size: 12px; color: var(--lx-muted) !important; }
