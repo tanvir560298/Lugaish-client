@@ -378,7 +378,7 @@ export function JavaTopicPracticeListing({
 
                       {/* Action */}
                       <td className="py-3.5 px-5 text-right">
-                        <ProblemSolution problem={prob} />
+                        <div className="problem-row-actions">
                         {isExternal ? (
                           <a
                             href={prob.externalUrl}
@@ -402,6 +402,8 @@ export function JavaTopicPracticeListing({
                             <ArrowRight className="w-3.5 h-3.5" />
                           </Link>
                         )}
+                        <ProblemSolution problem={prob} />
+                        </div>
                       </td>
                     </tr>
                   );
@@ -457,8 +459,7 @@ export function JavaTopicPracticeListing({
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-slate-800">
-                    <ProblemSolution problem={prob} />
+                  <div className="problem-row-actions pt-2 border-t border-slate-800">
                     {isExternal ? (
                       <a
                         href={prob.externalUrl}
@@ -482,6 +483,7 @@ export function JavaTopicPracticeListing({
                         <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
                     )}
+                    <ProblemSolution problem={prob} />
                   </div>
                 </div>
               );

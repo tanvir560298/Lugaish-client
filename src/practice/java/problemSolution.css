@@ -1,0 +1,22 @@
+.problem-row-actions { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
+.problem-row-actions > a { justify-content: center; }
+.problem-solution-trigger {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 40px; width: 100%; padding: 8px 12px; border: 1px solid #64748b;
+  border-radius: 6px; background: transparent; color: var(--lx-text, #e2e8f0);
+  font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;
+}
+.problem-solution-trigger svg { flex-shrink: 0; }
+.problem-solution-trigger:hover { background: rgb(56 189 248 / 10%); border-color: #38bdf8; }
+.problem-solution-trigger:focus-visible { outline: 2px solid #38bdf8; outline-offset: 3px; }
+.problem-solution-dialog {
+  margin: auto; width: calc(100% - 32px); max-width: 620px; max-height: 85dvh;
+  overflow-y: auto; border: 1px solid #475569; border-radius: 8px; padding: 24px;
+  background: #0f172a; color: #f1f5f9; text-align: left; box-shadow: 0 24px 64px #0006;
+}
+.problem-solution-dialog::backdrop { background: #0009; }
+.problem-solution-dialog h2 { color: #f1f5f9 !important; font-size: 20px; }
+.problem-solution-dialog pre { background: #020617; color: #e2e8f0; padding: 16px; border-radius: 6px; margin-top: 12px; }
+.problem-solution-dialog button { min-height: 40px; min-width: 40px; border-radius: 6px; color: #e2e8f0; }
+.problem-solution-dialog button:hover { background: #334155; }
+.problem-solution-dialog button:focus-visible { outline: 2px solid #38bdf8; outline-offset: 2px; }

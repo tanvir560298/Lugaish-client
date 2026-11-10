@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { BookOpen, Copy, Check, X } from 'lucide-react';
+import './problemSolution.css';
 
 const numberMirror = `#include <stdio.h>
 
@@ -26,11 +28,12 @@ export function ProblemSolution({ problem }) {
 
   return <>
     <button type="button" onClick={() => { setCopyStatus(''); dialog.current.showModal(); }}
-      className="mt-2 inline-flex items-center gap-2 rounded-md border border-slate-600 px-3 py-2 text-xs font-semibold text-cyan-400">
+      className="problem-solution-trigger">
       <BookOpen size={14} /> View Solution
     </button>
-    <dialog ref={dialog} aria-label="Number Mirror solution in C"
-      className="m-auto w-[calc(100%_-_32px)] max-w-xl max-h-[85dvh] overflow-y-auto rounded-lg border border-slate-700 bg-slate-950 p-5 text-left text-slate-100 shadow-xl backdrop:bg-black/60">
+    {createPortal(<dialog ref={dialog} aria-label="Number Mirror solution in C"
+      className="problem-solution-dialog"
+      onClick={event => { if (event.target === dialog.current) { const bounds = dialog.current.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.current.close(); } }}>
       <header className="flex items-start justify-between gap-4">
         <div><h2 className="text-xl font-bold">Number Mirror</h2><p className="mt-1 text-sm text-slate-400">Reference solution by Tanvir · C</p></div>
         <button type="button" aria-label="Close solution" title="Close solution" onClick={() => dialog.current.close()} className="p-2"><X size={20} /></button>
@@ -40,6 +43,6 @@ export function ProblemSolution({ problem }) {
       <pre className="overflow-x-auto py-4 text-sm leading-6"><code>{numberMirror}</code></pre>
       <p role="status" className="text-xs text-cyan-400">{copyStatus}</p>
       <p className="mt-3 text-xs text-slate-400">Example: input 42 produces 42. Time O(1), extra space O(1). This is C code; choose C when submitting on CodeChef.</p>
-    </dialog>
+    </dialog>, document.body)}
   </>;
 }
