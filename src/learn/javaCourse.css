@@ -4,6 +4,33 @@
   padding-top: 32px;
 }
 
+.java-course.java-course { max-width: 1120px !important; border-radius: 0; padding: 28px 24px; }
+.java-workspace-header { border-bottom: 1px solid var(--lx-border); padding-bottom: 24px; }
+.java-back-link { font-size: 12px; color: var(--lx-muted) !important; }
+.java-workspace-title { display: flex; justify-content: space-between; align-items: center; gap: 32px; padding: 28px 0; }
+.java-workspace-title h1 { font-size: 32px !important; margin: 8px 0 !important; }
+.java-workspace-title p, .java-topic-summary { color: var(--lx-muted); font-size: 14px; margin: 0; }
+.java-progress-summary { display: grid; grid-template-columns: auto 1fr; gap: 8px 12px; align-items: center; min-width: 220px; }
+.java-progress-summary strong { font-size: 26px; }
+.java-progress-summary span { font-size: 12px; color: var(--lx-muted); }
+.java-progress-summary progress { grid-column: 1 / -1; height: 5px; width: 100%; accent-color: #0891b2; }
+.java-topic-toolbar { display: flex; align-items: center; gap: 16px; padding: 16px 0; border-block: 1px solid var(--lx-border); margin-bottom: 24px; }
+.java-topic-toolbar label { font-size: 12px; font-weight: 600; white-space: nowrap; }
+.java-topic-toolbar select { flex: 1; min-width: 0; padding: 12px; border: 1px solid var(--lx-border); border-radius: 6px; background: var(--lx-panel); color: var(--lx-text); font-size: 14px; }
+.java-topic-toolbar > span { color: var(--lx-muted); font-size: 12px; }
+.java-course .java-topic-heading { font-size: 22px; letter-spacing: 0; margin: 0 0 10px; }
+.java-course .html-watch-layout { display: block; }
+.java-course .java-lesson-brief { padding: 0 0 24px; border-top: 0; }
+@media (max-width: 600px) {
+  .java-course.java-course { padding: 20px 16px; margin-top: 0; }
+  .java-workspace-title { flex-direction: column; align-items: stretch; gap: 20px; padding: 20px 0; }
+  .java-workspace-title h1 { font-size: 26px !important; }
+  .java-progress-summary { min-width: 0; }
+  .java-topic-toolbar { flex-wrap: wrap; gap: 8px; }
+  .java-topic-toolbar label { width: 100%; }
+  .java-topic-toolbar select { flex-basis: 100%; }
+}
+
 .java-lesson-brief { border-block: 1px solid var(--lx-border); padding: 28px 0 20px; }
 .java-lesson-brief-top { display: flex; align-items: center; gap: 16px; }
 .java-lesson-icon { width: 52px; height: 52px; border-radius: 8px; display: grid; place-items: center; background: #38bdf812; color: var(--java-accent); flex-shrink: 0; }

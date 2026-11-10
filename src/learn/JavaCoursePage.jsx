@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import {
   CheckCircle2,
   ArrowRight,
@@ -196,6 +196,7 @@ function JavaVideoPlayer({ video, onEnded, onMarkComplete, isCompleted, onSelect
 }
 
 export function JavaCoursePage() {
+  const navigate = useNavigate();
   const { videoId } = useParams();
   const { state } = useAppContext();
   const scope = state.userEmail || 'guest';
@@ -343,93 +344,20 @@ export function JavaCoursePage() {
 
   return (
     <div className="lx-learn lx-html-course java-course" style={{ maxWidth: '1400px' }}>
-      {/* Top Header */}
-      <header className="html-lesson-top" style={{ borderBottom: '1px solid var(--lx-border)', paddingBottom: '24px' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-            <Link to="/learn" style={{ color: 'var(--lx-muted)', fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-              Courses <ArrowRight size={12} />
-            </Link>
-            <span style={{ color: '#fbbf24', fontSize: '12px', fontWeight: 700 }}>Java Programming Track</span>
-            <span style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', fontSize: '10px', padding: '2px 8px', borderRadius: '12px', fontWeight: 600 }}>
-              Topic {currentVideo.id} of {String(javaVideos.length).padStart(2, '0')}
-            </span>
-          </div>
-          <h1 style={{ fontSize: 'clamp(26px, 3.5vw, 42px)', margin: '4px 0 10px', letterSpacing: '-0.03em' }}>
-            {currentVideo.title}
-          </h1>
-          <p style={{ maxWidth: '780px', color: 'var(--lx-muted)', fontSize: '14px', margin: 0, lineHeight: 1.7 }}>
-            {currentVideo.summary}
-          </p>
+      <header className="java-workspace-header">
+        <Link to="/learn" className="java-back-link">Courses / Java Programming</Link>
+        <div className="java-workspace-title"><div><span className="java-eyebrow">YOUR LEARNING WORKSPACE</span><h1>Java Programming</h1><p>Learn the concepts. Write the code. Build your confidence.</p></div>
+        <div className="java-progress-summary"><strong>{percentComplete}%</strong><span>{completed.length} of {javaVideos.length} topics complete</span><progress value={completed.length} max={javaVideos.length} aria-label="Course completion" /></div></div>
+        <div className="java-topic-toolbar">
+          <label htmlFor="java-topic-select">Current topic</label>
+          <select id="java-topic-select" value={currentVideo.id} onChange={event => navigate('/learn/java-programming/' + event.target.value)}>
+            {javaVideos.map(video => <option key={video.id} value={video.id}>{video.id} · {video.topicTitle || video.title}</option>)}
+          </select>
+          <span>{topicProblemCount} practice challenges</span>
         </div>
-
-        <div className="html-progress-card" style={{ borderColor: 'rgba(245, 158, 11, 0.3)', minWidth: '220px' }}>
-          <span style={{ color: '#fbbf24' }}>COURSE PROGRESS</span>
-          <strong style={{ color: '#f8fafc' }}>
-            {completed.length} <small>/ {javaVideos.length} topics</small>
-          </strong>
-          <div className="html-progress-track" style={{ marginTop: '10px' }}>
-            <span style={{ width: `${percentComplete}%`, background: 'linear-gradient(90deg, #f59e0b, #fbbf24)' }} />
-          </div>
-          <p style={{ margin: '8px 0 0', fontSize: '11px', color: 'var(--lx-muted)' }}>
-            {percentComplete}% of Java syllabus completed
-          </p>
-          <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px' }}>
-            <span style={{ color: 'var(--lx-muted)' }}>Solved Challenges:</span>
-            <span style={{ color: '#34d399', fontWeight: 700 }}>
-              {solvedProblemIds.length} solved
-            </span>
-          </div>
-        </div>
+        <h2 className="java-topic-heading">{currentVideo.topicTitle || currentVideo.title}</h2>
+        <p className="java-topic-summary">{currentVideo.summary}</p>
       </header>
-
-      {/* Featured Banner for Nested Loops if on another topic */}
-      {currentVideo.id !== '05' && currentVideo.id !== '01' && (
-        <div
-          style={{
-            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(180, 83, 9, 0.1) 100%)',
-            border: '1px solid rgba(245, 158, 11, 0.35)',
-            borderRadius: '12px',
-            padding: '14px 18px',
-            margin: '20px 0 10px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '12px'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '20px' }}>🔥</span>
-            <div>
-              <strong style={{ color: '#fbbf24', fontSize: '13px' }}>
-                Featured Practice Set: Nested Loops &amp; Algorithmic Simulation (14 Problems)
-              </strong>
-              <p style={{ margin: 0, fontSize: '11px', color: '#fed7aa' }}>
-                Star triangles, pyramids, Selection Sort, and Codeforces challenges.
-              </p>
-            </div>
-          </div>
-          <Link
-            to="/learn/java-programming/05"
-            style={{
-              background: 'linear-gradient(135deg, #d97706, #b45309)',
-              border: '1px solid #f59e0b',
-              color: '#ffffff',
-              borderRadius: '8px',
-              padding: '7px 14px',
-              fontSize: '11px',
-              fontWeight: 700,
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            Open 14 Practice Problems <ArrowRight size={13} />
-          </Link>
-        </div>
-      )}
 
       {/* Main Watch & Curriculum Layout */}
       <div className="html-watch-layout" style={{ marginTop: '28px' }}>
@@ -573,95 +501,8 @@ export function JavaCoursePage() {
           </div>
         </div>
 
-        {/* Right: Curriculum Roadmap & Topic Selector */}
-        <aside className="html-class-list" style={{ borderColor: 'rgba(245, 158, 11, 0.25)' }}>
-          <div className="html-class-list-heading" style={{ background: 'rgba(24, 13, 4, 0.6)' }}>
-            <span style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.12em', color: '#fbbf24' }}>
-              JAVA 14 TOPICS ROADMAP
-            </span>
-            <strong style={{ fontSize: '16px', color: '#f8fafc', marginTop: '4px' }}>
-              Syllabus Topics
-            </strong>
-            <p style={{ fontSize: '11px', color: 'var(--lx-muted)' }}>
-              Select any topic to view problems &amp; practice.
-            </p>
-          </div>
-
-          <ol style={{ padding: '8px' }}>
-            {javaVideos.map((vid) => {
-              const isDone = completed.includes(vid.id);
-              const isCurrent = vid.id === currentVideo.id;
-              const probs = javaPracticeProblems[vid.id] || [];
-              const probCount = probs.length;
-              const lugaishProbs = probs.filter(p => p.problemType === 'lugaish');
-              const topicSolved = lugaishProbs.filter(p => solvedProblemIds.includes(p.id)).length;
-
-              return (
-                <li key={vid.id}>
-                  <Link
-                    to={`/learn/java-programming/${vid.id}`}
-                    aria-current={isCurrent ? 'page' : undefined}
-                    style={{
-                      background: isCurrent ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
-                      boxShadow: isCurrent ? 'inset 3px 0 #f59e0b' : 'none'
-                    }}
-                  >
-                    <span className="html-class-number" style={{ color: isDone ? '#10b981' : isCurrent ? '#fbbf24' : 'var(--lx-muted)' }}>
-                      {isDone ? <CheckCircle2 size={16} /> : vid.id}
-                    </span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                        <strong style={{ color: isCurrent ? '#fbbf24' : '#f8fafc' }}>
-                          {vid.topicTitle || vid.title.replace(/^Topic \d+:\s*/, '')}
-                        </strong>
-                        {probCount > 0 && (
-                          <span style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', fontSize: '9px', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
-                            {probCount} {probCount === 1 ? 'Problem' : 'Problems'}
-                          </span>
-                        )}
-                      </div>
-                      <small style={{ color: 'var(--lx-muted)' }}>
-                        {probCount > 0
-                          ? `${probCount} Practice ${probCount === 1 ? 'Problem' : 'Problems'}${topicSolved > 0 ? ` · ${topicSolved}/${lugaishProbs.length} Solved` : ''}`
-                          : 'Problems uploading soon'} {isDone && '· Done ✓'}
-                      </small>
-                    </div>
-                  </Link>
-                </li>
-              );
-            })}
-          </ol>
-        </aside>
       </div>
 
-      {/* Milestones Earned */}
-      <section className="html-milestones" style={{ marginTop: '50px' }}>
-        <div className="html-milestones-intro">
-          <span className="html-start-kicker" style={{ color: '#fbbf24' }}>ACHIEVEMENTS</span>
-          <h2>Java Learning Milestones</h2>
-          <p>Track your verified skill milestones as you code in the interactive lab.</p>
-        </div>
-
-        <ol>
-          {javaMilestones.map((ms, i) => {
-            const earned = completed.length >= i + 1;
-            return (
-              <li key={ms.id} className={earned ? 'is-earned' : ''} style={{ borderColor: earned ? '#f59e0b' : 'var(--lx-border)' }}>
-                <div className="html-milestone-icon" style={{ background: earned ? '#f59e0b' : 'transparent', color: earned ? '#180d04' : 'var(--lx-muted)' }}>
-                  <Award size={20} />
-                </div>
-                <div>
-                  <strong style={{ color: earned ? '#fef3c7' : '#f8fafc' }}>{ms.title}</strong>
-                  <p>{ms.desc}</p>
-                  <small style={{ color: earned ? '#34d399' : 'var(--lx-muted)', fontWeight: 600 }}>
-                    {earned ? '✓ Unlocked' : 'Locked — Keep coding'}
-                  </small>
-                </div>
-              </li>
-            );
-          })}
-        </ol>
-      </section>
     </div>
   );
 }
