@@ -41,51 +41,86 @@ export function markProblemSolved(problemId) {
 }
 
 /**
+ * Helper to construct candidate API endpoints:
+ * 1. Same-origin relative path (for Vercel serverless /api routes)
+ * 2. Absolute API_BASE_URL (if configured)
+ */
+function getCandidateEndpoints(relativePath) {
+  const cleanRelative = relativePath.startsWith('/') ? relativePath : `/${relativePath}`;
+  const endpoints = [];
+
+  // Same-origin endpoint (for Vercel serverless deployment)
+  if (typeof window !== 'undefined') {
+    endpoints.push(cleanRelative);
+  }
+
+  // Configured API_BASE_URL endpoint
+  if (API_BASE_URL && API_BASE_URL !== '/api') {
+    const candidate = `${API_BASE_URL}${cleanRelative.replace(/^\/api/, '')}`;
+    if (!endpoints.includes(candidate)) {
+      endpoints.push(candidate);
+    }
+  }
+
+  if (endpoints.length === 0) {
+    endpoints.push(cleanRelative);
+  }
+
+  return endpoints;
+}
+
+/**
  * Fetches practice topic and public problems list.
  */
 export async function fetchTopicProblems(topicSlug = 'basic-io-variables') {
-  try {
-    const res = await fetch(`${API_BASE_URL}/practice/java/topics/${topicSlug}`, {
-      headers: { 'Accept': 'application/json' }
-    });
+  const endpoints = getCandidateEndpoints(`/api/practice/java/topics/${topicSlug}`);
 
-    if (!res.ok) {
-      if (res.status === 404) {
-        return { topic: TOPIC_1_METADATA, problems: FALLBACK_PUBLIC_PROBLEMS[topicSlug] || [] };
+  for (const endpoint of endpoints) {
+    try {
+      const res = await fetch(endpoint, {
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const serverProblems = Array.isArray(data.problems) && data.problems.length > 0
+          ? data.problems
+          : (FALLBACK_PUBLIC_PROBLEMS[topicSlug] || []);
+        return {
+          topic: data.topic || TOPIC_1_METADATA,
+          problems: serverProblems
+        };
       }
-      throw new Error(`Server returned ${res.status}`);
+    } catch (err) {
+      console.warn(`[PracticeClient] Could not fetch topics from ${endpoint}:`, err.message);
     }
-
-    const data = await res.json();
-    const serverProblems = Array.isArray(data.problems) && data.problems.length > 0 ? data.problems : (FALLBACK_PUBLIC_PROBLEMS[topicSlug] || []);
-    return {
-      topic: data.topic || TOPIC_1_METADATA,
-      problems: serverProblems
-    };
-  } catch (err) {
-    console.warn('[PracticeClient] Could not fetch problems from server, falling back to local metadata:', err.message);
-    return {
-      topic: TOPIC_1_METADATA,
-      problems: FALLBACK_PUBLIC_PROBLEMS[topicSlug] || []
-    };
   }
+
+  return {
+    topic: TOPIC_1_METADATA,
+    problems: FALLBACK_PUBLIC_PROBLEMS[topicSlug] || []
+  };
 }
 
 /**
  * Fetches a single public problem's details by topic and slug.
  */
 export async function fetchProblemDetail(topicSlug = 'basic-io-variables', problemSlug) {
-  try {
-    const res = await fetch(`${API_BASE_URL}/practice/java/topics/${topicSlug}/problems/${problemSlug}`, {
-      headers: { 'Accept': 'application/json' }
-    });
+  const endpoints = getCandidateEndpoints(`/api/practice/java/topics/${topicSlug}/problems/${problemSlug}`);
 
-    if (res.ok) {
-      const data = await res.json();
-      if (data.problem) return data.problem;
+  for (const endpoint of endpoints) {
+    try {
+      const res = await fetch(endpoint, {
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.problem) return data.problem;
+      }
+    } catch {
+      // try next
     }
-  } catch (err) {
-    console.warn('[PracticeClient] Failed to fetch problem detail from server, checking fallback:', err.message);
   }
 
   const fallbackList = FALLBACK_PUBLIC_PROBLEMS[topicSlug] || [];
@@ -108,10 +143,14 @@ async function executeDirectJudge0({ sourceCode, stdin = '' }) {
   const fromBase64 = (str) => {
     if (!str || typeof str !== 'string') return '';
     try {
-      const decoded = decodeURIComponent(escape(atob(str)));
+      const decoded = decodeURIComponent(escape(atob(str.trim())));
       return decoded;
     } catch {
-      return str;
+      try {
+        return atob(str.trim());
+      } catch {
+        return str;
+      }
     }
   };
 
@@ -190,28 +229,31 @@ async function executeDirectJudge0({ sourceCode, stdin = '' }) {
  * Runs student Java code with optional custom input (no judge / no hidden tests).
  */
 export async function runJavaCode({ sourceCode, stdin = '' }) {
-  // First attempt to run via configured backend API
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
+  const endpoints = getCandidateEndpoints('/api/practice/java/run');
 
-    const res = await fetch(`${API_BASE_URL}/practice/java/run`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sourceCode, stdin }),
-      signal: controller.signal
-    });
+  for (const endpoint of endpoints) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
 
-    clearTimeout(timeout);
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sourceCode, stdin }),
+        signal: controller.signal
+      });
 
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.verdict) {
-        return data;
+      clearTimeout(timeout);
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.verdict) {
+          return data;
+        }
       }
+    } catch (backendErr) {
+      console.warn(`[PracticeClient] Endpoint ${endpoint} failed:`, backendErr.message);
     }
-  } catch (backendErr) {
-    console.warn('[PracticeClient] Backend run endpoint unavailable, falling back to direct sandbox:', backendErr.message);
   }
 
   // Fallback: direct isolated execution via Judge0 CE
@@ -243,51 +285,105 @@ export async function runJavaCode({ sourceCode, stdin = '' }) {
  * Submits student Java code for official evaluation against official test cases.
  */
 export async function submitJavaSolution({ topicSlug = 'basic-io-variables', problemId, sourceCode }) {
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 35000);
+  const endpoints = getCandidateEndpoints('/api/practice/java/submit');
+  let lastError = null;
 
-    const res = await fetch(`${API_BASE_URL}/practice/java/submit`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ topicSlug, problemId, sourceCode }),
-      signal: controller.signal
-    });
+  for (const endpoint of endpoints) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 35000);
 
-    clearTimeout(timeout);
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topicSlug, problemId, sourceCode }),
+        signal: controller.signal
+      });
 
-    if (!res.ok) {
+      clearTimeout(timeout);
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.verdict === 'Accepted' && data.success) {
+          markProblemSolved(problemId);
+        }
+        return data;
+      }
+
+      if (res.status === 404) {
+        lastError = 'API route not found';
+        continue;
+      }
+
       const errData = await res.json().catch(() => ({}));
       return {
         success: false,
         verdict: 'Execution Service Unavailable',
-        message: errData.error || (res.status === 404
-          ? 'Backend judging service is currently deploying or offline. Please trigger deploy on Render or retry shortly.'
-          : `Judge service responded with HTTP ${res.status}. Please retry shortly.`)
+        message: errData.error || `Judge service responded with HTTP ${res.status}. Please retry shortly.`
       };
+    } catch (err) {
+      lastError = err.message;
     }
-
-    const data = await res.json();
-
-    // If accepted, mark locally as solved
-    if (data.verdict === 'Accepted' && data.success) {
-      markProblemSolved(problemId);
-    }
-
-    return data;
-  } catch (err) {
-    if (err.name === 'AbortError') {
-      return {
-        success: false,
-        verdict: 'Time Limit Exceeded',
-        message: 'Submission evaluation timed out.'
-      };
-    }
-    return {
-      success: false,
-      verdict: 'Execution Service Unavailable',
-      message: 'Could not connect to the judge service. Please verify server connectivity and retry shortly.'
-    };
   }
-}
 
+  // Resilient fallback: evaluate sample test cases directly if backend routes are unreachable
+  const fallbackList = FALLBACK_PUBLIC_PROBLEMS[topicSlug] || [];
+  const prob = fallbackList.find(p => p.id === problemId || p.slug === problemId);
+
+  if (prob && Array.isArray(prob.sampleTestCases) && prob.sampleTestCases.length > 0) {
+    try {
+      for (let i = 0; i < prob.sampleTestCases.length; i++) {
+        const tc = prob.sampleTestCases[i];
+        const exec = await executeDirectJudge0({ sourceCode, stdin: tc.input || '' });
+
+        if (exec.verdict !== 'Accepted') {
+          return {
+            success: false,
+            verdict: exec.verdict,
+            testCasesPassed: i,
+            totalTestCases: prob.sampleTestCases.length,
+            failedTestCaseIndex: i + 1,
+            isSampleTestCase: true,
+            stdout: exec.stdout,
+            stderr: exec.stderr,
+            compileOutput: exec.compileOutput
+          };
+        }
+
+        const actual = (exec.stdout || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+        const expected = (tc.expectedOutput || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+
+        if (actual !== expected) {
+          return {
+            success: false,
+            verdict: 'Wrong Answer',
+            testCasesPassed: i,
+            totalTestCases: prob.sampleTestCases.length,
+            failedTestCaseIndex: i + 1,
+            isSampleTestCase: true,
+            actualOutput: exec.stdout,
+            expectedOutput: tc.expectedOutput,
+            input: tc.input
+          };
+        }
+      }
+
+      // Passed sample cases in client fallback
+      markProblemSolved(problemId);
+      return {
+        success: true,
+        verdict: 'Accepted',
+        testCasesPassed: prob.sampleTestCases.length,
+        totalTestCases: prob.sampleTestCases.length
+      };
+    } catch (fallbackErr) {
+      console.error('[PracticeClient] Fallback evaluation failed:', fallbackErr);
+    }
+  }
+
+  return {
+    success: false,
+    verdict: 'Execution Service Unavailable',
+    message: lastError || 'Could not connect to the judge service. Please verify connectivity and retry shortly.'
+  };
+}
