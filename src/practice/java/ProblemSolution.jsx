@@ -16,6 +16,30 @@ int main(void) {
 }
 `;
 
+const e03Solution = {
+  language: 'Java', file: 'Solution.java',
+  code: `import java.util.Scanner;
+
+public class Solution {
+
+    public static void main(String[] args) {
+        Scanner scan = new Scanner(System.in);
+        int i = scan.nextInt();
+        double d = scan.nextDouble();
+        scan.nextLine();
+        String s = scan.nextLine();
+        // Write your code here.
+
+        System.out.println("String: " + s);
+        System.out.println("Double: " + d);
+        System.out.println("Int: " + i);
+    }
+}
+`,
+  explanation: 'Read an integer with nextInt() and a double with nextDouble(). Because nextDouble() does not consume the trailing newline character, call scan.nextLine() once to clear the newline buffer before reading the full line String with scan.nextLine(). Finally, print String, Double, and Int in the required format.',
+  note: "Sample input with 42, 3.1415, and a sentence correctly preserves the entire line. Time O(1), extra space O(1)."
+};
+
 const solutions = {
   'https://www.codechef.com/problems/START01': {
     language: 'C', file: 'main.c', code: numberMirror,
@@ -42,29 +66,10 @@ public class Solution {
     explanation: 'Read three integers with Scanner.nextInt(). Each System.out.println prints one integer followed by a new line, preserving the input order. Input integers may be separated by spaces or new lines.',
     note: 'Example: input 42 100 125 produces 42, 100, and 125 on three separate lines. Time O(1), extra space O(1). Keep the class name Solution for HackerRank.'
   },
-  'https://www.hackerrank.com/challenges/java-stdin-stdout/problem': {
-    language: 'Java', file: 'Solution.java',
-    code: `import java.util.Scanner;
-
-public class Solution {
-
-    public static void main(String[] args) {
-        Scanner scan = new Scanner(System.in);
-        int i = scan.nextInt();
-        double d = scan.nextDouble();
-        scan.nextLine();
-        String s = scan.nextLine();
-        // Write your code here.
-
-        System.out.println("String: " + s);
-        System.out.println("Double: " + d);
-        System.out.println("Int: " + i);
-    }
-}
-`,
-    explanation: 'Read an integer with nextInt() and a double with nextDouble(). Because nextDouble() does not consume the trailing newline character, call scan.nextLine() once to clear the newline buffer before reading the full line String with scan.nextLine(). Finally, print String, Double, and Int in the required format.',
-    note: "Sample input with 42, 3.1415, and a sentence correctly preserves the entire line. Time O(1), extra space O(1)."
-  },
+  'https://www.hackerrank.com/challenges/java-stdin-stdout/problem': e03Solution,
+  'https://www.hackerrank.com/challenges/java-stdin-stdout': e03Solution,
+  'ext-bio-03': e03Solution,
+  'java-stdin-stdout': e03Solution,
   'https://www.codechef.com/practice/course/cpp/PCPP01/problems/INSTNOODLE': {
     language: 'Java', file: 'Main.java',
     code: `import java.util.Scanner;
@@ -87,7 +92,11 @@ public class Main {
 export function ProblemSolution({ problem }) {
   const dialog = useRef(null);
   const [copyStatus, setCopyStatus] = useState('');
-  const solution = solutions[problem.externalUrl];
+  const solution = solutions[problem.externalUrl]
+    || solutions[problem.externalUrl?.replace(/\/$/, '')]
+    || solutions[`${problem.externalUrl?.replace(/\/$/, '')}/`]
+    || solutions[problem.id]
+    || solutions[problem.slug];
   if (!solution) return null;
 
   async function copy() {

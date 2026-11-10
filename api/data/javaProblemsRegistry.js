@@ -848,7 +848,7 @@ public class Main {
       language: 'Java',
       categorySlug: 'basic-io-variables',
       difficulty: 'Easy',
-      problemType: 'lugaish',
+      problemType: 'external',
       sourcePlatform: 'HackerRank',
       concepts: 'int, double, String',
       externalUrl: 'https://www.hackerrank.com/challenges/java-stdin-stdout/problem',
