@@ -12,6 +12,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { fetchTopicProblems, getSolvedProblemIds } from './javaPracticeClient.js';
+import { ProblemSolution } from './ProblemSolution.jsx';
 import { JavaLeaderboard } from './JavaLeaderboard.jsx';
 import { TOPIC_1_METADATA, FALLBACK_PUBLIC_PROBLEMS } from './javaPracticeData.js';
 
@@ -377,6 +378,7 @@ export function JavaTopicPracticeListing({
 
                       {/* Action */}
                       <td className="py-3.5 px-5 text-right">
+                        <ProblemSolution problem={prob} />
                         {isExternal ? (
                           <a
                             href={prob.externalUrl}
@@ -456,6 +458,7 @@ export function JavaTopicPracticeListing({
                   </div>
 
                   <div className="pt-2 border-t border-slate-800">
+                    <ProblemSolution problem={prob} />
                     {isExternal ? (
                       <a
                         href={prob.externalUrl}
