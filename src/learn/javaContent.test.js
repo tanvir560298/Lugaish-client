@@ -94,3 +94,31 @@ public class Test {
   assert.equal(sim.success, true);
   assert.equal(sim.output.trim(), '1');
 });
+
+test('Topic 01 has 25 practice problems attached with 13 Lugaish originals and 12 external challenges', () => {
+  const p1 = javaPracticeProblems['01'];
+  assert.ok(Array.isArray(p1), 'Topic 01 problems must be an array');
+  assert.equal(p1.length, 25, 'Topic 01 must have exactly 25 problems');
+
+  const lugaish = p1.filter(p => p.problemType === 'lugaish');
+  const external = p1.filter(p => p.problemType === 'external');
+  assert.equal(lugaish.length, 13, 'Must have 13 Lugaish original problems');
+  assert.equal(external.length, 12, 'Must have 12 external practice problems');
+
+  // Verify Lugaish original problem properties
+  for (const prob of lugaish) {
+    assert.ok(prob.id, 'Problem must have an ID');
+    assert.ok(prob.title, 'Problem must have a title');
+    assert.ok(prob.starterCode, 'Lugaish problem must have starter code');
+    assert.ok(Array.isArray(prob.sampleTestCases) && prob.sampleTestCases.length > 0, 'Must have sample test cases');
+  }
+
+  // Verify external problem properties
+  for (const prob of external) {
+    assert.ok(prob.id, 'External problem must have an ID');
+    assert.ok(prob.title, 'External problem must have a title');
+    assert.ok(prob.sourcePlatform, 'External problem must have sourcePlatform');
+    assert.ok(prob.externalUrl && prob.externalUrl.startsWith('http'), 'External problem must have valid URL');
+  }
+});
+

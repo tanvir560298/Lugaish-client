@@ -1,0 +1,365 @@
+import React, { useState } from 'react';
+import {
+  Sparkles,
+  Copy,
+  Check,
+  Code2,
+  Terminal,
+  AlertTriangle,
+  Lightbulb,
+  ArrowRight,
+  BookOpen
+} from 'lucide-react';
+
+function CodeSnippet({ code, language = 'java', title }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard?.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div style={{ background: '#090d16', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '10px', overflow: 'hidden', margin: '12px 0 16px' }}>
+      {title && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 14px', background: 'rgba(255, 255, 255, 0.03)', borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}>
+          <span style={{ fontSize: '11px', color: '#fbbf24', fontFamily: 'monospace', fontWeight: 600 }}>
+            {title}
+          </span>
+          <button
+            type="button"
+            onClick={handleCopy}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: copied ? '#34d399' : 'var(--lx-muted)',
+              cursor: 'pointer',
+              fontSize: '11px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}
+          >
+            {copied ? <Check size={12} /> : <Copy size={12} />}
+            {copied ? 'Copied!' : 'Copy'}
+          </button>
+        </div>
+      )}
+      <pre style={{ margin: 0, padding: '14px', fontSize: '12.5px', lineHeight: 1.6, color: '#f1f5f9', fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace', overflowX: 'auto', whiteSpace: 'pre' }}>
+        {code}
+      </pre>
+    </div>
+  );
+}
+
+export function JavaTopicNotes({ video, onSwitchToPractice }) {
+  if (video.id === '01') {
+    return (
+      <div className="space-y-6" style={{ padding: '4px 0' }}>
+        {/* Topic Header Summary */}
+        <div style={{ background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%)', border: '1px solid rgba(245, 158, 11, 0.25)', borderRadius: '14px', padding: '22px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#fbbf24', fontWeight: 700, fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>
+            <Sparkles size={16} /> Topic 01 · Comprehensive Study Notes
+          </div>
+          <h2 style={{ fontSize: '24px', color: '#f8fafc', margin: '4px 0 8px' }}>
+            Basic Input, Output &amp; Variables in Java
+          </h2>
+          <p style={{ color: '#fed7aa', fontSize: '14px', lineHeight: 1.7, margin: 0 }}>
+            Master the absolute foundations of Java: understanding how the Java Virtual Machine (JVM) finds your code, printing output to the terminal, capturing dynamic user input via Scanner, and declaring typed variables.
+          </p>
+        </div>
+
+        {/* Section 1: Java Program Structure */}
+        <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '14px', padding: '22px' }}>
+          <h3 style={{ fontSize: '18px', color: '#fbbf24', marginTop: 0, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Terminal size={18} /> 1. Structure of a Java Program &amp; Entry Point
+          </h3>
+          <p style={{ fontSize: '13.5px', color: 'var(--lx-muted)', lineHeight: 1.7, margin: '0 0 12px' }}>
+            Every standalone Java program requires a <strong>class</strong> definition and a special <strong>main method</strong>. The JVM looks specifically for this exact method signature to start execution:
+          </p>
+
+          <CodeSnippet
+            title="Main.java — Minimal Working Java Program"
+            code={`public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello, world!");
+    }
+}`}
+          />
+
+          <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '10px', padding: '12px 16px', fontSize: '12.5px', color: '#fed7aa', lineHeight: 1.7 }}>
+            <strong style={{ color: '#fbbf24' }}>Case Sensitivity Rule:</strong> Java is strictly case-sensitive!
+            <ul style={{ margin: '6px 0 0', paddingLeft: '20px' }}>
+              <li><code>public static void main</code> cannot be written as <code>mian</code> or <code>Main</code>.</li>
+              <li><code>String[]</code> must begin with a capital <code>S</code>. Using <code>string</code> will cause a compilation error.</li>
+              <li><code>System.out.println</code> requires a capital <code>S</code>. Writing <code>system.out.println</code> will fail to compile.</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Section 2: Standard Output */}
+        <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '14px', padding: '22px' }}>
+          <h3 style={{ fontSize: '18px', color: '#fbbf24', marginTop: 0, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Code2 size={18} /> 2. Printing Output to the Console
+          </h3>
+          <p style={{ fontSize: '13.5px', color: 'var(--lx-muted)', lineHeight: 1.7, margin: '0 0 12px' }}>
+            Java provides two primary methods on <code>System.out</code> for displaying text on the screen:
+          </p>
+
+          <ul style={{ fontSize: '13px', color: '#e2e8f0', lineHeight: 1.8, margin: '0 0 14px', paddingLeft: '22px' }}>
+            <li>
+              <code>System.out.println(data);</code> — Prints the data followed by a <strong>new line character (\n)</strong>. The next print will start on the next line.
+            </li>
+            <li>
+              <code>System.out.print(data);</code> — Prints the data <strong>without</strong> moving to the next line. Subsequent prints continue on the same line.
+            </li>
+            <li>
+              <strong>String Concatenation:</strong> Use the <code>+</code> operator to combine text with variable values, e.g. <code>"Temperature: " + temp + " C"</code>.
+            </li>
+          </ul>
+
+          <CodeSnippet
+            title="Output Examples"
+            code={`int age = 22;
+String name = "Tanvir";
+
+// Output on a single line
+System.out.println("Student: " + name + ", Age: " + age);
+
+// Print vs Println
+System.out.print("Loading... ");
+System.out.println("Done!");`}
+          />
+        </div>
+
+        {/* Section 3: Taking User Input with Scanner */}
+        <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '14px', padding: '22px' }}>
+          <h3 style={{ fontSize: '18px', color: '#fbbf24', marginTop: 0, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Lightbulb size={18} /> 3. Reading User Input with java.util.Scanner
+          </h3>
+          <p style={{ fontSize: '13.5px', color: 'var(--lx-muted)', lineHeight: 1.7, margin: '0 0 12px' }}>
+            To read input from standard input (keyboard or automated test cases), import and instantiate the <code>Scanner</code> class:
+          </p>
+
+          <CodeSnippet
+            title="SumOfTwoNumbers.java — Taking 2 Integers as Input"
+            code={`import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        // Reading two integers separated by space or newline
+        int a = sc.nextInt();
+        int b = sc.nextInt();
+
+        int sum = a + b;
+        System.out.println("Sum = " + sum);
+        
+        sc.close();
+    }
+}`}
+          />
+
+          <div style={{ marginTop: '12px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '10px' }}>
+            <div style={{ background: 'rgba(0, 0, 0, 0.3)', border: '1px solid var(--lx-border)', borderRadius: '8px', padding: '10px 14px' }}>
+              <code style={{ color: '#38bdf8', fontWeight: 700 }}>sc.nextInt()</code>
+              <p style={{ margin: '4px 0 0', fontSize: '12px', color: 'var(--lx-muted)' }}>Reads a 32-bit signed integer (e.g. 42, -15)</p>
+            </div>
+            <div style={{ background: 'rgba(0, 0, 0, 0.3)', border: '1px solid var(--lx-border)', borderRadius: '8px', padding: '10px 14px' }}>
+              <code style={{ color: '#38bdf8', fontWeight: 700 }}>sc.nextDouble()</code>
+              <p style={{ margin: '4px 0 0', fontSize: '12px', color: 'var(--lx-muted)' }}>Reads a 64-bit floating point number (e.g. 3.14159)</p>
+            </div>
+            <div style={{ background: 'rgba(0, 0, 0, 0.3)', border: '1px solid var(--lx-border)', borderRadius: '8px', padding: '10px 14px' }}>
+              <code style={{ color: '#38bdf8', fontWeight: 700 }}>sc.next()</code>
+              <p style={{ margin: '4px 0 0', fontSize: '12px', color: 'var(--lx-muted)' }}>Reads a single word up to the next whitespace</p>
+            </div>
+            <div style={{ background: 'rgba(0, 0, 0, 0.3)', border: '1px solid var(--lx-border)', borderRadius: '8px', padding: '10px 14px' }}>
+              <code style={{ color: '#38bdf8', fontWeight: 700 }}>sc.nextLine()</code>
+              <p style={{ margin: '4px 0 0', fontSize: '12px', color: 'var(--lx-muted)' }}>Reads an entire line of text including spaces</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 4: Data Types & Variables */}
+        <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '14px', padding: '22px' }}>
+          <h3 style={{ fontSize: '18px', color: '#fbbf24', marginTop: 0, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <BookOpen size={18} /> 4. Primitive Data Types in Java
+          </h3>
+          <p style={{ fontSize: '13.5px', color: 'var(--lx-muted)', lineHeight: 1.7, margin: '0 0 14px' }}>
+            Java is a statically-typed language: every variable must have its type declared before it can store values:
+          </p>
+
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--lx-border)', textAlign: 'left', color: '#fbbf24' }}>
+                  <th style={{ padding: '8px 12px' }}>Type</th>
+                  <th style={{ padding: '8px 12px' }}>Size</th>
+                  <th style={{ padding: '8px 12px' }}>Range / Value</th>
+                  <th style={{ padding: '8px 12px' }}>Example Declaration</th>
+                </tr>
+              </thead>
+              <tbody style={{ color: '#cbd5e1' }}>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <td style={{ padding: '8px 12px', fontFamily: 'monospace', color: '#38bdf8' }}>int</td>
+                  <td style={{ padding: '8px 12px' }}>4 bytes (32-bit)</td>
+                  <td style={{ padding: '8px 12px' }}>-2,147,483,648 to 2,147,483,647</td>
+                  <td style={{ padding: '8px 12px', fontFamily: 'monospace' }}>int cookies = 36;</td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <td style={{ padding: '8px 12px', fontFamily: 'monospace', color: '#38bdf8' }}>long</td>
+                  <td style={{ padding: '8px 12px' }}>8 bytes (64-bit)</td>
+                  <td style={{ padding: '8px 12px' }}>Large integers (~9 quintillion)</td>
+                  <td style={{ padding: '8px 12px', fontFamily: 'monospace' }}>long stars = 10000000000L;</td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <td style={{ padding: '8px 12px', fontFamily: 'monospace', color: '#38bdf8' }}>double</td>
+                  <td style={{ padding: '8px 12px' }}>8 bytes (64-bit)</td>
+                  <td style={{ padding: '8px 12px' }}>15 decimal digits precision</td>
+                  <td style={{ padding: '8px 12px', fontFamily: 'monospace' }}>double pi = 3.14159265;</td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <td style={{ padding: '8px 12px', fontFamily: 'monospace', color: '#38bdf8' }}>char</td>
+                  <td style={{ padding: '8px 12px' }}>2 bytes (16-bit)</td>
+                  <td style={{ padding: '8px 12px' }}>Single Unicode character in single quotes</td>
+                  <td style={{ padding: '8px 12px', fontFamily: 'monospace' }}>char grade = 'A';</td>
+                </tr>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <td style={{ padding: '8px 12px', fontFamily: 'monospace', color: '#38bdf8' }}>boolean</td>
+                  <td style={{ padding: '8px 12px' }}>1 bit</td>
+                  <td style={{ padding: '8px 12px' }}>true or false</td>
+                  <td style={{ padding: '8px 12px', fontFamily: 'monospace' }}>boolean passed = true;</td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '8px 12px', fontFamily: 'monospace', color: '#38bdf8' }}>String</td>
+                  <td style={{ padding: '8px 12px' }}>Object (Reference)</td>
+                  <td style={{ padding: '8px 12px' }}>Sequence of characters in double quotes</td>
+                  <td style={{ padding: '8px 12px', fontFamily: 'monospace' }}>String name = "Omar";</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Section 5: Common Pitfalls */}
+        <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '14px', padding: '22px' }}>
+          <h3 style={{ fontSize: '18px', color: '#fbbf24', marginTop: 0, marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <AlertTriangle size={18} /> 5. Common Beginner Errors &amp; How to Fix Them
+          </h3>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px', marginTop: '12px' }}>
+            <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.25)', borderRadius: '10px', padding: '14px' }}>
+              <strong style={{ color: '#f87171', fontSize: '13px', display: 'block', marginBottom: '4px' }}>
+                Compilation Error: ';' expected
+              </strong>
+              <p style={{ margin: 0, fontSize: '12px', color: '#fed7aa', lineHeight: 1.6 }}>
+                Every statement in Java must terminate with a semicolon <code>;</code>. Forgetting it will prevent the compiler from generating bytecode.
+              </p>
+            </div>
+
+            <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.25)', borderRadius: '10px', padding: '14px' }}>
+              <strong style={{ color: '#f87171', fontSize: '13px', display: 'block', marginBottom: '4px' }}>
+                ArithmeticException: / by zero
+              </strong>
+              <p style={{ margin: 0, fontSize: '12px', color: '#fed7aa', lineHeight: 1.6 }}>
+                Dividing an integer by zero (or an expression like <code>cookies / (friends - friends)</code>) crashes your program at runtime with an <code>ArithmeticException</code>.
+              </p>
+            </div>
+
+            <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.25)', borderRadius: '10px', padding: '14px' }}>
+              <strong style={{ color: '#f87171', fontSize: '13px', display: 'block', marginBottom: '4px' }}>
+                Unclosed Parenthesis: ')' expected
+              </strong>
+              <p style={{ margin: 0, fontSize: '12px', color: '#fed7aa', lineHeight: 1.6 }}>
+                Every opening parenthesis <code>(</code> must have a matching closing parenthesis <code>)</code>. Count your pairs carefully inside print statements.
+              </p>
+            </div>
+
+            <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.25)', borderRadius: '10px', padding: '14px' }}>
+              <strong style={{ color: '#f87171', fontSize: '13px', display: 'block', marginBottom: '4px' }}>
+                Cannot find symbol: class string
+              </strong>
+              <p style={{ margin: 0, fontSize: '12px', color: '#fed7aa', lineHeight: 1.6 }}>
+                In Java, <code>String</code> is a class and must be capitalized. Writing <code>string s = sc.next();</code> will fail compilation.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Call to Action: Switch to Practice */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(217, 119, 6, 0.12) 100%)',
+          border: '1px solid rgba(245, 158, 11, 0.4)',
+          borderRadius: '14px',
+          padding: '24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}>
+          <div>
+            <span style={{ fontSize: '11px', fontWeight: 800, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              STEP 2 OF YOUR LEARNING JOURNEY
+            </span>
+            <h3 style={{ margin: '4px 0 6px', fontSize: '18px', color: '#ffffff' }}>
+              Ready to Practice What You Learned?
+            </h3>
+            <p style={{ margin: 0, fontSize: '13px', color: '#fed7aa', maxWidth: '640px' }}>
+              Topic 01 includes <strong>25 hands-on coding challenges</strong> (13 Lugaish Original problems evaluated with real OpenJDK test cases + 12 curated external problems from CodeChef, HackerRank, beecrowd, and Codeforces).
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={onSwitchToPractice}
+            style={{
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+              border: 'none',
+              color: '#0f172a',
+              borderRadius: '12px',
+              padding: '12px 24px',
+              fontSize: '13px',
+              fontWeight: 800,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: '0 4px 14px rgba(245, 158, 11, 0.3)'
+            }}
+          >
+            Go to Practice Problems (25 Challenges) <ArrowRight size={16} />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Generic topic notes fallback for other topics
+  return (
+    <div className="space-y-6" style={{ padding: '4px 0' }}>
+      <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)', borderRadius: '14px', padding: '22px' }}>
+        <h3 style={{ color: '#fbbf24', fontSize: '20px', marginTop: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Sparkles size={20} /> {video.title}
+        </h3>
+        <p style={{ fontSize: '14px', lineHeight: 1.8, color: '#fef3c7', margin: '8px 0 0' }}>
+          {video.summary}
+        </p>
+      </div>
+
+      <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '14px', padding: '22px' }}>
+        <strong style={{ display: 'block', color: '#fbbf24', fontSize: '15px', marginBottom: '10px' }}>
+          🎯 Syllabus Overview &amp; Learning Objectives
+        </strong>
+        <p style={{ fontSize: '13.5px', color: 'var(--lx-muted)', lineHeight: 1.7, margin: '0 0 16px' }}>
+          {video.keyConcept || video.summary}
+        </p>
+        <p style={{ fontSize: '13px', color: 'var(--lx-muted)', lineHeight: 1.7, margin: 0 }}>
+          Watch the lecture class video when available, review the key algorithmic patterns, and practice in the <strong>Practice Problems</strong> tab.
+        </p>
+      </div>
+    </div>
+  );
+}

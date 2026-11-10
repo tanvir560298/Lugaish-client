@@ -255,12 +255,20 @@ export function JavaProblemSolverPage() {
           <AlertTriangle className="w-12 h-12 text-rose-400 mx-auto mb-3" />
           <h2 className="text-xl font-bold text-white mb-2">Problem Not Available</h2>
           <p className="text-slate-300 text-sm mb-6">{error || 'This problem is not currently published.'}</p>
-          <Link
-            to="/practice/java/basic-io-variables"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-amber-500 text-slate-950 hover:bg-amber-400 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back to Problem List
-          </Link>
+          <div className="flex justify-center gap-3">
+            <Link
+              to="/learn/java-programming/01"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-amber-500 text-slate-950 hover:bg-amber-400 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back to Java Course
+            </Link>
+            <Link
+              to="/practice/java/basic-io-variables"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-white hover:bg-slate-700 transition-colors"
+            >
+              All Problems
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -270,15 +278,22 @@ export function JavaProblemSolverPage() {
     <div className="min-h-screen py-4 sm:py-6 px-3 sm:px-6 lg:px-8 max-w-[1700px] mx-auto">
       {/* Top Bar with Navigation & Solved Badge */}
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-800">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
+          <Link
+            to="/learn/java-programming/01"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors px-2.5 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 hover:border-amber-500/50"
+            title="Return to Topic 01 in Java Programming Course"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" /> Back to Java Course
+          </Link>
           <Link
             to="/practice/java/basic-io-variables"
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700"
           >
-            <ArrowLeft className="w-3.5 h-3.5" /> Back to Topic 1
+            All Problems
           </Link>
           <div className="hidden sm:block text-slate-600">|</div>
-          <span className="text-xs font-semibold text-amber-400 hidden sm:inline">
+          <span className="text-xs font-semibold text-slate-300 hidden sm:inline">
             Java • {TOPIC_1_METADATA.title}
           </span>
         </div>

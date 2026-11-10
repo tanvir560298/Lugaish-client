@@ -9,7 +9,6 @@ import { getUnviewedCertificateCount } from "../utils/certificateStorage.js";
 const links = [
   ["/", "Home"],
   ["/learn", "Courses"],
-  ["/practice/java/basic-io-variables", "Practice"],
   ["/learning-spaces", "Campus"],
   ["/tanu", "Tanu AI"],
   ["/architects", "About"],
@@ -32,8 +31,6 @@ export function Header() {
   const active = (href) =>
     href === "/"
       ? pathname === "/"
-      : href === "/practice/java/basic-io-variables"
-        ? /^\/practice(\/|$)/.test(pathname)
       : href === "/learn"
         ? /^\/(learn|upcoming|course|pricing)(\/|$)/.test(pathname)
       : href === "/tanu"

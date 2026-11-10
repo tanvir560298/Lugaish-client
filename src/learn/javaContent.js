@@ -2,6 +2,7 @@
 // 14 Structured Topic Modules & Practice Curriculum by Tanvir Ahmad.
 
 import { nestedLoopsPracticeProblems } from './nestedLoopsPracticeData.js';
+import { FALLBACK_PUBLIC_PROBLEMS } from '../practice/java/javaPracticeData.js';
 export { nestedLoopsPracticeProblems };
 
 export const javaTopics = [
@@ -154,7 +155,7 @@ export const javaVideos = javaTopics.map(t => ({
 // Interactive practice problems mapped by topic id ('01' through '14')
 // Problems are added topic by topic as provided by Tanvir.
 export const javaPracticeProblems = {
-  '01': [],
+  '01': FALLBACK_PUBLIC_PROBLEMS['basic-io-variables'] || [],
   '02': [],
   '03': [],
   '04': [],

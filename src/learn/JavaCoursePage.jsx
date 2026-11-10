@@ -1,25 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
-  Lock,
   CheckCircle2,
-  Play,
   ArrowRight,
   Code2,
-  Terminal,
-  RotateCcw,
   Sparkles,
   Coffee,
   Check,
   BookOpen,
   Award,
-  Tv,
-  ExternalLink,
-  Eye,
-  EyeOff,
-  Copy,
-  Lightbulb,
-  CheckCircle
+  Tv
 } from 'lucide-react';
 import { useAppContext } from '../state/AppContext.jsx';
 import { useTanuPlayback } from '../tanu/GuidedSession.jsx';
@@ -27,15 +17,13 @@ import { createYouTubeLoader } from '../classroom/youtubeApi.js';
 import {
   javaVideos,
   javaPracticeProblems,
-  cleanJavaProgress,
-  isJavaClassUnlocked
+  cleanJavaProgress
 } from './javaContent.js';
-import {
-  runJavaSimulation,
-  checkJavaPractice,
-  javaMilestones
-} from './javaPractice.js';
+import { javaMilestones } from './javaPractice.js';
 import { NestedLoopsPracticeLab } from './NestedLoopsPracticeLab.jsx';
+import { JavaTopicPracticeListing } from '../practice/java/JavaTopicPracticeListing.jsx';
+import { JavaTopicNotes } from './JavaTopicNotes.jsx';
+import { getSolvedProblemIds } from '../practice/java/javaPracticeClient.js';
 import './learn.css';
 
 const loadYouTube = createYouTubeLoader({ window, document, setTimeout, clearTimeout });
@@ -135,14 +123,14 @@ function JavaVideoPlayer({ video, onEnded, onMarkComplete, isCompleted }) {
   if (!video.youtubeId) {
     return (
       <section className="html-player" aria-label="Java video player" style={{ borderColor: 'rgba(245, 158, 11, 0.3)' }}>
-        <div className="html-player-stage" style={{ minHeight: '380px' }}>
+        <div className="html-player-stage" style={{ minHeight: '360px' }}>
           <div className="html-player-placeholder" style={{ background: 'radial-gradient(ellipse at 50% 35%, #451a03, #080f1d 75%)' }}>
             <span className="html-player-symbol" style={{ borderColor: 'rgba(245, 158, 11, 0.4)', color: '#fbbf24' }}>
               <Coffee size={28} />
             </span>
             <strong style={{ fontSize: '20px', color: '#fef3c7' }}>{video.title}</strong>
-            <p style={{ maxWidth: '460px', color: '#fed7aa', fontSize: '13px', margin: '8px 0 16px', lineHeight: 1.6 }}>
-              Tanvir is uploading this class video to the YouTube channel. You can already start practicing in the interactive Java Lab below!
+            <p style={{ maxWidth: '480px', color: '#fed7aa', fontSize: '13px', margin: '8px 0 16px', lineHeight: 1.6 }}>
+              Tanvir is recording and uploading this lecture video to the YouTube channel. You can review the topic notes and solve the practice problems below!
             </p>
             <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center', background: 'rgba(245, 158, 11, 0.15)', padding: '6px 14px', borderRadius: '20px', color: '#fbbf24', fontSize: '11px', fontWeight: 600 }}>
               <Tv size={14} />
@@ -153,7 +141,7 @@ function JavaVideoPlayer({ video, onEnded, onMarkComplete, isCompleted }) {
         <div className="html-player-footer" style={{ background: 'rgba(24, 13, 4, 0.95)', borderTop: '1px solid rgba(245, 158, 11, 0.2)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span style={{ color: isCompleted ? '#38bdf8' : '#fbbf24', fontWeight: 600 }}>
-              {isCompleted ? '✓ Class Completed' : '☕ Class 01 Ready for Lab Practice'}
+              {isCompleted ? '✓ Class Completed' : `☕ Topic ${video.id} Lecture Ready`}
             </span>
             <span style={{ color: 'var(--lx-muted)' }}>•</span>
             <span style={{ color: 'var(--lx-muted)' }}>Instructor: <strong style={{ color: '#fed7aa' }}>{video.instructor}</strong></span>
@@ -243,734 +231,46 @@ function JavaVideoPlayer({ video, onEnded, onMarkComplete, isCompleted }) {
   );
 }
 
-function JavaPracticeLab({ video, onPassed, scope }) {
-  const allProblems = javaPracticeProblems[video.id] || [];
-  const [filter, setFilter] = useState('all'); // 'all' | 'solved' | 'pending'
-  const [selectedIdx, setSelectedIdx] = useState(0);
-  const [activeTab, setActiveTab] = useState('lab'); // 'lab' | 'notes'
-  const [showSolution, setShowSolution] = useState(false);
-  const [copiedSolution, setCopiedSolution] = useState(false);
-  const [copiedSample, setCopiedSample] = useState(false);
-
-  // Solved problem tracking in localStorage
-  const solvedStorageKey = `lugaish_java_solved_probs_v1:${scope}`;
-  const [solvedIds, setSolvedIds] = useState(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(solvedStorageKey) || '[]');
-      return Array.isArray(saved) ? saved : [];
-    } catch {
-      return [];
-    }
-  });
-
-  const markProblemSolved = (probId) => {
-    if (!probId) return;
-    setSolvedIds(prev => {
-      const next = prev.includes(probId) ? prev : [...prev, probId];
-      try {
-        localStorage.setItem(solvedStorageKey, JSON.stringify(next));
-      } catch {
-        /* ignore */
-      }
-      return next;
-    });
-  };
-
-  const solvedCount = allProblems.filter(p => solvedIds.includes(p.id)).length;
-  const pendingCount = allProblems.length - solvedCount;
-
-  // Filtered problems list
-  const displayedProblems = allProblems.filter(p => {
-    const isSolved = solvedIds.includes(p.id);
-    if (filter === 'solved') return isSolved;
-    if (filter === 'pending') return !isSolved;
-    return true;
-  });
-
-  const currentProblem = displayedProblems[selectedIdx] || displayedProblems[0] || null;
-
-  const storageKey = `lugaish_java_draft_v1:${scope}:${video.id}:${currentProblem?.id || 'default'}`;
-  const [code, setCode] = useState(() => {
-    if (!currentProblem) return '';
-    try {
-      return localStorage.getItem(storageKey) ?? (currentProblem.starterJava || currentProblem.starter || '');
-    } catch {
-      return currentProblem.starterJava || currentProblem.starter || '';
-    }
-  });
-
-  const [terminalOutput, setTerminalOutput] = useState('');
-  const [feedback, setFeedback] = useState(null);
-
-  useEffect(() => {
-    if (!currentProblem) return;
-    try {
-      const savedCode = localStorage.getItem(storageKey);
-      setCode(savedCode ?? (currentProblem.starterJava || currentProblem.starter || ''));
-    } catch {
-      setCode(currentProblem.starterJava || currentProblem.starter || '');
-    }
-    setTerminalOutput('');
-    setFeedback(null);
-    setShowSolution(false);
-  }, [currentProblem?.id, storageKey]);
-
-  useEffect(() => {
-    if (!currentProblem) return;
-    try {
-      localStorage.setItem(storageKey, code);
-    } catch {
-      /* ignore */
-    }
-  }, [code, storageKey, currentProblem]);
-
-  const handleCopySolution = () => {
-    const sol = currentProblem?.solutionJava || currentProblem?.solution || '';
-    if (!sol) return;
-    navigator.clipboard?.writeText(sol);
-    setCopiedSolution(true);
-    setTimeout(() => setCopiedSolution(false), 2000);
-  };
-
-  const handleLoadSolution = () => {
-    const sol = currentProblem?.solutionJava || currentProblem?.solution || '';
-    if (!sol) return;
-    setCode(sol);
-    setFeedback({
-      ok: true,
-      message: 'Official solution loaded into editor! You can now run or inspect it.'
-    });
-  };
-
-  const handleCopySample = (text) => {
-    if (!text) return;
-    navigator.clipboard?.writeText(text);
-    setCopiedSample(true);
-    setTimeout(() => setCopiedSample(false), 2000);
-  };
-
-  const handleRun = () => {
-    const sim = runJavaSimulation(code);
-    if (!sim.success) {
-      setTerminalOutput(`[Compilation Error - javac Test.java]\n${sim.errors.join('\n')}`);
-    } else {
-      setTerminalOutput(
-        sim.output
-          ? `[Java Virtual Machine Output]\n${sim.output}\n\n[Program exited with exit code 0]`
-          : '[Program exited with exit code 0 - No output printed]'
-      );
-    }
-  };
-
-  const handleCheck = () => {
-    if (!currentProblem) return;
-    const result = checkJavaPractice(currentProblem, code);
-    setFeedback(result);
-    if (result.output) {
-      setTerminalOutput(`[Java Output]\n${result.output}\n\n[Status: Verified by Lugaish Java Checker]`);
-    }
-    if (result.ok) {
-      markProblemSolved(currentProblem.id);
-      onPassed(video.id, currentProblem.id);
-    }
-  };
-
-  const handleReset = () => {
-    if (!currentProblem) return;
-    const defaultCode = currentProblem.starterJava || currentProblem.starter || '';
-    setCode(defaultCode);
-    setTerminalOutput('');
-    setFeedback(null);
-    try {
-      localStorage.removeItem(storageKey);
-    } catch {
-      /* ignore */
-    }
-  };
-
-  const copyNotesCode = (snippet) => {
-    setCode(snippet);
-    setActiveTab('lab');
-  };
-
-  return (
-    <section id="java-practice" className="html-practice" style={{ borderColor: 'rgba(245, 158, 11, 0.3)', marginTop: '32px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', borderBottom: '1px solid var(--lx-border)', paddingBottom: '16px', marginBottom: '20px' }}>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <button
-            type="button"
-            onClick={() => setActiveTab('lab')}
-            style={{
-              background: activeTab === 'lab' ? 'rgba(245, 158, 11, 0.15)' : 'transparent',
-              borderColor: activeTab === 'lab' ? '#f59e0b' : 'transparent',
-              color: activeTab === 'lab' ? '#fbbf24' : 'var(--lx-muted)',
-              borderWidth: '1px',
-              borderStyle: 'solid',
-              borderRadius: '8px',
-              padding: '8px 16px',
-              fontSize: '12px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            <Code2 size={15} /> Interactive Java Lab
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('notes')}
-            style={{
-              background: activeTab === 'notes' ? 'rgba(245, 158, 11, 0.15)' : 'transparent',
-              borderColor: activeTab === 'notes' ? '#f59e0b' : 'transparent',
-              color: activeTab === 'notes' ? '#fbbf24' : 'var(--lx-muted)',
-              borderWidth: '1px',
-              borderStyle: 'solid',
-              borderRadius: '8px',
-              padding: '8px 16px',
-              fontSize: '12px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}
-          >
-            <BookOpen size={15} /> Topic Overview &amp; Notes
-          </button>
-        </div>
-
-        {activeTab === 'lab' && currentProblem && (
-          <button type="button" className="lx-secondary" onClick={handleReset} style={{ fontSize: '11px', padding: '6px 12px', minHeight: '34px' }}>
-            <RotateCcw size={13} /> Reset starter code
-          </button>
-        )}
-      </div>
-
-      {activeTab === 'notes' ? (
-        <div style={{ padding: '8px 4px' }}>
-          <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)', borderRadius: '12px', padding: '20px', marginBottom: '20px' }}>
-            <h3 style={{ color: '#fbbf24', fontSize: '18px', marginTop: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Sparkles size={18} /> {video.title}
-            </h3>
-            <p style={{ fontSize: '14px', lineHeight: 1.8, color: '#fef3c7', margin: '8px 0 0' }}>
-              {video.summary}
-            </p>
-          </div>
-
-          <div style={{ background: 'var(--lx-panel)', border: '1px solid var(--lx-border)', borderRadius: '12px', padding: '18px' }}>
-            <strong style={{ display: 'block', color: '#fbbf24', fontSize: '14px', marginBottom: '8px' }}>
-              🎯 Learning Roadmap for this Topic
-            </strong>
-            <p style={{ fontSize: '13px', color: 'var(--lx-muted)', lineHeight: 1.7, margin: 0 }}>
-              Solve the coding exercises in the <strong>Interactive Java Lab</strong> tab. Each problem gives you instant feedback in the simulated Java Virtual Machine (JVM).
-            </p>
-          </div>
-        </div>
-      ) : (
-        <div>
-          {/* Solved / Pending Filter Bar */}
-          {allProblems.length > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '14px' }}>
-              <div style={{ display: 'flex', gap: '6px' }}>
-                <button
-                  type="button"
-                  onClick={() => { setFilter('all'); setSelectedIdx(0); }}
-                  style={{
-                    background: filter === 'all' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.04)',
-                    border: `1px solid ${filter === 'all' ? '#f59e0b' : 'var(--lx-border)'}`,
-                    color: filter === 'all' ? '#fbbf24' : 'var(--lx-muted)',
-                    borderRadius: '6px',
-                    padding: '5px 12px',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    cursor: 'pointer'
-                  }}
-                >
-                  All Problems ({allProblems.length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setFilter('solved'); setSelectedIdx(0); }}
-                  style={{
-                    background: filter === 'solved' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255, 255, 255, 0.04)',
-                    border: `1px solid ${filter === 'solved' ? '#10b981' : 'var(--lx-border)'}`,
-                    color: filter === 'solved' ? '#34d399' : 'var(--lx-muted)',
-                    borderRadius: '6px',
-                    padding: '5px 12px',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
-                >
-                  <CheckCircle size={12} /> Solved ({solvedCount})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setFilter('pending'); setSelectedIdx(0); }}
-                  style={{
-                    background: filter === 'pending' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255, 255, 255, 0.04)',
-                    border: `1px solid ${filter === 'pending' ? '#f59e0b' : 'var(--lx-border)'}`,
-                    color: filter === 'pending' ? '#fed7aa' : 'var(--lx-muted)',
-                    borderRadius: '6px',
-                    padding: '5px 12px',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    cursor: 'pointer'
-                  }}
-                >
-                  Pending ({pendingCount})
-                </button>
-              </div>
-
-              <span style={{ fontSize: '11px', color: 'var(--lx-muted)' }}>
-                {solvedCount} of {allProblems.length} solved in this topic
-              </span>
-            </div>
-          )}
-
-          {/* Problem Selector Tabs */}
-          {displayedProblems.length > 1 && (
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', overflowX: 'auto', paddingBottom: '4px' }}>
-              {displayedProblems.map((p, idx) => {
-                const isSolved = solvedIds.includes(p.id);
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => setSelectedIdx(idx)}
-                    style={{
-                      background: idx === selectedIdx ? 'linear-gradient(135deg, #d97706, #b45309)' : 'var(--lx-panel)',
-                      borderColor: idx === selectedIdx ? '#f59e0b' : isSolved ? '#10b981' : 'var(--lx-border)',
-                      color: idx === selectedIdx ? '#ffffff' : isSolved ? '#34d399' : 'var(--lx-muted)',
-                      borderWidth: '1px',
-                      borderStyle: 'solid',
-                      borderRadius: '8px',
-                      padding: '8px 14px',
-                      fontSize: '11px',
-                      fontWeight: 700,
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px'
-                    }}
-                  >
-                    {isSolved && <CheckCircle size={12} style={{ color: '#34d399' }} />}
-                    <span>{p.title}</span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          {currentProblem ? (
-            <div>
-              <div style={{ marginBottom: '18px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
-                  <span className="html-start-kicker" style={{ color: '#fbbf24' }}>
-                    TOPIC {video.id} · {(currentProblem.level || currentProblem.difficulty || 'PRACTICE').toUpperCase()}
-                  </span>
-                  {solvedIds.includes(currentProblem.id) && (
-                    <span style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      background: 'rgba(16, 185, 129, 0.15)',
-                      color: '#34d399',
-                      border: '1px solid rgba(16, 185, 129, 0.3)',
-                      padding: '3px 10px',
-                      borderRadius: '12px',
-                      fontSize: '11px',
-                      fontWeight: 700
-                    }}>
-                      <CheckCircle size={12} /> Solved ✓
-                    </span>
-                  )}
-                </div>
-
-                <h2 style={{ fontSize: '22px', margin: '6px 0 8px' }}>{currentProblem.title}</h2>
-
-                {/* External Link Button (If Link Provided) */}
-                {currentProblem.externalUrl && (
-                  <div style={{ margin: '8px 0 12px' }}>
-                    <a
-                      href={currentProblem.externalUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        background: 'rgba(59, 130, 246, 0.15)',
-                        border: '1px solid #3b82f6',
-                        color: '#60a5fa',
-                        padding: '7px 14px',
-                        borderRadius: '8px',
-                        fontSize: '12px',
-                        fontWeight: 700,
-                        textDecoration: 'none',
-                        boxShadow: '0 2px 8px rgba(59, 130, 246, 0.2)'
-                      }}
-                    >
-                      <ExternalLink size={14} /> Open Original Problem Link ↗
-                    </a>
-                  </div>
-                )}
-
-                {/* Short Idea & Key Logic (If Link or Summary Provided) */}
-                {currentProblem.shortIdea && (
-                  <div style={{
-                    background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.08) 100%)',
-                    border: '1px solid rgba(245, 158, 11, 0.35)',
-                    borderRadius: '10px',
-                    padding: '12px 16px',
-                    margin: '12px 0 16px',
-                    fontSize: '13px',
-                    lineHeight: 1.7,
-                    color: '#fef3c7'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fbbf24', fontWeight: 700, marginBottom: '4px' }}>
-                      <Lightbulb size={16} /> Short Idea &amp; Key Logic:
-                    </div>
-                    <p style={{ margin: 0 }}>{currentProblem.shortIdea}</p>
-                  </div>
-                )}
-
-                <p style={{ fontSize: '13px', lineHeight: 1.7, color: 'var(--lx-muted)', margin: 0 }}>
-                  {currentProblem.prompt}
-                </p>
-
-                {/* Sample Input / Output */}
-                {(currentProblem.sampleInput || currentProblem.sampleOutput) && (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '10px', marginTop: '12px' }}>
-                    {currentProblem.sampleInput && (
-                      <div style={{ background: 'rgba(0, 0, 0, 0.35)', border: '1px solid var(--lx-border)', borderRadius: '8px', padding: '10px 12px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                          <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--lx-muted)' }}>SAMPLE INPUT</span>
-                          <button
-                            type="button"
-                            onClick={() => handleCopySample(currentProblem.sampleInput)}
-                            style={{ background: 'transparent', border: 'none', color: '#fbbf24', cursor: 'pointer', fontSize: '10px' }}
-                          >
-                            Copy
-                          </button>
-                        </div>
-                        <pre style={{ margin: 0, fontSize: '11.5px', fontFamily: 'monospace', color: '#f8fafc', whiteSpace: 'pre-wrap' }}>
-                          {currentProblem.sampleInput}
-                        </pre>
-                      </div>
-                    )}
-                    {currentProblem.sampleOutput && (
-                      <div style={{ background: 'rgba(0, 0, 0, 0.35)', border: '1px solid var(--lx-border)', borderRadius: '8px', padding: '10px 12px' }}>
-                        <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--lx-muted)', display: 'block', marginBottom: '4px' }}>
-                          SAMPLE OUTPUT
-                        </span>
-                        <pre style={{ margin: 0, fontSize: '11.5px', fontFamily: 'monospace', color: '#34d399', whiteSpace: 'pre-wrap' }}>
-                          {currentProblem.sampleOutput}
-                        </pre>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Hint */}
-                {currentProblem.hint && (
-                  <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '8px', padding: '10px 14px', marginTop: '12px', fontSize: '12px', color: '#fed7aa' }}>
-                    <strong>💡 Hint:</strong> {currentProblem.hint}
-                  </div>
-                )}
-
-                {/* View Solved Code Button */}
-                {(currentProblem.solutionJava || currentProblem.solution) && (
-                  <div style={{ marginTop: '14px', marginBottom: '14px' }}>
-                    <button
-                      type="button"
-                      onClick={() => setShowSolution(!showSolution)}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        background: showSolution ? 'rgba(16, 185, 129, 0.18)' : 'rgba(245, 158, 11, 0.14)',
-                        border: `1px solid ${showSolution ? '#10b981' : '#f59e0b'}`,
-                        color: showSolution ? '#34d399' : '#fbbf24',
-                        borderRadius: '8px',
-                        padding: '7px 14px',
-                        fontSize: '12px',
-                        fontWeight: 700,
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {showSolution ? <EyeOff size={14} /> : <Eye size={14} />}
-                      {showSolution ? 'Hide Solved Solution' : '💡 View Solved Code'}
-                    </button>
-                  </div>
-                )}
-
-                {/* Solved Solution Box */}
-                {showSolution && (currentProblem.solutionJava || currentProblem.solution) && (
-                  <div style={{
-                    background: '#040711',
-                    border: '1px solid rgba(16, 185, 129, 0.4)',
-                    borderRadius: '10px',
-                    overflow: 'hidden',
-                    marginBottom: '16px'
-                  }}>
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      padding: '8px 14px',
-                      background: 'rgba(16, 185, 129, 0.1)',
-                      borderBottom: '1px solid rgba(16, 185, 129, 0.2)'
-                    }}>
-                      <span style={{ fontSize: '11px', color: '#34d399', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                        <CheckCircle2 size={13} /> Official Solved Solution (Java)
-                      </span>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <button
-                          type="button"
-                          onClick={handleCopySolution}
-                          style={{
-                            background: 'rgba(255, 255, 255, 0.08)',
-                            border: '1px solid rgba(255, 255, 255, 0.15)',
-                            color: '#f8fafc',
-                            borderRadius: '6px',
-                            padding: '4px 10px',
-                            fontSize: '11px',
-                            cursor: 'pointer',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px'
-                          }}
-                        >
-                          <Copy size={12} /> {copiedSolution ? 'Copied!' : 'Copy Code'}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={handleLoadSolution}
-                          style={{
-                            background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                            border: '1px solid #10b981',
-                            color: '#ffffff',
-                            borderRadius: '6px',
-                            padding: '4px 10px',
-                            fontSize: '11px',
-                            cursor: 'pointer',
-                            fontWeight: 700,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px'
-                          }}
-                        >
-                          <Code2 size={12} /> Load into Editor
-                        </button>
-                      </div>
-                    </div>
-                    <pre style={{
-                      margin: 0,
-                      padding: '14px',
-                      fontSize: '12.5px',
-                      lineHeight: 1.6,
-                      color: '#e2e8f0',
-                      fontFamily: 'monospace',
-                      overflowX: 'auto',
-                      whiteSpace: 'pre'
-                    }}>
-                      {currentProblem.solutionJava || currentProblem.solution || currentProblem.starter}
-                    </pre>
-                    {currentProblem.solutionExplanation && (
-                      <div style={{
-                        padding: '10px 14px',
-                        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-                        background: 'rgba(15, 23, 42, 0.5)',
-                        fontSize: '12px',
-                        color: '#94a3b8',
-                        lineHeight: 1.6
-                      }}>
-                        <strong style={{ color: '#f8fafc' }}>Logic Explanation: </strong>
-                        {currentProblem.solutionExplanation}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
-                {/* Code Editor */}
-                <div style={{ border: '1px solid var(--lx-border)', borderRadius: '12px', overflow: 'hidden', background: '#0a0f1d' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255, 255, 255, 0.04)', padding: '10px 16px', borderBottom: '1px solid var(--lx-border)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <Code2 size={14} style={{ color: '#fbbf24' }} />
-                      <span style={{ fontSize: '11px', fontFamily: 'monospace', color: '#f8fafc', fontWeight: 600 }}>
-                        Main.java
-                      </span>
-                    </div>
-                    <span style={{ fontSize: '10px', color: 'var(--lx-muted)' }}>Java 25 (Standard Edition)</span>
-                  </div>
-
-                  <textarea
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Tab') {
-                        e.preventDefault();
-                        const start = e.target.selectionStart;
-                        const end = e.target.selectionEnd;
-                        const updated = code.substring(0, start) + '    ' + code.substring(end);
-                        setCode(updated);
-                        setTimeout(() => {
-                          e.target.selectionStart = e.target.selectionEnd = start + 4;
-                        }, 0);
-                      }
-                    }}
-                    spellCheck="false"
-                    style={{
-                      width: '100%',
-                      minHeight: '260px',
-                      padding: '16px',
-                      background: 'transparent',
-                      border: 'none',
-                      outline: 'none',
-                      color: '#f8fafc',
-                      fontFamily: 'ui-monospace, SFMono-Regular, Consolas, monospace',
-                      fontSize: '13px',
-                      lineHeight: '1.8',
-                      resize: 'vertical',
-                      boxSizing: 'border-box'
-                    }}
-                  />
-
-                  <div style={{ display: 'flex', gap: '10px', padding: '12px 16px', background: 'rgba(255, 255, 255, 0.03)', borderTop: '1px solid var(--lx-border)' }}>
-                    <button
-                      type="button"
-                      onClick={handleRun}
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.08)',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
-                        color: '#f8fafc',
-                        borderRadius: '8px',
-                        padding: '8px 16px',
-                        fontSize: '12px',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px'
-                      }}
-                    >
-                      <Play size={13} /> Run Code
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleCheck}
-                      style={{
-                        background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)',
-                        border: '1px solid #f59e0b',
-                        color: '#ffffff',
-                        borderRadius: '8px',
-                        padding: '8px 18px',
-                        fontSize: '12px',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        boxShadow: '0 4px 12px rgba(217, 119, 6, 0.3)'
-                      }}
-                    >
-                      <CheckCircle2 size={14} /> Check Solution
-                    </button>
-                  </div>
-                </div>
-
-                {/* Terminal Output */}
-                <div style={{ border: '1px solid var(--lx-border)', borderRadius: '12px', overflow: 'hidden', background: '#050811', display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255, 255, 255, 0.04)', padding: '10px 14px', borderBottom: '1px solid var(--lx-border)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ width: '9px', height: '9px', borderRadius: '50%', background: '#ef4444' }} />
-                      <span style={{ width: '9px', height: '9px', borderRadius: '50%', background: '#eab308' }} />
-                      <span style={{ width: '9px', height: '9px', borderRadius: '50%', background: '#22c55e' }} />
-                      <span style={{ fontSize: '11px', fontFamily: 'monospace', color: 'var(--lx-muted)', marginLeft: '8px' }}>
-                        JVM Terminal
-                      </span>
-                    </div>
-                    <Terminal size={13} style={{ color: 'var(--lx-muted)' }} />
-                  </div>
-
-                  <div style={{ flex: 1, padding: '16px', font: '12px/1.8 monospace', color: '#94a3b8', minHeight: '240px', overflowY: 'auto', whiteSpace: 'pre-wrap' }}>
-                    <div style={{ color: '#38bdf8', marginBottom: '8px' }}>
-                      tanvir@lugaish-java-sandbox:~$ javac Main.java && java Main
-                    </div>
-                    {terminalOutput ? (
-                      <div style={{ color: terminalOutput.includes('Error') ? '#f87171' : '#e2e8f0' }}>
-                        {terminalOutput}
-                      </div>
-                    ) : (
-                      <div style={{ color: '#64748b', fontStyle: 'italic' }}>
-                        Press "Run Code" or "Check Solution" to compile and see output here...
-                      </div>
-                    )}
-                  </div>
-
-                  {feedback && (
-                    <div
-                      style={{
-                        padding: '12px 16px',
-                        borderTop: '1px solid var(--lx-border)',
-                        background: feedback.ok ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                        color: feedback.ok ? '#34d399' : '#f87171',
-                        fontSize: '12px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        fontWeight: 600
-                      }}
-                    >
-                      {feedback.ok ? <Sparkles size={16} /> : <RotateCcw size={16} />}
-                      <span>{feedback.message}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div style={{
-              padding: '48px 24px',
-              textAlign: 'center',
-              background: 'rgba(15, 23, 42, 0.5)',
-              border: '1px dashed rgba(245, 158, 11, 0.3)',
-              borderRadius: '12px',
-              margin: '12px 0'
-            }}>
-              <Code2 size={36} style={{ color: '#fbbf24', margin: '0 auto 12px' }} />
-              <h3 style={{ color: '#f8fafc', margin: '0 0 8px', fontSize: '18px' }}>
-                {video.topicTitle || video.title}
-              </h3>
-              <p style={{ color: 'var(--lx-muted)', fontSize: '13px', margin: '0 auto 18px', maxWidth: '520px', lineHeight: 1.6 }}>
-                এই টপিকের প্রবলেমগুলো আপলোড হওয়ার অপেক্ষায় রয়েছে। তানভীর ভাই একে একে প্রবলেম দিচ্ছেন এবং সেগুলো এই ল্যাবে তৎক্ষণাৎ যুক্ত হয়ে যাবে!
-              </p>
-              <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center', background: 'rgba(245, 158, 11, 0.12)', border: '1px solid rgba(245, 158, 11, 0.25)', padding: '6px 14px', borderRadius: '20px', color: '#fbbf24', fontSize: '11px', fontWeight: 600 }}>
-                <span>Ready to receive problems</span>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-    </section>
-  );
-}
-
 export function JavaCoursePage() {
   const { videoId } = useParams();
   const { state } = useAppContext();
   const scope = state.userEmail || 'guest';
 
-  // LocalStorage progress
+  // Navigation tab state: 'notes' | 'practice'
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window !== 'undefined' && window.location.hash === '#practice') {
+      return 'practice';
+    }
+    return 'notes';
+  });
+
+  // Solved problem IDs synchronized with practice system
+  const [solvedProblemIds, setSolvedProblemIds] = useState(() => getSolvedProblemIds());
+
+  useEffect(() => {
+    const sync = () => setSolvedProblemIds(getSolvedProblemIds());
+    window.addEventListener('storage', sync);
+    window.addEventListener('focus', sync);
+    return () => {
+      window.removeEventListener('storage', sync);
+      window.removeEventListener('focus', sync);
+    };
+  }, []);
+
+  // Listen to hash changes (e.g. from #practice links)
+  useEffect(() => {
+    const handleHash = () => {
+      if (window.location.hash === '#practice') {
+        setActiveTab('practice');
+      } else if (window.location.hash === '#notes') {
+        setActiveTab('notes');
+      }
+    };
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
+
+  // LocalStorage course progress
   const [completed, setCompleted] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(`lugaish_java_progress_v1:${scope}`) || '[]');
@@ -1023,13 +323,13 @@ export function JavaCoursePage() {
             display: 'inline-block',
             marginBottom: '16px'
           }}>
-            CURRICULUM RESET · READY FOR NEW CONTENT
+            CURRICULUM READY
           </span>
           <h1 style={{ fontSize: 'clamp(24px, 4vw, 36px)', color: '#f8fafc', margin: '0 0 14px' }}>
             Java Programming Course
           </h1>
           <p style={{ maxWidth: '600px', margin: '0 auto 28px', color: '#94a3b8', fontSize: '15px', lineHeight: 1.7 }}>
-            জাভা কোর্সের আগের কনটেন্ট সফলভাবে রিমুভ করা হয়েছে। এখন নতুন সিলেবাস, ভিডিও ক্লাস ও প্র্যাকটিস সমস্যা যুক্ত করার জন্য প্রস্তুত।
+            জাভা প্রোগ্রামিং ট্র্যাকের সকল ক্লাস ও প্র্যাকটিস সেশন লোড হচ্ছে...
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link
@@ -1058,6 +358,8 @@ export function JavaCoursePage() {
 
   const activeId = videoId === 'nested-loops' ? '05' : (videoId || javaVideos[0]?.id || '01');
   const currentVideo = javaVideos.find(v => v.id === activeId) || javaVideos[0];
+  const currentProblems = javaPracticeProblems[currentVideo.id] || [];
+  const topicProblemCount = currentProblems.length;
 
   const handleMarkComplete = (idToComplete = currentVideo.id) => {
     if (!completed.includes(idToComplete)) {
@@ -1066,7 +368,11 @@ export function JavaCoursePage() {
   };
 
   const handlePracticePassed = (vidId) => {
-    handleMarkComplete(vidId);
+    const targetVideo = javaVideos.find(v => v.id === vidId);
+    // Only mark the video completed if a real video actually exists
+    if (targetVideo && targetVideo.youtubeId) {
+      handleMarkComplete(vidId);
+    }
   };
 
   const percentComplete = Math.round((completed.length / javaVideos.length) * 100);
@@ -1104,11 +410,17 @@ export function JavaCoursePage() {
           <p style={{ margin: '8px 0 0', fontSize: '11px', color: 'var(--lx-muted)' }}>
             {percentComplete}% of Java syllabus completed
           </p>
+          <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px' }}>
+            <span style={{ color: 'var(--lx-muted)' }}>Solved Challenges:</span>
+            <span style={{ color: '#34d399', fontWeight: 700 }}>
+              {solvedProblemIds.length} solved
+            </span>
+          </div>
         </div>
       </header>
 
-      {/* Nested Loops Quick Banner */}
-      {currentVideo.id !== '05' && (
+      {/* Featured Banner for Nested Loops if on another topic */}
+      {currentVideo.id !== '05' && currentVideo.id !== '01' && (
         <div
           style={{
             background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.14) 0%, rgba(180, 83, 9, 0.1) 100%)',
@@ -1130,7 +442,7 @@ export function JavaCoursePage() {
                 Featured Practice Set: Nested Loops &amp; Algorithmic Simulation (14 Problems)
               </strong>
               <p style={{ margin: 0, fontSize: '11px', color: '#fed7aa' }}>
-                Star triangles, pyramids, Selection Sort, and Codeforces challenges (Fox &amp; Snake, Shape 1, 2, 3, Gravity Flip, Queue at School, Twins).
+                Star triangles, pyramids, Selection Sort, and Codeforces challenges.
               </p>
             </div>
           </div>
@@ -1157,7 +469,7 @@ export function JavaCoursePage() {
 
       {/* Main Watch & Curriculum Layout */}
       <div className="html-watch-layout" style={{ marginTop: '28px' }}>
-        {/* Left: Video Player & Practice Lab */}
+        {/* Left: Video Player & Tabs */}
         <div style={{ minWidth: 0 }}>
           <JavaVideoPlayer
             video={currentVideo}
@@ -1166,19 +478,129 @@ export function JavaCoursePage() {
             isCompleted={completed.includes(currentVideo.id)}
           />
 
-          {currentVideo.id === '05' ? (
-            <NestedLoopsPracticeLab
-              onPassed={handlePracticePassed}
-              scope={scope}
-              courseId="java-programming"
-            />
-          ) : (
-            <JavaPracticeLab
-              video={currentVideo}
-              onPassed={handlePracticePassed}
-              scope={scope}
-            />
-          )}
+          {/* TWO TABS: Topic Overview & Notes vs Practice Problems */}
+          <div style={{ marginTop: '28px' }}>
+            <div style={{ display: 'flex', gap: '10px', borderBottom: '1px solid var(--lx-border)', paddingBottom: '12px', marginBottom: '24px' }}>
+              <button
+                type="button"
+                onClick={() => setActiveTab('notes')}
+                style={{
+                  background: activeTab === 'notes' ? 'rgba(245, 158, 11, 0.16)' : 'transparent',
+                  borderColor: activeTab === 'notes' ? '#f59e0b' : 'transparent',
+                  color: activeTab === 'notes' ? '#fbbf24' : 'var(--lx-muted)',
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                  borderRadius: '10px',
+                  padding: '9px 18px',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <BookOpen size={16} /> Topic Overview &amp; Notes
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('practice')}
+                style={{
+                  background: activeTab === 'practice' ? 'rgba(245, 158, 11, 0.16)' : 'transparent',
+                  borderColor: activeTab === 'practice' ? '#f59e0b' : 'transparent',
+                  color: activeTab === 'practice' ? '#fbbf24' : 'var(--lx-muted)',
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                  borderRadius: '10px',
+                  padding: '9px 18px',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <Code2 size={16} /> Practice Problems
+                {topicProblemCount > 0 && (
+                  <span
+                    style={{
+                      background: activeTab === 'practice' ? '#f59e0b' : 'rgba(255, 255, 255, 0.1)',
+                      color: activeTab === 'practice' ? '#0f172a' : '#fed7aa',
+                      padding: '2px 8px',
+                      borderRadius: '10px',
+                      fontSize: '11px',
+                      fontWeight: 800
+                    }}
+                  >
+                    {topicProblemCount}
+                  </span>
+                )}
+              </button>
+            </div>
+
+            {/* Tab 1: Topic Overview & Notes */}
+            {activeTab === 'notes' ? (
+              <JavaTopicNotes
+                video={currentVideo}
+                onSwitchToPractice={() => setActiveTab('practice')}
+              />
+            ) : (
+              /* Tab 2: Practice Problems */
+              <div>
+                {currentVideo.id === '01' ? (
+                  <JavaTopicPracticeListing
+                    topicSlug="basic-io-variables"
+                    topicTitle={currentVideo.topicTitle || currentVideo.title}
+                    compact={true}
+                  />
+                ) : currentVideo.id === '05' ? (
+                  <NestedLoopsPracticeLab
+                    onPassed={handlePracticePassed}
+                    scope={scope}
+                    courseId="java-programming"
+                  />
+                ) : (
+                  <div style={{
+                    padding: '48px 24px',
+                    textAlign: 'center',
+                    background: 'rgba(15, 23, 42, 0.5)',
+                    border: '1px dashed rgba(245, 158, 11, 0.3)',
+                    borderRadius: '14px',
+                    margin: '12px 0'
+                  }}>
+                    <Code2 size={36} style={{ color: '#fbbf24', margin: '0 auto 12px' }} />
+                    <h3 style={{ color: '#f8fafc', margin: '0 0 8px', fontSize: '18px' }}>
+                      {currentVideo.topicTitle || currentVideo.title}
+                    </h3>
+                    <p style={{ color: 'var(--lx-muted)', fontSize: '13px', margin: '0 auto 18px', maxWidth: '520px', lineHeight: 1.6 }}>
+                      Problems for this topic are being prepared. In the meantime, head over to Topic 01 to practice Basic Input, Output &amp; Variables (25 practice problems ready)!
+                    </p>
+                    <Link
+                      to="/learn/java-programming/01"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                        color: '#0f172a',
+                        padding: '8px 16px',
+                        borderRadius: '10px',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        textDecoration: 'none'
+                      }}
+                    >
+                      Practice Topic 01 (25 Problems) <ArrowRight size={14} />
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right: Curriculum Roadmap & Topic Selector */}
@@ -1199,7 +621,10 @@ export function JavaCoursePage() {
             {javaVideos.map((vid) => {
               const isDone = completed.includes(vid.id);
               const isCurrent = vid.id === currentVideo.id;
-              const probCount = javaPracticeProblems[vid.id]?.length || 0;
+              const probs = javaPracticeProblems[vid.id] || [];
+              const probCount = probs.length;
+              const lugaishProbs = probs.filter(p => p.problemType === 'lugaish');
+              const topicSolved = lugaishProbs.filter(p => solvedProblemIds.includes(p.id)).length;
 
               return (
                 <li key={vid.id}>
@@ -1226,7 +651,9 @@ export function JavaCoursePage() {
                         )}
                       </div>
                       <small style={{ color: 'var(--lx-muted)' }}>
-                        {probCount > 0 ? `${probCount} Practice ${probCount === 1 ? 'Problem' : 'Problems'}` : 'Problems uploading soon'} {isDone && '· Done ✓'}
+                        {probCount > 0
+                          ? `${probCount} Practice ${probCount === 1 ? 'Problem' : 'Problems'}${topicSolved > 0 ? ` · ${topicSolved}/${lugaishProbs.length} Solved` : ''}`
+                          : 'Problems uploading soon'} {isDone && '· Done ✓'}
                       </small>
                     </div>
                   </Link>
