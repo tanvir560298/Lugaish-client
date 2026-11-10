@@ -64,6 +64,23 @@ public class Solution {
 `,
     explanation: 'Read an integer with nextInt() and a double with nextDouble(). Because nextDouble() does not consume the trailing newline character, call scan.nextLine() once to clear the newline buffer before reading the full line String with scan.nextLine(). Finally, print String, Double, and Int in the required format.',
     note: "Sample input with 42, 3.1415, and a sentence correctly preserves the entire line. Time O(1), extra space O(1)."
+  },
+  'https://www.codechef.com/practice/course/cpp/PCPP01/problems/INSTNOODLE': {
+    language: 'Java', file: 'Main.java',
+    code: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int x = sc.nextInt();
+        int y = sc.nextInt();
+
+        System.out.println(x * y);
+    }
+}
+`,
+    explanation: 'Read two integers X (number of stoves) and Y (number of minutes). Since each stove cooks 1 packet per minute, Chef cooks X packets in 1 minute. Over Y minutes, Chef cooks X * Y packets, serving X * Y customers.',
+    note: 'Example: 3 stoves for 7 minutes cook 3 * 7 = 21 packets. Time O(1), extra space O(1).'
   }
 };
 
