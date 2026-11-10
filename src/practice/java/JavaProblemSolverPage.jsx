@@ -55,10 +55,29 @@ export function JavaProblemSolverPage() {
   const [copiedKey, setCopiedKey] = useState(null);
 
   const editorRef = useRef(null);
+  const resultVersion = useRef(0);
+
+  function clearResults() {
+    resultVersion.current += 1;
+    setRunResult(null);
+    setSubmitResult(null);
+    setExecuting(false);
+    setSubmitting(false);
+    setActiveTab('output');
+  }
+
+  function updateCode(value) {
+    clearResults();
+    setCode(value);
+  }
 
   // Load problem details
   useEffect(() => {
     let isMounted = true;
+    clearResults();
+    setProblem(null);
+    setSolved(false);
+    setCustomInput('');
     async function load() {
       setLoading(true);
       setError(null);
@@ -108,6 +127,7 @@ export function JavaProblemSolverPage() {
     load();
     return () => {
       isMounted = false;
+      resultVersion.current += 1;
     };
   }, [problemSlug]);
 
@@ -129,7 +149,7 @@ export function JavaProblemSolverPage() {
       const end = e.target.selectionEnd;
       const val = code;
       const nextCode = val.substring(0, start) + '    ' + val.substring(end);
-      setCode(nextCode);
+      updateCode(nextCode);
       setTimeout(() => {
         if (editorRef.current) {
           editorRef.current.selectionStart = editorRef.current.selectionEnd = start + 4;
@@ -147,7 +167,7 @@ export function JavaProblemSolverPage() {
       if (indent.length > 0) {
         e.preventDefault();
         const nextCode = code.substring(0, start) + '\n' + indent + code.substring(start);
-        setCode(nextCode);
+        updateCode(nextCode);
         setTimeout(() => {
           if (editorRef.current) {
             editorRef.current.selectionStart = editorRef.current.selectionEnd = start + 1 + indent.length;
@@ -160,7 +180,7 @@ export function JavaProblemSolverPage() {
   // Reset Code
   const handleResetCode = () => {
     if (window.confirm('Reset code to default template?')) {
-      setCode(problem?.starterCode || DEFAULT_JAVA_STARTER);
+      updateCode(problem?.starterCode || DEFAULT_JAVA_STARTER);
       setRunResult(null);
       setSubmitResult(null);
     }
@@ -169,6 +189,7 @@ export function JavaProblemSolverPage() {
   // Run Code
   const handleRunCode = async () => {
     if (executing || submitting) return;
+    const version = ++resultVersion.current;
     setExecuting(true);
     setRunResult(null);
     setSubmitResult(null);
@@ -183,21 +204,24 @@ export function JavaProblemSolverPage() {
         sourceCode: code,
         stdin: stdinToUse
       });
+      if (version !== resultVersion.current) return;
       setRunResult(result);
     } catch (err) {
+      if (version !== resultVersion.current) return;
       setRunResult({
         success: false,
         verdict: 'Execution Service Unavailable',
         stderr: 'Failed to run code. Please try again.'
       });
     } finally {
-      setExecuting(false);
+      if (version === resultVersion.current) setExecuting(false);
     }
   };
 
   // Submit Solution
   const handleSubmitSolution = async () => {
     if (executing || submitting || !problem) return;
+    const version = ++resultVersion.current;
     setSubmitting(true);
     setSubmitResult(null);
     setRunResult(null);
@@ -210,18 +234,20 @@ export function JavaProblemSolverPage() {
         sourceCode: code
       });
 
+      if (version !== resultVersion.current) return;
       setSubmitResult(result);
-      if (result?.verdict === 'Accepted') {
+      if (result?.success && result?.verdict === 'Accepted') {
         setSolved(true);
       }
     } catch (err) {
+      if (version !== resultVersion.current) return;
       setSubmitResult({
         success: false,
         verdict: 'Execution Service Unavailable',
         message: 'Could not connect to evaluation judge. Please retry.'
       });
     } finally {
-      setSubmitting(false);
+      if (version === resultVersion.current) setSubmitting(false);
     }
   };
 
@@ -532,7 +558,7 @@ export function JavaProblemSolverPage() {
               <textarea
                 ref={editorRef}
                 value={code}
-                onChange={(e) => setCode(e.target.value)}
+                onChange={(e) => updateCode(e.target.value)}
                 onKeyDown={handleEditorKeyDown}
                 spellCheck="false"
                 autoCapitalize="none"

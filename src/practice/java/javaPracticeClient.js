@@ -334,60 +334,7 @@ export async function submitJavaSolution({ topicSlug = 'basic-io-variables', pro
     }
   }
 
-  // Resilient fallback: evaluate sample test cases directly if backend routes are unreachable
-  const fallbackList = FALLBACK_PUBLIC_PROBLEMS[topicSlug] || [];
-  const prob = fallbackList.find(p => p.id === problemId || p.slug === problemId);
-
-  if (prob && Array.isArray(prob.sampleTestCases) && prob.sampleTestCases.length > 0) {
-    try {
-      for (let i = 0; i < prob.sampleTestCases.length; i++) {
-        const tc = prob.sampleTestCases[i];
-        const exec = await executeDirectJudge0({ sourceCode, stdin: tc.input || '' });
-
-        if (exec.verdict !== 'Accepted') {
-          return {
-            success: false,
-            verdict: exec.verdict,
-            testCasesPassed: i,
-            totalTestCases: prob.sampleTestCases.length,
-            failedTestCaseIndex: i + 1,
-            isSampleTestCase: true,
-            stdout: exec.stdout,
-            stderr: exec.stderr,
-            compileOutput: exec.compileOutput
-          };
-        }
-
-        const actual = (exec.stdout || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
-        const expected = (tc.expectedOutput || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
-
-        if (actual !== expected) {
-          return {
-            success: false,
-            verdict: 'Wrong Answer',
-            testCasesPassed: i,
-            totalTestCases: prob.sampleTestCases.length,
-            failedTestCaseIndex: i + 1,
-            isSampleTestCase: true,
-            actualOutput: exec.stdout,
-            expectedOutput: tc.expectedOutput,
-            input: tc.input
-          };
-        }
-      }
-
-      // Passed sample cases in client fallback
-      markProblemSolved(problemId);
-      return {
-        success: true,
-        verdict: 'Accepted',
-        testCasesPassed: prob.sampleTestCases.length,
-        totalTestCases: prob.sampleTestCases.length
-      };
-    } catch (fallbackErr) {
-      console.error('[PracticeClient] Fallback evaluation failed:', fallbackErr);
-    }
-  }
+  // Only the server judge can issue an official verdict against hidden tests.
 
   return {
     success: false,
