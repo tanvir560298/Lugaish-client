@@ -156,8 +156,14 @@ async function executeDirectJudge0({ sourceCode, stdin = '' }) {
     }
   };
 
+  const normalizedSource = typeof sourceCode === 'string'
+    ? sourceCode
+        .replace(/public\s+class\s+[A-Za-z0-9_$]+/g, 'public class Main')
+        .replace(/\bclass\s+Solution\b/g, 'class Main')
+    : '';
+
   const payload = {
-    source_code: toBase64(sourceCode),
+    source_code: toBase64(normalizedSource),
     language_id: 62, // OpenJDK 13/14
     stdin: stdin ? toBase64(stdin) : '',
     cpu_time_limit: 5,

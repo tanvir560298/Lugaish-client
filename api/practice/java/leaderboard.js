@@ -35,3 +35,4 @@ export default async function handler(req, res) {
   // Graceful fallback: return empty list rather than 500 error
   return res.status(200).json({ leaders: [] });
 }
+

@@ -91,7 +91,7 @@ export function JavaProblemSolverPage() {
           return;
         }
 
-        if (prob.problemType === 'external') {
+        if (prob.problemType === 'external' && (!prob.sampleTestCases || prob.sampleTestCases.length === 0)) {
           if (prob.externalUrl) {
             window.location.replace(prob.externalUrl);
             return;

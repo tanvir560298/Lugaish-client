@@ -379,7 +379,7 @@ export function JavaTopicPracticeListing({
                       {/* Action */}
                       <td className="py-3.5 px-5 text-right">
                         <div className="problem-row-actions">
-                        {isExternal ? (
+                        {isExternal && !prob.sampleTestCases ? (
                           <a
                             href={prob.externalUrl}
                             target="_blank"
@@ -460,7 +460,7 @@ export function JavaTopicPracticeListing({
                   </div>
 
                   <div className="problem-row-actions pt-2 border-t border-slate-800">
-                    {isExternal ? (
+                    {isExternal && !prob.sampleTestCases ? (
                       <a
                         href={prob.externalUrl}
                         target="_blank"
