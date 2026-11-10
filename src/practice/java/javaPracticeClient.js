@@ -1,6 +1,7 @@
 import { API_BASE_URL, getAuthToken } from '../../api/client.js';
-export const JAVA_RANKING_API = (import.meta.env.VITE_API_URL || 'https://lugaish-server.onrender.com/api').replace(/\/$/, '');
 import { TOPIC_1_METADATA, SOLVED_STORAGE_KEY, FALLBACK_PUBLIC_PROBLEMS } from './javaPracticeData.js';
+
+export const JAVA_RANKING_API = API_BASE_URL || '/api';
 
 /**
  * Returns array of solved problem IDs from local storage.
@@ -46,7 +47,7 @@ export function markProblemSolved(problemId) {
  * 1. Same-origin relative path (for Vercel serverless /api routes)
  * 2. Absolute API_BASE_URL (if configured)
  */
-function getCandidateEndpoints(relativePath) {
+export function getCandidateEndpoints(relativePath) {
   const cleanRelative = relativePath.startsWith('/') ? relativePath : `/${relativePath}`;
   const endpoints = [];
 
@@ -286,8 +287,7 @@ export async function runJavaCode({ sourceCode, stdin = '' }) {
  * Submits student Java code for official evaluation against official test cases.
  */
 export async function submitJavaSolution({ topicSlug = 'basic-io-variables', problemId, sourceCode }) {
-  const token = getAuthToken();
-  const endpoints = token ? [`${JAVA_RANKING_API}/practice/java/submit`] : getCandidateEndpoints('/api/practice/java/submit');
+  const endpoints = getCandidateEndpoints('/api/practice/java/submit');
   let lastError = null;
 
   for (const endpoint of endpoints) {
@@ -295,10 +295,15 @@ export async function submitJavaSolution({ topicSlug = 'basic-io-variables', pro
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 35000);
 
+      const token = getAuthToken();
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const res = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        ...(token ? { headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } } : {}),
+        headers,
         body: JSON.stringify({ topicSlug, problemId, sourceCode }),
         signal: controller.signal
       });
@@ -329,7 +334,6 @@ export async function submitJavaSolution({ topicSlug = 'basic-io-variables', pro
     }
   }
 
-  if (token) return { success: false, verdict: 'Execution Service Unavailable', message: 'Ranked submission could not reach the server. Please retry; no points were awarded.' };
   // Resilient fallback: evaluate sample test cases directly if backend routes are unreachable
   const fallbackList = FALLBACK_PUBLIC_PROBLEMS[topicSlug] || [];
   const prob = fallbackList.find(p => p.id === problemId || p.slug === problemId);

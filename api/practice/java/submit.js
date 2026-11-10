@@ -49,6 +49,37 @@ export default async function handler(req, res) {
       sourceCode
     });
 
+    // Score & Leaderboard Integration with Render backend database
+    const authHeader = req.headers.authorization;
+    if (result.success && result.verdict === 'Accepted') {
+      if (authHeader) {
+        try {
+          const renderUrl = process.env.VITE_API_URL || 'https://lugaish-server.onrender.com/api';
+          const awardRes = await fetch(`${renderUrl.replace(/\/$/, '')}/practice/java/submit`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': authHeader
+            },
+            body: JSON.stringify({ topicSlug, problemId, sourceCode })
+          });
+          if (awardRes.ok) {
+            const awardData = await awardRes.json();
+            if (awardData.score) {
+              result.score = awardData.score;
+            }
+            if (awardData.scoreMessage) {
+              result.scoreMessage = awardData.scoreMessage;
+            }
+          }
+        } catch (awardErr) {
+          console.warn('[Vercel Submit] Could not sync score with Render:', awardErr.message);
+        }
+      } else {
+        result.scoreMessage = 'Sign in and submit to earn leaderboard points.';
+      }
+    }
+
     return res.status(200).json(result);
   } catch (err) {
     console.error('[Vercel API] Error judging Java submission:', err);

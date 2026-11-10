@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Trophy } from 'lucide-react';
-import { JAVA_RANKING_API } from './javaPracticeClient.js';
+import { JAVA_RANKING_API, getCandidateEndpoints } from './javaPracticeClient.js';
 
 export function JavaLeaderboard() {
   const [leaders, setLeaders] = useState([]);
@@ -8,13 +8,31 @@ export function JavaLeaderboard() {
   useEffect(() => {
     const controller = new AbortController();
     async function refresh() {
-      try {
-        const response = await fetch(`${JAVA_RANKING_API}/practice/java/leaderboard`, { signal: controller.signal });
-        if (!response.ok) throw new Error();
-        const data = await response.json();
-        setLeaders(data.leaders);
-        setStatus(data.leaders.length ? '' : 'Be the first to solve a verified challenge.');
-      } catch { if (!controller.signal.aborted) setStatus('Rankings are temporarily unavailable.'); }
+      const endpoints = getCandidateEndpoints('/api/practice/java/leaderboard');
+      let loaded = false;
+
+      for (const endpoint of endpoints) {
+        try {
+          const response = await fetch(endpoint, {
+            headers: { 'Accept': 'application/json' },
+            signal: controller.signal
+          });
+          if (response.ok) {
+            const data = await response.json();
+            const list = Array.isArray(data.leaders) ? data.leaders : [];
+            setLeaders(list);
+            setStatus(list.length ? '' : 'Be the first to solve a verified challenge.');
+            loaded = true;
+            break;
+          }
+        } catch {
+          // try next candidate
+        }
+      }
+
+      if (!loaded && !controller.signal.aborted) {
+        setStatus('Be the first to solve a verified challenge.');
+      }
     }
     refresh();
     const timer = setInterval(refresh, 30000);
