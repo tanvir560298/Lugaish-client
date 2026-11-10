@@ -418,6 +418,7 @@ export function JavaCoursePage() {
               <button
                 type="button"
                 onClick={() => setActiveTab('practice')}
+                className="java-practice-tab"
                 aria-pressed={activeTab === 'practice'}
                 style={{
                   background: activeTab === 'practice' ? 'rgba(245, 158, 11, 0.16)' : 'transparent',

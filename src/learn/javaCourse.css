@@ -13,6 +13,28 @@
 .java-course .java-start-challenge { display: inline-flex; gap: 10px; align-items: center; justify-content: center; background: #0e7490; color: white; border: 1px solid #0e7490; padding: 12px 18px; border-radius: 6px; font-size: 14px; font-weight: 650; min-height: 46px; }
 .java-course .java-browse-challenges { display: inline-flex; gap: 8px; align-items: center; padding: 10px 0; color: var(--lx-text); background: transparent; border: 0; font-size: 13px; }
 .java-start-challenge:hover { background: #155e75; }
+
+@keyframes java-practice-glow {
+  0%, 100% { box-shadow: 0 0 0 1px rgb(56 189 248 / 18%), 0 0 6px rgb(56 189 248 / 10%); }
+  50% { box-shadow: 0 0 0 3px rgb(56 189 248 / 24%), 0 0 20px rgb(56 189 248 / 30%); }
+}
+.java-course .java-start-challenge,
+.java-course .java-practice-tab[aria-pressed='false'] {
+  animation: java-practice-glow 3s ease-in-out infinite;
+}
+.java-course .java-start-challenge:hover,
+.java-course .java-start-challenge:focus-visible,
+.java-course .java-practice-tab:hover,
+.java-course .java-practice-tab:focus-visible {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .java-course .java-start-challenge,
+  .java-course .java-practice-tab[aria-pressed='false'] {
+    animation: none;
+    box-shadow: 0 0 0 2px rgb(56 189 248 / 30%);
+  }
+}
 .java-video-note { display: flex; align-items: center; gap: 8px; color: var(--lx-muted); font-size: 12px; margin: 14px 0 0; }
 @media (max-width: 600px) {
   .java-practice-spotlight { flex-direction: column; gap: 16px; padding: 20px 0; }
