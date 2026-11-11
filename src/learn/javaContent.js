@@ -161,7 +161,7 @@ export const javaPracticeProblems = {
   '04': [],
   '05': nestedLoopsPracticeProblems, // Pre-loaded with 14 nested loop algorithm challenges
   '06': [],
-  '07': [],
+  '07': FALLBACK_PUBLIC_PROBLEMS['strings-manipulation'] || [],
   '08': [],
   '09': [],
   '10': [],
