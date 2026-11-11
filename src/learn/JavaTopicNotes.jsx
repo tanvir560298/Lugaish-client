@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Sparkles,
   Copy,
@@ -54,6 +55,63 @@ function CodeSnippet({ code, language = 'java', title }) {
 }
 
 export function JavaTopicNotes({ video, onSwitchToPractice }) {
+  if (video.id === '02') {
+    const sections = [
+      {
+        title: '1. Turn a formula into an expression',
+        text: 'An operator acts on values; an expression produces a value. Use + for addition, - for subtraction and * for multiplication. Read the quantities first, then translate the formula. Multiplication and division happen before addition and subtraction; parentheses make the intended grouping explicit.',
+        code: 'int energy = power * panels * hours;\nint area = length * width;\nint fence = 2 * (length + width);\nint finalPoints = (base + bonus - penalty) * multiplier;',
+        tip: 'For base = 120, bonus = 35, penalty = 15 and multiplier = 3, the grouped score is 420. Without the parentheses, you change the formula.',
+        problems: [['Solar Farm Daily Output', 'solar-farm-daily-output'], ['Garden Plot Designer', 'garden-plot-designer'], ['Arcade Score Booster', 'arcade-score-booster']]
+      },
+      {
+        title: '2. Whole groups and leftovers',
+        text: 'With integer operands, / performs integer division and discards the fractional part (toward zero). The % operator gives the remainder. For these nonnegative inputs, quotient counts complete groups and remainder counts items left over. The divisor must not be zero.',
+        code: 'int packs = 146 / 12;       // 12\nint loose = 146 % 12;       // 2\nint hours = totalSeconds / 3600;\nint minutes = (totalSeconds % 3600) / 60;\nint seconds = totalSeconds % 60;',
+        tip: '7384 seconds becomes 2h 3m 4s. Remove the complete hours before calculating the remaining minutes.',
+        problems: [['Sticker Pack Machine', 'sticker-pack-machine'], ['Race Clock Formatter', 'race-clock-formatter']]
+      },
+      {
+        title: '3. Update a value step by step',
+        text: 'Assignment stores a result. For an int counter, counter += amount adds to its current value; -= subtracts. Keep intermediate results when the problem asks for more than the final state. Postfix x++ returns the old value before incrementing; prefix ++x increments first and returns the new value. Decrement works the same way.',
+        code: 'int battery = 480;\nbattery += 70;             // 550: after charging\nbattery -= 210;            // 340: after the mission\n\nint counter = 7;\nint first = counter++;     // first = 7, counter = 8\nint second = ++counter;    // second = 9, counter = 9\nint third = counter--;     // third = 9, counter = 8\nint fourth = --counter;    // fourth = 7, counter = 7',
+        tip: 'Trace each statement separately. Do not assume all four variables receive the final counter value.',
+        problems: [['Robot Charging Log', 'robot-charging-log'], ['Turnstile Counter Mystery', 'turnstile-counter-mystery']]
+      },
+      {
+        title: '4. Preserve fractions and format the answer',
+        text: 'Use double for fractional measurements and percentages. At least one operand of a division must be floating-point to preserve fractions: 9 / 5 is 1, but 9.0 / 5.0 is 1.8. Assigning an already-truncated integer result to double does not restore the lost fraction. Round for display, not after every calculation.',
+        code: 'double score = first * 0.25 + second * 0.35 + third * 0.40;\ndouble fahrenheit = celsius * 9.0 / 5.0 + 32;\ndouble subtotal = baseFare + zones * zoneFee;\ndouble fare = subtotal * (1 - discountPercent / 100.0);\ndouble speed = distance / (minutes / 60.0);\nSystem.out.printf(java.util.Locale.US, "Speed: %.2f km/h%n", speed);',
+        tip: '42 km in 80 minutes gives 31.50 km/h. A 10% discount on a subtotal of 41 gives 36.90. %.2f prints exactly two decimal places; Locale.US keeps the decimal separator as a dot.',
+        problems: [['Workshop Performance Score', 'workshop-performance-score'], ['Weather Lab Converter', 'weather-lab-converter'], ['Smart Bus Fare', 'smart-bus-fare'], ['Scooter Speed Calculator', 'scooter-speed-calculator']]
+      },
+      {
+        title: '5. Choose a type before multiplying',
+        text: 'An int can hold at most 2,147,483,647. A product can overflow even when each input fits in int. Java evaluates the expression before assigning it, so a long destination alone is not enough. Read the values with nextLong(), or promote the first multiplication to long.',
+        code: 'int seats = 50000, venues = 50000, sessions = 2;\nlong visits = 1L * seats * venues * sessions; // 5000000000\n// long visits = seats * venues * sessions; // int overflow first',
+        tip: 'Check the maximum possible product from the constraints, not just the sample input. long also has limits, so always check the stated bounds.',
+        problems: [['Festival Attendance Estimator', 'festival-attendance-estimator']]
+      }
+    ];
+    return (
+      <article className="java-operator-notes">
+        <header><span className="java-eyebrow">TOPIC 02 / STUDY NOTES</span><h2>Operators &amp; Expressions</h2><p>Build expressions, track changing values, and calculate accurate results. These notes prepare you for the 12 practice challenges in this topic.</p></header>
+        {sections.map(section => <section key={section.title}>
+          <h3>{section.title}</h3><p>{section.text}</p>
+          <CodeSnippet title="Java expressions" code={section.code} />
+          <p className="java-notes-tip"><Lightbulb size={18} aria-hidden="true" /><span>{section.tip}</span></p>
+          <div className="java-notes-related"><strong>Related practice</strong>{section.problems.map(([title, slug]) => <Link key={slug} to={`/practice/java/operators-expressions/${slug}`}>{title}<ArrowRight size={14} aria-hidden="true" /></Link>)}</div>
+        </section>)}
+        <section><h3>6. Beyond arithmetic</h3><p>These operators are foundations for later topics. The current 12 challenges focus on arithmetic and updates, rather than requiring every operator below.</p>
+          <CodeSnippet title="Comparisons and decisions" code={'boolean equal = a == b;       // == compares; = assigns\nboolean different = a != b;\nboolean eligible = age >= 18 && hasTicket;\nboolean canEnter = hasPass || hasTicket;\nboolean missing = !hasTicket;\nint larger = a > b ? a : b;    // condition ? trueValue : falseValue\nint mask = 6 & 3;             // bitwise AND: 110 & 011 = 010 (2)'} />
+          <p>Comparisons (&lt;, &lt;=, &gt;, &gt;=, ==, !=) produce boolean values. &amp;&amp; and || short-circuit: they skip the right operand when the left already determines the result. For integer bit operations, &amp;, | and ^ mean AND, OR and XOR; ~ flips bits, while &lt;&lt;, &gt;&gt; and &gt;&gt;&gt; shift bits. Do not confuse bitwise operators with logical operators.</p>
+        </section>
+        <section><h3>Before you submit</h3><ul><li>Read inputs in the exact order given, without printing input prompts.</li><li>Match output labels, spacing, units and decimal places exactly.</li><li>Check grouping, integer division and overflow before blaming formatting.</li><li>Test a smallest allowed input, an exact division, a leftover case and the maximum bounds.</li></ul>
+          <button className="java-start-challenge" type="button" onClick={onSwitchToPractice}>Practice Operators &amp; Expressions <ArrowRight size={16} aria-hidden="true" /></button>
+        </section>
+      </article>
+    );
+  }
   if (video.id === '01') {
     return (
       <div className="space-y-6" style={{ padding: '4px 0' }}>

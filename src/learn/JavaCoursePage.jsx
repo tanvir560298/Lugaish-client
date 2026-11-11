@@ -350,11 +350,11 @@ export function JavaCoursePage() {
         <div className="java-workspace-title"><div><span className="java-eyebrow">YOUR LEARNING WORKSPACE</span><h1>Java Programming</h1><p>Learn the concepts. Write the code. Build your confidence.</p></div>
         <div className="java-progress-summary"><strong>{percentComplete}%</strong><span>{completed.length} of {javaVideos.length} topics complete</span><progress value={completed.length} max={javaVideos.length} aria-label="Course completion" /></div></div>
         <div className="java-topic-toolbar">
-          <label htmlFor="java-topic-select">Current topic</label>
+          <label htmlFor="java-topic-select">Explore topics</label>
           <select id="java-topic-select" value={currentVideo.id} onChange={event => navigate('/learn/java-programming/' + event.target.value)}>
             {javaVideos.map(video => <option key={video.id} value={video.id}>{video.id} · {video.topicTitle || video.title}</option>)}
           </select>
-          <span>{topicProblemCount} practice challenges</span>
+          <span>Notes &amp; practice <strong>{topicProblemCount} challenges</strong></span>
         </div>
 
         {/* Quick Topic Navigation Pills */}

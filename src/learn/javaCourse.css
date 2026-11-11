@@ -59,6 +59,24 @@
 .java-topic-toolbar label { font-size: 12px; font-weight: 600; white-space: nowrap; }
 .java-topic-toolbar select { flex: 1; min-width: 0; padding: 12px; border: 1px solid var(--lx-border); border-radius: 6px; background: var(--lx-panel); color: var(--lx-text); font-size: 14px; }
 .java-topic-toolbar > span { color: var(--lx-muted); font-size: 12px; }
+.java-topic-toolbar > span strong { display: block; color: var(--lx-text); margin-top: 4px; }
+.java-topic-toolbar select { border-color: #159eaa; box-shadow: 0 0 12px rgba(20, 184, 166, .14); animation: java-topic-glow 4s ease-in-out infinite; }
+.java-topic-toolbar select:focus-visible { outline: 2px solid #159eaa; outline-offset: 3px; animation: none; }
+@keyframes java-topic-glow { 50% { box-shadow: 0 0 18px rgba(20, 184, 166, .28); } }
+@media (prefers-reduced-motion: reduce) { .java-topic-toolbar select { animation: none; } }
+.java-operator-notes { min-width: 0; color: var(--lx-text); }
+.java-operator-notes header, .java-operator-notes section { padding: 24px 0; border-bottom: 1px solid var(--lx-border); }
+.java-operator-notes h2 { font-size: 24px; margin: 8px 0 12px; }
+.java-operator-notes h3 { font-size: 18px; margin: 0 0 12px; }
+.java-operator-notes p, .java-operator-notes li { color: var(--lx-muted); font-size: 14px; line-height: 1.8; }
+.java-operator-notes ul { padding-left: 20px; margin-bottom: 24px; }
+.java-notes-tip { display: flex; gap: 10px; }
+.java-notes-tip svg { flex-shrink: 0; margin-top: 4px; color: #159eaa; }
+.java-notes-related { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; font-size: 13px; }
+.java-notes-related strong { width: 100%; }
+.java-notes-related a { display: inline-flex; align-items: center; gap: 6px; color: var(--lx-text); text-decoration: underline; text-underline-offset: 4px; }
+.java-notes-related a svg { flex-shrink: 0; }
+.java-operator-notes .java-start-challenge { max-width: 100%; white-space: normal; }
 .java-course .java-topic-heading { font-size: 22px; letter-spacing: 0; margin: 0 0 10px; }
 .java-course .html-watch-layout { display: block; }
 .java-course .java-lesson-brief { padding: 0 0 24px; border-top: 0; }
