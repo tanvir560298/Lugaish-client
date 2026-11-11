@@ -358,7 +358,7 @@ export function JavaCoursePage() {
         </div>
 
         {/* Quick Topic Navigation Pills */}
-        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '12px', marginBottom: '16px' }} aria-label="Quick topic navigation">
+        <nav className="java-topic-navigation" aria-label="Quick topic navigation">
           {javaVideos.map(v => {
             const count = (javaPracticeProblems[v.id] || []).length;
             const isSelected = v.id === currentVideo.id;
@@ -366,6 +366,8 @@ export function JavaCoursePage() {
               <button
                 key={v.id}
                 type="button"
+                className="java-topic-option"
+                aria-current={isSelected ? 'page' : undefined}
                 onClick={() => navigate('/learn/java-programming/' + v.id)}
                 style={{
                   display: 'inline-flex',
@@ -375,17 +377,18 @@ export function JavaCoursePage() {
                   borderRadius: '8px',
                   fontSize: '12px',
                   fontWeight: isSelected ? 700 : 500,
-                  whiteSpace: 'nowrap',
+                  whiteSpace: 'normal',
                   cursor: 'pointer',
                   border: isSelected ? '1px solid #f59e0b' : '1px solid var(--lx-border)',
-                  background: isSelected ? 'rgba(245, 158, 11, 0.18)' : 'rgba(15, 23, 42, 0.6)',
-                  color: isSelected ? '#fbbf24' : 'var(--lx-muted)',
+                  background: isSelected ? 'rgba(245, 158, 11, 0.12)' : 'var(--lx-panel)',
+                  color: 'var(--lx-text)',
                   transition: 'all 0.15s ease'
                 }}
               >
-                <span>{v.id} · {v.topicTitle || v.title}</span>
+                <span className="java-topic-option-title">{v.id} · {v.topicTitle || v.title}</span>
                 {count > 0 && (
                   <span style={{
+                    flexShrink: 0,
                     fontSize: '10px',
                     fontWeight: 800,
                     padding: '1px 6px',
@@ -399,7 +402,7 @@ export function JavaCoursePage() {
               </button>
             );
           })}
-        </div>
+        </nav>
         <h2 className="java-topic-heading">{currentVideo.topicTitle || currentVideo.title}</h2>
         <p className="java-topic-summary">{currentVideo.summary}</p>
       </header>

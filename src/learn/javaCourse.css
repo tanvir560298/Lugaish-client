@@ -59,6 +59,10 @@
 .java-topic-toolbar label { font-size: 12px; font-weight: 600; white-space: nowrap; }
 .java-topic-toolbar select { flex: 1; min-width: 0; padding: 12px; border: 1px solid var(--lx-border); border-radius: 6px; background: var(--lx-panel); color: var(--lx-text); font-size: 14px; }
 .java-topic-toolbar > span { color: var(--lx-muted); font-size: 12px; }
+.java-topic-navigation { display: flex; gap: 8px; max-width: 100%; min-width: 0; overflow-x: auto; padding: 4px 2px 12px; margin-bottom: 16px; scroll-snap-type: x proximity; scrollbar-width: thin; }
+.java-course .java-topic-option { flex: 0 0 240px; width: 240px; min-height: 64px; justify-content: space-between; text-align: left; scroll-snap-align: start; }
+.java-topic-option-title { min-width: 0; line-height: 1.5; overflow-wrap: anywhere; }
+.java-topic-option:focus-visible { outline: 2px solid #159eaa; outline-offset: 2px; }
 .java-topic-toolbar > span strong { display: block; color: var(--lx-text); margin-top: 4px; }
 .java-topic-toolbar select { border-color: #159eaa; box-shadow: 0 0 12px rgba(20, 184, 166, .14); animation: java-topic-glow 4s ease-in-out infinite; }
 .java-topic-toolbar select:focus-visible { outline: 2px solid #159eaa; outline-offset: 3px; animation: none; }
