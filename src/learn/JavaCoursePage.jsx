@@ -541,9 +541,21 @@ export function JavaCoursePage() {
                     scope={scope}
                     courseId="java-programming"
                   />
+                ) : currentVideo.id === '06' ? (
+                  <JavaTopicPracticeListing
+                    topicSlug="arrays"
+                    topicTitle={currentVideo.topicTitle || currentVideo.title}
+                    compact={true}
+                  />
                 ) : currentVideo.id === '07' ? (
                   <JavaTopicPracticeListing
                     topicSlug="strings-manipulation"
+                    topicTitle={currentVideo.topicTitle || currentVideo.title}
+                    compact={true}
+                  />
+                ) : currentVideo.id === '08' ? (
+                  <JavaTopicPracticeListing
+                    topicSlug="methods-functions"
                     topicTitle={currentVideo.topicTitle || currentVideo.title}
                     compact={true}
                   />

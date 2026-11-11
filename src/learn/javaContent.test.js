@@ -206,4 +206,38 @@ test('Topic 05 has 16 nested loop problems with 2 new appended problems', () => 
   assert.ok(p16.solutionJava, 'Problem 16 must have Java solution');
 });
 
+test('Topic 06 has 3 array practice problems attached with 3 Lugaish originals', () => {
+  const p6 = javaPracticeProblems['06'];
+  assert.ok(Array.isArray(p6), 'Topic 06 problems must be an array');
+  assert.equal(p6.length, 3, 'Topic 06 must have exactly 3 problems');
+
+  const lugaish = p6.filter(p => p.problemType === 'lugaish');
+  assert.equal(lugaish.length, 3, 'All 3 must be Lugaish original problems');
+
+  for (const prob of lugaish) {
+    assert.ok(prob.id, 'Problem must have an ID');
+    assert.ok(prob.id.startsWith('java-arr-'), 'Topic 06 problem IDs must start with java-arr-');
+    assert.ok(prob.title, 'Problem must have a title');
+    assert.ok(prob.starterCode, 'Lugaish problem must have starter code');
+    assert.ok(Array.isArray(prob.sampleTestCases) && prob.sampleTestCases.length > 0, 'Must have sample test cases');
+  }
+});
+
+test('Topic 08 has 9 methods & functions practice problems attached with 9 Lugaish originals', () => {
+  const p8 = javaPracticeProblems['08'];
+  assert.ok(Array.isArray(p8), 'Topic 08 problems must be an array');
+  assert.equal(p8.length, 9, 'Topic 08 must have exactly 9 problems');
+
+  const lugaish = p8.filter(p => p.problemType === 'lugaish');
+  assert.equal(lugaish.length, 9, 'All 9 must be Lugaish original problems');
+
+  for (const prob of lugaish) {
+    assert.ok(prob.id, 'Problem must have an ID');
+    assert.ok(prob.id.startsWith('java-meth-'), 'Topic 08 problem IDs must start with java-meth-');
+    assert.ok(prob.title, 'Problem must have a title');
+    assert.ok(prob.starterCode, 'Lugaish problem must have starter code');
+    assert.ok(Array.isArray(prob.sampleTestCases) && prob.sampleTestCases.length > 0, 'Must have sample test cases');
+  }
+});
+
 

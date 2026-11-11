@@ -160,9 +160,9 @@ export const javaPracticeProblems = {
   '03': FALLBACK_PUBLIC_PROBLEMS['conditional-statements'] || [],
   '04': FALLBACK_PUBLIC_PROBLEMS['loops-iterations'] || [],
   '05': nestedLoopsPracticeProblems, // Pre-loaded with nested loop algorithm challenges
-  '06': [],
+  '06': FALLBACK_PUBLIC_PROBLEMS['arrays'] || [],
   '07': FALLBACK_PUBLIC_PROBLEMS['strings-manipulation'] || [],
-  '08': [],
+  '08': FALLBACK_PUBLIC_PROBLEMS['methods-functions'] || [],
   '09': [],
   '10': [],
   '11': [],
