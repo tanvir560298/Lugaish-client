@@ -356,6 +356,50 @@ export function JavaCoursePage() {
           </select>
           <span>{topicProblemCount} practice challenges</span>
         </div>
+
+        {/* Quick Topic Navigation Pills */}
+        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '12px', marginBottom: '16px' }} aria-label="Quick topic navigation">
+          {javaVideos.map(v => {
+            const count = (javaPracticeProblems[v.id] || []).length;
+            const isSelected = v.id === currentVideo.id;
+            return (
+              <button
+                key={v.id}
+                type="button"
+                onClick={() => navigate('/learn/java-programming/' + v.id)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 12px',
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                  fontWeight: isSelected ? 700 : 500,
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                  border: isSelected ? '1px solid #f59e0b' : '1px solid var(--lx-border)',
+                  background: isSelected ? 'rgba(245, 158, 11, 0.18)' : 'rgba(15, 23, 42, 0.6)',
+                  color: isSelected ? '#fbbf24' : 'var(--lx-muted)',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                <span>{v.id} · {v.topicTitle || v.title}</span>
+                {count > 0 && (
+                  <span style={{
+                    fontSize: '10px',
+                    fontWeight: 800,
+                    padding: '1px 6px',
+                    borderRadius: '10px',
+                    background: isSelected ? '#f59e0b' : 'rgba(245, 158, 11, 0.15)',
+                    color: isSelected ? '#0f172a' : '#fbbf24'
+                  }}>
+                    {count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
         <h2 className="java-topic-heading">{currentVideo.topicTitle || currentVideo.title}</h2>
         <p className="java-topic-summary">{currentVideo.summary}</p>
       </header>
