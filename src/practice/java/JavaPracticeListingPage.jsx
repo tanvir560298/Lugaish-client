@@ -6,10 +6,10 @@ import { JavaTopicPracticeListing } from './JavaTopicPracticeListing.jsx';
 
 export function JavaPracticeListingPage() {
   const { topicSlug = 'basic-io-variables' } = useParams();
-  const currentTopic = TOPIC_METADATA_MAP?.[topicSlug] || (topicSlug === 'operators-expressions' ? TOPIC_2_METADATA : TOPIC_1_METADATA);
-  const isTopic2 = topicSlug === 'operators-expressions';
-  const coursePath = isTopic2 ? '/learn/java-programming/02' : '/learn/java-programming/01';
-  const topicLabel = isTopic2 ? 'Topic 02' : 'Topic 01';
+  const currentTopic = TOPIC_METADATA_MAP?.[topicSlug] || TOPIC_1_METADATA;
+  const topicNum = currentTopic.id ? currentTopic.id.replace('topic-', '') : '01';
+  const coursePath = `/learn/java-programming/${topicNum}`;
+  const topicLabel = `Topic ${topicNum}`;
 
   useEffect(() => {
     document.title = `${currentTopic.title} — Java Practice | Lugaish`;

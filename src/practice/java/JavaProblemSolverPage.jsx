@@ -38,9 +38,9 @@ export function JavaProblemSolverPage() {
   const { topicSlug = 'basic-io-variables', problemSlug } = useParams();
   const navigate = useNavigate();
 
-  const currentTopic = TOPIC_METADATA_MAP?.[topicSlug] || (topicSlug === 'operators-expressions' ? TOPIC_2_METADATA : TOPIC_1_METADATA);
-  const isTopic2 = topicSlug === 'operators-expressions';
-  const coursePath = isTopic2 ? '/learn/java-programming/02' : '/learn/java-programming/01';
+  const currentTopic = TOPIC_METADATA_MAP?.[topicSlug] || TOPIC_1_METADATA;
+  const topicNum = currentTopic.id ? currentTopic.id.replace('topic-', '') : '01';
+  const coursePath = `/learn/java-programming/${topicNum}`;
   const allProblemsPath = `/practice/java/${topicSlug}`;
 
   const [problem, setProblem] = useState(null);

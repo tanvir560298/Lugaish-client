@@ -157,7 +157,7 @@ export const javaVideos = javaTopics.map(t => ({
 export const javaPracticeProblems = {
   '01': FALLBACK_PUBLIC_PROBLEMS['basic-io-variables'] || [],
   '02': FALLBACK_PUBLIC_PROBLEMS['operators-expressions'] || [],
-  '03': [],
+  '03': FALLBACK_PUBLIC_PROBLEMS['conditional-statements'] || [],
   '04': [],
   '05': nestedLoopsPracticeProblems, // Pre-loaded with 14 nested loop algorithm challenges
   '06': [],

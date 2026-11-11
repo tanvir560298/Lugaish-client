@@ -523,6 +523,12 @@ export function JavaCoursePage() {
                     topicTitle={currentVideo.topicTitle || currentVideo.title}
                     compact={true}
                   />
+                ) : currentVideo.id === '03' ? (
+                  <JavaTopicPracticeListing
+                    topicSlug="conditional-statements"
+                    topicTitle={currentVideo.topicTitle || currentVideo.title}
+                    compact={true}
+                  />
                 ) : currentVideo.id === '05' ? (
                   <NestedLoopsPracticeLab
                     onPassed={handlePracticePassed}

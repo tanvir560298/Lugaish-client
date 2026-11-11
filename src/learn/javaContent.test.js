@@ -139,3 +139,20 @@ test('Topic 02 has 12 practice problems attached with 12 Lugaish originals', () 
   }
 });
 
+test('Topic 03 has 12 practice problems attached with 12 Lugaish originals', () => {
+  const p3 = javaPracticeProblems['03'];
+  assert.ok(Array.isArray(p3), 'Topic 03 problems must be an array');
+  assert.equal(p3.length, 12, 'Topic 03 must have exactly 12 problems');
+
+  const lugaish = p3.filter(p => p.problemType === 'lugaish');
+  assert.equal(lugaish.length, 12, 'All 12 must be Lugaish original problems');
+
+  for (const prob of lugaish) {
+    assert.ok(prob.id, 'Problem must have an ID');
+    assert.ok(prob.id.startsWith('java-cs-'), 'Topic 03 problem IDs must start with java-cs-');
+    assert.ok(prob.title, 'Problem must have a title');
+    assert.ok(prob.starterCode, 'Lugaish problem must have starter code');
+    assert.ok(Array.isArray(prob.sampleTestCases) && prob.sampleTestCases.length > 0, 'Must have sample test cases');
+  }
+});
+
