@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { javaStringNotes } from './javaStringNotes';
+import { FALLBACK_PUBLIC_PROBLEMS } from '../practice/java/javaPracticeData';
 import {
   Sparkles,
   Copy,
@@ -55,6 +57,28 @@ function CodeSnippet({ code, language = 'java', title }) {
 }
 
 export function JavaTopicNotes({ video, onSwitchToPractice }) {
+  if (video.id === '07') {
+    const problems = FALLBACK_PUBLIC_PROBLEMS['strings-manipulation'] || [];
+    return (
+      <article className="java-operator-notes">
+        <header><span className="java-eyebrow">TOPIC 07 / STUDY NOTES</span><h2>Strings &amp; String Manipulation</h2><p>Read, inspect, search, transform and compare text. Work through these concepts before attempting the {problems.length} challenges. You should already know variables, Scanner input and if/else; loops are needed only for the optional extension below.</p></header>
+        {javaStringNotes.map(section => <section key={section.title}>
+          <h3>{section.title}</h3><p>{section.text}</p>
+          <CodeSnippet title="Java string examples" code={section.code} />
+          <p className="java-notes-tip"><Lightbulb size={18} aria-hidden="true" /><span>{section.tip}</span></p>
+          <div className="java-notes-related"><strong>Related practice</strong>{section.problems.map(slug => {
+            const problem = problems.find(item => item.slug === slug);
+            return problem ? <Link key={slug} to={`/practice/java/strings-manipulation/${slug}`}>{problem.title}<ArrowRight size={14} aria-hidden="true" /></Link> : null;
+          })}</div>
+        </section>)}
+        <section><h3>Extra foundation: traversal, StringBuilder and palindromes</h3><p>The current eight challenges do not require reversal or palindrome checking. These are useful next steps: traverse positions with a loop, use StringBuilder for repeated appends, and compare the result with equals(). For English/ASCII text, this example checks an exact palindrome, including case and spaces.</p>
+          <CodeSnippet title="Optional extension: an exact palindrome" code={'String word = "level";\nStringBuilder reversed = new StringBuilder();\nfor (int i = word.length() - 1; i >= 0; i--) {\n    reversed.append(word.charAt(i));\n}\nboolean palindrome = word.equals(reversed.toString()); // true'} />
+          <p>StringBuilder is mutable, unlike String. Building a long result by repeatedly concatenating immutable strings in a loop can repeatedly copy the existing text. The traversal above takes O(n) time and O(n) extra space. A two-pointer comparison can check a palindrome in O(n) time with O(1) extra space, without constructing a reversed copy.</p>
+        </section>
+        <section><h3>Before you submit</h3><ul><li>Choose nextLine() for full lines and next() for individual names.</li><li>Test first and last positions, absent search terms, case differences and boundary lengths.</li><li>Preserve spaces and serial-number zeros unless the statement says otherwise.</li><li>Match output labels and capitalization exactly. Do not print input prompts.</li></ul><button className="java-start-challenge" type="button" onClick={onSwitchToPractice}>Practice Strings <ArrowRight size={16} aria-hidden="true" /></button></section>
+      </article>
+    );
+  }
   if (video.id === '02') {
     const sections = [
       {
