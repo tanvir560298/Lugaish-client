@@ -156,7 +156,7 @@ export const javaVideos = javaTopics.map(t => ({
 // Problems are added topic by topic as provided by Tanvir.
 export const javaPracticeProblems = {
   '01': FALLBACK_PUBLIC_PROBLEMS['basic-io-variables'] || [],
-  '02': [],
+  '02': FALLBACK_PUBLIC_PROBLEMS['operators-expressions'] || [],
   '03': [],
   '04': [],
   '05': nestedLoopsPracticeProblems, // Pre-loaded with 14 nested loop algorithm challenges

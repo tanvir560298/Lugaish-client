@@ -217,6 +217,8 @@ export default function App() {
               <Route path='/practice/java' element={<Navigate to="/practice/java/basic-io-variables" replace />} />
               <Route path='/practice/java/basic-io-variables' element={<JavaPracticeListingPage />} />
               <Route path='/practice/java/basic-io-variables/:problemSlug' element={<JavaProblemSolverPage />} />
+              <Route path='/practice/java/:topicSlug' element={<JavaPracticeListingPage />} />
+              <Route path='/practice/java/:topicSlug/:problemSlug' element={<JavaProblemSolverPage />} />
               <Route path='/practice/nested-loops' element={<Navigate to="/learn/java-programming/05" replace />} />
               <Route path='/practice/c-nested-loops' element={<Navigate to="/learn/c-programming/02" replace />} />
               <Route path='/practice/java-nested-loops' element={<Navigate to="/learn/java-programming/05" replace />} />

@@ -27,11 +27,21 @@ import {
   submitJavaSolution,
   isProblemSolved
 } from './javaPracticeClient.js';
-import { DEFAULT_JAVA_STARTER, TOPIC_1_METADATA } from './javaPracticeData.js';
+import {
+  DEFAULT_JAVA_STARTER,
+  TOPIC_1_METADATA,
+  TOPIC_2_METADATA,
+  TOPIC_METADATA_MAP
+} from './javaPracticeData.js';
 
 export function JavaProblemSolverPage() {
-  const { problemSlug } = useParams();
+  const { topicSlug = 'basic-io-variables', problemSlug } = useParams();
   const navigate = useNavigate();
+
+  const currentTopic = TOPIC_METADATA_MAP?.[topicSlug] || (topicSlug === 'operators-expressions' ? TOPIC_2_METADATA : TOPIC_1_METADATA);
+  const isTopic2 = topicSlug === 'operators-expressions';
+  const coursePath = isTopic2 ? '/learn/java-programming/02' : '/learn/java-programming/01';
+  const allProblemsPath = `/practice/java/${topicSlug}`;
 
   const [problem, setProblem] = useState(null);
   const [allProblems, setAllProblems] = useState([]);
@@ -82,7 +92,7 @@ export function JavaProblemSolverPage() {
       setLoading(true);
       setError(null);
       try {
-        const prob = await fetchProblemDetail('basic-io-variables', problemSlug);
+        const prob = await fetchProblemDetail(topicSlug, problemSlug);
         if (!isMounted) return;
 
         if (!prob) {
@@ -96,7 +106,7 @@ export function JavaProblemSolverPage() {
             window.location.replace(prob.externalUrl);
             return;
           }
-          navigate('/practice/java/basic-io-variables', { replace: true });
+          navigate(allProblemsPath, { replace: true });
           return;
         }
 
@@ -112,7 +122,7 @@ export function JavaProblemSolverPage() {
         document.title = `${prob.title} — Java Practice | Lugaish`;
 
         // Fetch sibling problems for prev/next navigation
-        const listData = await fetchTopicProblems('basic-io-variables');
+        const listData = await fetchTopicProblems(topicSlug);
         if (isMounted && listData?.problems) {
           setAllProblems(listData.problems.filter((p) => p.problemType === 'lugaish'));
         }
@@ -229,7 +239,7 @@ export function JavaProblemSolverPage() {
 
     try {
       const result = await submitJavaSolution({
-        topicSlug: 'basic-io-variables',
+        topicSlug: topicSlug || problem.categorySlug || 'basic-io-variables',
         problemId: problem.id,
         sourceCode: code
       });
@@ -283,13 +293,13 @@ export function JavaProblemSolverPage() {
           <p className="text-slate-300 text-sm mb-6">{error || 'This problem is not currently published.'}</p>
           <div className="flex justify-center gap-3">
             <Link
-              to="/learn/java-programming/01"
+              to={coursePath}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-amber-500 text-slate-950 hover:bg-amber-400 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" /> Back to Java Course
             </Link>
             <Link
-              to="/practice/java/basic-io-variables"
+              to={allProblemsPath}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-white hover:bg-slate-700 transition-colors"
             >
               All Problems
@@ -306,21 +316,21 @@ export function JavaProblemSolverPage() {
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-800">
         <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
           <Link
-            to="/learn/java-programming/01"
+            to={coursePath}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors px-2.5 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 hover:border-amber-500/50"
-            title="Return to Topic 01 in Java Programming Course"
+            title={`Return to ${currentTopic.title} in Java Programming Course`}
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Back to Java Course
           </Link>
           <Link
-            to="/practice/java/basic-io-variables"
+            to={allProblemsPath}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700"
           >
             All Problems
           </Link>
           <div className="hidden sm:block text-slate-600">|</div>
           <span className="text-xs font-semibold text-slate-300 hidden sm:inline">
-            Java • {TOPIC_1_METADATA.title}
+            Java • {currentTopic.title}
           </span>
         </div>
 
@@ -333,7 +343,7 @@ export function JavaProblemSolverPage() {
 
           {prevProblem && (
             <Link
-              to={`/practice/java/basic-io-variables/${prevProblem.slug || prevProblem.id}`}
+              to={`/practice/java/${topicSlug}/${prevProblem.slug || prevProblem.id}`}
               className="px-2.5 py-1 text-xs font-medium text-slate-300 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg transition-colors"
               title={`Previous: ${prevProblem.title}`}
             >
@@ -343,7 +353,7 @@ export function JavaProblemSolverPage() {
 
           {nextProblem && (
             <Link
-              to={`/practice/java/basic-io-variables/${nextProblem.slug || nextProblem.id}`}
+              to={`/practice/java/${topicSlug}/${nextProblem.slug || nextProblem.id}`}
               className="px-2.5 py-1 text-xs font-medium text-slate-300 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-lg transition-colors"
               title={`Next: ${nextProblem.title}`}
             >

@@ -371,7 +371,7 @@ export function JavaCoursePage() {
               <h2>Your next skill starts with one problem.</h2>
               <p>{topicProblemCount} challenges ready. Write Java, test your ideas, and learn by solving.</p>
               <div className="java-practice-cta">
-                {firstChallenge ? <Link className="java-start-challenge" to={`/practice/java/basic-io-variables/${firstChallenge.slug || firstChallenge.id}`}><Code2 size={17} /> Start first challenge <ArrowRight size={17} /></Link> : <button className="java-start-challenge" onClick={() => { setActiveTab('practice'); document.getElementById('java-lesson-sections')?.scrollIntoView({ behavior: 'smooth' }); }}>Explore challenges <ArrowRight size={17} /></button>}
+                {firstChallenge ? <Link className="java-start-challenge" to={`/practice/java/${currentVideo.slug || 'basic-io-variables'}/${firstChallenge.slug || firstChallenge.id}`}><Code2 size={17} /> Start first challenge <ArrowRight size={17} /></Link> : <button className="java-start-challenge" onClick={() => { setActiveTab('practice'); document.getElementById('java-lesson-sections')?.scrollIntoView({ behavior: 'smooth' }); }}>Explore challenges <ArrowRight size={17} /></button>}
                 <button className="java-browse-challenges" onClick={() => { setActiveTab('practice'); document.getElementById('java-lesson-sections')?.scrollIntoView({ behavior: 'smooth' }); }}>Browse all {topicProblemCount} challenges <ArrowRight size={15} /></button>
               </div>
             </div>
@@ -467,6 +467,12 @@ export function JavaCoursePage() {
                 {currentVideo.id === '01' ? (
                   <JavaTopicPracticeListing
                     topicSlug="basic-io-variables"
+                    topicTitle={currentVideo.topicTitle || currentVideo.title}
+                    compact={true}
+                  />
+                ) : currentVideo.id === '02' ? (
+                  <JavaTopicPracticeListing
+                    topicSlug="operators-expressions"
                     topicTitle={currentVideo.topicTitle || currentVideo.title}
                     compact={true}
                   />

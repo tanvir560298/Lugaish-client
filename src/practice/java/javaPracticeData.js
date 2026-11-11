@@ -10,6 +10,21 @@ export const TOPIC_1_METADATA = {
     'Begin your Java programming journey by practicing printing output, working with variables, and taking user input. Strengthen your fundamentals through practical coding challenges.'
 };
 
+export const TOPIC_2_METADATA = {
+  id: 'topic-02',
+  slug: 'operators-expressions',
+  title: 'Operators & Expressions',
+  language: 'Java',
+  level: 'Beginner',
+  description:
+    'Master Java arithmetic operators, integer division, modulo, operator precedence, prefix and postfix operators, and floating-point calculations with practical coding challenges.'
+};
+
+export const TOPIC_METADATA_MAP = {
+  'basic-io-variables': TOPIC_1_METADATA,
+  'operators-expressions': TOPIC_2_METADATA
+};
+
 export const DEFAULT_JAVA_STARTER = `public class Main {
     public static void main(String[] args) {
         // Write your code here
@@ -759,5 +774,319 @@ public class Main {
       concepts: 'Rounding Up, long',
       externalUrl: 'https://codeforces.com/problemset/problem/1/A'
     }
+  ],
+  'operators-expressions': [
+      {
+          "id": "java-oe-14",
+          "number": "14",
+          "title": "Solar Farm Daily Output",
+          "slug": "solar-farm-daily-output",
+          "language": "Java",
+          "categorySlug": "operators-expressions",
+          "difficulty": "Easy",
+          "problemType": "lugaish",
+          "sourcePlatform": "Lugaish",
+          "description": "A small solar farm has several identical solar panels. Each panel produces a fixed amount of power, and all panels operate for a certain number of hours.\n\nCalculate the total energy produced by the solar farm.\n\nThe total energy in watt-hours is the power of one panel multiplied by the number of panels and the operating hours.",
+          "inputFormat": "Three space-separated integers:\n- P — Power produced by one panel in watts\n- N — Number of solar panels\n- H — Operating hours",
+          "outputFormat": "Print the total energy produced.\nFormat: Energy Produced: X Wh",
+          "constraints": "1 ≤ P ≤ 1000\n1 ≤ N ≤ 1000\n1 ≤ H ≤ 24",
+          "sampleTestCases": [
+              {
+                  "input": "85 6 4",
+                  "expectedOutput": "Energy Produced: 2040 Wh",
+                  "explanation": "Energy = 85 * 6 * 4 = 2040 Wh."
+              }
+          ],
+          "starterCode": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        // Write your code here\n        \n    }\n}\n",
+          "timeLimit": 3,
+          "memoryLimit": 128000,
+          "notes": "• Multiply the power P, number of panels N, and hours H.\n• Format: Energy Produced: X Wh"
+      },
+      {
+          "id": "java-oe-15",
+          "number": "15",
+          "title": "Sticker Pack Machine",
+          "slug": "sticker-pack-machine",
+          "language": "Java",
+          "categorySlug": "operators-expressions",
+          "difficulty": "Easy",
+          "problemType": "lugaish",
+          "sourcePlatform": "Lugaish",
+          "description": "A stationery store has a machine that packs stickers into identical packets.\n\nEach complete packet must contain exactly K stickers. Any stickers that cannot fill a complete packet remain unpacked.\n\nWrite a program to calculate the number of complete packets and leftover stickers.",
+          "inputFormat": "Two integers:\n- S — Total stickers\n- K — Stickers per packet",
+          "outputFormat": "Print two lines:\nComplete Packs: X\nLoose Stickers: Y",
+          "constraints": "0 ≤ S ≤ 1000000\n1 ≤ K ≤ 100000",
+          "sampleTestCases": [
+              {
+                  "input": "146 12",
+                  "expectedOutput": "Complete Packs: 12\nLoose Stickers: 2",
+                  "explanation": "146 / 12 = 12 complete packs, 146 % 12 = 2 loose stickers."
+              }
+          ],
+          "starterCode": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        // Write your code here\n        \n    }\n}\n",
+          "timeLimit": 3,
+          "memoryLimit": 128000,
+          "notes": "• Use integer division (S / K) to count complete packs.\n• Use modulus (S % K) to find remaining loose stickers."
+      },
+      {
+          "id": "java-oe-16",
+          "number": "16",
+          "title": "Arcade Score Booster",
+          "slug": "arcade-score-booster",
+          "language": "Java",
+          "categorySlug": "operators-expressions",
+          "difficulty": "Easy",
+          "problemType": "lugaish",
+          "sourcePlatform": "Lugaish",
+          "description": "A player earns points in an arcade game.\n\nThe player starts with some base points, receives bonus points, and loses penalty points. At the end, the remaining score is multiplied by a special booster.\n\nCalculate the final score.\n\nThe multiplier applies after the bonus and penalty adjustments.",
+          "inputFormat": "Four integers:\n- B — Base points\n- A — Bonus points\n- P — Penalty points\n- M — Score multiplier",
+          "outputFormat": "Print:\nFinal Points: X",
+          "constraints": "0 ≤ B, A ≤ 5000\n0 ≤ P ≤ B + A\n1 ≤ M ≤ 10",
+          "sampleTestCases": [
+              {
+                  "input": "120 35 15 3",
+                  "expectedOutput": "Final Points: 420",
+                  "explanation": "(120 + 35 - 15) * 3 = 140 * 3 = 420."
+              }
+          ],
+          "starterCode": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        // Write your code here\n        \n    }\n}\n",
+          "timeLimit": 3,
+          "memoryLimit": 128000,
+          "notes": "• Operator precedence: ensure (B + A - P) is evaluated inside parentheses before multiplying by M."
+      },
+      {
+          "id": "java-oe-17",
+          "number": "17",
+          "title": "Race Clock Formatter",
+          "slug": "race-clock-formatter",
+          "language": "Java",
+          "categorySlug": "operators-expressions",
+          "difficulty": "Easy",
+          "problemType": "lugaish",
+          "sourcePlatform": "Lugaish",
+          "description": "A digital stopwatch records the duration of a race in total seconds.\n\nThe race organizer wants to display the duration in hours, minutes, and seconds.\n\nConvert the given total seconds into the required format.",
+          "inputFormat": "One non-negative integer T representing total seconds.",
+          "outputFormat": "Print:\nTime: Hh Mm Ss\nNo leading zeros are required.",
+          "constraints": "0 ≤ T ≤ 10000000",
+          "sampleTestCases": [
+              {
+                  "input": "7384",
+                  "expectedOutput": "Time: 2h 3m 4s",
+                  "explanation": "7384s = 2h (7200s) + 3m (180s) + 4s."
+              }
+          ],
+          "starterCode": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        // Write your code here\n        \n    }\n}\n",
+          "timeLimit": 3,
+          "memoryLimit": 128000,
+          "notes": "• Hours = T / 3600\n• Minutes = (T % 3600) / 60\n• Seconds = T % 60"
+      },
+      {
+          "id": "java-oe-18",
+          "number": "18",
+          "title": "Robot Charging Log",
+          "slug": "robot-charging-log",
+          "language": "Java",
+          "categorySlug": "operators-expressions",
+          "difficulty": "Easy",
+          "problemType": "lugaish",
+          "sourcePlatform": "Lugaish",
+          "description": "A delivery robot stores its available energy in energy units.\n\nBefore starting a delivery, the robot receives additional energy from a charging station.\n\nDuring the delivery, it consumes some energy.\n\nCalculate the robot's energy immediately after charging and after completing the delivery.",
+          "inputFormat": "Three integers:\n- E — Initial energy\n- C — Energy added by charging\n- U — Energy consumed during delivery",
+          "outputFormat": "Print:\nAfter Charge: X\nAfter Mission: Y",
+          "constraints": "0 ≤ E, C ≤ 1000000\n0 ≤ U ≤ E + C",
+          "sampleTestCases": [
+              {
+                  "input": "480 70 210",
+                  "expectedOutput": "After Charge: 550\nAfter Mission: 340",
+                  "explanation": "After charge = 480 + 70 = 550. After mission = 550 - 210 = 340."
+              }
+          ],
+          "starterCode": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        // Write your code here\n        \n    }\n}\n",
+          "timeLimit": 3,
+          "memoryLimit": 128000,
+          "notes": "• Update energy after charge with (E + C).\n• Update energy after mission with (E + C - U)."
+      },
+      {
+          "id": "java-oe-19",
+          "number": "19",
+          "title": "Workshop Performance Score",
+          "slug": "workshop-performance-score",
+          "language": "Java",
+          "categorySlug": "operators-expressions",
+          "difficulty": "Easy",
+          "problemType": "lugaish",
+          "sourcePlatform": "Lugaish",
+          "description": "A training workshop evaluates students using three components:\n\n- Project: 25%\n- Practical Lab: 35%\n- Final Assessment: 40%\n\nA student's marks for all three components are given.\n\nCalculate the student's final weighted score.",
+          "inputFormat": "Three integers representing the student's Project, Practical Lab, and Final Assessment marks.",
+          "outputFormat": "Print the final weighted score with exactly two digits after the decimal point.\nFormat: Course Score: X",
+          "constraints": "0 ≤ Each mark ≤ 100\nNote: Use decimal arithmetic when calculating percentages.",
+          "sampleTestCases": [
+              {
+                  "input": "80 90 70",
+                  "expectedOutput": "Course Score: 79.50",
+                  "explanation": "80 * 0.25 + 90 * 0.35 + 70 * 0.40 = 20.0 + 31.5 + 28.0 = 79.50."
+              }
+          ],
+          "starterCode": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        // Write your code here\n        \n    }\n}\n",
+          "timeLimit": 3,
+          "memoryLimit": 128000,
+          "notes": "• Perform floating-point multiplication: (p * 0.25) + (lab * 0.35) + (finalExam * 0.40).\n• Format with System.out.printf(java.util.Locale.US, \"Course Score: %.2f%n\", score);"
+      },
+      {
+          "id": "java-oe-20",
+          "number": "20",
+          "title": "Garden Plot Designer",
+          "slug": "garden-plot-designer",
+          "language": "Java",
+          "categorySlug": "operators-expressions",
+          "difficulty": "Medium",
+          "problemType": "lugaish",
+          "sourcePlatform": "Lugaish",
+          "description": "A gardening company is designing a rectangular garden.\n\nThe company needs two measurements:\n1. The total area available for planting.\n2. The total fence length needed to surround the garden.\n\nCalculate both values using the garden's length and width.",
+          "inputFormat": "Two positive integers L and W representing the garden's length and width in meters.",
+          "outputFormat": "Print:\nArea: X\nFence: Y\nThe area is measured in square meters, and the fence length is measured in meters.",
+          "constraints": "1 ≤ L, W ≤ 10000",
+          "sampleTestCases": [
+              {
+                  "input": "14 9",
+                  "expectedOutput": "Area: 126\nFence: 46",
+                  "explanation": "Area = 14 * 9 = 126. Perimeter (fence) = 2 * (14 + 9) = 46."
+              }
+          ],
+          "starterCode": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        // Write your code here\n        \n    }\n}\n",
+          "timeLimit": 3,
+          "memoryLimit": 128000,
+          "notes": "• Area = L * W\n• Fence = 2 * (L + W)"
+      },
+      {
+          "id": "java-oe-21",
+          "number": "21",
+          "title": "Festival Attendance Estimator",
+          "slug": "festival-attendance-estimator",
+          "language": "Java",
+          "categorySlug": "operators-expressions",
+          "difficulty": "Medium",
+          "problemType": "lugaish",
+          "sourcePlatform": "Lugaish",
+          "description": "An event management company organizes a large festival across multiple venues.\n\nEach venue has the same number of visitor seats.\n\nThe company wants to estimate the total number of visitor entries across several festival sessions.\n\nAssume every seat is occupied during each session.\n\nCalculate the total visitor entries.",
+          "inputFormat": "Three integers:\n- S — Seats per venue\n- V — Number of venues\n- R — Number of sessions",
+          "outputFormat": "Print:\nTotal Visits: X",
+          "constraints": "1 ≤ S, V, R ≤ 1000000\nImportant: The result may exceed the maximum value of a Java int. Students should use an appropriate numeric data type and avoid intermediate integer overflow.",
+          "sampleTestCases": [
+              {
+                  "input": "25000 150 20",
+                  "expectedOutput": "Total Visits: 75000000",
+                  "explanation": "25000 * 150 * 20 = 75,000,000."
+              }
+          ],
+          "starterCode": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        // Write your code here\n        \n    }\n}\n",
+          "timeLimit": 3,
+          "memoryLimit": 128000,
+          "notes": "• Avoid 32-bit int overflow! Read or cast values to long before multiplying: (long) S * V * R."
+      },
+      {
+          "id": "java-oe-22",
+          "number": "22",
+          "title": "Turnstile Counter Mystery",
+          "slug": "turnstile-counter-mystery",
+          "language": "Java",
+          "categorySlug": "operators-expressions",
+          "difficulty": "Medium",
+          "problemType": "lugaish",
+          "sourcePlatform": "Lugaish",
+          "description": "An electronic turnstile maintains an integer counter.\n\nA technician performs four operations and records the value returned by each operation.\n\nThe following Java statements describe the operations:\n\n```java\nint counter = N;\n\nint first = counter++;\nint second = ++counter;\nint third = counter--;\nint fourth = --counter;\n```\n\nYour task is to determine the values of first, second, third, fourth, and the final counter.",
+          "inputFormat": "A single integer N representing the initial counter value.",
+          "outputFormat": "Print exactly five lines:\nFirst: X\nSecond: Y\nThird: Z\nFourth: W\nFinal: F",
+          "constraints": "0 ≤ N ≤ 1000000",
+          "sampleTestCases": [
+              {
+                  "input": "7",
+                  "expectedOutput": "First: 7\nSecond: 9\nThird: 9\nFourth: 7\nFinal: 7",
+                  "explanation": "• counter starts at 7.\n• first = counter++ takes 7, counter becomes 8.\n• second = ++counter increments counter to 9, takes 9.\n• third = counter-- takes 9, counter becomes 8.\n• fourth = --counter decrements counter to 7, takes 7.\n• final counter is 7."
+              }
+          ],
+          "starterCode": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        // Write your code here\n        \n    }\n}\n",
+          "timeLimit": 3,
+          "memoryLimit": 128000,
+          "notes": "• Post-increment/decrement (x++, x--) uses the current value before updating.\n• Pre-increment/decrement (++x, --x) updates the variable before returning the value."
+      },
+      {
+          "id": "java-oe-23",
+          "number": "23",
+          "title": "Weather Lab Converter",
+          "slug": "weather-lab-converter",
+          "language": "Java",
+          "categorySlug": "operators-expressions",
+          "difficulty": "Medium",
+          "problemType": "lugaish",
+          "sourcePlatform": "Lugaish",
+          "description": "A science laboratory records temperatures in Celsius, but its international monitoring system displays temperatures in Fahrenheit.\n\nCreate a program to convert a Celsius temperature into Fahrenheit.\n\nUse the standard conversion formula:\nF = (C × 9 / 5) + 32",
+          "inputFormat": "One decimal number C representing the Celsius temperature.",
+          "outputFormat": "Print the Fahrenheit temperature with exactly two digits after the decimal point.\nFormat: Fahrenheit: X",
+          "constraints": "-100 ≤ C ≤ 100\nNote: Avoid unintended integer division.",
+          "sampleTestCases": [
+              {
+                  "input": "23.5",
+                  "expectedOutput": "Fahrenheit: 74.30",
+                  "explanation": "(23.5 * 9.0 / 5.0) + 32.0 = 42.3 + 32.0 = 74.30."
+              }
+          ],
+          "starterCode": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        // Write your code here\n        \n    }\n}\n",
+          "timeLimit": 3,
+          "memoryLimit": 128000,
+          "notes": "• Beware of integer division! 9 / 5 evaluates to 1. Use 9.0 / 5.0 or (C * 9.0) / 5.0.\n• Format with System.out.printf(java.util.Locale.US, \"Fahrenheit: %.2f%n\", fahrenheit);"
+      },
+      {
+          "id": "java-oe-24",
+          "number": "24",
+          "title": "Smart Bus Fare",
+          "slug": "smart-bus-fare",
+          "language": "Java",
+          "categorySlug": "operators-expressions",
+          "difficulty": "Hard",
+          "problemType": "lugaish",
+          "sourcePlatform": "Lugaish",
+          "description": "A city transport company calculates bus fares using a base fare and a fee for each travel zone.\n\nPassengers may also receive a percentage discount on the total fare.\n\nCalculate the final fare after applying the discount.\n\nThe fare before discount is the base fare plus the number of zones multiplied by the fee per zone.\n\nThe discount is applied to that entire amount.",
+          "inputFormat": "Four space-separated integers:\n- B — Base fare\n- Z — Number of travel zones\n- F — Fee per zone\n- D — Discount percentage",
+          "outputFormat": "Print the final fare with exactly two digits after the decimal point.\nFormat: Fare: X",
+          "constraints": "0 ≤ B ≤ 10000\n0 ≤ Z ≤ 100\n0 ≤ F ≤ 1000\n0 ≤ D ≤ 50\nNote: D is a percentage, not a fixed monetary discount.",
+          "sampleTestCases": [
+              {
+                  "input": "20 3 7 10",
+                  "expectedOutput": "Fare: 36.90",
+                  "explanation": "Subtotal = 20 + (3 * 7) = 41. 10% discount = 4.10. Final fare = 41 - 4.10 = 36.90."
+              }
+          ],
+          "starterCode": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        // Write your code here\n        \n    }\n}\n",
+          "timeLimit": 3,
+          "memoryLimit": 128000,
+          "notes": "• Subtotal = B + (Z * F)\n• Final fare = subtotal * (1.0 - D / 100.0)\n• Format: Fare: %.2f"
+      },
+      {
+          "id": "java-oe-25",
+          "number": "25",
+          "title": "Scooter Speed Calculator",
+          "slug": "scooter-speed-calculator",
+          "language": "Java",
+          "categorySlug": "operators-expressions",
+          "difficulty": "Hard",
+          "problemType": "lugaish",
+          "sourcePlatform": "Lugaish",
+          "description": "An electric scooter completes a journey of D kilometers in T minutes.\n\nThe rider wants to calculate the average speed in kilometers per hour.\n\nWrite a Java program that converts the travel duration into hours and calculates the scooter's average speed.",
+          "inputFormat": "Two integers:\n- D — Distance traveled in kilometers\n- T — Travel duration in minutes",
+          "outputFormat": "Print the average speed with exactly two digits after the decimal point.\nFormat: Speed: X km/h",
+          "constraints": "0 ≤ D ≤ 10000\n1 ≤ T ≤ 10000\nNote: Perform decimal division when calculating the average speed.",
+          "sampleTestCases": [
+              {
+                  "input": "42 80",
+                  "expectedOutput": "Speed: 31.50 km/h",
+                  "explanation": "Duration = 80 / 60.0 hours. Speed = 42 / (80 / 60.0) = 31.50 km/h."
+              }
+          ],
+          "starterCode": "import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner scanner = new Scanner(System.in);\n        // Write your code here\n        \n    }\n}\n",
+          "timeLimit": 3,
+          "memoryLimit": 128000,
+          "notes": "• Convert duration to hours using T / 60.0.\n• Speed = D / hours (or (D * 60.0) / T).\n• Format: Speed: %.2f km/h"
+      }
   ]
 };
