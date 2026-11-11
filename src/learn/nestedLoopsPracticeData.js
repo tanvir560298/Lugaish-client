@@ -1626,5 +1626,252 @@ public class Main {
     }
 }`,
     expectedKeywords: ['for', 'scanf', 'printf']
+  },
+  {
+    id: 'nested-p15',
+    number: 15,
+    title: 'Problem 15: Pixel Art Frame',
+    difficulty: 'Medium',
+    level: 'Medium',
+    topics: ['Nested Loops', 'Pattern Printing', 'Boundary Conditions'],
+    statement: `A digital artist wants to create a rectangular pixel frame.
+
+The frame must have R rows and C columns.
+The outer border must use the # character.
+Every position inside the border must use the . character.
+
+Write a program that prints the requested frame.`,
+    inputFormat: 'Two integers: R C representing rows and columns.',
+    constraints: '2 <= R, C <= 30',
+    sampleInput: '4 6',
+    sampleOutput: `######
+#....#
+#....#
+######`,
+    explanation: 'Frame of 4 rows and 6 columns. Outer border has "#" and inner area has "." characters.',
+    instructional: {
+      prerequisites: [
+        'Outer loop control: An outer for-loop runs for each row r (from 0 to R - 1).',
+        'Inner loop control: An inner for-loop runs for each column c (from 0 to C - 1).',
+        'Border condition: A cell is on the border if r == 0, r == R - 1, c == 0, or c == C - 1.'
+      ],
+      stepByStepLogic: [
+        'Step 1: Read R and C from standard input.',
+        'Step 2: Run an outer loop: for (int r = 0; r < R; r++).',
+        'Step 3: Inside outer loop, run inner loop: for (int c = 0; c < C; c++).',
+        'Step 4: If r == 0 || r == R - 1 || c == 0 || c == C - 1, print "#", otherwise print ".".',
+        'Step 5: Output a newline after each row.'
+      ],
+      commonPitfalls: [
+        'Do not print spaces between characters.',
+        'Do not print an extra blank line at the end.'
+      ],
+      timeComplexity: 'O(R * C) time, O(1) space.'
+    },
+    starter: `#include <stdio.h>
+
+int main(void) {
+    int R, C;
+    if (scanf("%d %d", &R, &C) != 2) return 0;
+
+    // Write your code here
+
+    return 0;
+}`,
+    starterJava: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        // Write your code here
+        
+    }
+}`,
+    solutionC: `#include <stdio.h>
+
+int main(void) {
+    int R, C;
+    if (scanf("%d %d", &R, &C) != 2) return 0;
+
+    for (int r = 0; r < R; r++) {
+        for (int c = 0; c < C; c++) {
+            if (r == 0 || r == R - 1 || c == 0 || c == C - 1) {
+                putchar('#');
+            } else {
+                putchar('.');
+            }
+        }
+        putchar('\\n');
+    }
+
+    return 0;
+}`,
+    solution: `#include <stdio.h>
+
+int main(void) {
+    int R, C;
+    if (scanf("%d %d", &R, &C) != 2) return 0;
+
+    for (int r = 0; r < R; r++) {
+        for (int c = 0; c < C; c++) {
+            if (r == 0 || r == R - 1 || c == 0 || c == C - 1) {
+                putchar('#');
+            } else {
+                putchar('.');
+            }
+        }
+        putchar('\\n');
+    }
+
+    return 0;
+}`,
+    solutionJava: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        if (!sc.hasNextInt()) return;
+        int R = sc.nextInt();
+        int C = sc.nextInt();
+
+        for (int r = 0; r < R; r++) {
+            StringBuilder sb = new StringBuilder();
+            for (int c = 0; c < C; c++) {
+                if (r == 0 || r == R - 1 || c == 0 || c == C - 1) {
+                    sb.append('#');
+                } else {
+                    sb.append('.');
+                }
+            }
+            System.out.println(sb.toString());
+        }
+    }
+}`,
+    expectedKeywords: ['for']
+  },
+  {
+    id: 'nested-p16',
+    number: 16,
+    title: 'Problem 16: Double Diagonal Radar',
+    difficulty: 'Hard',
+    level: 'Hard',
+    topics: ['Nested Loops', 'Pattern Printing', 'Diagonals'],
+    statement: `A radar display uses a square grid of size N by N.
+
+The display must mark both diagonals using the character X.
+All remaining positions must contain a dot (.).
+
+The first diagonal runs from the top-left corner to the bottom-right corner.
+The second diagonal runs from the top-right corner to the bottom-left corner.
+
+Write a program that generates the radar pattern.`,
+    inputFormat: 'One positive integer N.',
+    constraints: '1 <= N <= 30',
+    sampleInput: '5',
+    sampleOutput: `X...X
+.X.X.
+..X..
+.X.X.
+X...X`,
+    explanation: '5x5 grid with X on both main diagonal (r == c) and anti-diagonal (r + c == 4). Center position (2,2) contains a single X.',
+    instructional: {
+      prerequisites: [
+        'Outer loop control: An outer for-loop runs for each row r (from 0 to N - 1).',
+        'Inner loop control: An inner for-loop runs for each column c (from 0 to N - 1).',
+        'Main diagonal condition: A cell is on the main diagonal if r == c.',
+        'Anti-diagonal condition: A cell is on the anti-diagonal if r + c == N - 1.'
+      ],
+      stepByStepLogic: [
+        'Step 1: Read N from standard input.',
+        'Step 2: Run an outer loop: for (int r = 0; r < N; r++).',
+        'Step 3: Inside outer loop, run inner loop: for (int c = 0; c < N; c++).',
+        'Step 4: If r == c || r + c == N - 1, print "X", otherwise print ".".',
+        'Step 5: Output a newline after each row.'
+      ],
+      commonPitfalls: [
+        'When N is odd, the center belongs to both diagonals; print only one "X".',
+        'Do not print spaces between characters.'
+      ],
+      timeComplexity: 'O(N^2) time, O(1) space.'
+    },
+    starter: `#include <stdio.h>
+
+int main(void) {
+    int N;
+    if (scanf("%d", &N) != 1) return 0;
+
+    // Write your code here
+
+    return 0;
+}`,
+    starterJava: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        // Write your code here
+        
+    }
+}`,
+    solutionC: `#include <stdio.h>
+
+int main(void) {
+    int N;
+    if (scanf("%d", &N) != 1) return 0;
+
+    for (int r = 0; r < N; r++) {
+        for (int c = 0; c < N; c++) {
+            if (r == c || r + c == N - 1) {
+                putchar('X');
+            } else {
+                putchar('.');
+            }
+        }
+        putchar('\\n');
+    }
+
+    return 0;
+}`,
+    solution: `#include <stdio.h>
+
+int main(void) {
+    int N;
+    if (scanf("%d", &N) != 1) return 0;
+
+    for (int r = 0; r < N; r++) {
+        for (int c = 0; c < N; c++) {
+            if (r == c || r + c == N - 1) {
+                putchar('X');
+            } else {
+                putchar('.');
+            }
+        }
+        putchar('\\n');
+    }
+
+    return 0;
+}`,
+    solutionJava: `import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        if (!sc.hasNextInt()) return;
+        int N = sc.nextInt();
+
+        for (int r = 0; r < N; r++) {
+            StringBuilder sb = new StringBuilder();
+            for (int c = 0; c < N; c++) {
+                if (r == c || r + c == N - 1) {
+                    sb.append('X');
+                } else {
+                    sb.append('.');
+                }
+            }
+            System.out.println(sb.toString());
+        }
+    }
+}`,
+    expectedKeywords: ['for']
   }
 ];

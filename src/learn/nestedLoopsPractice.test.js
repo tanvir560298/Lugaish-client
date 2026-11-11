@@ -4,8 +4,8 @@ import { nestedLoopsPracticeProblems } from './nestedLoopsPracticeData.js';
 import { javaVideos, javaPracticeProblems } from './javaContent.js';
 import { cVideos, cPracticeProblems } from './cContent.js';
 
-test('Nested Loops Practice Set contains exactly 14 problems', () => {
-  assert.equal(nestedLoopsPracticeProblems.length, 14, 'Must have 14 practice problems');
+test('Nested Loops Practice Set contains exactly 16 problems', () => {
+  assert.equal(nestedLoopsPracticeProblems.length, 16, 'Must have 16 practice problems');
 });
 
 test('Difficulty distribution covers Easy, Medium, and Hard', () => {
@@ -14,8 +14,8 @@ test('Difficulty distribution covers Easy, Medium, and Hard', () => {
   const hard = nestedLoopsPracticeProblems.filter(p => p.difficulty === 'Hard');
 
   assert.equal(easy.length, 4, 'Should have 4 Easy problems');
-  assert.equal(medium.length, 5, 'Should have 5 Medium problems');
-  assert.equal(hard.length, 5, 'Should have 5 Hard problems');
+  assert.equal(medium.length, 6, 'Should have 6 Medium problems');
+  assert.equal(hard.length, 6, 'Should have 6 Hard problems');
 });
 
 test('Codeforces problems have accurate external contest URLs and IDs including Assiut Sheets', () => {
@@ -58,7 +58,7 @@ test('Codeforces problems have accurate external contest URLs and IDs including 
   assert.equal(p14.externalUrl, 'https://codeforces.com/group/MWSDmqGsZm/contest/219774/problem/H');
 });
 
-test('All 14 problems contain instructional prerequisites, step-by-step logic and dual language starters and solutions', () => {
+test('All 16 problems contain instructional prerequisites, step-by-step logic and dual language starters and solutions', () => {
   for (const prob of nestedLoopsPracticeProblems) {
     assert.ok(prob.title, `Problem ${prob.number} must have a title`);
     assert.ok(prob.statement, `Problem ${prob.number} must have a statement`);
@@ -81,10 +81,10 @@ test('All 14 problems contain instructional prerequisites, step-by-step logic an
 });
 
 test('Java Programming nested loops problems dataset remains intact and connects when scheduled', () => {
-  assert.equal(nestedLoopsPracticeProblems.length, 14);
+  assert.equal(nestedLoopsPracticeProblems.length, 16);
   if (javaVideos.some(v => v.title.toLowerCase().includes('nested loops'))) {
     const javaPracticeClass = javaVideos.find(v => v.title.toLowerCase().includes('nested loops'));
-    assert.equal(javaPracticeProblems[javaPracticeClass.id]?.length, 14);
+    assert.equal(javaPracticeProblems[javaPracticeClass.id]?.length, 16);
   }
 });
 
@@ -92,7 +92,7 @@ test('C Programming Practice Class connects to the nested loops problems', () =>
   const cPracticeClass = cVideos.find(v => v.title.toLowerCase().includes('nested loops'));
   assert.ok(cPracticeClass, 'C practice class must exist');
   assert.ok(cPracticeClass.title.toLowerCase().includes('nested loops'));
-  assert.equal(cPracticeProblems[cPracticeClass.id].length, 14);
-  assert.equal(cPracticeProblems['02'].length, 14);
-  assert.equal(cPracticeProblems['04'].length, 14);
+  assert.equal(cPracticeProblems[cPracticeClass.id].length, 16);
+  assert.equal(cPracticeProblems['02'].length, 16);
+  assert.equal(cPracticeProblems['04'].length, 16);
 });

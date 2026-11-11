@@ -529,6 +529,12 @@ export function JavaCoursePage() {
                     topicTitle={currentVideo.topicTitle || currentVideo.title}
                     compact={true}
                   />
+                ) : currentVideo.id === '04' ? (
+                  <JavaTopicPracticeListing
+                    topicSlug="loops-iterations"
+                    topicTitle={currentVideo.topicTitle || currentVideo.title}
+                    compact={true}
+                  />
                 ) : currentVideo.id === '05' ? (
                   <NestedLoopsPracticeLab
                     onPassed={handlePracticePassed}

@@ -173,3 +173,37 @@ test('Topic 07 has 8 practice problems attached with 8 Lugaish originals', () =>
   }
 });
 
+test('Topic 04 has 10 practice problems attached with 10 Lugaish originals', () => {
+  const p4 = javaPracticeProblems['04'];
+  assert.ok(Array.isArray(p4), 'Topic 04 problems must be an array');
+  assert.equal(p4.length, 10, 'Topic 04 must have exactly 10 problems');
+
+  const lugaish = p4.filter(p => p.problemType === 'lugaish');
+  assert.equal(lugaish.length, 10, 'All 10 must be Lugaish original problems');
+
+  for (const prob of lugaish) {
+    assert.ok(prob.id, 'Problem must have an ID');
+    assert.ok(prob.id.startsWith('java-loop-'), 'Topic 04 problem IDs must start with java-loop-');
+    assert.ok(prob.title, 'Problem must have a title');
+    assert.ok(prob.starterCode, 'Lugaish problem must have starter code');
+    assert.ok(Array.isArray(prob.sampleTestCases) && prob.sampleTestCases.length > 0, 'Must have sample test cases');
+  }
+});
+
+test('Topic 05 has 16 nested loop problems with 2 new appended problems', () => {
+  const p5 = javaPracticeProblems['05'];
+  assert.ok(Array.isArray(p5), 'Topic 05 problems must be an array');
+  assert.equal(p5.length, 16, 'Topic 05 must have exactly 16 problems');
+
+  const p15 = p5.find(p => p.number === 15 || p.id === 'nested-p15');
+  assert.ok(p15, 'Problem 15 must exist in Topic 05');
+  assert.equal(p15.title, 'Problem 15: Pixel Art Frame');
+  assert.ok(p15.solutionJava, 'Problem 15 must have Java solution');
+
+  const p16 = p5.find(p => p.number === 16 || p.id === 'nested-p16');
+  assert.ok(p16, 'Problem 16 must exist in Topic 05');
+  assert.equal(p16.title, 'Problem 16: Double Diagonal Radar');
+  assert.ok(p16.solutionJava, 'Problem 16 must have Java solution');
+});
+
+

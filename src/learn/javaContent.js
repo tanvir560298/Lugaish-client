@@ -158,8 +158,8 @@ export const javaPracticeProblems = {
   '01': FALLBACK_PUBLIC_PROBLEMS['basic-io-variables'] || [],
   '02': FALLBACK_PUBLIC_PROBLEMS['operators-expressions'] || [],
   '03': FALLBACK_PUBLIC_PROBLEMS['conditional-statements'] || [],
-  '04': [],
-  '05': nestedLoopsPracticeProblems, // Pre-loaded with 14 nested loop algorithm challenges
+  '04': FALLBACK_PUBLIC_PROBLEMS['loops-iterations'] || [],
+  '05': nestedLoopsPracticeProblems, // Pre-loaded with nested loop algorithm challenges
   '06': [],
   '07': FALLBACK_PUBLIC_PROBLEMS['strings-manipulation'] || [],
   '08': [],
