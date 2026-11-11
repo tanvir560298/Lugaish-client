@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { javaStringNotes } from './javaStringNotes';
+import { javaLoopNotes } from './javaLoopNotes';
 import { FALLBACK_PUBLIC_PROBLEMS } from '../practice/java/javaPracticeData';
 import {
   Sparkles,
@@ -57,6 +58,28 @@ function CodeSnippet({ code, language = 'java', title }) {
 }
 
 export function JavaTopicNotes({ video, onSwitchToPractice }) {
+  if (video.id === '04') {
+    const problems = FALLBACK_PUBLIC_PROBLEMS['loops-iterations'] || [];
+    return (
+      <article className="java-operator-notes">
+        <header><span className="java-eyebrow">TOPIC 04 / STUDY NOTES</span><h2>Loops &amp; Iterations</h2><p>Repeat work, process input and track changing state. These notes connect directly to the {problems.length} practice challenges. Start with variables, comparisons, if/else and Scanner input; the character-traversal section also introduces length() and charAt().</p></header>
+        {javaLoopNotes.map(section => <section key={section.title}>
+          <h3>{section.title}</h3><p>{section.text}</p>
+          <CodeSnippet title="Java loop examples" code={section.code} />
+          <p className="java-notes-tip"><Lightbulb size={18} aria-hidden="true" /><span>{section.tip}</span></p>
+          <div className="java-notes-related"><strong>Related practice</strong>{section.problems.map(slug => {
+            const problem = problems.find(item => item.slug === slug);
+            return problem ? <Link key={slug} to={`/practice/java/loops-iterations/${slug}`}>{problem.title}<ArrowRight size={14} aria-hidden="true" /></Link> : null;
+          })}</div>
+        </section>)}
+        <section><h3>Extra foundation: break, continue and termination</h3><p>break exits the nearest loop; continue skips the rest of the current iteration. In a for loop, continue still runs the update expression. In a while loop, an update below continue is skipped, which can cause an infinite loop. Always identify what moves your loop toward stopping.</p>
+          <CodeSnippet title="Skip an iteration" code={'for (int i = 1; i <= 5; i++) {\n    if (i == 3) continue;\n    System.out.println(i);\n}\n// Prints 1, 2, 4, 5 on separate lines.'} />
+          <p>These challenges need single-pass loops, not nested loops. Two consecutive O(n) loops still take O(n) time; placing an n-iteration loop inside another can require O(n squared) work. Save nested loops for the pattern-printing topic.</p>
+        </section>
+        <section><h3>Before you submit</h3><ul><li>Write down the initial state, stop condition and update before coding.</li><li>Check zero-iteration and one-iteration cases wherever the constraints allow them.</li><li>Keep totals and counters outside the loop; exclude sentinel values.</li><li>Use long before multiplication when totals can exceed int.</li><li>Match spaces, labels and line breaks exactly; print no input prompts.</li></ul><button className="java-start-challenge" type="button" onClick={onSwitchToPractice}>Practice Loops &amp; Iterations <ArrowRight size={16} aria-hidden="true" /></button></section>
+      </article>
+    );
+  }
   if (video.id === '07') {
     const problems = FALLBACK_PUBLIC_PROBLEMS['strings-manipulation'] || [];
     return (
