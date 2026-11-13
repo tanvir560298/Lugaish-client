@@ -59,56 +59,40 @@ export function HomePage() {
   return (
     <div className="lx-home home-redesign home-focused">
       {/* 1. HERO SECTION (5-Second Clarity: Identity, Subjects, Free Status, Primary CTA) */}
-      <section className="home-hero" aria-labelledby="home-title">
+      <section className="home-hero home-hero-refined" aria-labelledby="home-title">
         <div className="home-hero-copy">
           <p className="home-kicker">
             <span /> OPEN LEARNING PLATFORM
           </p>
           <h1 id="home-title">
-            Master practical skills.<br />
+            Master practical skills.
             <em>Build your next chapter.</em>
           </h1>
           <p className="home-intro">
-            Structured, distraction-free courses for ambitious learners.
+            Practical courses. A clearer way to learn.
           </p>
           <p className="home-description">
-            Learn IELTS English Writing, Java, C Programming, and Web Development. Guided step-by-step in clear Bangla &amp; English with interactive practice labs and Tanu AI.
+            Build your English and coding skills with step-by-step lessons, Bangla &amp; English explanations, and hands-on practice.
           </p>
 
-          {/* Quick Subject Access Pills */}
-          <div className="home-subjects-strip" aria-label="Available course tracks">
-            <Link to="/learn/ielts-writing" className="home-subject-badge featured">
-              📝 IELTS Writing (7-Day)
+          <div className="lx-actions">
+            <Link className="lx-primary" to="/learn">
+              Explore courses <ArrowUpRight size={17} />
             </Link>
-            <Link to="/learn/c-programming" className="home-subject-badge">
-              💻 C Programming
-            </Link>
-            <Link to="/learn/java-programming" className="home-subject-badge">
-              ☕ Java Core
-            </Link>
-            <Link to="/learn/web-development/html" className="home-subject-badge">
-              🌐 Web Development
-            </Link>
+            <a className="home-quiet-link" href="#learning-paths">
+              Browse learning tracks <ArrowDown size={15} />
+            </a>
           </div>
 
-          <div className="home-guide-action-card">
-            <div className="mini-guide-bot-pill">
-              <span className="mini-bot-icon">🤖</span>
-              <span><strong>Tanu Guide:</strong> Choose a track below to start learning 👇</span>
-            </div>
-            <div className="lx-actions">
-              <Link className="lx-primary" to="/learn">
-                Explore All Courses <ArrowUpRight size={18} />
-              </Link>
-              <a className="home-quiet-link" href="#learning-paths">
-                Browse Ongoing Tracks <ArrowDown size={15} />
-              </a>
-            </div>
+          <div className="home-subjects-strip" aria-label="Available course tracks">
+            <Link to="/learn/ielts-writing" className="home-subject-badge">IELTS Writing</Link>
+            <Link to="/learn/c-programming" className="home-subject-badge">C Programming</Link>
+            <Link to="/learn/java-programming" className="home-subject-badge">Java</Link>
+            <Link to="/learn/web-development/html" className="home-subject-badge">Web Development</Link>
           </div>
 
           <div className="home-hero-notes">
             <span><Check size={14} /> 100% Free Foundation Tracks</span>
-            <span><Check size={14} /> Bangla &amp; English Explanations</span>
             <span><Check size={14} /> Interactive Practice Labs</span>
           </div>
         </div>
@@ -116,12 +100,12 @@ export function HomePage() {
         <div className="home-hero-studio">
           <div className="home-studio-caption">
             <span><Code2 size={15} /> PRACTICAL LEARNING ENVIRONMENT</span>
-            <span>01 — FOUNDATION LABS</span>
+
           </div>
           <WebCourseArtwork />
           <div className="home-studio-note">
             <span><span className="web-status-dot" /> Clear concept. Guided practice. Real progress.</span>
-            <span>LEARN → PRACTISE → MASTER</span>
+
           </div>
         </div>
       </section>
