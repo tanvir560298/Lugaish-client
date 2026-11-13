@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="180" viewBox="0 0 360 180" role="img" aria-labelledby="title desc">
+<title id="title">Heading এবং paragraph-এর প্রত্যাশিত output</title>
+<desc id="desc">বড় শিরোনাম আমার প্রথম ওয়েবপেজ। নিচে আমি আজ HTML শেখা শুরু করেছি।</desc>
+<rect width="360" height="180" fill="white"/>
+<g fill="#172b3a" font-family="system-ui, Nirmala UI, sans-serif">
+<text x="16" y="76" font-size="28" font-weight="700">আমার প্রথম ওয়েবপেজ</text>
+<text x="16" y="126" font-size="16">আমি আজ HTML শেখা শুরু করেছি।</text>
+</g>
+</svg>

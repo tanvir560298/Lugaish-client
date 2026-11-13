@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, ArrowRight, Code2, Play, Globe2, Check } from 'lucide-react';
-import { htmlLessons, moduleBase } from '../learn/html-module/lessons.js';
+import { moduleBase } from '../learn/html-module/lessons.js';
 import { htmlVideos } from '../learn/htmlContent.js';
 import './course-showcase.css';
 
@@ -18,6 +18,6 @@ export function WebCourseArtwork({ compact = false }) {
 export function WebDevelopmentCourse() {
   return <article className="web-course-card" data-course="web-development">
     <div className="web-course-visual"><span className="web-course-visual-label">THE FIRST CHAPTER</span><span className="web-course-glyph" aria-hidden="true">&lt;/&gt;</span><div className="web-course-visual-bottom"><span>WEB DEVELOPMENT</span><span>01 / HTML</span></div><span className="web-course-orbit" aria-hidden="true"/></div>
-    <div className="web-course-copy"><div className="web-course-topline"><span className="web-open-label"><span/> AVAILABLE NOW</span><span className="web-course-free">Free course</span></div><h3>Web Development</h3><p>Start with HTML: read original Bengali lessons, edit live examples, solve practice problems and build your first webpage. The existing video classes are also available.</p><div className="web-course-meta"><span><Play size={15}/>{htmlLessons.length} reading lessons · {htmlVideos.length} videos</span><span><Globe2 size={15}/>Taught in Bangla</span><span><Code2 size={15}/>Beginner friendly</span></div><div className="web-course-bottom"><Link className="lx-primary" to={moduleBase}>Explore the course <ArrowRight size={17}/></Link><span><Check size={14}/> Start without an account</span></div></div>
+    <div className="web-course-copy"><div className="web-course-topline"><span className="web-open-label"><span/> AVAILABLE NOW</span><span className="web-course-free">Free course</span></div><h3>Web Development</h3><p>Start small: learn headings and paragraphs, then recreate a webpage from its output picture. Get hints and help code when you need them.</p><div className="web-course-meta"><span><Play size={15}/>Step-by-step HTML · {htmlVideos.length} videos</span><span><Globe2 size={15}/>Taught in Bangla</span><span><Code2 size={15}/>Beginner friendly</span></div><div className="web-course-bottom"><Link className="lx-primary" to={moduleBase}>Explore the course <ArrowRight size={17}/></Link><span><Check size={14}/> Start without an account</span></div></div>
   </article>;
 }

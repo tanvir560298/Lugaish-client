@@ -38,7 +38,7 @@ const ArchitectsPage = lazy(() => import('./pages/ArchitectsPage.jsx').then(modu
 const InterviewPage = lazy(() => import('./pages/InterviewPage.jsx').then(module => ({ default: module.InterviewPage })));
 const SpeakingPracticePage = lazy(() => import('./pages/SpeakingPracticePage.jsx').then(module => ({ default: module.SpeakingPracticePage })));
 const CertificatePage = lazy(() => import('./pages/CertificatePage.jsx').then(module => ({ default: module.CertificatePage })));
-const HtmlModulePage = lazy(() => import('./learn/html-module/HtmlModulePage.jsx').then(m=>({default:m.HtmlModulePage})));
+const HtmlModulePage = lazy(() => import('./learn/html-module/FirstStepsPage.jsx').then(m=>({default:m.FirstStepsPage})));
 const HtmlCoursePage = lazy(() => import('./learn/HtmlCoursePage.jsx').then(m=>({default:m.HtmlCoursePage})));
 const CCoursePage = lazy(() => import('./learn/CCoursePage.jsx').then(m=>({default:m.CCoursePage})));
 const JavaCoursePage = lazy(() => import('./learn/JavaCoursePage.jsx').then(m=>({default:m.JavaCoursePage})));
