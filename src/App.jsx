@@ -38,6 +38,7 @@ const ArchitectsPage = lazy(() => import('./pages/ArchitectsPage.jsx').then(modu
 const InterviewPage = lazy(() => import('./pages/InterviewPage.jsx').then(module => ({ default: module.InterviewPage })));
 const SpeakingPracticePage = lazy(() => import('./pages/SpeakingPracticePage.jsx').then(module => ({ default: module.SpeakingPracticePage })));
 const CertificatePage = lazy(() => import('./pages/CertificatePage.jsx').then(module => ({ default: module.CertificatePage })));
+const HtmlModulePage = lazy(() => import('./learn/html-module/HtmlModulePage.jsx').then(m=>({default:m.HtmlModulePage})));
 const HtmlCoursePage = lazy(() => import('./learn/HtmlCoursePage.jsx').then(m=>({default:m.HtmlCoursePage})));
 const CCoursePage = lazy(() => import('./learn/CCoursePage.jsx').then(m=>({default:m.CCoursePage})));
 const JavaCoursePage = lazy(() => import('./learn/JavaCoursePage.jsx').then(m=>({default:m.JavaCoursePage})));
@@ -202,6 +203,7 @@ export default function App() {
               <Route path='/manage-courses' element={<ProtectedRoute><ManageCourses /></ProtectedRoute>} />
               <Route path='/learn' element={<LearnPage />} />
               <Route path='/upcoming/:courseId' element={<UpcomingCoursePage />} />
+              <Route path='/learn/web-development/html/module-1/*' element={<HtmlModulePage />} />
               <Route path='/learn/web-development/html' element={<HtmlCoursePage />} />
               <Route path='/learn/web-development/html/:videoId' element={<HtmlCoursePage />} />
               <Route path='/learn/c-programming' element={<CCoursePage />} />
