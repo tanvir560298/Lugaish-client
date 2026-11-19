@@ -1,7 +1,7 @@
 {
   "subject": "arabic",
   "current_day": 4,
-  "last_run_timestamp": "2026-11-18T21:41:37.495533",
+  "last_run_timestamp": "2026-11-19T12:28:38.868509",
   "day_initialized_at": "2026-11-18T16:59:08.557183",
   "today_questions": {
     "1": {
@@ -45,6 +45,11 @@
     "1": {
       "post_id": "mock_post_id_123456789",
       "posted_at": "2026-11-18T21:41:37.495529",
+      "revealed": false
+    },
+    "3": {
+      "post_id": "mock_post_id_123456789",
+      "posted_at": "2026-11-19T12:28:38.868504",
       "revealed": false
     }
   }
