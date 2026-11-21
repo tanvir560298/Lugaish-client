@@ -1,5 +1,18 @@
 // Owner-supplied public YouTube references, in the requested order.
 // Titles checked against YouTube on 15 October 2026. Durations not inferred.
+export const htmlWelcomeVideo = {
+  id: '00',
+  youtubeId: 'A0exlm8BHCc',
+  title: 'Why Learn Web Development When AI Can Build Websites? | Day 0',
+  subtitle: 'Welcoming Video · Ready for a New Journey',
+  summary: 'AI এর যুগে কেন ওয়েব ডেভেলপমেন্ট শিখবেন? কোডিং শুরু করার আগে সঠিক মানসিকতা, মৌলিক ভিত্তি এবং কীভাবে এই নতুন জার্নিতে সফল হবেন তা জানুন।',
+  duration: 'Day 0 · Orientation',
+  course: 'web-development-html',
+  kind: 'video',
+  path: '/learn/web-development/html/00',
+  url: 'https://www.youtube.com/watch?v=A0exlm8BHCc'
+};
+
 export const htmlVideos = [
  ['YEZHgqqsocs','HTML basics & environment setup'],
  ['PtwgTt8RX5M','Paragraphs & text formatting'],

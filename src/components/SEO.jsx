@@ -55,6 +55,10 @@ const ROUTE_SEO = {
     title: 'Web Development — HTML in Bangla | Lugaish',
     description: 'Seven beginner HTML video lessons in Bangla, from your first tag to a portfolio website.',
   },
+  '/learn/web-development/html/00': {
+    title: 'Day 0: Why Learn Web Development When AI Can Build Websites? | Lugaish',
+    description: 'Welcoming video & orientation for Web Development in Bangla: Ready for a new journey.',
+  },
   '/signup': {
     title: 'Join Lugaish | Your Learning Campus',
     description: 'Create your Lugaish account with Google for your learning profile and study tools.',
