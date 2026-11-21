@@ -59,6 +59,10 @@ const ROUTE_SEO = {
     title: 'Day 0: Why Learn Web Development When AI Can Build Websites? | Lugaish',
     description: 'Welcoming video & orientation for Web Development in Bangla: Ready for a new journey.',
   },
+  '/learn/web-development/html/day-1': {
+    title: 'Day 1: What Is HTML? Explained in 30 Seconds | Lugaish',
+    description: 'Quick concept video explaining HTML fundamentals in 30 seconds for Web Development Day 1.',
+  },
   '/signup': {
     title: 'Join Lugaish | Your Learning Campus',
     description: 'Create your Lugaish account with Google for your learning profile and study tools.',

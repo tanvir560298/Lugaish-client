@@ -13,6 +13,19 @@ export const htmlWelcomeVideo = {
   url: 'https://www.youtube.com/watch?v=A0exlm8BHCc'
 };
 
+export const htmlDay1Video = {
+  id: 'day-1',
+  youtubeId: 'i6NGvCsGIsc',
+  title: 'What Is HTML? Explained in 30 Seconds | Web Development Day 1',
+  subtitle: '30-Second Quick Concept · Day 1',
+  summary: 'HTML আসলে কী? মাত্র ৩০ সেকেন্ডে সহজে বুঝে নিন ব্রাউজারে ওয়েবপেজের ভিত্তি কীভাবে কাজ করে।',
+  duration: '30s · Quick Concept',
+  course: 'web-development-html',
+  kind: 'video',
+  path: '/learn/web-development/html/day-1',
+  url: 'https://www.youtube.com/watch?v=i6NGvCsGIsc'
+};
+
 export const htmlVideos = [
  ['YEZHgqqsocs','HTML basics & environment setup'],
  ['PtwgTt8RX5M','Paragraphs & text formatting'],
