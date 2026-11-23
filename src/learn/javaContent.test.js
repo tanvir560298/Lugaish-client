@@ -206,13 +206,13 @@ test('Topic 05 has 16 nested loop problems with 2 new appended problems', () => 
   assert.ok(p16.solutionJava, 'Problem 16 must have Java solution');
 });
 
-test('Topic 06 has 15 array practice problems attached with 15 Lugaish originals', () => {
+test('Topic 06 has 23 array practice problems attached with 23 Lugaish originals', () => {
   const p6 = javaPracticeProblems['06'];
   assert.ok(Array.isArray(p6), 'Topic 06 problems must be an array');
-  assert.equal(p6.length, 15, 'Topic 06 must have exactly 15 problems');
+  assert.equal(p6.length, 23, 'Topic 06 must have exactly 23 problems');
 
   const lugaish = p6.filter(p => p.problemType === 'lugaish');
-  assert.equal(lugaish.length, 15, 'All 15 must be Lugaish original problems');
+  assert.equal(lugaish.length, 23, 'All 23 must be Lugaish original problems');
 
   for (const prob of lugaish) {
     assert.ok(prob.id, 'Problem must have an ID');
