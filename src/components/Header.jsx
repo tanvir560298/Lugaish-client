@@ -1,7 +1,7 @@
 import { isStudentPreview } from "../utils/roles.js";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Sun, Moon, ChevronDown, User, LogOut, ArrowUpRight, ArrowRight, Code2 } from "lucide-react";
+import { Menu, X, Sun, Moon, ChevronDown, User, LogOut, ArrowUpRight, ArrowRight, Code2, ArrowLeft } from "lucide-react";
 import { useAppContext } from "../state/AppContext.jsx";
 import { ROLES, getViewedRole } from "../utils/roles.js";
 import "./header.css";
@@ -112,6 +112,109 @@ export function Header() {
       </button>
     </>
   );
+  const isWebDevLearning = /^\/learn\/web-development\/html(\/.*)?$/.test(pathname);
+  if (isWebDevLearning) {
+    return (
+      <header className="site-header academic-header studio-header compact-learning-header" ref={header}>
+        <div className="compact-learning-header-inner">
+          <div className="compact-header-left">
+            <Link to="/" className="compact-brand" aria-label="Lugaish home">
+              <img src="/favicon.png" alt="" />
+              <span>
+                Lugaish<span className="brand-period">.</span>
+              </span>
+            </Link>
+            <span className="compact-header-sep" aria-hidden="true">/</span>
+            <Link to="/learn" className="compact-back-btn" title="Back to all courses">
+              <ArrowLeft size={15} />
+              <span>Courses</span>
+            </Link>
+            <span className="compact-header-sep hidden sm:inline" aria-hidden="true">/</span>
+            <span className="compact-course-name hidden sm:inline-flex">
+              Web Development
+            </span>
+          </div>
+
+          <div className="academic-header-actions compact-header-actions">
+            <button
+              className="header-control academic-icon compact-theme-btn"
+              onClick={actions.toggleTheme}
+              aria-label={themeLabel}
+              title={themeLabel}
+            >
+              {state.theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
+            </button>
+            {state.isLoggedIn ? (
+              <div className="academic-account" ref={account}>
+                <button
+                  ref={accountButton}
+                  data-tour="account-menu"
+                  className="academic-account-trigger compact-account-trigger"
+                  aria-label={accountOpen ? "Close account menu" : "Open account menu"}
+                  aria-expanded={accountOpen}
+                  aria-controls="account-navigation"
+                  onClick={() => {
+                    setAccountOpen((v) => !v);
+                    setMobileOpen(false);
+                  }}
+                >
+                  <User size={16} />
+                  <span className="compact-user-name">{state.userName || "Account"}</span>
+                  <ChevronDown size={14} />
+                </button>
+                {accountOpen && (
+                  <nav
+                    id="account-navigation"
+                    className="academic-account-panel"
+                    aria-label="Account navigation"
+                  >
+                    {accountLinks}
+                  </nav>
+                )}
+              </div>
+            ) : (
+              <Link className="header-signin compact-signin-btn" to="/login">
+                Sign in
+              </Link>
+            )}
+            <button
+              ref={menu}
+              data-tour="mobile-menu"
+              className="header-menu academic-icon compact-menu-btn"
+              aria-label={
+                mobileOpen ? "Close navigation menu" : "Open navigation menu"
+              }
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-navigation"
+              onClick={() => {
+                setMobileOpen((v) => !v);
+                setAccountOpen(false);
+              }}
+            >
+              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
+        </div>
+        {mobileOpen && (
+          <nav
+            id="mobile-navigation"
+            className="mobile-nav academic-mobile-nav"
+            aria-label="Mobile navigation"
+          >
+            <div className="mobile-nav-caption">EXPLORE LUGAISH</div>
+            {links.map(([href, label], index) => (
+              <Link key={href} to={href} aria-current={active(href) ? "page" : undefined}>
+                <span className="mobile-nav-number">0{index + 1}</span><span>{label}</span><ArrowUpRight size={17}/>
+              </Link>
+            ))}
+            <Link className="mobile-course-highlight" to="/learn/web-development/html"><Code2 size={20}/><span>Web Development<small>Free · 2 beginner lessons</small></span><ArrowRight size={17}/></Link>
+            {!state.isLoggedIn && <Link className="mobile-signin" to="/login">Already learning? <strong>Sign in <ArrowUpRight size={14}/></strong></Link>}
+          </nav>
+        )}
+      </header>
+    );
+  }
+
   return (
     <header className="site-header academic-header studio-header" ref={header}>
       <div className="academic-header-inner">

@@ -9,10 +9,11 @@ export function Layout({ children }) {
   const { pathname } = useLocation();
   const isClassroom = /^\/classroom(\/immersive|-preview)$/.test(pathname);
   const isStudyRoom = /^\/study-room(\/library|-preview)$/.test(pathname);
+  const isWebDevLearning = /^\/learn\/web-development\/html(\/.*)?$/.test(pathname);
   const previewing = isStudentPreview(state);
   if(isClassroom)return <main id="main-content" tabIndex={-1} className="classroom-route-shell">{children}</main>;
   return (
-    <div className={`main-container bg-bg text-slate-100 ${isStudyRoom ? 'has-study-library' : ''}`}>
+    <div className={`main-container bg-bg text-slate-100 ${isStudyRoom ? 'has-study-library' : ''} ${isWebDevLearning ? 'is-webdev-workspace' : ''}`}>
       <a href="#main-content" className="campus-skip-link">Skip to content</a>
       <Header />
       {previewing && (
@@ -21,8 +22,8 @@ export function Layout({ children }) {
           <button type="button" onClick={actions.toggleWebDeveloperMode} className="ml-2 underline underline-offset-2">Exit preview</button>
         </div>
       )}
-      <main id="main-content" tabIndex={-1} className={isStudyRoom?'study-library-route-shell':'app-shell py-4 sm:py-6 lg:py-8'}>{children}</main>
-      {!isStudyRoom&&<Footer />}
+      <main id="main-content" tabIndex={-1} className={isStudyRoom ? 'study-library-route-shell' : isWebDevLearning ? 'webdev-learning-main' : 'app-shell py-4 sm:py-6 lg:py-8'}>{children}</main>
+      {!isStudyRoom && !isWebDevLearning && <Footer />}
     </div>
   );
 }

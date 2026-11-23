@@ -12,7 +12,7 @@ export function cleanWorkspace(value) {
       if (!task || typeof task.id !== 'string' || !task.id || task.id.length > 100 || ids.has(task.id) || typeof task.text !== 'string' || !task.text.trim()) return false;
       ids.add(task.id); return true;
     }).slice(0, 12).map(task => ({ id: task.id, text: task.text.trim().slice(0, 200), done: task.done === true })),
-    watched: [...new Set((Array.isArray(source.watched) ? source.watched : []).filter(id => /^(0[1-7])$/.test(id)))],
+    watched: [...new Set((Array.isArray(source.watched) ? source.watched : []).filter(id => ['00', 'day-1'].includes(id)))],
   };
 }
 export function studySummary(history, now = Date.now()) {

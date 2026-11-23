@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { cleanWorkspace, studySummary, calendarDay, youtubeId } from './workspaceState.js';
 test('workspace restoration bounds tasks and rejects duplicate ids, malformed values and invented lesson progress', () => {
-  const saved = cleanWorkspace({ target: 999, tasks: [{ id: 'a', text: ' Read chapter 3 ', done: true }, { id: 'a', text: 'Duplicate' }, { id: 'b', text: ' ' }, null], watched: ['01', '01', '07', '08', '<script>'] });
-  assert.deepEqual(saved, { target: 60, tasks: [{ id: 'a', text: 'Read chapter 3', done: true }], watched: ['01', '07'] });
+  const saved = cleanWorkspace({ target: 999, tasks: [{ id: 'a', text: ' Read chapter 3 ', done: true }, { id: 'a', text: 'Duplicate' }, { id: 'b', text: ' ' }, null], watched: ['00', '00', 'day-1', '01', '08', '<script>'] });
+  assert.deepEqual(saved, { target: 60, tasks: [{ id: 'a', text: 'Read chapter 3', done: true }], watched: ['00', 'day-1'] });
   assert.equal(cleanWorkspace(null).tasks.length, 0);
 });
 test('daily recap counts only real unique finished sessions and uses local calendar dates', () => {
