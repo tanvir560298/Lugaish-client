@@ -63,6 +63,10 @@ const ROUTE_SEO = {
     title: 'Day 1: What Is HTML? Explained in 30 Seconds | Lugaish',
     description: 'Quick concept video explaining HTML fundamentals in 30 seconds for Web Development Day 1.',
   },
+  '/learn/web-development/html/css-1': {
+    title: 'CSS Introduction · Video 1 | Web Development | Lugaish',
+    description: 'Start learning CSS after completing HTML: style and design modern web pages.',
+  },
   '/signup': {
     title: 'Join Lugaish | Your Learning Campus',
     description: 'Create your Lugaish account with Google for your learning profile and study tools.',

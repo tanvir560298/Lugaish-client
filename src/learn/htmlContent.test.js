@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {htmlVideos,htmlExercises,cleanHtmlProgress} from './htmlContent.js';
 import {makeSession,sessionRoute} from '../tanu/session.js';
-test('HTML catalog publishes exactly the two current animated lessons',()=>{
- assert.deepEqual(htmlVideos.map(v=>v.youtubeId),['A0exlm8BHCc','i6NGvCsGIsc']);
+test('HTML & CSS catalog publishes the approved animated lessons in order',()=>{
+ assert.deepEqual(htmlVideos.map(v=>v.youtubeId),['A0exlm8BHCc','i6NGvCsGIsc','cX3x7TLxe8k']);
  for(const v of htmlVideos) assert.equal(new URL(v.url).searchParams.get('v'),v.youtubeId);
  assert.deepEqual(htmlExercises,{});
 });

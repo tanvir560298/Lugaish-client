@@ -2,16 +2,20 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { allHtmlLessons, htmlModules, cleanHtmlProgress, isHtmlLessonUnlocked } from './htmlContent.js';
 import { recordPlayback, watchedFraction, canCompletePlayback, htmlProgressKey } from './htmlWatchProgress.js';
-test('only approved Day 0 and HTML lessons are published across the catalog', () => {
-  assert.deepEqual(allHtmlLessons.map(l => [l.id,l.youtubeId]), [['00','A0exlm8BHCc'],['day-1','i6NGvCsGIsc']]);
-  assert.deepEqual(htmlModules.flatMap(m => m.lessons).map(l => l.id), ['00','day-1']);
-  assert.deepEqual(cleanHtmlProgress(['01','07','00','00','day-1',null]), ['00','day-1']);
+test('only approved Day 0, HTML, and CSS lessons are published in order across the catalog', () => {
+  assert.deepEqual(allHtmlLessons.map(l => [l.id,l.youtubeId]), [['00','A0exlm8BHCc'],['day-1','i6NGvCsGIsc'],['css-1','cX3x7TLxe8k']]);
+  assert.deepEqual(htmlModules.flatMap(m => m.lessons).map(l => l.id), ['00','day-1','css-1']);
+  assert.deepEqual(cleanHtmlProgress(['01','07','00','00','day-1','css-1',null]), ['00','day-1','css-1']);
 });
-test('progression checks all prerequisites, including a direct URL', () => {
+test('progression checks all prerequisites, including a direct URL, and locks CSS behind HTML', () => {
   assert.equal(isHtmlLessonUnlocked('00',[]),true);
   assert.equal(isHtmlLessonUnlocked('day-1',[]),false);
   assert.equal(isHtmlLessonUnlocked('day-1',['day-1']),false);
   assert.equal(isHtmlLessonUnlocked('day-1',['00']),true);
+  assert.equal(isHtmlLessonUnlocked('css-1',[]),false);
+  assert.equal(isHtmlLessonUnlocked('css-1',['00']),false);
+  assert.equal(isHtmlLessonUnlocked('css-1',['day-1']),false);
+  assert.equal(isHtmlLessonUnlocked('css-1',['00','day-1']),true);
   assert.equal(isHtmlLessonUnlocked('01',['00','day-1']),false);
 });
 test('natural playback earns completion only after reaching the end', () => {
